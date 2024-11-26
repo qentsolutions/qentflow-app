@@ -39,7 +39,7 @@ export default function TermsOfUse() {
         <h2 className="text-xl font-semibold mb-2">4. Changes to the Terms</h2>
         <p className="mb-4">
           We reserve the right to update these Terms of Use at any time. If changes are made, we will notify you by
-          updating the &apos;Last Updated&apos; date at the top of this page.
+          updating the "Last Updated" date at the top of this page.
         </p>
   
         <p className="mb-4">Last Updated: November 21, 2024</p>
