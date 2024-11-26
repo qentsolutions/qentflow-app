@@ -16,6 +16,9 @@ type Board = {
   updatedAt: string;
 };
 
+export const dynamic = 'force-dynamic';
+
+
 export const BoardList = () => {
   const [boards, setBoards] = useState<Board[]>([]);
   const [loading, setLoading] = useState(true);
