@@ -6,6 +6,11 @@ import Google from "next-auth/providers/google";
 import { LoginSchema } from "@/schemas";
 import { getUserByEmail } from "@/data/user";
 
+// Ajoutez cette ligne pour désactiver le runtime Edge
+export const config = {
+  runtime: "nodejs", // Utilise Node.js classique pour cette fonction
+};
+
 export default {
   providers: [
     Google({

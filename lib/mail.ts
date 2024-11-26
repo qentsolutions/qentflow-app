@@ -1,22 +1,22 @@
 import AWS from 'aws-sdk';
 
-if (!process.env.AWS_REGION || 
-    !process.env.AWS_ACCESS_KEY_ID || 
-    !process.env.AWS_SECRET_ACCESS_KEY || 
-    !process.env.AWS_SES_FROM_EMAIL) {
+if (!process.env.NEXT_AWS_REGION || 
+    !process.env.NEXT_AWS_ACCESS_KEY_ID || 
+    !process.env.NEXT_AWS_SECRET_ACCESS_KEY || 
+    !process.env.NEXT_AWS_SES_FROM_EMAIL) {
   throw new Error("Missing AWS SES configuration environment variables");
 }
 
 const ses = new AWS.SES({
-  region: process.env.AWS_REGION,
+  region: process.env.NEXT_AWS_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: process.env.NEXT_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.NEXT_AWS_SECRET_ACCESS_KEY,
   },
 });
 
 const domain = process.env.NEXT_PUBLIC_APP_URL;
-const fromEmail = process.env.AWS_SES_FROM_EMAIL;
+const fromEmail = process.env.NEXT_AWS_SES_FROM_EMAIL;
 
 const sendEmail = async (
   to: string,
