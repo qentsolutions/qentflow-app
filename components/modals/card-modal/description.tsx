@@ -1,7 +1,6 @@
 "use client";
 
 import { toast } from "sonner";
-import { AlignLeft } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState, useRef, ElementRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -19,7 +18,7 @@ import { TextAlignLeftIcon } from "@radix-ui/react-icons";
 
 interface DescriptionProps {
   data: CardWithList;
-};
+}
 
 export const Description = ({
   data
@@ -85,10 +84,19 @@ export const Description = ({
     })
   }
 
+  const formatDescription = (text: string) => {
+    return text.split('\n').map((line, index) => (
+      <span key={index}>
+        {line}
+        <br />
+      </span>
+    ));
+  };
+
   return (
     <div className="flex items-start gap-x-3 w-full">
       <div className="w-full">
-        <span className="flex items-center font-bold text-lg  mb-6">
+        <span className="flex items-center font-bold text-lg mb-6">
           <TextAlignLeftIcon className="mr-2" /> Description
         </span>
         {isEditing ? (
@@ -123,9 +131,11 @@ export const Description = ({
           <div
             onClick={enableEditing}
             role="button"
-            className="min-h-[200px] border text-sm font-medium py-3 px-3.5 rounded-md"
+            className="min-h-[200px] border text-sm font-medium py-3 px-3.5 rounded-md whitespace-pre-wrap"
           >
-            {data.description || "Add a more detailed description..."}
+            {data.description 
+              ? formatDescription(data.description)
+              : "Add a more detailed description..."}
           </div>
         )}
       </div>
@@ -144,3 +154,4 @@ Description.Skeleton = function DescriptionSkeleton() {
     </div>
   );
 };
+

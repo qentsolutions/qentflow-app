@@ -100,7 +100,7 @@ export const ListItem = ({ data, index }: ListItemProps) => {
                           </ContextMenuTrigger>
                           <ContextMenuContent>
                             <ContextMenuItem>
-                              Copy
+                              Duplicate
                             </ContextMenuItem>
                             <ContextMenuSeparator />
                             <ContextMenuItem

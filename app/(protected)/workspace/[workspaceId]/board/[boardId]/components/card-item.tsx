@@ -57,7 +57,7 @@ export const CardItem = ({ data, index }: CardItemProps) => {
           ref={provided.innerRef}
           role="button"
           onClick={() => cardModal.onOpen(data.id)}
-          className="truncate border bg-white rounded-lg shadow-sm hover:border-black"
+          className="border bg-white rounded-lg shadow-sm hover:border-black"
         >
           <div className="p-3 space-y-3">
             <div className="flex items-start gap-x-2 gap-y-2 flex-wrap">
