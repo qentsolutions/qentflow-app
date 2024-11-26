@@ -8,6 +8,8 @@ import { getPasswordResetTokenByToken } from "@/data/password-reset-token";
 import { getUserByEmail } from "@/data/user";
 import { db } from "@/lib/db";
 
+export const runtime = 'nodejs';
+
 export const newPassword = async (
   values: z.infer<typeof NewPasswordSchema> ,
   token?: string | null,

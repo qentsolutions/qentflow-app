@@ -11,6 +11,8 @@ import { currentUser } from "@/lib/auth";
 import { generateVerificationToken } from "@/lib/tokens";
 import { sendVerificationEmail } from "@/lib/mail";
 
+export const runtime = 'nodejs';
+
 export const settings = async (
   values: z.infer<typeof SettingsSchema>
 ) => {
