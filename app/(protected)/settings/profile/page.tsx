@@ -5,7 +5,6 @@ import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 
 const ProfilePage = () => {
   const user = useCurrentUser();
@@ -24,7 +23,7 @@ const ProfilePage = () => {
               </Avatar>
               <h2 className="text-2xl font-semibold">{user?.name}</h2>
               <p className="text-muted-foreground">{user?.email}</p>
-              {currentWorkspace?.members.find((m) => m.user.id === user?.id)?.role === "OWNER" && (
+              {currentWorkspace?.members.find((m) => m.user.id === user?.id)?.role === "ADMIN" && (
                 <Badge variant="secondary">Workspace Owner</Badge>
               )}
             </div>

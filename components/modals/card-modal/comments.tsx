@@ -20,6 +20,7 @@ type CommentsProps = {
   cardId: string;
 };
 
+
 export const Comments = ({ items, cardId }: CommentsProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
@@ -29,11 +30,7 @@ export const Comments = ({ items, cardId }: CommentsProps) => {
   const params = useParams();
   const user = useCurrentUser();
 
-  if (!user) {
-    toast.error("User not found or not authenticated.");
-    return null;  // Or handle the absence of the user differently
-  }
-
+  // Appel des hooks avant la logique conditionnelle
   const { execute: executeCreateComment, fieldErrors } = useAction(createComment, {
     onSuccess: (newComment) => {
       toast.success("Comment added!");
@@ -59,8 +56,11 @@ export const Comments = ({ items, cardId }: CommentsProps) => {
     onError: (error) => toast.error(error),
   });
 
-
-
+  // Vérification de l'utilisateur après avoir appelé les hooks
+  if (!user) {
+    toast.error("User not found or not authenticated.");
+    return null;  // Ou handlez l'absence de l'utilisateur autrement
+  }
 
   const handleSubmit = async (formData: FormData) => {
     const text = formData.get("new-comment") as string;
@@ -103,7 +103,6 @@ export const Comments = ({ items, cardId }: CommentsProps) => {
     }
   };
 
-
   const sortedComments = [...comments].sort((a, b) =>
     sortOrder === "newest"
       ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -126,6 +125,7 @@ export const Comments = ({ items, cardId }: CommentsProps) => {
     </div>
   );
 };
+
 
 const CommentForm = ({
   isEditing,
@@ -222,7 +222,7 @@ const CommentList = ({ comments, onDelete, user }: { comments: Comment[]; onDele
       <ul className="space-y-8">
         {comments.map((comment) => (
           <li key={comment.id}>
-            <div className="group flex items-start space-x-4"> 
+            <div className="group flex items-start space-x-4">
               <Avatar>
                 <AvatarImage src={comment.user?.image} alt={comment.user?.name || "undefined"} />
                 <AvatarFallback>{comment.user.name.charAt(0) ?? "?"}</AvatarFallback>

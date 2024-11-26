@@ -90,9 +90,8 @@ export function TeamSwitcher({
                         </DropdownMenuLabel>
 
                         {workspaces.map((workspace) => (
-                            <div className="flex items-center w-full">
+                            <div key={workspace.id} className="flex items-center w-full">
                                 <DropdownMenuItem
-                                    key={workspace.id}
                                     onClick={() => handleWorkspaceSelect(workspace)}
                                     className={`${currentWorkspace?.id === workspace.id ? "bg-blue-50 text-black w-full" : "text-muted-foreground w-full"
                                         }`}  // Condition pour appliquer le fond bleu si c'est le workspace sélectionné

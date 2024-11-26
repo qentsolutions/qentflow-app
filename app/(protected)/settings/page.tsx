@@ -84,7 +84,7 @@ const SettingsPage = () => {
       <CardHeader>
         <p className="text-2xl font-semibold text-center">
           ⚙️ Settings
-          {currentWorkspace?.members.find((m) => m.user.id === user?.id)?.role === "OWNER" && (
+          {currentWorkspace?.members.find((m) => m.user.id === user?.id)?.role === "ADMIN" && (
             <span className="text-sm text-gray-500"> - Workspace Owner</span>
           )}
         </p>

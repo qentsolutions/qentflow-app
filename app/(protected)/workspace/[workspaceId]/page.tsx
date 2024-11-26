@@ -65,8 +65,8 @@ const ManageWorkspacesPage = () => {
     };
 
     const filteredMembers = currentWorkspace?.members.filter((member) =>
-        member.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        member.user.email.toLowerCase().includes(searchTerm.toLowerCase())
+        member.user.name && member.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        member.user.email && member.user.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
