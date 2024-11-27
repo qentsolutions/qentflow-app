@@ -144,8 +144,7 @@ const CommentForm = ({
   handleSubmit: (formData: FormData) => void;
   fieldErrors: any;
 }) => (
-  <div>
-    <h2 className="text-base font-medium">Add a comment</h2>
+  <div className="mt-4">
     <form
       onSubmit={(e) => {
         e.preventDefault();

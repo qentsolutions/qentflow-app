@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { WorkspaceProvider } from '@/hooks/use-current-workspace';
 import { ModalProvider } from '@/providers/modal-provider'
 import { QueryProvider } from '@/providers/query-provider'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -26,13 +27,15 @@ export default async function RootLayout({
     <SessionProvider session={session}>
       <WorkspaceProvider>
         <QueryProvider>
+          <TooltipProvider>
             <html lang="en">
-          <body className={inter.className}>
-            <Toaster />
-            <ModalProvider />
-            {children}
-          </body>
-        </html>
+              <body className={inter.className}>
+                <Toaster />
+                <ModalProvider />
+                {children}
+              </body>
+            </html>
+          </TooltipProvider>
         </QueryProvider>
       </WorkspaceProvider>
     </SessionProvider>

@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { Copy, Trash, Check, Plus, X } from "lucide-react";
+import { Copy, Trash, Check, Plus, X, PlusCircle, Info, Pencil } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -17,6 +17,8 @@ import { addTagToCard } from "@/actions/tasks/add-tag-to-card";
 import { Badge } from "@/components/ui/badge"; // Importer le composant Badge
 import { removeTagFromCard } from "@/actions/tasks/delete-tag-from-card";
 import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ActionsProps {
   data: CardWithList;
@@ -207,9 +209,21 @@ export const Actions = ({
       <CardContent>
         <div className="space-y-4 mt-4">
           <div>
-            <p className="text-lg font-semibold my-2">Tags</p>
+            <div className="flex items-center">
+              <p className="text-lg font-semibold my-2">Tags</p>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info size={14} className="ml-1 cursor-pointer" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-sm text-muted-foreground">
+                    Add tags to categorize your cards.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <div
-              className={`border rounded-md p-2 cursor-pointer ${isEditMode ? "ring-2 ring-blue-500" : ""}`}
+              className={`relative border rounded-md p-2 bg-gray-50 cursor-pointer group ${isEditMode ? "ring-2 ring-blue-500" : ""}`}
               onClick={() => setIsEditMode((prev) => !prev)} // Toggle l'état
             >
               <div className="flex flex-wrap gap-2">
@@ -239,7 +253,20 @@ export const Actions = ({
                 )}
               </div>
 
+              {/* Pencil Icon */}
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  className="flex items-center justify-center text-gray-400 hover:text-gray-600"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsEditMode((prev) => !prev);
+                  }}
+                >
+                  {isEditMode ? <Check size={14} /> : <Pencil size={14} />}
+                </button>
+              </div>
             </div>
+
             {isEditMode && (
               <Select
                 value={selectedTag || ""}
@@ -253,8 +280,15 @@ export const Actions = ({
                   <SelectValue placeholder="Select a tag" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="ok" className="hover:bg-gray-50">
+                    <div className="flex items-center ">
+                      <PlusCircle size={14} className="mr-2" />
+                      New tag
+                    </div>
+                  </SelectItem>
+                  <Separator />
                   {availableTags.map((tag) => (
-                    <SelectItem key={tag.id} value={tag.id}>
+                    <SelectItem key={tag.id} value={tag.id} className="hover:bg-gray-50">
                       <div className="flex items-center">
                         {tag.name}
                         {linkedTags.includes(tag.name) && <Check className="ml-2 h-4 w-4 text-green-500" />}
@@ -319,7 +353,7 @@ export const Actions = ({
             </DialogContent>
           </Dialog>
         </div >
-        </CardContent>
+      </CardContent>
     </Card>
   );
 };
