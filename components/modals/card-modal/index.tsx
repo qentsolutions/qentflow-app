@@ -46,7 +46,7 @@ export const CardModal = () => {
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className=" overflow-y-auto">
+      <SheetContent className="overflow-y-auto">
         {!cardData ? (
           <Header.Skeleton />
         ) : (
