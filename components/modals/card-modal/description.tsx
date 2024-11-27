@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { useParams } from "next/navigation";
 import { useState, useRef, ElementRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEventListener, useOnClickOutside } from "usehooks-ts";
+import { useEventListener } from "usehooks-ts";
 import { TextAlignLeftIcon } from "@radix-ui/react-icons";
 import { useAction } from "@/hooks/use-action";
 import { updateCard } from "@/actions/tasks/update-card";
@@ -36,7 +36,6 @@ export const Description = ({
     }
   };
   useEventListener("keydown", onKeyDown);
-  useOnClickOutside(formRef, disableEditing);
   const { execute } = useAction(updateCard, {
     onSuccess: (data) => {
       queryClient.invalidateQueries({

@@ -16,6 +16,7 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { ActivityIcon, Logs, MessageSquareText } from "lucide-react";
 import { Tabs, TabsTrigger, TabsContent, TabsList } from "@/components/ui/tabs";
 import { useParams } from "next/navigation";
+import Details from "./details";
 
 export const CardModal = () => {
   const id = useCardModal((state) => state.id);
@@ -90,7 +91,10 @@ export const CardModal = () => {
           {!cardData ? (
             <Actions.Skeleton />
           ) : (
+            <div>
+            <Details card={cardData} />
             <Actions data={cardData} availableTags={availableTags ?? []} />
+            </div>
           )}
         </div>
       </SheetContent>

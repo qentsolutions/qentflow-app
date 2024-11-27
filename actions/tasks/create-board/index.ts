@@ -26,16 +26,33 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  let board;
-
   try {
-    board = await db.board.create({
+    // Créer le board et récupérer son id
+    const board = await db.board.create({
       data: {
         title,
         workspaceId,
       },
     });
 
+    // Vérification pour s'assurer que le board est bien créé
+    if (!board || !board.id) {
+      throw new Error("Failed to retrieve board ID after creation.");
+    }
+
+    // Créer automatiquement les listes associées
+    const defaultLists = ["To Do", "In Progress", "Done"];
+    const listsData = defaultLists.map((listTitle, index) => ({
+      title: listTitle,
+      order: index, // Ordre des listes
+      boardId: board.id,
+    }));
+
+    await db.list.createMany({
+      data: listsData,
+    });
+
+    // Ajouter un audit log pour la création du board
     await createAuditLog({
       entityTitle: board.title,
       entityId: board.id,
@@ -43,14 +60,17 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       action: ACTION.CREATE,
       workspaceId,
     });
+
+    // Revalidation du chemin pour mettre à jour le cache
+    revalidatePath(`/workspace/${workspaceId}/board/${board.id}`);
+
+    return { data: board };
   } catch (error) {
+    console.error("Error creating board or lists:", error);
     return {
       error: "Failed to create.",
     };
   }
-
-  revalidatePath(`/workspace/${workspaceId}board/${board.id}`);
-  return { data: board };
 };
 
 export const createBoard = createSafeAction(CreateBoard, handler);

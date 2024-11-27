@@ -8,6 +8,7 @@ import { FormInput } from "@/components/form/form-input";
 import { ListOptions } from "./list-options";
 import { updateList } from "@/actions/tasks/update-list";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
+import { Pencil } from "lucide-react";
 
 interface ListWithCards extends List {
   cards: { id: string }[]; // Définir la structure des cartes
@@ -103,13 +104,16 @@ export const ListHeader = ({ data, onAddCard }: ListHeaderProps) => {
         ) : (
           <div
             onClick={enableEditing}
-            className="w-full text-sm px-2.5 py-1 h-7 font-medium border-transparent flex items-center"
+            className="w-full text-sm px-2.5 py-1 h-7 font-medium border-transparent flex items-center relative hover:cursor-pointer transition-colors duration-200"
           >
-            {title}
-            <span className="ml-2 flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-500 text-xs font-bold rounded-full">
+            <span className="flex items-center hover:bg-gray-200 rounded-lg p-1">
+              {title}
+            </span>
+            <span className="ml-1 flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-500 text-xs font-bold rounded-full">
               {data.cards.length}
             </span>
           </div>
+
         )}
       </div>
       <ListOptions onAddCard={onAddCard} data={data} />

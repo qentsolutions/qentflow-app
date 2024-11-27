@@ -108,9 +108,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
               <TabsContent value="overview">Overview</TabsContent>
               <TabsContent value="list">List</TabsContent>
               <TabsContent value="board">
-                <div className="overflow-x-auto">
                   <ListContainer boardId={board?.id} data={board.lists} />
-                </div>
               </TabsContent>
               <TabsContent value="timeline">Timeline</TabsContent>
             </Tabs>

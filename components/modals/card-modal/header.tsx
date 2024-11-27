@@ -10,7 +10,6 @@ import { updateCard } from "@/actions/tasks/update-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormInput } from "@/components/form/form-input";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
-import { Badge } from "@/components/ui/badge";
 
 interface HeaderProps {
   data: CardWithList;
@@ -100,9 +99,6 @@ export const Header = ({
             </p>
           )}
         </form>
-        <p className="text-sm text-muted-foreground mt-4">
-          <Badge className="bg-blue-500 text-white py-1 px-4 text-sm">{data.list.title}</Badge>
-        </p>
       </div>
     </div>
   );

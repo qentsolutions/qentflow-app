@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { addTagToCard } from "@/actions/tasks/add-tag-to-card";
 import { Badge } from "@/components/ui/badge"; // Importer le composant Badge
 import { removeTagFromCard } from "@/actions/tasks/delete-tag-from-card";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface ActionsProps {
   data: CardWithList;
@@ -202,120 +203,124 @@ export const Actions = ({
 
 
   return (
-    <div className="space-y-4 mt-2">
-      <p className="text-xs font-semibold">Actions</p>
-      <Button
-        onClick={onCopy}
-        disabled={isLoadingCopy}
-        variant="outline"
-        className="w-full justify-start"
-        size="default"
-      >
-        <Copy className="h-4 w-4 mr-2" />
-        Duplicate
-      </Button>
-      <Dialog>
-        <DialogTrigger className="w-full">
+    <Card className="mt-4 shadow-none">
+      <CardContent>
+        <div className="space-y-4 mt-4">
+          <div>
+            <p className="text-lg font-semibold my-2">Tags</p>
+            <div
+              className={`border rounded-md p-2 cursor-pointer ${isEditMode ? "ring-2 ring-blue-500" : ""}`}
+              onClick={() => setIsEditMode((prev) => !prev)} // Toggle l'état
+            >
+              <div className="flex flex-wrap gap-2">
+                {linkedTags.length === 0 ? (
+                  <span className="text-gray-400 text-xs">Add tags</span>
+                ) : (
+                  linkedTags.map((tag) => {
+                    const tagId = availableTags.find((t) => t.name === tag)?.id || "";
+                    return (
+                      <Badge
+                        key={tagId}
+                        className={`relative flex items-center ${getRandomColor(tagId)} group`}
+                      >
+                        {tag}
+                        <button
+                          className="absolute -right-2 -top-2 h-4 w-4 bg-white rounded-full flex items-center justify-center shadow-lg border opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onRemoveTag(tagId);
+                          }}
+                        >
+                          <X className="h-3 w-3 text-red-500" />
+                        </button>
+                      </Badge>
+                    );
+                  })
+                )}
+              </div>
+
+            </div>
+            {isEditMode && (
+              <Select
+                value={selectedTag || ""}
+                onValueChange={(value) => {
+                  setSelectedTag(value);
+                  onAddTag(value);
+                }}
+                disabled={isLoadingAddTag}
+              >
+                <SelectTrigger className="w-full mt-2">
+                  <SelectValue placeholder="Select a tag" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableTags.map((tag) => (
+                    <SelectItem key={tag.id} value={tag.id}>
+                      <div className="flex items-center">
+                        {tag.name}
+                        {linkedTags.includes(tag.name) && <Check className="ml-2 h-4 w-4 text-green-500" />}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+
+          </div>
+          <p className="text-lg font-semibold">Actions</p>
           <Button
+            onClick={onCopy}
+            disabled={isLoadingCopy}
             variant="outline"
             className="w-full justify-start"
             size="default"
           >
-            <Trash className="h-4 w-4 mr-2" />
-            Delete
+            <Copy className="h-4 w-4 mr-2" />
+            Duplicate
           </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <p className="text-base text-muted-foreground mb-4">
-            Are you sure you want to delete this card? This action is irreversible.
-          </p>
-          <div className="flex items-center">
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete();
-              }}
-              disabled={isLoadingDelete}
-              variant="destructive"
-              className="w-full justify-center mr-8"
-              size="default"
-            >
-              <Trash className="h-4 w-4 mr-1" />
-              Delete
-            </Button>
-            <DialogClose className="w-full">
+          <Dialog>
+            <DialogTrigger className="w-full">
               <Button
                 variant="outline"
-                className="w-full justify-center cursor-pointer"
+                className="w-full justify-start"
                 size="default"
               >
-                Cancel
+                <Trash className="h-4 w-4 mr-2" />
+                Delete
               </Button>
-            </DialogClose>
-          </div>
-        </DialogContent>
-      </Dialog>
-      <div>
-        <p className="text-xs font-semibold mb-2">Tags</p>
-        <div
-          className={`border rounded-md p-2 cursor-pointer ${isEditMode ? "ring-2 ring-blue-500" : ""}`}
-          onClick={() => setIsEditMode((prev) => !prev)} // Toggle l'état
-        >
-          <div className="flex flex-wrap gap-2">
-            {linkedTags.length === 0 ? (
-              <span className="text-gray-400 text-xs">Add tags</span>
-            ) : (
-              linkedTags.map((tag) => {
-                const tagId = availableTags.find((t) => t.name === tag)?.id || "";
-                return (
-                  <Badge
-                    key={tagId}
-                    className={`relative flex items-center ${getRandomColor(tagId)} group`}
+            </DialogTrigger>
+            <DialogContent>
+              <p className="text-base text-muted-foreground mb-4">
+                Are you sure you want to delete this card? This action is irreversible.
+              </p>
+              <div className="flex items-center">
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete();
+                  }}
+                  disabled={isLoadingDelete}
+                  variant="destructive"
+                  className="w-full justify-center mr-8"
+                  size="default"
+                >
+                  <Trash className="h-4 w-4 mr-1" />
+                  Delete
+                </Button>
+                <DialogClose className="w-full">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-center cursor-pointer"
+                    size="default"
                   >
-                    {tag}
-                    <button
-                      className="absolute -right-2 -top-2 h-4 w-4 bg-white rounded-full flex items-center justify-center shadow-lg border opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onRemoveTag(tagId);
-                      }}
-                    >
-                      <X className="h-3 w-3 text-red-500" />
-                    </button>
-                  </Badge>
-                );
-              })
-            )}
-          </div>
-
-        </div>
-        {isEditMode && (
-          <Select
-            value={selectedTag || ""}
-            onValueChange={(value) => {
-              setSelectedTag(value);
-              onAddTag(value);
-            }}
-            disabled={isLoadingAddTag}
-          >
-            <SelectTrigger className="w-full mt-2">
-              <SelectValue placeholder="Select a tag" />
-            </SelectTrigger>
-            <SelectContent>
-              {availableTags.map((tag) => (
-                <SelectItem key={tag.id} value={tag.id}>
-                  <div className="flex items-center">
-                    {tag.name}
-                    {linkedTags.includes(tag.name) && <Check className="ml-2 h-4 w-4 text-green-500" />}
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-
-      </div>
-    </div>
+                    Cancel
+                  </Button>
+                </DialogClose>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div >
+        </CardContent>
+    </Card>
   );
 };
 
