@@ -280,21 +280,26 @@ export const Actions = ({
                   <SelectValue placeholder="Select a tag" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ok" className="hover:bg-gray-50">
-                    <div className="flex items-center ">
-                      <PlusCircle size={14} className="mr-2" />
-                      New tag
-                    </div>
-                  </SelectItem>
                   <Separator />
-                  {availableTags.map((tag) => (
-                    <SelectItem key={tag.id} value={tag.id} className="hover:bg-gray-50">
-                      <div className="flex items-center">
-                        {tag.name}
-                        {linkedTags.includes(tag.name) && <Check className="ml-2 h-4 w-4 text-green-500" />}
+                  {availableTags.length > 0 ? (
+                    <div>
+                      {availableTags.map((tag: any) => (
+                        <SelectItem key={tag.id} value={tag.id} className="hover:bg-gray-50">
+                          <div className="flex items-center">
+                            {tag.name}
+                            {linkedTags.includes(tag.name) && <Check className="ml-2 h-4 w-4 text-green-500" />}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </div>
+                  ) : (
+                    <SelectItem value="no-tags" disabled>
+                      <div className="flex items-center justify-center">
+                        No tags available 
                       </div>
                     </SelectItem>
-                  ))}
+                  )}
+
                 </SelectContent>
               </Select>
             )}

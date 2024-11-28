@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CreateTagForm from "./components/create-tag-form";
+import Settings from "./components/settings-board";
 
 interface BoardIdPageProps {
   params: {
@@ -67,9 +68,9 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
   }
 
   return (
-    <div className="bg-white mt-8">
-      <main className="relative  h-full mx-auto p-8">
-        <div className="flex flex-col h-full">
+    <div className="bg-white mt-8 w-full">
+      <main className="relative w-full h-full mx-auto p-8">
+        <div className="flex flex-col h-full w-full">
           <div className="flex items-center gap-x-2 text-lg font-semibold mb-6">
             <div className="flex items-center gap-2">
               <Link href={`/workspace/${params.workspaceId}/board`}>
@@ -79,22 +80,9 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
               <BoardNavbar board={board} />
             </div>
           </div>
-          <div className="flex items-center gap-4 mb-6">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-neutral-700">Timeline:</span>
-              <span className="text-sm">Nov 14, 2024 - Dec 14 2024</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-neutral-700">Assignees:</span>
-              <div className="flex -space-x-2">
-                <div className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white" />
-                <div className="w-8 h-8 rounded-full bg-gray-300 border-2 border-white" />
-                <div className="w-8 h-8 rounded-full bg-gray-400 border-2 border-white" />
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 mb-6">
-            <Tabs defaultValue="board">
+        
+          <div className="flex w-full items-center gap-4 mb-6">
+            <Tabs defaultValue="board" className="w-full">
               <TabsList>
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="list">List</TabsTrigger>
@@ -102,15 +90,18 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                 <TabsTrigger value="timeline">Timeline</TabsTrigger>
                 <TabsTrigger value="calendar">Calendar</TabsTrigger>
                 <TabsTrigger value="review">Review</TabsTrigger>
+                <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
               <div className="mt-8"></div>
-              <CreateTagForm boardId={board.id} />
               <TabsContent value="overview">Overview</TabsContent>
               <TabsContent value="list">List</TabsContent>
               <TabsContent value="board">
-                  <ListContainer boardId={board?.id} data={board.lists} />
+                <ListContainer boardId={board?.id} data={board.lists} />
               </TabsContent>
               <TabsContent value="timeline">Timeline</TabsContent>
+              <TabsContent value="settings">
+                <Settings boardId={board.id} />
+              </TabsContent>
             </Tabs>
           </div>
         </div>

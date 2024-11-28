@@ -1,14 +1,16 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Link from "next/link";
-import { Search, Plus, Clock } from 'lucide-react';
+import { Search, Plus, Clock } from "lucide-react";
 import { FormPopover } from "@/components/form/form-popover";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useQuery } from "@tanstack/react-query";
+import { fetcher } from "@/lib/fetcher";
 
 type Board = {
   id: string;
@@ -16,37 +18,21 @@ type Board = {
   updatedAt: string;
 };
 
-export const dynamic = 'force-dynamic';
-
+export const dynamic = "force-dynamic";
 
 export const BoardList = () => {
-  const [boards, setBoards] = useState<Board[]>([]);
-  const [loading, setLoading] = useState(true);
   const { currentWorkspace } = useCurrentWorkspace();
   const workspaceId = currentWorkspace?.id;
 
-  useEffect(() => {
-    if (!workspaceId) return;
-
-    const fetchBoards = async () => {
-      try {
-        const response = await fetch(`/api/boards?workspaceId=${workspaceId}`, {
-          method: "GET",
-        });
-        if (!response.ok) throw new Error("Failed to fetch boards");
-        const data = await response.json();
-        const sortedBoards = data.sort((a: Board, b: Board) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-        setBoards(sortedBoards);
-      
-      } catch (error) {
-        console.error("Error fetching boards:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBoards();
-  }, [workspaceId]);
+  // Utilisation de React Query pour gérer les données
+  const { data: boards = [], isLoading, error } = useQuery({
+    queryKey: ["boards", workspaceId],
+    queryFn: () =>
+      workspaceId
+        ? fetcher(`/api/boards?workspaceId=${workspaceId}`)
+        : Promise.resolve([]),
+    enabled: !!workspaceId, // Ne pas exécuter tant que workspaceId n'est pas défini
+  });
 
   const isToday = (date: string) => {
     const today = new Date();
@@ -57,6 +43,14 @@ export const BoardList = () => {
       today.getFullYear() === givenDate.getFullYear()
     );
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading boards. Please try again later.</div>;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -78,40 +72,35 @@ export const BoardList = () => {
             <Input className="pl-10" placeholder="Search boards" />
           </div>
           <div className="space-y-4">
-            {boards.map((board) => (
-              <Link
-                key={board.id}
-                href={`/workspace/${workspaceId}/board/${board.id}`}
-                className="block"
-              >
-                <Card className="hover:bg-gray-50 transition duration-300">
-                  <CardContent className="flex items-center justify-between p-4">
-                    <div className="flex items-center space-x-4">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={`https://avatar.vercel.sh/${board.id}.png`} alt={board.title} />
-                        <AvatarFallback>{board.title.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-800">{board.title}</h3>
-                        <p className="text-sm text-gray-500 flex items-center">
-                          <Clock className="mr-1 h-3 w-3" />
-                          Last updated:{" "}
-                          {isToday(board.updatedAt)
-                            ? new Date(board.updatedAt).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                              hour12: true, 
-                            })
-                            : new Date(board.updatedAt).toLocaleDateString('en-US')}
-                        </p>
-
+            {Array.isArray(boards) && boards.length > 0 ? (
+              boards.map((board) => (
+                <Link
+                  key={board.id}
+                  href={`/workspace/${workspaceId}/board/${board.id}`}
+                  className="block"
+                >
+                  <Card className="hover:bg-gray-50 transition duration-300">
+                    <CardContent className="flex items-center justify-between p-4">
+                      <div className="flex items-center space-x-4">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage
+                            src={`https://avatar.vercel.sh/${board.id}.png`}
+                            alt={board.title}
+                          />
+                          <AvatarFallback>{board.title.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-800">{board.title}</h3>
+                        </div>
                       </div>
-                    </div>
-                    <Button variant="ghost">View Board</Button>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+                      <Button variant="ghost">View Board</Button>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))
+            ) : (
+              <p>No boards available.</p>
+            )}
           </div>
         </CardContent>
       </Card>
