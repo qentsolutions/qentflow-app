@@ -28,7 +28,7 @@ export const BoardList = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   // Utilisation de React Query pour gérer les données
-  const { data: boards = [], isLoading, error } = useQuery({
+  const { data: boards, isLoading, error } = useQuery({
     queryKey: ["boards", workspaceId],
     queryFn: () =>
       workspaceId
@@ -37,10 +37,12 @@ export const BoardList = () => {
     enabled: !!workspaceId, // Ne pas exécuter tant que workspaceId n'est pas défini
   });
 
-  // Filtrer les boards en fonction de la recherche
-  const filteredBoards = boards.filter((board: Board) =>
-    board.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filtrer les boards en fonction de la recherche, en vérifiant que `boards` est bien un tableau
+  const filteredBoards = Array.isArray(boards)
+    ? boards.filter((board: Board) =>
+        board.title.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   if (error) {
     return <div>Error loading boards. Please try again later.</div>;
@@ -72,9 +74,9 @@ export const BoardList = () => {
           </div>
           <div className="space-y-4">
             {isLoading ? (
-              <p></p>
+              <p>Loading boards...</p>
             ) : filteredBoards.length > 0 ? (
-              filteredBoards.map((board:any) => (
+              filteredBoards.map((board: Board) => (
                 <Link
                   key={board.id}
                   href={`/${workspaceId}/board/${board.id}`}
@@ -100,7 +102,7 @@ export const BoardList = () => {
                 </Link>
               ))
             ) : (
-              <p></p>
+              <p>No boards available</p>
             )}
           </div>
         </CardContent>

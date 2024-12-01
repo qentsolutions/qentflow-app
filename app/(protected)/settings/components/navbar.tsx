@@ -11,7 +11,6 @@ const SettingsNavbar = () => {
         <div className="w-64 border-r p-4">
             <div className="flex items-center justify-between mb-6 mt-8">
                 <h1 className="text-xl font-semibold">Settings</h1>
-                <Search className="w-5 h-5 text-muted-foreground" />
             </div>
             <nav className="space-y-2">
                 {[

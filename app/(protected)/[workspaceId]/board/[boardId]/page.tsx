@@ -3,10 +3,9 @@ import { BoardNavbar } from "./components/board-navbar";
 import { ListContainer } from "./components/list-container";
 import { currentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import CreateTagForm from "./components/create-tag-form";
 import Settings from "./components/settings-board";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 interface BoardIdPageProps {
   params: {
@@ -71,17 +70,28 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
     <div className="bg-white mt-8 w-full">
       <main className="relative w-full h-full mx-auto p-8">
         <div className="flex flex-col h-full w-full">
-          <div className="flex items-center gap-x-2 text-lg font-semibold mb-6">
-            <div className="flex items-center gap-2">
-              <Link href={`/${params.workspaceId}/board`}>
-                <span className="text-blue-500">Boards</span>
-              </Link>
-              <span className="text-neutral-400">/</span>
-              <BoardNavbar board={board} />
-            </div>
+          <div className="flex items-center gap-x-2 text-lg mb-2">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href={`/${params.workspaceId}/board`}>
+                    <span className="text-blue-500">Boards</span>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BoardNavbar board={board} />
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+
           </div>
-        
-          <div className="flex w-full items-center gap-4 mb-6">
+
+          <div>
+            <p className="text-2xl font-bold">{board.title}</p>
+          </div>
+
+          <div className="flex w-full items-center gap-4 mb-6 mt-8">
             <Tabs defaultValue="board" className="w-full">
               <TabsList>
                 <TabsTrigger value="overview">Overview</TabsTrigger>
