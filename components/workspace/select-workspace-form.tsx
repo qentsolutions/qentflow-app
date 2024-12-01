@@ -50,7 +50,7 @@ export const SelectWorkspaceForm = () => {
             }
 
             if (result.workspaceId) {
-                router.push(`/workspace/${result.workspaceId}`);
+                router.push(`/${result.workspaceId}`);
             }
         } catch (error) {
             // Assurez-vous que l'erreur est gérée correctement

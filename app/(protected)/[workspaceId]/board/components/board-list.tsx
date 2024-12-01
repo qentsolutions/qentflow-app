@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { Search, Plus, Clock } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import { FormPopover } from "@/components/form/form-popover";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,9 @@ export const BoardList = () => {
   const { currentWorkspace } = useCurrentWorkspace();
   const workspaceId = currentWorkspace?.id;
 
+  // State pour l'input de recherche
+  const [searchTerm, setSearchTerm] = useState("");
+
   // Utilisation de React Query pour gérer les données
   const { data: boards = [], isLoading, error } = useQuery({
     queryKey: ["boards", workspaceId],
@@ -34,19 +37,10 @@ export const BoardList = () => {
     enabled: !!workspaceId, // Ne pas exécuter tant que workspaceId n'est pas défini
   });
 
-  const isToday = (date: string) => {
-    const today = new Date();
-    const givenDate = new Date(date);
-    return (
-      today.getDate() === givenDate.getDate() &&
-      today.getMonth() === givenDate.getMonth() &&
-      today.getFullYear() === givenDate.getFullYear()
-    );
-  };
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  // Filtrer les boards en fonction de la recherche
+  const filteredBoards = boards.filter((board: Board) =>
+    board.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (error) {
     return <div>Error loading boards. Please try again later.</div>;
@@ -69,14 +63,21 @@ export const BoardList = () => {
         <CardContent>
           <div className="relative mb-6">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input className="pl-10" placeholder="Search boards" />
+            <Input
+              className="pl-10"
+              placeholder="Search boards"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
           <div className="space-y-4">
-            {Array.isArray(boards) && boards.length > 0 ? (
-              boards.map((board) => (
+            {isLoading ? (
+              <p></p>
+            ) : filteredBoards.length > 0 ? (
+              filteredBoards.map((board:any) => (
                 <Link
                   key={board.id}
-                  href={`/workspace/${workspaceId}/board/${board.id}`}
+                  href={`/${workspaceId}/board/${board.id}`}
                   className="block"
                 >
                   <Card className="hover:bg-gray-50 transition duration-300">
@@ -99,7 +100,7 @@ export const BoardList = () => {
                 </Link>
               ))
             ) : (
-              <p>No boards available.</p>
+              <p></p>
             )}
           </div>
         </CardContent>

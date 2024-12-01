@@ -66,7 +66,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
 
     // Revalidation du chemin pour mettre à jour la page concernée
-    revalidatePath(`/workspace/${workspaceId}board/${boardId}`);
+    revalidatePath(`/${workspaceId}board/${boardId}`);
 
     return { data: list };
   } catch (error) {

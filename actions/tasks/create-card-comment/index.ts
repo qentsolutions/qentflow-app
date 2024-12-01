@@ -50,7 +50,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     });
 
     // Revalide la page pour mettre à jour l'interface utilisateur
-    revalidatePath(`/workspace/${workspaceId}/board/${boardId}`);
+    revalidatePath(`/${workspaceId}/board/${boardId}`);
 
     return { data: comment };
   } catch (error) {

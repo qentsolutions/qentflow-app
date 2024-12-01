@@ -62,7 +62,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     });
 
     // Revalidation du chemin pour mettre à jour le cache
-    revalidatePath(`/workspace/${workspaceId}/board/${board.id}`);
+    revalidatePath(`/${workspaceId}/board/${board.id}`);
 
     return { data: board };
   } catch (error) {

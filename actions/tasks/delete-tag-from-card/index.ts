@@ -48,7 +48,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     });
 
     // Réactualiser la page pour refléter les changements
-    revalidatePath(`/workspace/${workspaceId}/board/${boardId}`);
+    revalidatePath(`/${workspaceId}/board/${boardId}`);
     return { data: updatedCard };
   } catch (error) {
     console.error("Error removing tag from card:", error);

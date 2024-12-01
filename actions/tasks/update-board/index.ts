@@ -46,7 +46,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     }
   }
 
-  revalidatePath(`/workspace/${workspaceId}board/${board.id}`);
+  revalidatePath(`/${workspaceId}board/${board.id}`);
   return { data: board };
 };
 

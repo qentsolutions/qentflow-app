@@ -80,7 +80,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  revalidatePath(`/workspace/${workspaceId}/board/${boardId}`);
+  revalidatePath(`/${workspaceId}/board/${boardId}`);
   return { data: list };
 };
 

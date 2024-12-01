@@ -43,7 +43,7 @@ export function TeamSwitcher({
 
     const handleWorkspaceSelect = (workspace: any) => {
         setCurrentWorkspace(workspace);  // Met à jour l'espace de travail actuel
-        router.push(`/workspace/${workspace.id}`);  // Redirige vers le workspace sélectionné
+        router.push(`/${workspace.id}`);  // Redirige vers le workspace sélectionné
     };
     return (
         <SidebarMenu>
@@ -117,7 +117,7 @@ export function TeamSwitcher({
 
                                 </DropdownMenuItem>
                                 {currentWorkspace?.id === workspace.id && (
-                                    <Link href={`/workspace/${workspace.id}/settings`}>
+                                    <Link href={`/${workspace.id}/settings`}>
                                         <p className="flex items-center justify-center w-6 h-6 rounded-ful text-gray-800">
                                             <Settings size={14} className="ml-1" />
                                         </p>
