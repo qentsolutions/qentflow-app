@@ -71,7 +71,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         items: [
           {
             title: "Boards",
-            url: `/${workspaceId}/board`,
+            url: `/${workspaceId}/boards`,
           },
           {
             title: "Starred",

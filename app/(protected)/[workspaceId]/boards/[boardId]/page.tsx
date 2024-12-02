@@ -29,7 +29,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
   // Si l'utilisateur n'est pas membre du workspace, retournez une page d'erreur
   if (!isUserMember) {
     // redirect to board
-    redirect(`/${params.workspaceId}/board`);
+    redirect(`/${params.workspaceId}/boards`);
   }
 
   // Récupérer les données du board
@@ -71,24 +71,11 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
       <main className="relative w-full h-full mx-auto p-8">
         <div className="flex flex-col h-full w-full">
           <div className="flex items-center gap-x-2 text-lg mb-2">
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href={`/${params.workspaceId}/board`}>
-                    <span className="text-blue-500">Boards</span>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BoardNavbar board={board} />
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-
           </div>
 
           <div>
-            <p className="text-2xl font-bold">{board.title}</p>
+            <p className="text-2xl font-bold">{board.title}</p>                  <BoardNavbar board={board} />
+
           </div>
 
           <div className="flex w-full items-center gap-4 mb-6 mt-8">

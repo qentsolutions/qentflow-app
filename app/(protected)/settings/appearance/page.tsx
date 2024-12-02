@@ -1,8 +1,22 @@
+"use client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
+import { useEffect } from "react";
 
 export default function AppearanceSettings() {
+
+  const { setBreadcrumbs } = useBreadcrumbs();
+
+  useEffect(() => {
+    setBreadcrumbs([
+      { label: "Settings" },
+      { label: "Appearance" }
+    ]);
+  }, [setBreadcrumbs]);
+
+
   return (
     <div className="w-full max-w-3xl p-6 space-y-8">
       <div className="space-y-2">

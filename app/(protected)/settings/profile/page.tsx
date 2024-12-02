@@ -5,10 +5,22 @@ import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
+import { useEffect } from "react";
 
 const ProfilePage = () => {
   const user = useCurrentUser();
   const { currentWorkspace } = useCurrentWorkspace();
+
+  const { setBreadcrumbs } = useBreadcrumbs();
+
+  useEffect(() => {
+    setBreadcrumbs([
+      { label: "Settings" },
+      { label: "Profile" },
+    ]);
+  }, [setBreadcrumbs]);
+
 
   return (
     <div className="container mx-auto py-10">

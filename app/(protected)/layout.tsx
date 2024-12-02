@@ -1,41 +1,53 @@
+"use client";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { BreadcrumbProvider, useBreadcrumbs } from "@/hooks/use-breadcrumb";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
-};
+}
 
-const ProtectedLayout = async ({ children }: ProtectedLayoutProps) => {
+const BreadcrumbHeader = () => {
+  const { breadcrumbs } = useBreadcrumbs();
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <main className="w-full">
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="#">
-                  Building Your Application
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </header>
-
-        {children}
-      </main>
-    </SidebarProvider>
-
+    <Breadcrumb>
+      <BreadcrumbList>
+        {breadcrumbs.map((breadcrumb, index) => (
+          <BreadcrumbItem key={index}>
+            {breadcrumb.href ? (
+              <BreadcrumbLink href={breadcrumb.href}>{breadcrumb.label}</BreadcrumbLink>
+            ) : (
+              <BreadcrumbPage>{breadcrumb.label}</BreadcrumbPage>
+            )}
+            {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
+          </BreadcrumbItem>
+        ))}
+      </BreadcrumbList>
+    </Breadcrumb>
   );
-}
+};
+
+const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
+  return (
+    <SidebarProvider>
+      <BreadcrumbProvider>
+        <AppSidebar />
+        <main className="w-full">
+          <header className="flex z-50 bg-white w-full fixed h-16 shrink-0 items-center gap-2 border-b px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <BreadcrumbHeader />
+          </header>
+          <div className="mt-12">
+            {children}
+          </div>
+        </main>
+      </BreadcrumbProvider>
+    </SidebarProvider>
+  );
+};
 
 export default ProtectedLayout;

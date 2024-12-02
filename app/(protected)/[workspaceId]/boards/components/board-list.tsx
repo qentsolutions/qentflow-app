@@ -79,7 +79,7 @@ export const BoardList = () => {
               filteredBoards.map((board: Board) => (
                 <Link
                   key={board.id}
-                  href={`/${workspaceId}/board/${board.id}`}
+                  href={`/${workspaceId}/boards/${board.id}`}
                   className="block"
                 >
                   <Card className="hover:bg-gray-50 transition duration-300">

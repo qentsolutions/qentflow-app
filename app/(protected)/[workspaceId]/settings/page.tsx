@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,6 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
 import { CreditCard, PlusCircle, Settings, Users } from "lucide-react";
+import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
 
 const UpdateWorkspaceSchema = z.object({
     name: z.string().min(1, "Workspace name is required"),
@@ -28,6 +29,15 @@ const ManageWorkspacesPage = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [error, setError] = useState<string | undefined>();
     const [success, setSuccess] = useState<string | undefined>();
+    const { setBreadcrumbs } = useBreadcrumbs();
+
+    useEffect(() => {
+        setBreadcrumbs([
+            { label: `${currentWorkspace?.name}` },
+            { label: "Settings" },
+        ]);
+    }, [setBreadcrumbs, currentWorkspace]);
+
 
     const form = useForm<z.infer<typeof UpdateWorkspaceSchema>>({
         resolver: zodResolver(UpdateWorkspaceSchema),

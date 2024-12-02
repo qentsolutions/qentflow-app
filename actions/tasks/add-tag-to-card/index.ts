@@ -37,7 +37,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     });
 
     // Réactualiser la page pour refléter les changements
-    revalidatePath(`/${workspaceId}/board/${boardId}`);
+    revalidatePath(`/${workspaceId}/boards/${boardId}`);
     return { data: updatedCard };
   } catch (error) {
     console.error("Error adding tag to card:", error);

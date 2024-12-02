@@ -1,11 +1,21 @@
 "use client";
-import { Palette, Search, Settings2, Shield, User, Video } from "lucide-react";
+import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
+import { Palette, Settings2, Shield, User, Video } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
 const SettingsNavbar = () => {
 
     const pathname = usePathname();
+    const { setBreadcrumbs } = useBreadcrumbs();
+
+    useEffect(() => {
+        setBreadcrumbs([
+            { label: "Settings" },
+            { label: "Profile" }
+        ]);
+    }, [setBreadcrumbs]);
 
     return (
         <div className="w-64 border-r p-4">
@@ -17,10 +27,9 @@ const SettingsNavbar = () => {
                     { icon: User, label: "Profile", href: "/settings/profile" },
                     { icon: Settings2, label: "Account", href: "/settings/account" },
                     { icon: Shield, label: "Security", href: "/settings/security" },
-                    { icon: Video, label: "Voice & video", href: "/settings/voice-video" },
                     { icon: Palette, label: "Appearance", href: "/settings/appearance" },
                 ].map((item) => {
-                    // Vérifier si le chemin de l'élément correspond à l'URL actuelle
+
                     const isActive = pathname === item.href;
 
                     return (

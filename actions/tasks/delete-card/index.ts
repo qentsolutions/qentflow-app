@@ -47,7 +47,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   }
 
   // Réactualiser la page pour refléter les changements
-  revalidatePath(`/${workspaceId}/board/${boardId}`);
+  revalidatePath(`/${workspaceId}/boards/${boardId}`);
   return { data: card };
 };
 

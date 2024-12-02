@@ -3,7 +3,7 @@
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTransition, useState } from "react";
+import { useTransition, useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 
 import { Switch } from "@/components/ui/switch";
@@ -24,6 +24,7 @@ import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { UserRole } from "@prisma/client";
+import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
 
 const SecuritySchema = z.object({
   password: z.string().min(6).optional(),
@@ -40,6 +41,14 @@ const SecurityPage = () => {
   const [success, setSuccess] = useState<string | undefined>();
   const { update } = useSession();
   const [isPending, startTransition] = useTransition();
+  const { setBreadcrumbs } = useBreadcrumbs();
+
+  useEffect(() => {
+    setBreadcrumbs([
+      { label: "Settings" },
+      { label: "Security" },
+    ]);
+  }, [setBreadcrumbs]);
 
   const form = useForm<z.infer<typeof SecuritySchema>>({
     resolver: zodResolver(SecuritySchema),
