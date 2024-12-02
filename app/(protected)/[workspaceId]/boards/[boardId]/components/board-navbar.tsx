@@ -12,8 +12,6 @@ interface BoardNavbarProps {
 }
 
 export const BoardNavbar = ({ board }: BoardNavbarProps) => {
-  if (!board) return null;
-
   const { setBreadcrumbs } = useBreadcrumbs();
   const { currentWorkspace } = useCurrentWorkspace();
 
@@ -24,6 +22,10 @@ export const BoardNavbar = ({ board }: BoardNavbarProps) => {
     ]);
   }, [board, setBreadcrumbs]);
 
+
+  if (!board) return null;
+
+  
   return (
     <div className="flex items-center" >
       <BoardTitleForm data={board} />
