@@ -74,8 +74,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
           </div>
 
           <div>
-            <p className="text-2xl font-bold">{board.title}</p>                  <BoardNavbar board={board} />
-
+             <BoardNavbar board={board} />
           </div>
 
           <div className="flex w-full items-center gap-4 mb-6 mt-8">

@@ -81,7 +81,7 @@ export const BoardTitleForm = ({ data }: BoardTitleFormProps) => {
     <Button
       onClick={enableEditing}
       variant="default"
-      className="bg-transparent shadow-none text-gray-700 hover:bg-gray-100 h-auto w-auto p-1"
+      className="bg-transparent text-lg font-bold shadow-none text-gray-700 hover:bg-gray-100 h-auto w-auto p-1"
     >
       {title}
     </Button>
