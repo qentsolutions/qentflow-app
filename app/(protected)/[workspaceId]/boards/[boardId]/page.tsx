@@ -74,7 +74,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
           </div>
 
           <div>
-             <BoardNavbar board={board} />
+            <BoardNavbar board={board} />
           </div>
 
           <div className="flex w-full items-center gap-4 mb-6 mt-8">
@@ -92,7 +92,9 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
               <TabsContent value="overview">Overview</TabsContent>
               <TabsContent value="list">List</TabsContent>
               <TabsContent value="board">
-                <ListContainer boardId={board?.id} data={board.lists} />
+                <main className="w-full max-w-screen bg-gray-100 border overflow-x-auto">
+                  <ListContainer boardId={board?.id} data={board.lists} />
+                </main>
               </TabsContent>
               <TabsContent value="timeline">Timeline</TabsContent>
               <TabsContent value="settings">
