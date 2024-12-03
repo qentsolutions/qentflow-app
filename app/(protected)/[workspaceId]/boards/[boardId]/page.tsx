@@ -5,7 +5,6 @@ import { currentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Settings from "./components/settings-board";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 interface BoardIdPageProps {
   params: {
