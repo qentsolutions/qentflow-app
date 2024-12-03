@@ -6,7 +6,7 @@ export const ListWrapper = ({
   children
 }: ListWrapperProps) => {
   return (
-    <li className="shrink-0 h-full w-[272px] select-none">
+    <li className="shrink-0 h-full w-[272px] select-none list-none">
       {children}
     </li>
   );

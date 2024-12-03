@@ -6,9 +6,11 @@ import { TableView } from "./table-view";
 import { ListView } from "./list-view";
 import { useState } from "react";
 
+
+
 interface BoardContentProps {
   boardId: string;
-  lists: any[]; // Remplacer any[] par le bon type quand disponible
+  lists: any;
 }
 
 export const BoardContent = ({ boardId, lists }: BoardContentProps) => {
@@ -19,9 +21,9 @@ export const BoardContent = ({ boardId, lists }: BoardContentProps) => {
       case "kanban":
         return <KanbanView boardId={boardId} data={lists} />;
       case "table":
-        return <TableView boardId={boardId} />;
+        return <TableView boardId={boardId} data={lists} />;
       case "list":
-        return <ListView boardId={boardId} />;
+        return <ListView boardId={boardId} data={lists} />;
       default:
         return <KanbanView boardId={boardId} data={lists} />;
     }
@@ -30,7 +32,7 @@ export const BoardContent = ({ boardId, lists }: BoardContentProps) => {
   return (
     <>
       <div className="flex items-center justify-end gap-4 mb-4">
-        <ViewSwitcher 
+        <ViewSwitcher
           selectedView={selectedView}
           onViewChange={setSelectedView}
         />
