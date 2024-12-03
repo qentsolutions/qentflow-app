@@ -20,7 +20,7 @@ const Settings = ({ boardId }: BoardSettingsProps) => {
 
 
     return (
-        <div className="min-h-screen bg-gray-50 w-full">
+        <div className="min-h-screen bg-[#f2f5f9] w-full">
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="grid grid-cols-12 gap-8">
                     {/* Sidebar */}

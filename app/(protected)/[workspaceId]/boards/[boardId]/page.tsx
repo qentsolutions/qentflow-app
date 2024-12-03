@@ -88,11 +88,11 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                 <TabsTrigger value="review">Review</TabsTrigger>
                 <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
-              <div className="mt-8"></div>
+              <div className="mt-4"></div>
               <TabsContent value="overview">Overview</TabsContent>
               <TabsContent value="list">List</TabsContent>
               <TabsContent value="board">
-                <main className="w-full max-w-screen bg-gray-100 border overflow-x-auto">
+                <main className="w-full max-w-screen bg-[#f2f5f9] border overflow-x-auto">
                   <ListContainer boardId={board?.id} data={board.lists} />
                 </main>
               </TabsContent>
