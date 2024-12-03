@@ -25,7 +25,7 @@ function reorder<T>(list: T[], startIndex: number, endIndex: number) {
   return result;
 }
 
-export const ListContainer = ({ data, boardId }: ListContainerProps) => {
+export const KanbanView = ({ data, boardId }: ListContainerProps) => {
   const [orderedData, setOrderedData] = useState(data);
   const { currentWorkspace } = useCurrentWorkspace();
 

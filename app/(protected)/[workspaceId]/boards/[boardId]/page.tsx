@@ -1,10 +1,10 @@
 import { db } from "@/lib/db";
 import { BoardNavbar } from "./components/board-navbar";
-import { ListContainer } from "./components/list-container";
 import { currentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Settings from "./components/settings-board";
+import { BoardContent } from "./components/board-content";
 
 interface BoardIdPageProps {
   params: {
@@ -25,13 +25,10 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
     },
   });
 
-  // Si l'utilisateur n'est pas membre du workspace, retournez une page d'erreur
   if (!isUserMember) {
-    // redirect to board
     redirect(`/${params.workspaceId}/boards`);
   }
 
-  // Récupérer les données du board
   const board = await db.board.findUnique({
     where: {
       id: params.boardId,
@@ -81,7 +78,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
               <TabsList>
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="list">List</TabsTrigger>
-                <TabsTrigger value="board">Board</TabsTrigger>
+                <TabsTrigger value="board">Tasks</TabsTrigger>
                 <TabsTrigger value="timeline">Timeline</TabsTrigger>
                 <TabsTrigger value="calendar">Calendar</TabsTrigger>
                 <TabsTrigger value="review">Review</TabsTrigger>
@@ -91,9 +88,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
               <TabsContent value="overview">Overview</TabsContent>
               <TabsContent value="list">List</TabsContent>
               <TabsContent value="board">
-                <main className="w-full max-w-screen bg-[#f2f5f9] border overflow-x-auto">
-                  <ListContainer boardId={board?.id} data={board.lists} />
-                </main>
+                <BoardContent boardId={board.id} lists={board.lists} />
               </TabsContent>
               <TabsContent value="timeline">Timeline</TabsContent>
               <TabsContent value="settings">
