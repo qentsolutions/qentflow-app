@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from "next/server";
+{/* import { NextResponse, NextRequest } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
@@ -50,3 +50,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Not signed in" }, { status: 401 });
   }
 }
+
+
+*/}

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
+import { ShieldCheck } from "lucide-react";
 
 interface ButtonCheckoutProps {
     priceId: string;
@@ -59,7 +60,7 @@ const ButtonCheckout = ({
             onClick={() => handlePayment()}
             disabled={disabled || isLoading}
         >
-            {isLoading ? "Processing..." : "Buy Workspace"}
+           <ShieldCheck /> {isLoading ? "Processing..." : "Proceed to Payment"}
         </Button>
     );
 };

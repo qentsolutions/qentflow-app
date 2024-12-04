@@ -88,7 +88,7 @@ export const SelectWorkspaceForm = () => {
     const { setBreadcrumbs } = useBreadcrumbs();
 
     useEffect(() => {
-        setBreadcrumbs([{ label: "Buy Workspace" }]);
+        setBreadcrumbs([{ label: "Create Workspace" }]);
     }, [setBreadcrumbs]);
 
     const form = useForm<z.infer<typeof CreateWorkspaceSchema>>({
@@ -246,7 +246,6 @@ export const SelectWorkspaceForm = () => {
 
                     <div className="mt-2 text-center">
                         <p className="text-sm text-muted-foreground flex items-center gap-2">
-                            <Lock className="h-4 w-4" />
                             Guaranteed to be safe & secure, ensuring that all transactions are protected with the highest level of security.
                         </p>
                     </div>

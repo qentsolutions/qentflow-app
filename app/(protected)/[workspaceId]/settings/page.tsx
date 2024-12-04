@@ -19,6 +19,8 @@ import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
 import { CreditCard, PlusCircle, Settings, Users } from "lucide-react";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
+import { deleteWorkspace } from "@/actions/workspace/delete-workspace";
+import { set } from "date-fns";
 
 const UpdateWorkspaceSchema = z.object({
     name: z.string().min(1, "Workspace name is required"),
@@ -76,6 +78,21 @@ const ManageWorkspacesPage = () => {
         member.user.name && member.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         member.user.email && member.user.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+
+    const handleDeleteWorkspace = async () => {
+        if (!currentWorkspace) return;
+
+        const result = await deleteWorkspace({ workspaceId: currentWorkspace.id });
+
+        if (result.error) {
+            setError(result.error);
+            return;
+        }
+
+        setSuccess(result.success);
+        setCurrentWorkspace(undefined);
+    };
 
     return (
         <div className="container mx-auto py-10">
@@ -200,6 +217,17 @@ const ManageWorkspacesPage = () => {
                                     </Button>
                                 </form>
                             </Form>
+                            <div className="space-y-4">
+                                <Button
+                                    className="bg-red-500 hover:bg-red-700 w-full"
+                                    onClick={() => handleDeleteWorkspace()}
+                                >
+                                    Delete Workspace
+                                </Button>
+
+                                {error && <p className="text-red-500">{error}</p>}
+                                {success && <p className="text-green-500">{success}</p>}
+                            </div>
                         </TabsContent>
                     </Tabs>
                 </CardContent>
