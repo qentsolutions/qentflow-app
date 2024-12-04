@@ -91,7 +91,7 @@ const ManageWorkspacesPage = () => {
         }
 
         setSuccess(result.success);
-        setCurrentWorkspace(undefined);
+        setCurrentWorkspace(null);
     };
 
     return (

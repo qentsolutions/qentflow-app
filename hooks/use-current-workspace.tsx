@@ -28,7 +28,7 @@ interface Workspace {
 interface WorkspaceContextType {
   currentWorkspace: Workspace | null;
   workspaces: Workspace[];
-  setCurrentWorkspace: (workspace: Workspace) => void;
+  setCurrentWorkspace: (workspace: Workspace | null) => void;  // Modification ici
   isLoading: boolean;
 }
 
