@@ -107,16 +107,21 @@ export const SelectWorkspaceForm = () => {
 
             if (result.error) {
                 setError(result.error);
-                return;
+                return { error: result.error };
             }
 
             if (result.workspaceId) {
-                router.push(`/${result.workspaceId}`);
+                return { workspaceId: result.workspaceId };
             }
+
+            return { error: "No workspace ID returned" };
         } catch (error) {
             setError("Something went wrong!");
+            return { error: "Something went wrong!" };
         }
     };
+
+    const isFormValid = form.formState.isValid && selectedPlan;
 
     const getCurrentPriceId = () => {
         const currentPlans = plans[billingType];
@@ -131,7 +136,7 @@ export const SelectWorkspaceForm = () => {
                 <div>
                     <Card className="shadow-sm">
                         <CardHeader>
-                            <h1 className="text-2xl font-semibold">Buy Workspace</h1>
+                            <h1 className="text-2xl font-semibold">Create Workspace</h1>
                             <p className="text-muted-foreground">
                                 Get started with your new workspace today
                             </p>
@@ -232,6 +237,9 @@ export const SelectWorkspaceForm = () => {
                         <ButtonCheckout
                             mode="subscription"
                             priceId={getCurrentPriceId()}
+                            disabled={!isFormValid}
+                            workspaceName={form.getValues("name")}
+                            onSubmit={() => onSubmit(form.getValues())}
                         />
                     </div>
 

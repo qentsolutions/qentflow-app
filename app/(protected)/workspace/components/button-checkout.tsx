@@ -1,29 +1,47 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios"; // Import axios directement
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 
+interface ButtonCheckoutProps {
+    priceId: string;
+    mode?: "payment" | "subscription";
+    disabled?: boolean;
+    workspaceName: string;
+    onSubmit: () => Promise<{ workspaceId?: string; error?: string }>;
+}
 
 const ButtonCheckout = ({
     priceId,
     mode = "payment",
-}: {
-    priceId: string;
-    mode?: "payment" | "subscription";
-}) => {
+    disabled = false,
+    workspaceName,
+    onSubmit,
+}: ButtonCheckoutProps) => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const handlePayment = async () => {
+        if (!workspaceName) return;
         setIsLoading(true);
 
         try {
-            // Utilisation directe d'axios
+            // First create the workspace
+            const result = await onSubmit();
+            
+            if (result.error || !result.workspaceId) {
+                console.error("Failed to create workspace:", result.error);
+                setIsLoading(false);
+                return;
+            }
+
+            // Then proceed with payment
             const response = await axios.post("/api/stripe/create-checkout", {
                 priceId,
-                successUrl: window.location.href,
+                successUrl: `${window.location.origin}/${result.workspaceId}`,
                 cancelUrl: window.location.href,
                 mode,
+                workspaceName,
             });
 
             const { url } = response.data;
@@ -39,8 +57,9 @@ const ButtonCheckout = ({
         <Button
             className="btn btn-warning btn-block group"
             onClick={() => handlePayment()}
+            disabled={disabled || isLoading}
         >
-            Buy Workspace
+            {isLoading ? "Processing..." : "Buy Workspace"}
         </Button>
     );
 };
