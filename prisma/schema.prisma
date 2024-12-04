@@ -54,6 +54,16 @@ model Workspace {
   boards      Board[]
 }
 
+model WorkspaceSubscription {
+  id          String @id @default(uuid())
+  workspaceId String @unique
+
+  stripeCustomerId       String?   @unique @map(name: "stripe_customer_id")
+  stripeSubscriptionId   String?   @unique @map(name: "stripe_subscription_id")
+  stripePriceId          String?   @map(name: "stripe_price_id")
+  stripeCurrentPeriodEnd DateTime? @map(name: "stripe_current_period_end")
+}
+
 model WorkspaceMember {
   id          String    @id @default(cuid())
   workspaceId String
@@ -64,6 +74,15 @@ model WorkspaceMember {
   joinedAt    DateTime  @default(now())
 
   @@unique([workspaceId, userId])
+}
+
+model StripeCustomer {
+  id               String @id @default(uuid())
+  userId           String @unique
+  stripeCustomerId String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Board {

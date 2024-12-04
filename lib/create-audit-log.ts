@@ -2,7 +2,6 @@ import { ACTION, ENTITY_TYPE } from "@prisma/client";
 
 import { db } from "@/lib/db";
 import { currentUser } from "./auth";
-import { useSession } from "next-auth/react";
 
 interface Props {
   entityId: string;

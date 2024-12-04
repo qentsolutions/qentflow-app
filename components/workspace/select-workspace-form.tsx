@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { CreditCard, Building2, Coins, Lock } from "lucide-react";
+import { CreditCard, Building2, Coins, Lock, Users } from "lucide-react";
 
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,15 +24,67 @@ import { FormSuccess } from "@/components/form-success";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import ButtonCheckout from "@/app/(protected)/workspace/components/button-checkout";
 
 const CreateWorkspaceSchema = z.object({
     name: z.string().min(1, "Workspace name is required"),
 });
 
+const plans = {
+    monthly: [
+        {
+            name: "Starter",
+            members: "1 member",
+            price: 4.99,
+            priceId: "price_1QSQ4lJCavvHusTltoAiG987",
+            description: "Perfect for individual users"
+        },
+        {
+            name: "Team",
+            members: "2-5 members",
+            price: 19.99,
+            priceId: "price_1QSQ8bJCavvHusTlIKvid0Aj",
+            description: "Great for small teams"
+        },
+        {
+            name: "Business",
+            members: "6-10 members",
+            price: 49.00,
+            priceId: "price_1QSQA0JCavvHusTlpzbpAlNa",
+            description: "Ideal for growing businesses"
+        }
+    ],
+    annual: [
+        {
+            name: "Starter",
+            members: "1 member",
+            price: 50.00,
+            priceId: "price_1QSQ5pJCavvHusTlfwBZcvid",
+            description: "Perfect for individual users"
+        },
+        {
+            name: "Team",
+            members: "2-5 members",
+            price: 200.00,
+            priceId: "price_1QSQ94JCavvHusTls0RQSyG1",
+            description: "Great for small teams"
+        },
+        {
+            name: "Business",
+            members: "6-10 members",
+            price: 500.00,
+            priceId: "price_1QSQAMJCavvHusTl5aOPiBAY",
+            description: "Ideal for growing businesses"
+        }
+    ]
+};
+
 export const SelectWorkspaceForm = () => {
     const router = useRouter();
     const [error, setError] = useState<string | undefined>();
     const [success, setSuccess] = useState<string | undefined>();
+    const [billingType, setBillingType] = useState<"monthly" | "annual">("monthly");
+    const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
     const { setBreadcrumbs } = useBreadcrumbs();
 
     useEffect(() => {
@@ -64,6 +116,12 @@ export const SelectWorkspaceForm = () => {
         } catch (error) {
             setError("Something went wrong!");
         }
+    };
+
+    const getCurrentPriceId = () => {
+        const currentPlans = plans[billingType];
+        const plan = currentPlans.find(p => p.priceId === selectedPlan);
+        return plan?.priceId || "";
     };
 
     return (
@@ -100,42 +158,8 @@ export const SelectWorkspaceForm = () => {
                                         )}
                                     />
 
-                                    <div>
-                                        <Label>Payment Method</Label>
-                                        <div className="grid grid-cols-3 gap-4 mt-2">
-                                            <Button variant="outline" className="flex items-center gap-2 justify-center h-11">
-                                                <CreditCard className="h-4 w-4" />
-                                                Credit Card
-                                            </Button>
-                                            <Button variant="outline" className="flex items-center gap-2 justify-center h-11">
-                                                <Building2 className="h-4 w-4" />
-                                                Bank Transfer
-                                            </Button>
-                                            <Button variant="outline" className="flex items-center gap-2 justify-center h-11">
-                                                <Coins className="h-4 w-4" />
-                                                Cosmic Points
-                                            </Button>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <Input placeholder="Card Number" className="h-11" />
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <Input placeholder="MM/YY" className="h-11" />
-                                            <Input placeholder="CVC" className="h-11" />
-                                        </div>
-                                    </div>
-
                                     <FormError message={error} />
                                     <FormSuccess message={success} />
-                                    
-                                    <Button
-                                        type="submit"
-                                        className="w-full bg-purple-600 hover:bg-purple-700 h-11"
-                                        disabled={form.formState.isSubmitting}
-                                    >
-                                        Complete Purchase
-                                    </Button>
                                 </form>
                             </Form>
                         </CardContent>
@@ -144,46 +168,79 @@ export const SelectWorkspaceForm = () => {
 
                 {/* Right Column - Plan Details */}
                 <div className="bg-slate-50 rounded-lg p-8">
-                    <h2 className="text-lg font-medium mb-6">Starter Plan</h2>
-
-                    <RadioGroup defaultValue="monthly" className="space-y-4">
-                        <div className="flex items-center justify-between p-4 rounded-lg border bg-white">
-                            <div className="flex items-center gap-2">
-                                <RadioGroupItem value="monthly" id="monthly" />
-                                <Label htmlFor="monthly">Pay Monthly</Label>
-                            </div>
-                            <span>$20 / Month / Member</span>
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-lg font-medium">Choose Your Plan</h2>
+                        <div className="flex items-center gap-4 bg-white rounded-lg p-2">
+                            <button
+                                onClick={() => setBillingType("monthly")}
+                                className={`px-4 py-2 rounded-md transition-all ${billingType === "monthly"
+                                    ? "bg-blue-500 text-white"
+                                    : "hover:bg-gray-100"
+                                    }`}
+                            >
+                                Monthly
+                            </button>
+                            <button
+                                onClick={() => setBillingType("annual")}
+                                className={`px-4 py-2 rounded-md transition-all ${billingType === "annual"
+                                    ? "bg-blue-500 text-white"
+                                    : "hover:bg-gray-100"
+                                    }`}
+                            >
+                                Annual
+                            </button>
                         </div>
+                    </div>
 
-                        <div className="flex items-center justify-between p-4 rounded-lg border bg-purple-50">
-                            <div className="flex items-center gap-2">
-                                <RadioGroupItem value="annual" id="annual" />
-                                <Label htmlFor="annual">Pay Annual</Label>
+                    <div className="space-y-4">
+                        {plans[billingType].map((plan) => (
+                            <div
+                                key={plan.priceId}
+                                onClick={() => setSelectedPlan(plan.priceId)}
+                                className={`p-6 rounded-lg border transition-all cursor-pointer ${selectedPlan === plan.priceId
+                                    ? "border-blue-500 bg-blue-50"
+                                    : "bg-white hover:border-blue-300"
+                                    }`}
+                            >
+                                <div className="flex justify-between items-start mb-4">
+                                    <div>
+                                        <h3 className="font-semibold text-lg">{plan.name}</h3>
+                                        <p className="text-sm text-gray-600">{plan.description}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-2xl font-bold">${plan.price}</div>
+                                        <div className="text-sm text-gray-600">per member/month</div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <Users className="h-4 w-4" />
+                                    {plan.members}
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <span>$16 / Month / Member</span>
-                                <span className="bg-purple-600 text-white text-xs px-2 py-1 rounded">Save 15%</span>
-                            </div>
-                        </div>
-                    </RadioGroup>
+                        ))}
+                    </div>
 
-                    <div className="mt-8">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="font-medium">Total</span>
-                            <span className="text-xl font-semibold">$16 / Month</span>
+                    {billingType === "annual" && (
+                        <div className="mt-4 p-4 bg-green-50 rounded-lg">
+                            <p className="text-green-700 text-sm flex items-center gap-2">
+                                <span className="bg-green-600 text-white text-xs px-2 py-1 rounded">Save 15%</span>
+                                Save by paying annually
+                            </p>
                         </div>
+                    )}
+                    <div className="flex items-center justify-center my-4">
+                        <ButtonCheckout
+                            mode="subscription"
+                            priceId={getCurrentPriceId()}
+                        />
+                    </div>
+
+
+                    <div className="mt-2 text-center">
                         <p className="text-sm text-muted-foreground flex items-center gap-2">
                             <Lock className="h-4 w-4" />
                             Guaranteed to be safe & secure, ensuring that all transactions are protected with the highest level of security.
                         </p>
-                    </div>
-
-                    <div className="mt-8">
-                        <img
-                            src="/lovable-uploads/6a1049e4-50e6-418f-b8e0-86146ac8e9a1.png"
-                            alt="Plan illustration"
-                            className="w-full max-w-[200px] mx-auto opacity-80"
-                        />
                     </div>
                 </div>
             </div>
