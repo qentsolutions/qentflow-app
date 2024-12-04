@@ -34,7 +34,7 @@ const ManageWorkspacesPage = () => {
     useEffect(() => {
         setBreadcrumbs([
             { label: `${currentWorkspace?.name}` },
-            { label: "Settings" },
+            { label: "Manage Workspace" },
         ]);
     }, [setBreadcrumbs, currentWorkspace]);
 
