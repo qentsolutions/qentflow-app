@@ -14,7 +14,7 @@ import { PlusCircle  } from "lucide-react";
 
 export default function Members() {
 
-    const { currentWorkspace, setCurrentWorkspace } = useCurrentWorkspace();
+    const { currentWorkspace } = useCurrentWorkspace();
     const [searchTerm, setSearchTerm] = useState("");
   
     const filteredMembers = currentWorkspace?.members.filter((member) =>
