@@ -67,7 +67,9 @@ export default function Members() {
                 const response = await leaveWorkspace({
                     workspaceId: currentWorkspace.id,
                 });
-
+                // refresh
+                toast.success("You have left the workspace");
+                window.location.reload();
             } catch (error) {
                 toast.error("An error occurred while leaving the workspace");
             }
