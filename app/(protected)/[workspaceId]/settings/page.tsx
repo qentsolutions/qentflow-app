@@ -9,19 +9,14 @@ import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { updateWorkspace } from "@/actions/workspace";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { FormError } from "@/components/form-error";
-import { FormSuccess } from "@/components/form-success";
+
 import { CreditCard, PlusCircle, Settings, Users } from "lucide-react";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
 import { deleteWorkspace } from "@/actions/workspace/delete-workspace";
 import { set } from "date-fns";
 import Members from "./components/members";
+import SettingsWorkspace from "./components/settings";
 
 const UpdateWorkspaceSchema = z.object({
     name: z.string().min(1, "Workspace name is required"),
@@ -81,23 +76,7 @@ const ManageWorkspacesPage = () => {
     );
 
 
-    const handleDeleteWorkspace = async () => {
-        if (!currentWorkspace) return;
-
-        const result = await deleteWorkspace({ workspaceId: currentWorkspace.id });
-
-        if (result.error) {
-            setError(result.error);
-            return;
-        }
-
-        setSuccess(result.success);
-        setCurrentWorkspace(null);
-
-        // Redirect to the dashboard
-        window.location.href = "/";
-    };
-
+   
     return (
         <div className="container mx-auto py-10">
             <Card>
@@ -141,46 +120,8 @@ const ManageWorkspacesPage = () => {
                             </p>
                         </TabsContent>
                         <TabsContent value="settings" className="space-y-4">
-                            <Form {...form}>
-                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                                    <FormField
-                                        control={form.control}
-                                        name="name"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Workspace Name</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        {...field}
-                                                        placeholder={currentWorkspace?.name}
-                                                        disabled={form.formState.isSubmitting}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormError message={error} />
-                                    <FormSuccess message={success} />
-                                    <Button
-                                        type="submit"
-                                        disabled={form.formState.isSubmitting}
-                                    >
-                                        Save Changes
-                                    </Button>
-                                </form>
-                            </Form>
-                            <div className="space-y-4">
-                                <Button
-                                    className="bg-red-500 hover:bg-red-700 w-full"
-                                    onClick={() => handleDeleteWorkspace()}
-                                >
-                                    Delete Workspace
-                                </Button>
-
-                                {error && <p className="text-red-500">{error}</p>}
-                                {success && <p className="text-green-500">{success}</p>}
-                            </div>
+                            <SettingsWorkspace />
+                            
                         </TabsContent>
                     </Tabs>
                 </CardContent>
