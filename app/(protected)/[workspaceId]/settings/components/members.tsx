@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { InviteMemberDialog } from "./invite-member";
 import { excludeMember } from "@/actions/workspace/exclude-member";
+import { leaveWorkspace } from "@/actions/workspace/leave-workspace";
 
 export default function Members() {
     const { currentWorkspace } = useCurrentWorkspace();
@@ -58,8 +59,19 @@ export default function Members() {
         });
     };
 
-    const handleLeaveWorkspace = () => {
-        toast.success("You left the workspace.");
+    const handleLeaveWorkspace = async () => {
+        if (!currentWorkspace?.id || !currentUser?.id) return;
+
+        startTransition(async () => {
+            try {
+                const response = await leaveWorkspace({
+                    workspaceId: currentWorkspace.id,
+                });
+
+            } catch (error) {
+                toast.error("An error occurred while leaving the workspace");
+            }
+        });
     };
 
     const handleChangeRole = (memberId: string, newRole: string) => {
