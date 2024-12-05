@@ -20,6 +20,7 @@ import {
 import { InviteMemberDialog } from "./invite-member";
 import { excludeMember } from "@/actions/workspace/exclude-member";
 import { leaveWorkspace } from "@/actions/workspace/leave-workspace";
+import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 export default function Members() {
     const { currentWorkspace } = useCurrentWorkspace();
@@ -27,7 +28,8 @@ export default function Members() {
     const [roleFilter, setRoleFilter] = useState("all");
     const [isPending, startTransition] = useTransition();
     const currentUser = useCurrentUser();
-    const [members, setMembers] = useState(currentWorkspace?.members || []); // État local pour les membres
+    const [members, setMembers] = useState(currentWorkspace?.members || []);
+    const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
 
     const filteredMembers = members.filter((member) => {
         const matchesSearch =
@@ -42,42 +44,43 @@ export default function Members() {
             (member) => member.user.id === currentUser?.id
         )?.role === "ADMIN";
 
-    const handleExcludeMember = async (memberId: string) => {
-        startTransition(async () => {
-            const response = await excludeMember({
-                workspaceId: currentWorkspace?.id ?? "",
-                memberId,
-            });
+    const handleExcludeMember = (memberId: string) => {
+        setPendingAction(() => async () => {
+            startTransition(async () => {
+                const response = await excludeMember({
+                    workspaceId: currentWorkspace?.id ?? "",
+                    memberId,
+                });
 
-            if (response.error) {
-                toast.error(response.error);
-            } else {
-                toast.success(response.success);
-                // Mettez à jour l'état local après exclusion
-                setMembers((prevMembers) => prevMembers.filter((member) => member.user.id !== memberId));
-            }
+                if (response.error) {
+                    toast.error(response.error);
+                } else {
+                    toast.success(response.success);
+                    setMembers((prevMembers) => prevMembers.filter((member) => member.user.id !== memberId));
+                }
+            });
         });
     };
 
-    const handleLeaveWorkspace = async () => {
-        if (!currentWorkspace?.id || !currentUser?.id) return;
+    const handleLeaveWorkspace = () => {
+        setPendingAction(() => async () => {
+            if (!currentWorkspace?.id || !currentUser?.id) return;
 
-        startTransition(async () => {
-            try {
-                const response = await leaveWorkspace({
-                    workspaceId: currentWorkspace.id,
-                });
-                // refresh
-                toast.success("You have left the workspace");
-                window.location.reload();
-            } catch (error) {
-                toast.error("An error occurred while leaving the workspace");
-            }
+            startTransition(async () => {
+                try {
+                    const response = await leaveWorkspace({
+                        workspaceId: currentWorkspace.id,
+                    });
+                    toast.success("You have left the workspace");
+                    window.location.reload();
+                } catch (error) {
+                    toast.error("You cannot leave the workspace");
+                }
+            });
         });
     };
 
     const handleChangeRole = (memberId: string, newRole: string) => {
-        // Ajoutez la logique pour changer le rôle d'un membre ici.
         toast.success(`Role changed to ${newRole}`);
     };
 
@@ -85,15 +88,12 @@ export default function Members() {
         <div>
             <div className="flex justify-between items-center">
                 <div className="space-y-1">
-                    <h2 className="text-xl font-semibold tracking-tight">
-                        Workspace Members
-                    </h2>
-                    <p className="text-sm text-muted-foreground">
-                        Manage and invite members to your workspace
-                    </p>
+                    <h2 className="text-xl font-semibold tracking-tight mt-4">Members</h2>
+                    <p className="text-sm text-muted-foreground">Manage and invite members to your workspace</p>
                 </div>
                 {isCurrentUserAdmin && <InviteMemberDialog />}
             </div>
+
             <div className="flex items-center space-x-2 py-4">
                 <Input
                     placeholder="Search members..."
@@ -111,6 +111,7 @@ export default function Members() {
                     </SelectContent>
                 </Select>
             </div>
+
             <div className="space-y-4">
                 {filteredMembers?.map((member) => (
                     <Card key={member.user.id}>
@@ -118,23 +119,15 @@ export default function Members() {
                             <div className="flex items-center space-x-4">
                                 <Avatar>
                                     <AvatarImage src={member.user.image || ""} />
-                                    <AvatarFallback>
-                                        {member.user.name ? member.user.name[0] : ""}
-                                    </AvatarFallback>
+                                    <AvatarFallback>{member.user.name ? member.user.name[0] : ""}</AvatarFallback>
                                 </Avatar>
                                 <div>
-                                    <p className="text-sm font-medium leading-none">
-                                        {member.user.name}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {member.user.email}
-                                    </p>
+                                    <p className="text-sm font-medium leading-none">{member.user.name}</p>
+                                    <p className="text-sm text-muted-foreground">{member.user.email}</p>
                                 </div>
                             </div>
                             <div className="flex items-center space-x-4">
-                                <Badge
-                                    variant={member.role === "ADMIN" ? "default" : "secondary"}
-                                >
+                                <Badge variant={member.role === "ADMIN" ? "default" : "secondary"}>
                                     {member.role}
                                 </Badge>
                                 {(isCurrentUserAdmin || member.user.id === currentUser?.id) && (
@@ -145,30 +138,28 @@ export default function Members() {
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            {isCurrentUserAdmin &&
-                                                member.user.id !== currentUser?.id && (
-                                                    <>
-                                                        <DropdownMenuItem
-                                                            onClick={() => handleExcludeMember(member.user.id)}
-                                                            className="text-destructive"
-                                                        >
-                                                            <UserMinus className="mr-2 h-4 w-4" />
-                                                            Remove Member
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem
-                                                            onClick={() =>
-                                                                handleChangeRole(
-                                                                    member.user.id,
-                                                                    member.role === "ADMIN" ? "USER" : "ADMIN"
-                                                                )
-                                                            }
-                                                        >
-                                                            <UserCog className="mr-2 h-4 w-4" />
-                                                            Change to{" "}
-                                                            {member.role === "ADMIN" ? "USER" : "Admin"}
-                                                        </DropdownMenuItem>
-                                                    </>
-                                                )}
+                                            {isCurrentUserAdmin && member.user.id !== currentUser?.id && (
+                                                <>
+                                                    <DropdownMenuItem
+                                                        onClick={() => handleExcludeMember(member.user.id)}
+                                                        className="text-destructive"
+                                                    >
+                                                        <UserMinus className="mr-2 h-4 w-4" />
+                                                        Remove Member
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() =>
+                                                            handleChangeRole(
+                                                                member.user.id,
+                                                                member.role === "ADMIN" ? "USER" : "ADMIN"
+                                                            )
+                                                        }
+                                                    >
+                                                        <UserCog className="mr-2 h-4 w-4" />
+                                                        Change to {member.role === "ADMIN" ? "USER" : "Admin"}
+                                                    </DropdownMenuItem>
+                                                </>
+                                            )}
                                             {member.user.id === currentUser?.id && (
                                                 <DropdownMenuItem
                                                     onClick={handleLeaveWorkspace}
@@ -186,6 +177,30 @@ export default function Members() {
                     </Card>
                 ))}
             </div>
+
+            {/* Dialog de confirmation */}
+            {pendingAction && (
+                <Dialog open={true} onOpenChange={(open) => !open && setPendingAction(null)}>
+                    <DialogContent>
+                        <DialogTitle>Are you sure?</DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to perform this action? It cannot be undone.
+                        </DialogDescription>
+                            <Button variant="outline" onClick={() => setPendingAction(null)}>
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                onClick={() => {
+                                    pendingAction();
+                                    setPendingAction(null);
+                                }}
+                            >
+                                Confirm
+                            </Button>
+                    </DialogContent>
+                </Dialog>
+            )}
         </div>
     );
 }
