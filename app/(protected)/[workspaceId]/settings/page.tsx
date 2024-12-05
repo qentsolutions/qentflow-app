@@ -21,6 +21,7 @@ import { CreditCard, PlusCircle, Settings, Users } from "lucide-react";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
 import { deleteWorkspace } from "@/actions/workspace/delete-workspace";
 import { set } from "date-fns";
+import Members from "./components/members";
 
 const UpdateWorkspaceSchema = z.object({
     name: z.string().min(1, "Workspace name is required"),
@@ -126,58 +127,7 @@ const ManageWorkspacesPage = () => {
                             </TabsTrigger>
                         </TabsList>
                         <TabsContent value="members" className="space-y-4">
-                            <div className="flex justify-between items-center">
-                                <div className="space-y-1">
-                                    <h2 className="text-xl font-semibold tracking-tight">
-                                        Workspace Members
-                                    </h2>
-                                    <p className="text-sm text-muted-foreground">
-                                        Manage and invite members to your workspace
-                                    </p>
-                                </div>
-                                <Button className="bg-blue-500 hover:bg-blue-700">
-                                    <PlusCircle className="mr-2 h-4 w-4" />
-                                    Invite Member
-                                </Button>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <Input
-                                    placeholder="Search members..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                                <Select defaultValue="all">
-                                    <SelectTrigger className="w-[180px]">
-                                        <SelectValue placeholder="Filter by role" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Roles</SelectItem>
-                                        <SelectItem value="admin">Admin</SelectItem>
-                                        <SelectItem value="member">Member</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-4">
-                                {filteredMembers?.map((member, index) => (
-                                    <Card key={index}>
-                                        <CardContent className="flex items-center justify-between p-4">
-                                            <div className="flex items-center space-x-4">
-                                                <Avatar>
-                                                    <AvatarImage src={member.user.image || ""} />
-                                                    <AvatarFallback>{member.user.name ? member.user.name[0] : ''}</AvatarFallback>
-                                                </Avatar>
-                                                <div>
-                                                    <p className="text-sm font-medium leading-none">{member.user.name}</p>
-                                                    <p className="text-sm text-muted-foreground">{member.user.email}</p>
-                                                </div>
-                                            </div>
-                                            <Badge variant={member.role === "ADMIN" ? "default" : "secondary"}>
-                                                {member.role}
-                                            </Badge>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
+                            <Members />
                         </TabsContent>
                         <TabsContent value="billing" className="space-y-4">
                             <h2 className="text-xl font-semibold tracking-tight">
