@@ -4,11 +4,9 @@ import * as z from "zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { CreditCard, Building2, Coins, Lock, Users } from "lucide-react";
+import { Users } from "lucide-react";
 
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
     Form,
     FormControl,
@@ -22,8 +20,6 @@ import { createWorkspace } from "@/actions/workspace";
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import ButtonCheckout from "@/app/(protected)/workspace/components/button-checkout";
 
 const CreateWorkspaceSchema = z.object({
@@ -80,7 +76,6 @@ const plans = {
 };
 
 export const SelectWorkspaceForm = () => {
-    const router = useRouter();
     const [error, setError] = useState<string | undefined>();
     const [success, setSuccess] = useState<string | undefined>();
     const [billingType, setBillingType] = useState<"monthly" | "annual">("monthly");
@@ -130,7 +125,7 @@ export const SelectWorkspaceForm = () => {
     };
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="bg-background">
             <div className="container mx-auto grid md:grid-cols-2 gap-8 p-8">
                 {/* Left Column - Payment Form */}
                 <div>

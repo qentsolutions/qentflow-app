@@ -93,6 +93,9 @@ const ManageWorkspacesPage = () => {
 
         setSuccess(result.success);
         setCurrentWorkspace(null);
+
+        // Redirect to the dashboard
+        window.location.href = "/";
     };
 
     return (
