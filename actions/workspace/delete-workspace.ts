@@ -17,20 +17,22 @@ export const deleteWorkspace = async (values: z.infer<typeof DeleteWorkspaceSche
       return { error: "Invalid workspace ID!" };
     }
 
+    const { workspaceId } = validatedFields.data;
+
     const user = await currentUser();
 
     if (!user) {
       return { error: "Unauthorized" };
     }
 
-    // Vérifie si l'utilisateur est un administrateur dans ce workspace
+    // Vérifie si l'utilisateur est le OWNER du workspace
     const workspace = await db.workspace.findFirst({
       where: {
-        id: values.workspaceId,
+        id: workspaceId,
         members: {
           some: {
             userId: user.id,
-            role: UserRole.ADMIN,
+            role: UserRole.OWNER,
           },
         },
       },
@@ -40,10 +42,23 @@ export const deleteWorkspace = async (values: z.infer<typeof DeleteWorkspaceSche
       return { error: "Workspace not found or unauthorized" };
     }
 
+    // Compte le nombre de membres dans le workspace
+    const memberCount = await db.workspaceMember.count({
+      where: {
+        workspaceId,
+      },
+    });
+
+    if (memberCount > 1) {
+      return {
+        error: "You cannot delete the workspace while other members are present.",
+      };
+    }
+
     // Supprime le workspace
     await db.workspace.delete({
       where: {
-        id: values.workspaceId,
+        id: workspaceId,
       },
     });
 

@@ -29,18 +29,17 @@ export async function leaveWorkspace({ workspaceId }: LeaveWorkspaceParams) {
     throw new Error("You are not a member of this workspace");
   }
 
-  // Si l'utilisateur est un admin et que c'est le seul admin, vous pouvez ajouter une logique pour ne pas le laisser partir
-  if (currentMember.role === "ADMIN") {
-    const adminCount = await db.workspaceMember.count({
-      where: {
-        workspaceId,
-        role: "ADMIN",
-      },
+  // Vérifiez si l'utilisateur est OWNER
+  if (currentMember.role === "OWNER") {
+    const memberCount = await db.workspaceMember.count({
+      where: { workspaceId },
     });
 
-    // Si c'est le seul admin, vous pouvez empêcher l'utilisateur de quitter ou demander de transférer l'admin
-    if (adminCount === 1) {
-      throw new Error("You cannot leave the workspace as the only admin. Please transfer admin rights first.");
+    // Empêcher le OWNER de quitter si d'autres membres sont encore présents
+    if (memberCount > 1) {
+      throw new Error(
+        "You cannot leave the workspace as the owner while other members are still part of it. Please transfer ownership or remove other members first."
+      );
     }
   }
 
@@ -55,7 +54,7 @@ export async function leaveWorkspace({ workspaceId }: LeaveWorkspaceParams) {
   });
 
   // Optionnel : Revalider les données de la page pour une mise à jour immédiate
-  revalidatePath(`/workspace/${workspaceId}`);
+  revalidatePath(`/${workspaceId}/settings`);
 
   return { message: "You have successfully left the workspace" };
 }

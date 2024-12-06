@@ -16,7 +16,7 @@ export async function updateLogoWorkspace({ workspaceId, logoUrl }: UpdateLogoPa
     throw new Error("Unauthorized");
   }
 
-  // Vérifiez si l'utilisateur actuel est un admin du workspace
+  // Vérifiez si l'utilisateur actuel est OWNER ou ADMIN du workspace
   const currentMember = await db.workspaceMember.findUnique({
     where: {
       workspaceId_userId: {
@@ -26,7 +26,7 @@ export async function updateLogoWorkspace({ workspaceId, logoUrl }: UpdateLogoPa
     },
   });
 
-  if (!currentMember || currentMember.role !== "ADMIN") {
+  if (!currentMember || (currentMember.role !== "OWNER" && currentMember.role !== "ADMIN")) {
     throw new Error("You do not have permission to update the workspace logo");
   }
 
@@ -37,7 +37,7 @@ export async function updateLogoWorkspace({ workspaceId, logoUrl }: UpdateLogoPa
   });
 
   // Optionnel : Revalider les données de la page pour une mise à jour immédiate
-  revalidatePath(`/workspace/${workspaceId}`);
+  revalidatePath(`/${workspaceId}/settings`);
 
   // Réponse générique
   return { message: "Logo has been updated successfully." };

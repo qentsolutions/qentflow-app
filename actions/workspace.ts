@@ -86,7 +86,7 @@ export const createWorkspace = async (
         members: {
           create: {
             userId: user.id,
-            role: UserRole.ADMIN,
+            role: UserRole.OWNER,
           },
         },
       },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -20,16 +20,15 @@ import {
 import { InviteMemberDialog } from "./invite-member";
 import { excludeMember } from "@/actions/workspace/exclude-member";
 import { leaveWorkspace } from "@/actions/workspace/leave-workspace";
-import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { updateMemberRole } from "@/actions/workspace/update-member-role"; // Import de l'action serveur
+import { UserRole } from "@prisma/client";
 
 export default function Members() {
     const { currentWorkspace } = useCurrentWorkspace();
     const [searchTerm, setSearchTerm] = useState("");
     const [roleFilter, setRoleFilter] = useState("all");
-    const [isPending, startTransition] = useTransition();
     const currentUser = useCurrentUser();
     const [members, setMembers] = useState(currentWorkspace?.members || []);
-    const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
 
     const filteredMembers = members.filter((member) => {
         const matchesSearch =
@@ -39,49 +38,64 @@ export default function Members() {
         return matchesSearch && matchesRole;
     });
 
-    const isCurrentUserAdmin =
+    const isCurrentUserAdminOrOwner =
         currentWorkspace?.members.find(
             (member) => member.user.id === currentUser?.id
-        )?.role === "ADMIN";
+        )?.role === "ADMIN" || currentWorkspace?.members.find(
+            (member) => member.user.id === currentUser?.id
+        )?.role === "OWNER";
 
-    const handleExcludeMember = (memberId: string) => {
-        setPendingAction(() => async () => {
-            startTransition(async () => {
-                const response = await excludeMember({
-                    workspaceId: currentWorkspace?.id ?? "",
-                    memberId,
-                });
-
-                if (response.error) {
-                    toast.error(response.error);
-                } else {
-                    toast.success(response.success);
-                    setMembers((prevMembers) => prevMembers.filter((member) => member.user.id !== memberId));
-                }
-            });
+    const handleExcludeMember = async (memberId: string) => {
+        const response = await excludeMember({
+            workspaceId: currentWorkspace?.id ?? "",
+            memberId,
         });
+
+        if (response.error) {
+            toast.error(response.error);
+        } else {
+            toast.success(response.success);
+            setMembers((prevMembers) => prevMembers.filter((member) => member.user.id !== memberId));
+        }
     };
 
-    const handleLeaveWorkspace = () => {
-        setPendingAction(() => async () => {
-            if (!currentWorkspace?.id || !currentUser?.id) return;
+    const handleLeaveWorkspace = async () => {
+        if (!currentWorkspace?.id || !currentUser?.id) return;
 
-            startTransition(async () => {
-                try {
-                    const response = await leaveWorkspace({
-                        workspaceId: currentWorkspace.id,
-                    });
-                    toast.success("You have left the workspace");
-                    window.location.reload();
-                } catch (error) {
-                    toast.error("You cannot leave the workspace");
-                }
+        try {
+            const response = await leaveWorkspace({
+                workspaceId: currentWorkspace.id,
             });
-        });
+            toast.success("You have left the workspace");
+            window.location.reload();
+        } catch (error) {
+            toast.error("You cannot leave the workspace");
+        }
     };
 
-    const handleChangeRole = (memberId: string, newRole: string) => {
-        toast.success(`Role changed to ${newRole}`);
+    const handleChangeRole = async (memberId: string, newRole: any) => {
+        try {
+            const response: any = await updateMemberRole({
+                workspaceId: currentWorkspace?.id ?? "",
+                memberId,
+                newRole,
+            });
+
+            if (response.error) {
+                toast.error(response.error);
+            } else {
+                toast.success(`Role changed to ${newRole}`);
+                setMembers((prevMembers) =>
+                    prevMembers.map((member) =>
+                        member.user.id === memberId
+                            ? { ...member, role: newRole as UserRole }
+                            : member
+                    )
+                );
+            }
+        } catch (error) {
+            toast.error("Failed to change role");
+        }
     };
 
     return (
@@ -91,7 +105,7 @@ export default function Members() {
                     <h2 className="text-xl font-semibold tracking-tight mt-4">Members</h2>
                     <p className="text-sm text-muted-foreground">Manage and invite members to your workspace</p>
                 </div>
-                {isCurrentUserAdmin && <InviteMemberDialog />}
+                {isCurrentUserAdminOrOwner && <InviteMemberDialog />}
             </div>
 
             <div className="flex items-center space-x-2 py-4">
@@ -130,7 +144,7 @@ export default function Members() {
                                 <Badge variant={member.role === "ADMIN" ? "default" : "secondary"}>
                                     {member.role}
                                 </Badge>
-                                {(isCurrentUserAdmin || member.user.id === currentUser?.id) && (
+                                {(isCurrentUserAdminOrOwner || member.user.id === currentUser?.id) && (
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" size="sm">
@@ -138,7 +152,7 @@ export default function Members() {
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            {isCurrentUserAdmin && member.user.id !== currentUser?.id && (
+                                            {isCurrentUserAdminOrOwner && member.user.id !== currentUser?.id && (
                                                 <>
                                                     <DropdownMenuItem
                                                         onClick={() => handleExcludeMember(member.user.id)}
@@ -177,30 +191,6 @@ export default function Members() {
                     </Card>
                 ))}
             </div>
-
-            {/* Dialog de confirmation */}
-            {pendingAction && (
-                <Dialog open={true} onOpenChange={(open) => !open && setPendingAction(null)}>
-                    <DialogContent>
-                        <DialogTitle>Are you sure?</DialogTitle>
-                        <DialogDescription>
-                            Are you sure you want to perform this action? It cannot be undone.
-                        </DialogDescription>
-                            <Button variant="outline" onClick={() => setPendingAction(null)}>
-                                Cancel
-                            </Button>
-                            <Button
-                                variant="destructive"
-                                onClick={() => {
-                                    pendingAction();
-                                    setPendingAction(null);
-                                }}
-                            >
-                                Confirm
-                            </Button>
-                    </DialogContent>
-                </Dialog>
-            )}
         </div>
     );
 }

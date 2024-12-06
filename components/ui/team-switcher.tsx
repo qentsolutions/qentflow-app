@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Bolt, ChevronsUpDown, Cog, Plus, Settings, } from "lucide-react"
+import { Bolt, ChevronsUpDown, Cog, Plus, Settings, Settings2, } from "lucide-react"
 
 import {
     DropdownMenu,
@@ -119,7 +119,7 @@ export function TeamSwitcher({
                                 {currentWorkspace?.id === workspace.id && (
                                     <Link href={`/${workspace.id}/settings`}>
                                         <p className="flex items-center justify-center w-6 h-6 rounded-ful text-gray-800">
-                                            <Settings size={14} className="ml-1" />
+                                            <Settings2 size={14} className="ml-1" />
                                         </p>
                                     </Link>
                                 )}

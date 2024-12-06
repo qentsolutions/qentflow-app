@@ -16,7 +16,7 @@ export async function inviteMember({ workspaceId, email }: InviteMemberParams) {
     throw new Error("Unauthorized");
   }
 
-  // Vérifiez si l'utilisateur actuel est un admin du workspace
+  // Vérifiez si l'utilisateur actuel est un membre autorisé (OWNER ou ADMIN)
   const currentMember = await db.workspaceMember.findUnique({
     where: {
       workspaceId_userId: {
@@ -26,16 +26,15 @@ export async function inviteMember({ workspaceId, email }: InviteMemberParams) {
     },
   });
 
-  if (!currentMember || currentMember.role !== "ADMIN") {
+  if (!currentMember || !["OWNER", "ADMIN"].includes(currentMember.role)) {
     throw new Error("You do not have permission to invite members");
   }
 
-  // Vérifiez si l'utilisateur existe dans la base de données
+  // Vérifiez si l'utilisateur à inviter existe déjà dans la base de données
   const existingUser = await db.user.findUnique({
     where: { email },
   });
 
-  // Ne pas révéler si l'utilisateur existe ou non pour des raisons de sécurité
   if (existingUser) {
     // Vérifiez si l'utilisateur est déjà membre du workspace
     const existingMember = await db.workspaceMember.findFirst({
@@ -54,14 +53,17 @@ export async function inviteMember({ workspaceId, email }: InviteMemberParams) {
       data: {
         workspaceId,
         userId: existingUser.id,
-        role: "USER", // L'utilisateur invité aura le rôle "USER"
+        role: "USER", // Les utilisateurs invités auront le rôle "USER"
       },
     });
+  } else {
+    // Logique pour gérer l'invitation d'un nouvel utilisateur
+    // Exemple : envoyer un email d'invitation ou créer un compte temporaire
+    throw new Error("User does not exist. Please invite registered users only.");
   }
 
   // Optionnel : Revalider les données de la page pour une mise à jour immédiate
-  revalidatePath(`/workspace/${workspaceId}`);
+  revalidatePath(`/${workspaceId}/settings`);
 
-  // Réponse générique qui ne révèle rien sur l'existence de l'utilisateur
   return { message: "Invitation has been sent." };
 }

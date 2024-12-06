@@ -29,10 +29,12 @@ export default function SettingsWorkspace() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const currentUser = useCurrentUser();
 
-  const isAdmin =
-  currentWorkspace?.members.find(
+  const isAdminOrOwner =
+    currentWorkspace?.members.find(
       (member) => member.user.id === currentUser?.id
-  )?.role === "ADMIN";
+    )?.role === "ADMIN" || currentWorkspace?.members.find(
+      (member) => member.user.id === currentUser?.id
+    )?.role === "OWNER";
   const form = useForm<z.infer<typeof UpdateWorkspaceSchema>>({
     resolver: zodResolver(UpdateWorkspaceSchema),
     defaultValues: {
@@ -103,7 +105,7 @@ export default function SettingsWorkspace() {
                       <Input
                         {...field}
                         placeholder={currentWorkspace?.name}
-                        disabled={!isAdmin || form.formState.isSubmitting}
+                        disabled={!isAdminOrOwner || form.formState.isSubmitting}
                       />
                     </FormControl>
                     <FormMessage />
@@ -121,7 +123,7 @@ export default function SettingsWorkspace() {
                       <Input
                         type="file"
                         accept="image/*"
-                        disabled={!isAdmin}
+                        disabled={!isAdminOrOwner}
                       />
                     </FormControl>
                     <FormMessage />
@@ -150,7 +152,7 @@ export default function SettingsWorkspace() {
           <Button
             type="submit"
             onClick={form.handleSubmit(onSubmit)}
-            disabled={!isAdmin || form.formState.isSubmitting}
+            disabled={!isAdminOrOwner || form.formState.isSubmitting}
           >
             Save Changes
           </Button>
@@ -170,7 +172,7 @@ export default function SettingsWorkspace() {
             <DialogTrigger asChild>
               <Button
                 variant="destructive"
-                disabled={!isAdmin}
+                disabled={!isAdminOrOwner}
               >
                 Delete Workspace
               </Button>
