@@ -16,6 +16,7 @@ interface BoardIdPageProps {
 const BoardIdPage = async ({ params }: BoardIdPageProps) => {
   const user = await currentUser();
 
+  // Vérifie si l'utilisateur est membre du workspace
   const isUserMember = await db.workspaceMember.findUnique({
     where: {
       workspaceId_userId: {
@@ -26,9 +27,29 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
   });
 
   if (!isUserMember) {
+    // Si l'utilisateur n'est pas membre du workspace, redirige vers la liste des boards
     redirect(`/${params.workspaceId}/boards`);
   }
 
+  // Vérifie si l'utilisateur fait partie du board
+  const isUserInBoard = await db.board.findFirst({
+    where: {
+      id: params.boardId,
+      workspaceId: params.workspaceId,
+      User: {
+        some: {
+          id: user?.id,
+        },
+      },
+    },
+  });
+
+  if (!isUserInBoard) {
+    // Si l'utilisateur n'est pas associé au board, redirige vers la liste des boards
+    redirect(`/${params.workspaceId}/boards`);
+  }
+
+  // Récupère les informations du board
   const board = await db.board.findUnique({
     where: {
       id: params.boardId,

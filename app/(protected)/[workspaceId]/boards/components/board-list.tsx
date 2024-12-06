@@ -16,6 +16,7 @@ type Board = {
   id: string;
   title: string;
   updatedAt: string;
+  isMember: boolean; // Ajout de la propriété isMember
 };
 
 export const dynamic = "force-dynamic";
@@ -24,20 +25,17 @@ export const BoardList = () => {
   const { currentWorkspace } = useCurrentWorkspace();
   const workspaceId = currentWorkspace?.id;
 
-  // State pour l'input de recherche
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Utilisation de React Query pour gérer les données
   const { data: boards, isLoading, error } = useQuery({
     queryKey: ["boards", workspaceId],
     queryFn: () =>
       workspaceId
         ? fetcher(`/api/boards?workspaceId=${workspaceId}`)
         : Promise.resolve([]),
-    enabled: !!workspaceId, // Ne pas exécuter tant que workspaceId n'est pas défini
+    enabled: !!workspaceId,
   });
 
-  // Filtrer les boards en fonction de la recherche, en vérifiant que `boards` est bien un tableau
   const filteredBoards = Array.isArray(boards)
     ? boards.filter((board: Board) =>
         board.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -80,7 +78,14 @@ export const BoardList = () => {
                 <Link
                   key={board.id}
                   href={`/${workspaceId}/boards/${board.id}`}
-                  className="block"
+                  className={`block ${
+                    !board.isMember ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  onClick={(e) => {
+                    if (!board.isMember) {
+                      e.preventDefault(); // Empêche la navigation si l'utilisateur n'est pas membre
+                    }
+                  }}
                 >
                   <Card className="hover:bg-gray-50 transition duration-300">
                     <CardContent className="flex items-center justify-between p-4">

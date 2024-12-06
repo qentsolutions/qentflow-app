@@ -12,7 +12,7 @@ import { ACTION, ENTITY_TYPE } from "@prisma/client";
 import { currentUser } from "@/lib/auth";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
-  const user = currentUser();
+  const user = await currentUser();
 
   if (!user) {
     throw new Error("User not found!");
@@ -32,6 +32,12 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       data: {
         title,
         workspaceId,
+        // Ajouter l'utilisateur dans la relation User du board
+        User: {
+          connect: {
+            id: user.id, // L'ID de l'utilisateur qui crée le board
+          },
+        },
       },
     });
 
