@@ -120,6 +120,7 @@ export default function Members() {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">All Roles</SelectItem>
+                        <SelectItem value="OWNER">Owner</SelectItem>
                         <SelectItem value="ADMIN">Admin</SelectItem>
                         <SelectItem value="USER">User</SelectItem>
                     </SelectContent>
@@ -152,10 +153,11 @@ export default function Members() {
                                         <SelectContent>
                                             <SelectItem value="ADMIN">Admin</SelectItem>
                                             <SelectItem value="USER">User</SelectItem>
+                                            <SelectItem value="OWNER">Owner</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 ) : (
-                                    <Badge variant={member.role === "ADMIN" ? "default" : "secondary"}>
+                                    <Badge variant={member.role === "OWNER" ? "default" : "secondary"}>
                                         {member.role}
                                     </Badge>
                                 )}

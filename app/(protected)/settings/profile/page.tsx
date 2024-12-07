@@ -35,7 +35,7 @@ const ProfilePage = () => {
               </Avatar>
               <h2 className="text-2xl font-semibold">{user?.name}</h2>
               <p className="text-muted-foreground">{user?.email}</p>
-              {currentWorkspace?.members.find((m) => m.user.id === user?.id)?.role === "ADMIN" && (
+              {currentWorkspace?.members.find((m) => m.user.id === user?.id)?.role === "OWNER" && (
                 <Badge variant="secondary">Workspace Owner</Badge>
               )}
             </div>

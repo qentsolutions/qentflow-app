@@ -11,10 +11,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { CreditCard, PlusCircle, Settings, Users } from "lucide-react";
+import { CreditCard, Settings, Users } from "lucide-react";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
-import { deleteWorkspace } from "@/actions/workspace/delete-workspace";
-import { set } from "date-fns";
+
 import Members from "./components/members";
 import SettingsWorkspace from "./components/settings";
 
