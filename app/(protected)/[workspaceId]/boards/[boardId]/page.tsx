@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Settings from "./components/settings-board";
 import { BoardContent } from "./components/board-content";
+import { Avatar } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface BoardIdPageProps {
   params: {
@@ -27,7 +29,6 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
   });
 
   if (!isUserMember) {
-    // Si l'utilisateur n'est pas membre du workspace, redirige vers la liste des boards
     redirect(`/${params.workspaceId}/boards`);
   }
 
@@ -45,11 +46,10 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
   });
 
   if (!isUserInBoard) {
-    // Si l'utilisateur n'est pas associé au board, redirige vers la liste des boards
     redirect(`/${params.workspaceId}/boards`);
   }
 
-  // Récupère les informations du board
+  // Récupère les informations du board, y compris les utilisateurs
   const board = await db.board.findUnique({
     where: {
       id: params.boardId,
@@ -76,6 +76,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
           order: "asc",
         },
       },
+      User: true, // Inclut les utilisateurs associés au board
     },
   });
 
@@ -88,6 +89,32 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
       <main className="relative w-full h-full mx-auto p-8">
         <div className="flex flex-col h-full w-full">
           <div className="flex items-center gap-x-2 text-lg mb-2">
+            <div className="flex space-x-2">
+              {board.User.map((user) => (
+                <div className="flex space-x-2">
+                  {board.User.map((user) => (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Avatar key={user.id}>
+                          <div className="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
+                            {user.image ? (
+                              <img src={user.image} alt={user.name || "User"} className="w-full h-full object-cover" />
+                            ) : (
+                              <span className="text-sm font-medium text-gray-500">
+                                {user.name?.charAt(0).toUpperCase() || "U"}
+                              </span>
+                            )}
+                          </div>
+                        </Avatar>
+                      </TooltipTrigger>
+                      <TooltipContent>{user.name}</TooltipContent>
+                    </Tooltip>
+
+                  ))}
+                </div>
+
+              ))}
+            </div>
           </div>
 
           <div>
@@ -124,3 +151,5 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
 };
 
 export default BoardIdPage;
+
+
