@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MoreVertical, UserMinus, LogOut, UserCog } from "lucide-react";
+import { MoreVertical, UserMinus, LogOut } from 'lucide-react';
 import { toast } from "sonner";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import {
@@ -20,7 +20,7 @@ import {
 import { InviteMemberDialog } from "./invite-member";
 import { excludeMember } from "@/actions/workspace/exclude-member";
 import { leaveWorkspace } from "@/actions/workspace/leave-workspace";
-import { updateMemberRole } from "@/actions/workspace/update-member-role"; // Import de l'action serveur
+import { updateMemberRole } from "@/actions/workspace/update-member-role";
 import { UserRole } from "@prisma/client";
 
 export default function Members() {
@@ -73,9 +73,9 @@ export default function Members() {
         }
     };
 
-    const handleChangeRole = async (memberId: string, newRole: any) => {
+    const handleChangeRole = async (memberId: string, newRole: UserRole) => {
         try {
-            const response: any = await updateMemberRole({
+            const response:any = await updateMemberRole({
                 workspaceId: currentWorkspace?.id ?? "",
                 memberId,
                 newRole,
@@ -88,7 +88,7 @@ export default function Members() {
                 setMembers((prevMembers) =>
                     prevMembers.map((member) =>
                         member.user.id === memberId
-                            ? { ...member, role: newRole as UserRole }
+                            ? { ...member, role: newRole }
                             : member
                     )
                 );
@@ -120,8 +120,8 @@ export default function Members() {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">All Roles</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="user">User</SelectItem>
+                        <SelectItem value="ADMIN">Admin</SelectItem>
+                        <SelectItem value="USER">User</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -141,9 +141,24 @@ export default function Members() {
                                 </div>
                             </div>
                             <div className="flex items-center space-x-4">
-                                <Badge variant={member.role === "ADMIN" ? "default" : "secondary"}>
-                                    {member.role}
-                                </Badge>
+                                {isCurrentUserAdminOrOwner && member.user.id !== currentUser?.id ? (
+                                    <Select
+                                        defaultValue={member.role}
+                                        onValueChange={(value) => handleChangeRole(member.user.id, value as UserRole)}
+                                    >
+                                        <SelectTrigger className="w-[100px]">
+                                            <SelectValue placeholder={member.role} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="ADMIN">Admin</SelectItem>
+                                            <SelectItem value="USER">User</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                ) : (
+                                    <Badge variant={member.role === "ADMIN" ? "default" : "secondary"}>
+                                        {member.role}
+                                    </Badge>
+                                )}
                                 {(isCurrentUserAdminOrOwner || member.user.id === currentUser?.id) && (
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
@@ -153,26 +168,13 @@ export default function Members() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
                                             {isCurrentUserAdminOrOwner && member.user.id !== currentUser?.id && (
-                                                <>
-                                                    <DropdownMenuItem
-                                                        onClick={() => handleExcludeMember(member.user.id)}
-                                                        className="text-destructive"
-                                                    >
-                                                        <UserMinus className="mr-2 h-4 w-4" />
-                                                        Remove Member
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        onClick={() =>
-                                                            handleChangeRole(
-                                                                member.user.id,
-                                                                member.role === "ADMIN" ? "USER" : "ADMIN"
-                                                            )
-                                                        }
-                                                    >
-                                                        <UserCog className="mr-2 h-4 w-4" />
-                                                        Change to {member.role === "ADMIN" ? "USER" : "Admin"}
-                                                    </DropdownMenuItem>
-                                                </>
+                                                <DropdownMenuItem
+                                                    onClick={() => handleExcludeMember(member.user.id)}
+                                                    className="text-destructive"
+                                                >
+                                                    <UserMinus className="mr-2 h-4 w-4" />
+                                                    Remove Member
+                                                </DropdownMenuItem>
                                             )}
                                             {member.user.id === currentUser?.id && (
                                                 <DropdownMenuItem
@@ -194,3 +196,4 @@ export default function Members() {
         </div>
     );
 }
+
