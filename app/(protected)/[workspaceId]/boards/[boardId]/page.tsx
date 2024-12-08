@@ -14,42 +14,10 @@ interface BoardIdPageProps {
     workspaceId: string;
   };
 }
+import BoardUsers from "./components/board-users"; // Assurez-vous que le chemin est correct
 
 const BoardIdPage = async ({ params }: BoardIdPageProps) => {
-  const user = await currentUser();
-
-  // Vérifie si l'utilisateur est membre du workspace
-  const isUserMember = await db.workspaceMember.findUnique({
-    where: {
-      workspaceId_userId: {
-        workspaceId: params.workspaceId,
-        userId: user?.id ?? '',
-      },
-    },
-  });
-
-  if (!isUserMember) {
-    redirect(`/${params.workspaceId}/boards`);
-  }
-
-  // Vérifie si l'utilisateur fait partie du board
-  const isUserInBoard = await db.board.findFirst({
-    where: {
-      id: params.boardId,
-      workspaceId: params.workspaceId,
-      User: {
-        some: {
-          id: user?.id,
-        },
-      },
-    },
-  });
-
-  if (!isUserInBoard) {
-    redirect(`/${params.workspaceId}/boards`);
-  }
-
-  // Récupère les informations du board, y compris les utilisateurs
+  // Logique serveur pour récupérer `board` (comme dans votre code existant)
   const board = await db.board.findUnique({
     where: {
       id: params.boardId,
@@ -88,39 +56,12 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
     <div className="bg-white w-full">
       <main className="relative w-full h-full mx-auto p-8">
         <div className="flex flex-col h-full w-full">
-          <div className="flex items-center gap-x-2 text-lg mb-2">
-            <div className="flex space-x-2">
-              {board.User.map((user) => (
-                <div className="flex space-x-2">
-                  {board.User.map((user) => (
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Avatar key={user.id}>
-                          <div className="bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
-                            {user.image ? (
-                              <img src={user.image} alt={user.name || "User"} className="w-full h-full object-cover" />
-                            ) : (
-                              <span className="text-sm font-medium text-gray-500">
-                                {user.name?.charAt(0).toUpperCase() || "U"}
-                              </span>
-                            )}
-                          </div>
-                        </Avatar>
-                      </TooltipTrigger>
-                      <TooltipContent>{user.name}</TooltipContent>
-                    </Tooltip>
-
-                  ))}
-                </div>
-
-              ))}
-            </div>
-          </div>
-
-          <div>
+          <div className="flex items-center justify-between">
             <BoardNavbar board={board} />
           </div>
-
+          <div className="flex">
+            <BoardUsers users={board.User} boardId={board.id} />
+          </div>
           <div className="flex w-full items-center gap-4 mb-6 mt-8">
             <Tabs defaultValue="board" className="w-full">
               <TabsList>
@@ -151,5 +92,4 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
 };
 
 export default BoardIdPage;
-
 
