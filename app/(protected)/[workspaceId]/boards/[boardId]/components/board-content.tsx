@@ -6,6 +6,10 @@ import { TableView } from "./table-view";
 import { ListView } from "./list-view";
 import { useState } from "react";
 import BoardUsers from "./board-users";
+import { useQuery } from "@tanstack/react-query";
+import { fetcher } from "@/lib/fetcher";
+import { ChevronDown, Plus, TagIcon } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 
 
@@ -31,6 +35,11 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     }
   };
 
+  const { data: availableTags } = useQuery({
+    queryKey: ["available-tags", boardId],
+    queryFn: () => fetcher(`/api/boards/tags?boardId=${boardId}`),
+  });
+
   return (
     <>
       <div className="flex items-center justify-between gap-4 mb-4">
@@ -42,7 +51,26 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
               className="w-full px-4 py-2 text-sm text-gray-800 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
             />
             <BoardUsers boardId={boardId} users={users} />
-            {/* display the list of name of all users */}
+            <Popover>
+              <PopoverTrigger className="ml-2 flex items-center text-sm text-gray-500 p-2 hover:bg-gray-100">
+                Tags <ChevronDown size={12} className="ml-1" />
+              </PopoverTrigger>
+              <PopoverContent>
+                {availableTags?.map((tag: any) => (
+                  <div
+                    key={tag.id}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <TagIcon className="w-5 h-5" style={{ color: tag.color }} />
+                      <span className="font-medium">{tag.name}</span>
+                    </div>
+                  </div>
+                ))
+                }
+              </PopoverContent>
+            </Popover>
+
           </div>
         </div>
         <ViewSwitcher

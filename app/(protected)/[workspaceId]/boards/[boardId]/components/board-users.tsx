@@ -173,7 +173,6 @@ const BoardUsers: React.FC<BoardUsersProps> = ({ users, boardId }) => {
                                 )}
                             </ScrollArea>
                         </PopoverContent>
-
                     </Popover>
                 </>
             ) : (

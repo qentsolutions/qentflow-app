@@ -31,7 +31,8 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         title: "",
         order: 0,
         description: null,
-        listId: ""
+        listId: "",
+        assignedUserId: null
       }
     }; // Retourne le tag créé avec les propriétés manquantes
   } catch (error) {
