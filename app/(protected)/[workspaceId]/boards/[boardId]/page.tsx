@@ -59,9 +59,6 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
           <div className="flex items-center justify-between">
             <BoardNavbar board={board} />
           </div>
-          <div className="flex">
-            <BoardUsers users={board.User} boardId={board.id} />
-          </div>
           <div className="flex w-full items-center gap-4 mb-6 mt-8">
             <Tabs defaultValue="board" className="w-full">
               <TabsList>
@@ -77,7 +74,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
               <TabsContent value="overview">Overview</TabsContent>
               <TabsContent value="list">List</TabsContent>
               <TabsContent value="board">
-                <BoardContent boardId={board.id} lists={board.lists} />
+                <BoardContent users={board.User} boardId={board.id} lists={board.lists} />
               </TabsContent>
               <TabsContent value="timeline">Timeline</TabsContent>
               <TabsContent value="settings">
