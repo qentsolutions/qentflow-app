@@ -25,14 +25,12 @@ interface BoardUsersProps {
 }
 
 const BoardUsers: React.FC<BoardUsersProps> = ({ users, boardId }) => {
-    if (!users) {
-        return null;
-    }
+
     const { currentWorkspace } = useCurrentWorkspace()
     const [isAdding, setIsAdding] = useState(false)
     const [boardUsers, setBoardUsers] = useState(users)
-    const [showAllUsers, setShowAllUsers] = useState(false)
 
+    
     const workspaceUsers = currentWorkspace?.members?.map(({ user }) => user).filter(Boolean) ?? []
 
     const handleToggleUser = useCallback(async (user: User) => {
@@ -41,11 +39,11 @@ const BoardUsers: React.FC<BoardUsersProps> = ({ users, boardId }) => {
         try {
             if (isCurrentlyInBoard) {
                 await removeUserFromBoard(user.id, boardId)
-                setBoardUsers(prevUsers => prevUsers.filter(u => u.id !== user.id))
+                setBoardUsers(prevUsers => (prevUsers ?? []).filter(u => u.id !== user.id))
                 toast.success(`${user.name} removed from board`)
             } else {
                 await addUserToBoard(user.id, boardId)
-                setBoardUsers(prevUsers => [...prevUsers, user])
+                setBoardUsers(prevUsers => [...(prevUsers ?? []), user])
                 toast.success(`${user.name} added to board`)
             }
         } catch (error) {
