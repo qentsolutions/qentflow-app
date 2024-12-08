@@ -132,7 +132,7 @@ const BoardUsers: React.FC<BoardUsersProps> = ({ users, boardId }) => {
                             </Avatar>
                         </PopoverTrigger>
                         <PopoverContent className="w-56">
-                            <ScrollArea>
+                            <ScrollArea className="h-52">
                                 {workspaceUsers.length === 0 ? (
                                     <div className="flex items-center justify-center text-gray-500">
                                         No users to add

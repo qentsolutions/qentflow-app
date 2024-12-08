@@ -41,6 +41,7 @@ model User {
   boards                Board[]
   auditLogs             AuditLog[]
   Comment               Comment[]
+  Card                  Card[]
 }
 
 model Workspace {
@@ -97,7 +98,7 @@ model Board {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  User User[] 
+  User User[]
   Tag  Tag[]
 }
 
@@ -124,6 +125,9 @@ model Card {
 
   listId String
   list   List   @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  assignedUserId String? // Ajout du champ pour stocker l'ID de l'utilisateur assigné
+  assignedUser   User?   @relation(fields: [assignedUserId], references: [id])
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

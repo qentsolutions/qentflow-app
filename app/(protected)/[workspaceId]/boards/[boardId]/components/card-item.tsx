@@ -1,14 +1,20 @@
 "use client";
 
-import { Card, Tag } from "@prisma/client";
+import { Card, Tag, User } from "@prisma/client";
 import { Draggable } from "@hello-pangea/dnd";
 import { useCardModal } from "@/hooks/use-card-modal";
 import { Badge } from "@/components/ui/badge";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { format } from "date-fns";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { UserPlus, User as UserIcon } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { assignUserToCard } from "@/actions/boards/assign-user-to-card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface CardWithTags extends Card {
-  tags: Tag[]; // Inclure les tags associés
+  tags: Tag[];
   index: number;
 }
 
@@ -21,14 +27,36 @@ interface CardItemProps {
     listId: string;
     createdAt: Date;
     updatedAt: Date;
-    tags?: Tag[];  // Les tags peuvent être optionnels si ce n'est pas toujours fourni
-    index?: number; // L'index peut être optionnel si ce n'est pas toujours fourni
+    assignedUserId?: string | null;
+    tags?: Tag[];
+    index?: number;
   };
   index: number;
+  users: User[];
 }
 
-export const CardItem = ({ data, index }: CardItemProps) => {
+export const CardItem = ({ data, index, users }: CardItemProps) => {
   const cardModal = useCardModal();
+
+  // Etat local pour l'utilisateur assigné
+  const [assignedUserState, setAssignedUserState] = useState<User | null>(
+    users.find(user => user.id === data.assignedUserId) || null
+  );
+
+  const handleAssignUser = async (userId: string) => {
+    try {
+      // Assigner l'utilisateur à la carte côté backend
+      await assignUserToCard(data.id, userId);
+
+      // Mise à jour de l'état local pour refléter l'utilisateur assigné
+      const assignedUser = users.find(user => user.id === userId);
+      setAssignedUserState(assignedUser || null);
+
+      toast.success("User assigned to card");
+    } catch (error) {
+      toast.error("Failed to assign user to card");
+    }
+  };
 
   function getRandomColor(id: string): string {
     const colors = [
@@ -41,7 +69,6 @@ export const CardItem = ({ data, index }: CardItemProps) => {
       "bg-indigo-500",
       "bg-teal-500",
     ];
-    // Génère un index basé sur l'ID
     const index = id
       .split("")
       .reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
@@ -79,8 +106,65 @@ export const CardItem = ({ data, index }: CardItemProps) => {
                 </svg>
                 {format(new Date(data.createdAt), "MMM d")}
               </div>
-              <Avatar className="h-6 w-6">
-              </Avatar>
+              <Popover>
+                <PopoverTrigger onClick={(e) => e.stopPropagation()} asChild>
+                  <button className="hover:opacity-75 transition">
+                    {assignedUserState ? (
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={assignedUserState.image || ""} />
+                        <AvatarFallback className="text-gray-500 text-sm">
+                          {assignedUserState.name?.charAt(0) || <UserIcon className="h-2 w-2" />}
+                        </AvatarFallback>
+                      </Avatar>
+                    ) : (
+                      <UserPlus className="h-5 w-5 text-muted-foreground" />
+                    )}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-50 p-2"
+                  side="bottom"
+                  align="end"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ScrollArea className="h-28">
+
+                    <div className="space-y-2">
+                      {users.map((user) => (
+                        <button
+                          key={user.id}
+                          onClick={() => handleAssignUser(user.id)}
+                          className="w-full flex items-center gap-x-2 hover:bg-slate-100 p-2 rounded-md transition"
+                        >
+                          <Avatar className="h-6 w-6">
+                            <AvatarImage src={user.image || ""} />
+                            <AvatarFallback className="text-gray-500">
+                              {user.name?.charAt(0) || <UserIcon className="h-2 w-2" />}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm">{user.name}</span>
+                          {assignedUserState?.id === user.id && (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5 text-green-500"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </div>

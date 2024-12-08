@@ -21,13 +21,13 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
   const renderView = () => {
     switch (selectedView) {
       case "kanban":
-        return <KanbanView boardId={boardId} data={lists} />;
+        return <KanbanView boardId={boardId} data={lists} users={users} />;
       case "table":
         return <TableView boardId={boardId} data={lists} />;
       case "list":
         return <ListView boardId={boardId} data={lists} />;
       default:
-        return <KanbanView boardId={boardId} data={lists} />;
+        return <KanbanView boardId={boardId} data={lists} users={users} />;
     }
   };
 
@@ -42,6 +42,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
               className="w-full px-4 py-2 text-sm text-gray-800 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
             />
             <BoardUsers boardId={boardId} users={users} />
+            {/* display the list of name of all users */}
           </div>
         </div>
         <ViewSwitcher

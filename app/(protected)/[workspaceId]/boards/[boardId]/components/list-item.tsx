@@ -19,9 +19,10 @@ import { useParams } from "next/navigation";
 interface ListItemProps {
   data: ListWithCards;
   index: number;
+  users: any;
 }
 
-export const ListItem = ({ data, index }: ListItemProps) => {
+export const ListItem = ({ data, index, users }: ListItemProps) => {
   const textareaRef = useRef<ElementRef<"textarea">>(null);
   const [isEditing, setIsEditing] = useState(false);
   const params = useParams();
@@ -96,7 +97,7 @@ export const ListItem = ({ data, index }: ListItemProps) => {
                       {data.cards.map((card, index) => (
                         <ContextMenu key={card.id}>
                           <ContextMenuTrigger>
-                            <CardItem index={index} data={card} />
+                            <CardItem index={index} data={card} users={users} />
                           </ContextMenuTrigger>
                           <ContextMenuContent>
                             <ContextMenuItem>
