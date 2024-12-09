@@ -79,24 +79,18 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
           <div className="flex items-center justify-between">
             <BoardNavbar board={board} />
           </div>
-          <div className="flex w-full items-center gap-4 mb-6 mt-8">
+          <div className="flex w-full items-center gap-4 mb-6 mt-4">
             <Tabs defaultValue="board" className="w-full">
               <TabsList>
                 <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="list">List</TabsTrigger>
                 <TabsTrigger value="board">Tasks</TabsTrigger>
-                <TabsTrigger value="timeline">Timeline</TabsTrigger>
-                <TabsTrigger value="calendar">Calendar</TabsTrigger>
-                <TabsTrigger value="review">Review</TabsTrigger>
                 <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
               <div className="mt-4"></div>
               <TabsContent value="overview">Overview</TabsContent>
-              <TabsContent value="list">List</TabsContent>
               <TabsContent value="board">
                 <BoardContent users={board.User} boardId={board.id} lists={board.lists} />
               </TabsContent>
-              <TabsContent value="timeline">Timeline</TabsContent>
               <TabsContent value="settings">
                 <Settings boardId={board.id} />
               </TabsContent>

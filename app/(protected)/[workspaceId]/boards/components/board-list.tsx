@@ -38,8 +38,8 @@ export const BoardList = () => {
 
   const filteredBoards = Array.isArray(boards)
     ? boards.filter((board: Board) =>
-        board.title.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      board.title.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     : [];
 
   if (error) {
@@ -50,7 +50,7 @@ export const BoardList = () => {
     <div className="container mx-auto px-4 py-8">
       <Card className="bg-white shadow-sm rounded-md">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-2xl font-bold">Boards</CardTitle>
+          <CardTitle className="text-2xl font-bold">All Boards {boards && (<span>({boards?.length})</span>)}</CardTitle>
           {workspaceId && (
             <FormPopover sideOffset={10} side="right" workspaceId={String(workspaceId)}>
               <Button variant="outline">
@@ -78,9 +78,8 @@ export const BoardList = () => {
                 <Link
                   key={board.id}
                   href={`/${workspaceId}/boards/${board.id}`}
-                  className={`block ${
-                    !board.isMember ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
+                  className={`block ${!board.isMember ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                   onClick={(e) => {
                     if (!board.isMember) {
                       e.preventDefault(); // Empêche la navigation si l'utilisateur n'est pas membre
