@@ -1,12 +1,10 @@
 import { db } from "@/lib/db";
 import { BoardNavbar } from "./components/board-navbar";
-import { currentUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Settings from "./components/settings-board";
 import { BoardContent } from "./components/board-content";
-import { Avatar } from "@/components/ui/avatar";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { currentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 interface BoardIdPageProps {
   params: {
@@ -14,10 +12,25 @@ interface BoardIdPageProps {
     workspaceId: string;
   };
 }
-import BoardUsers from "./components/board-users"; // Assurez-vous que le chemin est correct
 
 const BoardIdPage = async ({ params }: BoardIdPageProps) => {
-  // Logique serveur pour récupérer `board` (comme dans votre code existant)
+
+  const user = await currentUser();
+
+
+
+  const isMember = await db.workspaceMember.findFirst({
+    where: {
+      workspaceId: params.workspaceId,
+      userId: user?.id,
+    },
+  });
+
+  if (!isMember) {
+    redirect(`/${params.workspaceId}/boards`);
+  }
+
+
   const board = await db.board.findUnique({
     where: {
       id: params.boardId,
@@ -51,6 +64,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
   if (!board) {
     return <div>Board not found</div>;
   }
+  
 
   return (
     <div className="bg-white w-full">

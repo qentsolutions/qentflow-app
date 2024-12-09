@@ -6,10 +6,13 @@ import { z } from "zod";
 
 const removeBoardMemberSchema = z.object({
   boardId: z.string(),
-  userId: z.string(), // ID de l'utilisateur à supprimer
-});
+  userId: z.string()
+})
 
-export async function removeUserFromBoard(userId: string, boardId: string) {
+export async function removeUserFromBoard(input: { userId: string; boardId: string }) {
+  // Valider les données d'entrée avec Zod
+  const { userId, boardId } = removeBoardMemberSchema.parse(input);
+
   const user = await currentUser();
   if (!user) {
     throw new Error("Unauthorized");

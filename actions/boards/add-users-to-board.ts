@@ -1,15 +1,19 @@
 "use server";
 
-import { db } from "@/lib/db"; // Remplacez par le chemin de votre client Prisma
-import { currentUser } from "@/lib/auth"; // Remplacez par la méthode pour obtenir l'utilisateur actuel
+import { db } from "@/lib/db";
+import { currentUser } from "@/lib/auth";
 import { z } from "zod";
 
 const addBoardMemberSchema = z.object({
   boardId: z.string(),
-  userId: z.string(), // ID de l'utilisateur à ajouter
+  userId: z.string()
 });
 
-export async function addUserToBoard(userId: string, boardId: string) {
+export async function addUserToBoard(input: { boardId: string; userId: string }) {
+  // Valider les données d'entrée avec Zod
+  const { boardId, userId } = addBoardMemberSchema.parse(input);
+
+  // Vérifiez l'utilisateur actuel
   const user = await currentUser();
   if (!user) {
     throw new Error("Unauthorized");

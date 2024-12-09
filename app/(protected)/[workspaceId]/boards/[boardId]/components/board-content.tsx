@@ -8,7 +8,7 @@ import { useState } from "react";
 import BoardUsers from "./board-users";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
-import { ChevronDown, Plus, TagIcon } from "lucide-react";
+import { ChevronDown, TagIcon } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 
