@@ -16,9 +16,6 @@ interface BoardIdPageProps {
 const BoardIdPage = async ({ params }: BoardIdPageProps) => {
 
   const user = await currentUser();
-
-
-
   const isMember = await db.workspaceMember.findFirst({
     where: {
       workspaceId: params.workspaceId,
@@ -57,7 +54,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
           order: "asc",
         },
       },
-      User: true, // Inclut les utilisateurs associés au board
+      User: true,
     },
   });
 
@@ -82,17 +79,19 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
           <div className="flex w-full items-center gap-4 mb-6 mt-4">
             <Tabs defaultValue="board" className="w-full">
               <TabsList>
-                <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="board">Tasks</TabsTrigger>
                 <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
               <div className="mt-4"></div>
-              <TabsContent value="overview">Overview</TabsContent>
               <TabsContent value="board">
                 <BoardContent users={board.User} boardId={board.id} lists={board.lists} />
               </TabsContent>
               <TabsContent value="settings">
-                <Settings boardId={board.id} />
+                <Settings
+                  boardId={board.id}
+                  boardTitle={board.title}
+                  users={board.User}
+                />
               </TabsContent>
             </Tabs>
           </div>

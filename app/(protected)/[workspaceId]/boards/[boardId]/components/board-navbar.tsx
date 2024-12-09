@@ -2,7 +2,6 @@
 
 import { Board } from "@prisma/client";
 import { BoardTitleForm } from "./board-title-form";
-import { BoardOptions } from "./board-options";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
 import { useEffect } from "react";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
@@ -38,9 +37,6 @@ export const BoardNavbar = ({ board }: BoardNavbarProps) => {
           <AvatarFallback>{board.title.charAt(0)}</AvatarFallback>
         </Avatar>
         <BoardTitleForm data={board} />
-      </div>
-      <div className="ml-2">
-        <BoardOptions boardId={board.id} />
       </div>
     </div>
   );

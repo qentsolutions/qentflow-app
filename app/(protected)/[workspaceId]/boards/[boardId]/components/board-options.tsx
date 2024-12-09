@@ -1,14 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import { toast } from "sonner";
-import { MoreHorizontal, X } from "lucide-react";
+import { MoreHorizontal, Trash2 } from 'lucide-react';
 
 import { Button } from "@/components/ui/button";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { deleteBoard } from "@/actions/tasks/delete-board";
 import { useAction } from "@/hooks/use-action";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
@@ -19,9 +24,13 @@ interface BoardOptionsProps {
 
 export const BoardOptions = ({ boardId }: BoardOptionsProps) => {
   const { currentWorkspace } = useCurrentWorkspace();
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { execute, isLoading } = useAction(deleteBoard, {
+    onSuccess: () => {
+      toast.success("Board deleted successfully");
+      setIsDialogOpen(false);
+    },
     onError: (error) => {
       toast.error(error);
     }
@@ -30,36 +39,55 @@ export const BoardOptions = ({ boardId }: BoardOptionsProps) => {
   const onDelete = () => {
     const workspaceId = currentWorkspace?.id;
     if (!workspaceId) {
-
       toast.error("Workspace ID is required.");
+      return;
     }
-    execute({ id: boardId, workspaceId: workspaceId! });
+    execute({ id: boardId, workspaceId });
   };
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button className="h-auto w-auto p-2" variant="outline">
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        className="px-0 pt-3 pb-3"
-        side="bottom"
-        align="start"
-      >
-        <div className="text-sm font-medium text-center text-neutral-600 pb-4">
-          Board actions
-        </div>
-        <Button
-          variant="ghost"
-          onClick={onDelete}
-          disabled={isLoading}
-          className="rounded-none w-full h-auto p-2 px-5 justify-start font-normal text-sm"
-        >
-          Delete this board
-        </Button>
-      </PopoverContent>
-    </Popover>
+    <div className="flex items-center justify-between mb-2">
+      <div>
+        <label className="text-sm font-medium text-gray-700">Delete the board</label>
+        <p className="text-sm text-gray-500">
+          Permanently delete this board with all its tasks. This action cannot be undone.
+        </p>
+      </div>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogTrigger asChild>
+          <Button variant="destructive">
+            <Trash2 className="h-4 w-4" /> Delete
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Delete Board</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete the board ? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-start">
+            <Button
+              variant="destructive"
+              onClick={onDelete}
+              disabled={isLoading}
+              className="w-full sm:w-auto"
+            >
+              {isLoading ? "Deleting..." : "Delete Board"}
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setIsDialogOpen(false)}
+              className="w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+
   );
 };
+

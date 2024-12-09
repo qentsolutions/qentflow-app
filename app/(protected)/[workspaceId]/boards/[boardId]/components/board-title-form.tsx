@@ -14,76 +14,13 @@ interface BoardTitleFormProps {
 }
 
 export const BoardTitleForm = ({ data }: BoardTitleFormProps) => {
-  const { currentWorkspace } = useCurrentWorkspace();
-  const { execute } = useAction(updateBoard, {
-    onSuccess: (data) => {
-      toast.success(`Board "${data.title}" updated!`);
-      setTitle(data.title);
-      disableEditing();
-    },
-    onError: (error) => {
-      toast.error(error);
-    }
-  });
-
-  const formRef = useRef<ElementRef<"form">>(null);
-  const inputRef = useRef<ElementRef<"input">>(null);
-
-  const [title, setTitle] = useState(data.title);
-  const [isEditing, setIsEditing] = useState(false);
-
-  const enableEditing = () => {
-    setIsEditing(true);
-    setTimeout(() => {
-      inputRef.current?.focus();
-      inputRef.current?.select();
-    });
-  };
-
-  const disableEditing = () => {
-    setIsEditing(false);
-  };
-
-  const onSubmit = (formData: FormData) => {
-    const title = formData.get("title") as string;
-    const workspaceId = currentWorkspace?.id;
-    if (!workspaceId) {
-      toast.error("Workspace ID is required.");
-      return;
-    }
-
-    execute({
-      title,
-      id: data.id,
-      workspaceId,
-    });
-  };
-
-  const onBlur = () => {
-    formRef.current?.requestSubmit();
-  };
-
-  if (isEditing) {
-    return (
-      <form action={onSubmit} ref={formRef} className="flex items-center gap-x-2">
-        <FormInput
-          ref={inputRef}
-          id="title"
-          onBlur={onBlur}
-          defaultValue={title}
-          className="text-lg font-bold px-[7px] py-1 h-7 bg-gray-50 focus-visible:outline-none focus-visible:ring-transparent border-none"
-        />
-      </form>
-    );
-  }
-
+  
   return (
     <Button
-      onClick={enableEditing}
       variant="default"
-      className="bg-transparent text-lg font-bold shadow-none text-gray-700 hover:bg-gray-100 h-auto w-auto p-1"
+      className="bg-transparent text-lg font-bold shadow-none hover:bg-white text-gray-700  h-auto w-auto p-1"
     >
-      {title}
+      {data.title}
     </Button>
   );
 };

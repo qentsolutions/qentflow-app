@@ -1,109 +1,80 @@
+// app/(protected)/[workspaceId]/boards/[boardId]/components/settings-board.tsx
 "use client";
-import { Settings2, Tag, Users, Layout } from "lucide-react";
+
+import { Settings2, Tag, Users } from "lucide-react";
 import { useState } from "react";
-import TagManager from "./tag-manager";
-import SettingsSection from "./settings-section";
-import { toast } from "sonner";
-import BoardSettings from "./board-settings";
+import { Card } from "@/components/ui/card";
+import { GeneralSettings } from "./general-settings";
+import { TagManager } from "./tag-manager";
+import { BoardMembers } from "./board-member";
 
 interface BoardSettingsProps {
-    boardId: string;
+  boardId: string;
+  boardTitle: string;
+  users: any[];
 }
 
+const Settings = ({ boardId, boardTitle, users }: BoardSettingsProps) => {
+  const [activeTab, setActiveTab] = useState("general");
 
-const Settings = ({ boardId }: BoardSettingsProps) => {
-    const [activeTab, setActiveTab] = useState("general");
+  const tabs = [
+    {
+      id: "general",
+      label: "General",
+      icon: Settings2,
+      component: <GeneralSettings boardId={boardId} boardTitle={boardTitle} />,
+    },
+    {
+      id: "tags",
+      label: "Tags",
+      icon: Tag,
+      component: <TagManager boardId={boardId} />,
+    },
+    {
+      id: "members",
+      label: "Members",
+      icon: Users,
+      component: <BoardMembers boardId={boardId} users={users} />,
+    },
+  ];
 
-    const handleSave = () => {
-        toast.success("Les paramètres ont été sauvegardés.");
-    };
+  return (
+    <div className="min-h-screen w-full">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-12 gap-8">
+          <div className="col-span-3">
+            <nav className="space-y-1">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-md transition-colors ${
+                    activeTab === tab.id
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  <tab.icon className="w-5 h-5" />
+                  <span className="text-sm">{tab.label}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
 
-
-    return (
-        <div className="min-h-screen bg-[#f2f5f9] w-full">
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="grid grid-cols-12 gap-8">
-                    {/* Sidebar */}
-                    <div className="col-span-3">
-                        <nav className="space-y-1">
-                            <button
-                                onClick={() => setActiveTab("general")}
-                                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-md transition-colors ${activeTab === "general"
-                                    ? "bg-blue-50 text-blue-700"
-                                    : "text-gray-700 hover:bg-gray-100"
-                                    }`}
-                            >
-                                <Settings2 className="w-5 h-5" />
-                                <span>Général</span>
-                            </button>
-                            <button
-                                onClick={() => setActiveTab("tags")}
-                                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-md transition-colors ${activeTab === "tags"
-                                    ? "bg-blue-50 text-blue-700"
-                                    : "text-gray-700 hover:bg-gray-100"
-                                    }`}
-                            >
-                                <Tag className="w-5 h-5" />
-                                <span>Tags</span>
-                            </button>
-                            <button
-                                onClick={() => setActiveTab("permissions")}
-                                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-md transition-colors ${activeTab === "permissions"
-                                    ? "bg-blue-50 text-blue-700"
-                                    : "text-gray-700 hover:bg-gray-100"
-                                    }`}
-                            >
-                                <Users className="w-5 h-5" />
-                                <span>Permissions</span>
-                            </button>
-                            <button
-                                onClick={() => setActiveTab("display")}
-                                className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-md transition-colors ${activeTab === "display"
-                                    ? "bg-blue-50 text-blue-700"
-                                    : "text-gray-700 hover:bg-gray-100"
-                                    }`}
-                            >
-                                <Layout className="w-5 h-5" />
-                                <span>Affichage</span>
-                            </button>
-                        </nav>
-                    </div>
-
-                    {/* Main content */}
-                    <div className="col-span-9">
-                        <div className="bg-white rounded-lg shadow">
-                            {activeTab === "general" && <BoardSettings />}
-                            {activeTab === "tags" && <TagManager boardId={boardId} />}
-                            {activeTab === "permissions" && (
-                                <SettingsSection
-                                    title="Permissions"
-                                    description="Gérez qui peut voir et modifier ce board."
-                                >
-                                    <div className="p-6">
-                                        <p className="text-gray-500">
-                                            Les paramètres de permissions seront bientôt disponibles.
-                                        </p>
-                                    </div>
-                                </SettingsSection>
-                            )}
-                            {activeTab === "display" && (
-                                <SettingsSection
-                                    title="Options d'affichage"
-                                    description="Personnalisez l'apparence de votre board."
-                                >
-                                    <div className="p-6">
-                                        <p className="text-gray-500">
-                                            Les options d&apos;affichage seront bientôt disponibles.
-                                        </p>
-                                    </div>
-                                </SettingsSection>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </div>
+          <div className="col-span-9">
+            <Card className="shadow-sm">
+              <div className="border-b border-gray-200 bg-gray-50 px-6 py-5 rounded-t-lg">
+                <h3 className="text-lg font-medium text-gray-900">
+                  {tabs.find((tab) => tab.id === activeTab)?.label} Settings
+                </h3>
+              </div>
+              {tabs.find((tab) => tab.id === activeTab)?.component}
+            </Card>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default Settings;
