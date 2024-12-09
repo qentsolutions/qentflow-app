@@ -25,9 +25,12 @@ export const useBoardFilters = ({ lists }: UseCardFiltersProps) => {
           .toLowerCase()
           .includes(searchTerm.toLowerCase());
         
-        const matchesUser = selectedUser
-          ? card.assignedUserId === selectedUser
-          : true;
+        // Gestion spéciale pour les cartes non assignées
+        const matchesUser = selectedUser === "unassigned" 
+          ? !card.assignedUserId // Vérifie si la carte n'est pas assignée
+          : selectedUser 
+            ? card.assignedUserId === selectedUser // Vérifie si la carte est assignée à l'utilisateur sélectionné
+            : true; // Aucun filtre utilisateur
         
         const matchesTags = selectedTags.length > 0
           ? selectedTags.every(tagId => 

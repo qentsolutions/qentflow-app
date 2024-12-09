@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Check, Plus, UserPlus, X, Loader2 } from 'lucide-react'
+import { Check, Plus, UserPlus, X, Loader2, UserX } from 'lucide-react'
 import { toast } from "sonner"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -67,11 +67,31 @@ const BoardUsers: React.FC<BoardUsersProps> = ({
             {boardUsers && boardUsers.length > 0 ? (
                 <>
                     <div className="flex items-center">
+                        {/* Option "Not Assigned" */}
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Avatar
+                                    className={`w-8 h-8 ring-2 ring-background cursor-pointer
+                                        ${selectedUser === "unassigned" ? 'ring-blue-500' : ''}
+                                        hover:ring-blue-500 transition-all duration-200`}
+                                    onClick={() => onUserSelect?.("unassigned")}
+                                >
+                                    <div className="bg-gray-200 w-full h-full rounded-full flex items-center justify-center overflow-hidden transition-all duration-300 ease-in-out hover:scale-110 hover:z-10">
+                                        <UserX className="w-4 h-4 text-gray-500" />
+                                    </div>
+                                </Avatar>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                Not Assigned
+                                {selectedUser === "unassigned" && " (Filtered)"}
+                            </TooltipContent>
+                        </Tooltip>
+
                         {displayedUsers.map((user, index) => (
                             <Tooltip key={user.id}>
                                 <TooltipTrigger>
                                     <Avatar
-                                        className={`w-8 h-8 ${index !== 0 ? '-ml-2' : ''} ring-2 ring-background cursor-pointer
+                                        className={`w-8 h-8 -ml-2 ring-2 ring-background cursor-pointer
                                             ${selectedUser === user.id ? 'ring-blue-500' : ''}
                                             hover:ring-blue-500 transition-all duration-200`}
                                         onClick={() => onUserSelect?.(user.id)}
@@ -134,7 +154,6 @@ const BoardUsers: React.FC<BoardUsersProps> = ({
                                 </PopoverContent>
                             </Popover>
                         )}
-                  
                     </div>
                 </>
             ) : (
