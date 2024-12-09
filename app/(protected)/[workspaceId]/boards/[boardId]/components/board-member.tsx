@@ -1,27 +1,26 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { removeUserFromBoard } from "@/actions/boards/remove-user-from-board";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { 
+import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { addUserToBoard } from "@/actions/boards/add-users-to-board";
-import { PlusCircle } from "lucide-react";
-import { Label } from "@/components/ui/label";
+import { Check, PlusCircle, UserPlus, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { User } from "@prisma/client";
+import { cn } from "@/lib/utils";
 
 interface BoardMembersProps {
   boardId: string;
@@ -32,10 +31,30 @@ interface BoardMembersProps {
 export const BoardMembers = ({ boardId, users, createdById }: BoardMembersProps) => {
   const { currentWorkspace } = useCurrentWorkspace();
   const currentUser = useCurrentUser();
-  const [email, setEmail] = useState("");
-  const [isAddingMember, setIsAddingMember] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [boardUsers, setBoardUsers] = useState(users);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const workspaceUsers = currentWorkspace?.members?.map(({ user }) => user).filter(Boolean) ?? [];
+  const availableUsers = workspaceUsers.filter(
+    user => !boardUsers.some(boardUser => boardUser.id === user.id)
+  );
 
   const isCreator = currentUser?.id === createdById;
+
+  const handleAddUser = useCallback(async (user: any) => {
+    setIsAdding(true);
+    try {
+      await addUserToBoard(user.id, boardId);
+      setBoardUsers(prevUsers => [...prevUsers, user]);
+      toast.success(`${user.name} added to board`);
+    } catch (error) {
+      console.error("Failed to update board users:", error);
+      toast.error("Failed to update board users");
+    } finally {
+      setIsAdding(false);
+    }
+  }, [boardId]);
 
   const handleRemoveUser = async (userId: string) => {
     if (!isCreator) {
@@ -45,98 +64,112 @@ export const BoardMembers = ({ boardId, users, createdById }: BoardMembersProps)
 
     try {
       await removeUserFromBoard(userId, boardId);
+      setBoardUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
       toast.success("User removed from board");
     } catch (error) {
       toast.error("Failed to remove user");
     }
   };
 
-  const handleAddMember = async () => {
-    if (!isCreator) {
-      toast.error("Only the board creator can add members");
-      return;
-    }
-
-    try {
-      setIsAddingMember(true);
-      await addUserToBoard(email, boardId);
-      toast.success("User added to board");
-      setEmail("");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to add user");
-    } finally {
-      setIsAddingMember(false);
-    }
-  };
-
   return (
     <div className="p-6">
       {isCreator && (
-        <div className="mb-6">
-          <Dialog>
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Board Members</h2>
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-              <Button className="w-full">
-                <PlusCircle className="h-4 w-4 mr-2" />
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                <UserPlus className="h-4 w-4 mr-2" />
                 Add Member
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>Add Member</DialogTitle>
+                <DialogTitle>Add Board Members</DialogTitle>
                 <DialogDescription>
-                  Add a new member to this board by their email address.
+                  Add members from your workspace to this board.
                 </DialogDescription>
               </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label>Email Address</Label>
-                  <Input
-                    placeholder="Enter member's email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
+              <ScrollArea className="mt-4 max-h-[60vh]">
+                <div className="space-y-2 pr-4">
+                  {availableUsers.length === 0 ? (
+                    <div className="text-center py-4 text-sm text-muted-foreground">
+                      No available users to add
+                    </div>
+                  ) : (
+                    availableUsers.map(user => (
+                      <div
+                        key={user.id}
+                        className={cn(
+                          "flex items-center justify-between p-3 rounded-lg transition-colors",
+                          "hover:bg-slate-100 group cursor-pointer"
+                        )}
+                        onClick={() => handleAddUser(user)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={user?.image || ""} />
+                            <AvatarFallback>
+                              {user.name?.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="text-sm font-medium leading-none">{user.name}</p>
+                            <p className="text-sm text-muted-foreground">{user.email}</p>
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="opacity-0 group-hover:opacity-100"
+                        >
+                          Add
+                        </Button>
+                      </div>
+                    ))
+                  )}
                 </div>
-              </div>
-              <DialogFooter>
-                <Button
-                  onClick={handleAddMember}
-                  disabled={isAddingMember || !email}
-                >
-                  {isAddingMember ? "Adding..." : "Add Member"}
-                </Button>
-              </DialogFooter>
+              </ScrollArea>
             </DialogContent>
           </Dialog>
         </div>
       )}
 
       <div className="space-y-4">
-        {users?.map((user) => (
+        {boardUsers.map((user) => (
           <div
             key={user.id}
-            className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+            className="group flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-sm transition-all hover:shadow-md"
           >
             <div className="flex items-center space-x-4">
-              <Avatar>
+              <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
                 <AvatarImage src={user.image} />
-                <AvatarFallback>{user.name?.[0]}</AvatarFallback>
+                <AvatarFallback className="bg-blue-600 text-white">
+                  {user.name?.charAt(0).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-medium">{user.name}</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-medium text-gray-900">{user.name}</p>
+                  {user.id === createdById && (
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                      Creator
+                    </Badge>
+                  )}
+                </div>
                 <p className="text-sm text-gray-500">{user.email}</p>
               </div>
             </div>
             {isCreator && user.id !== createdById && (
               <Button
                 variant="ghost"
-                className="text-red-500 hover:text-red-700"
+                size="sm"
+                className="text-red-500 hover:text-red-700 hover:bg-red-50"
                 onClick={() => handleRemoveUser(user.id)}
               >
+                <X className="h-4 w-4 mr-1" />
                 Remove
               </Button>
-            )}
-            {user.id === createdById && (
-              <Badge variant="secondary">Creator</Badge>
             )}
           </div>
         ))}

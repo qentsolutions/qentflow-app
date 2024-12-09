@@ -8,7 +8,7 @@ import { useState } from "react";
 import BoardUsers from "./board-users";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
-import { ChevronDown, TagIcon, X } from "lucide-react";
+import { CheckIcon, ChevronDown, Plus, Search, TagIcon, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,6 +16,10 @@ import { Badge } from "@/components/ui/badge";
 import { useBoardFilters } from "@/hooks/use-board-filters";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import CreateTagForm from "./create-tag-form";
 
 interface BoardContentProps {
   boardId: string;
@@ -25,6 +29,8 @@ interface BoardContentProps {
 
 export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
   const [selectedView, setSelectedView] = useState<ViewType>("kanban");
+  const [tagSearchTerm, setTagSearchTerm] = useState("");
+  const [isCreateTagOpen, setIsCreateTagOpen] = useState(false);
 
   const {
     searchTerm,
@@ -60,6 +66,10 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     }
   };
 
+  const filteredTags = availableTags?.filter((tag: any) =>
+    tag.name.toLowerCase().includes(tagSearchTerm.toLowerCase())
+  );
+
   function getRandomColor(id: string): string {
     const colors = [
       "bg-red-500",
@@ -82,13 +92,15 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
       <div className="flex items-center justify-between gap-4 mb-4">
         <div className="flex-1">
           <div className="flex items-center gap-4">
-            <Input
-              type="text"
-              placeholder="Search cards..."
-              className="w-52 px-4 py-2 text-sm text-gray-800 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search cards..."
+                className="w-[200px] pl-9"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
 
             <BoardUsers
               boardId={boardId}
@@ -96,40 +108,82 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
               onUserSelect={handleUserSelect}
               selectedUser={selectedUser}
             />
+
             <Popover>
-              <PopoverTrigger className="ml-2 flex items-center text-sm text-gray-500 p-2 hover:bg-gray-100 rounded-md">
-                <TagIcon className="mr-2 h-4 w-4" />
-                Tags
-                <ChevronDown size={12} className="ml-1" />
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <TagIcon className="h-4 w-4" />
+                  Tags
+                  <ChevronDown className="h-3 w-3 opacity-50" />
+                </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-64">
+              <PopoverContent className="w-80 p-0" align="start">
+                <div className="p-3 border-b">
+                  <div className="flex items-center gap-2">
+                    <Search className="h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search tags..."
+                      value={tagSearchTerm}
+                      onChange={(e) => setTagSearchTerm(e.target.value)}
+                      className="h-8"
+                    />
+                  </div>
+                </div>
                 <ScrollArea className="h-72">
-                  <div className="space-y-2">
-                    {availableTags?.map((tag: any) => (
-                      <div
-                        key={tag.id}
-                        className={cn(
-                          "flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors",
-                          selectedTags.includes(tag.id) ? "bg-gray-100" : "hover:bg-gray-50"
-                        )}
-                        onClick={() => toggleTag(tag.id)}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className={cn(
-                            "w-2 h-2 rounded-full",
-                            getRandomColor(tag.id)
-                          )} />
-                          <span className="text-sm font-medium">{tag.name}</span>
-                        </div>
-                        {selectedTags.includes(tag.id) && (
-                          <CheckIcon className="h-4 w-4 text-blue-500" />
-                        )}
+                  <div className="p-2">
+                    {filteredTags?.length === 0 ? (
+                      <div className="text-center p-4 text-sm text-muted-foreground">
+                        No tags found
                       </div>
-                    ))}
+                    ) : (
+                      filteredTags?.map((tag: any) => (
+                        <div
+                          key={tag.id}
+                          onClick={() => toggleTag(tag.id)}
+                          className={cn(
+                            "flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors",
+                            selectedTags.includes(tag.id)
+                              ? "bg-secondary"
+                              : "hover:bg-secondary/50"
+                          )}
+                        >
+                          <div className="flex items-center gap-2">
+                            <div
+                              className={cn(
+                                "w-2 h-2 rounded-full",
+                                getRandomColor(tag.id)
+                              )}
+                            />
+                            <span className="text-sm font-medium">{tag.name}</span>
+                          </div>
+                          {selectedTags.includes(tag.id) && (
+                            <CheckIcon className="h-4 w-4 text-primary" />
+                          )}
+                        </div>
+                      ))
+                    )}
                   </div>
                 </ScrollArea>
+                <Separator />
+                <div className="p-2">
+                  <Dialog open={isCreateTagOpen} onOpenChange={setIsCreateTagOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="ghost" className="w-full justify-start">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Create new tag
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Create New Tag</DialogTitle>
+                      </DialogHeader>
+                      <CreateTagForm boardId={boardId} />
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </PopoverContent>
             </Popover>
+
             <div className="flex items-center gap-2">
               {selectedUser && users.find((u: any) => u.id === selectedUser) && (
                 <Badge
@@ -156,15 +210,14 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                 return (
                   <Badge
                     key={tagId}
-                    variant="secondary"
                     className={cn(
-                      "flex items-center cursor-pointer gap-2 hover:bg-black",
+                      "flex items-center gap-2 text-white",
                       getRandomColor(tagId)
                     )}
                   >
-                    <span className="text-white">{tag.name}</span>
+                    {tag.name}
                     <X
-                      className="h-3 w-3 cursor-pointer text-white"
+                      className="h-3 w-3 cursor-pointer hover:text-white/80"
                       onClick={() => toggleTag(tagId)}
                     />
                   </Badge>
@@ -172,7 +225,6 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
               })}
             </div>
           </div>
-
         </div>
         <ViewSwitcher
           selectedView={selectedView}
@@ -185,5 +237,3 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     </>
   );
 };
-
-import { CheckIcon } from "@radix-ui/react-icons";

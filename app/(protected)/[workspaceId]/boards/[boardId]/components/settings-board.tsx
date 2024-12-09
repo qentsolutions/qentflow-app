@@ -25,16 +25,16 @@ const Settings = ({ boardId, boardTitle, users, createdById }: BoardSettingsProp
       component: <GeneralSettings boardId={boardId} boardTitle={boardTitle} createdById={createdById} />,
     },
     {
-      id: "tags",
-      label: "Tags",
-      icon: Tag,
-      component: <TagManager boardId={boardId} />,
-    },
-    {
       id: "members",
       label: "Members",
       icon: Users,
       component: <BoardMembers boardId={boardId} users={users} createdById={createdById} />,
+    },
+    {
+      id: "tags",
+      label: "Tags",
+      icon: Tag,
+      component: <TagManager boardId={boardId} />,
     },
   ];
 
@@ -48,11 +48,10 @@ const Settings = ({ boardId, boardTitle, users, createdById }: BoardSettingsProp
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-md transition-colors ${
-                    activeTab === tab.id
+                  className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-md transition-colors ${activeTab === tab.id
                       ? "bg-blue-50 text-blue-700"
                       : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                    }`}
                 >
                   <tab.icon className="w-5 h-5" />
                   <span className="text-sm">{tab.label}</span>
