@@ -18,7 +18,7 @@ export const BoardTitleForm = ({ data }: BoardTitleFormProps) => {
   return (
     <Button
       variant="default"
-      className="bg-transparent text-lg font-bold shadow-none hover:bg-white text-gray-700  h-auto w-auto p-1"
+      className="bg-transparent text-lg font-bold shadow-none text-gray-700 hover:bg-transparent dark:text-white h-auto w-auto p-1"
     >
       {data.title}
     </Button>

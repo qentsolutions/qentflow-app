@@ -3,11 +3,12 @@ import { Inter } from 'next/font/google'
 import { SessionProvider } from 'next-auth/react'
 import { auth } from '@/auth'
 import './globals.css'
-import { Toaster } from "@/components/ui/sonner";
-import { WorkspaceProvider } from '@/hooks/use-current-workspace';
+import { Toaster } from "@/components/ui/sonner"
+import { WorkspaceProvider } from '@/hooks/use-current-workspace'
 import { ModalProvider } from '@/providers/modal-provider'
 import { QueryProvider } from '@/providers/query-provider'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { ThemeProvider } from '@/providers/theme-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -24,20 +25,28 @@ export default async function RootLayout({
   const session = await auth();
 
   return (
-    <SessionProvider session={session}>
-      <WorkspaceProvider>
-        <QueryProvider>
-          <TooltipProvider>
-            <html lang="en">
-              <body className={inter.className}>
-                <Toaster />
-                <ModalProvider />
-                {children}
-              </body>
-            </html>
-          </TooltipProvider>
-        </QueryProvider>
-      </WorkspaceProvider>
-    </SessionProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+          storageKey="qent-theme"
+        >
+          <SessionProvider session={session}>
+            <WorkspaceProvider>
+              <QueryProvider>
+                <TooltipProvider>
+                  <Toaster />
+                  <ModalProvider />
+                  {children}
+                </TooltipProvider>
+              </QueryProvider>
+            </WorkspaceProvider>
+          </SessionProvider>
+        </ThemeProvider>
+      </body>
+    </html>
   )
 }

@@ -105,7 +105,7 @@ export const Description = ({
           <div
             onClick={enableEditing}
             role="button"
-            className="bg-gray-50 min-h-[200px] text-gray-500 border text-sm py-3 px-3.5 rounded-md"
+            className="bg-gray-50 dark:bg-gray-700 min-h-[200px] text-gray-500 dark:text-gray-200 border text-sm py-3 px-3.5 rounded-md"
             dangerouslySetInnerHTML={{ __html: description || "Add a more detailed description..." }}
           />
         )}

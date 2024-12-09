@@ -77,7 +77,7 @@ export const CardForm = forwardRef<HTMLTextAreaElement, CardFormProps>(
             onKeyDown={onTextareaKeyDown}
             ref={textareaRef as React.RefObject<HTMLTextAreaElement>}
             placeholder="Enter a title for this card..."
-            className="bg-white"
+            className="bg-white dark:bg-gray-700"
             errors={fieldErrors}
           />
           <input hidden id="listId" name="listId" value={listId} />
@@ -92,14 +92,14 @@ export const CardForm = forwardRef<HTMLTextAreaElement, CardFormProps>(
     }
 
     return (
-      <div className=" px-2 border-2 border-dashed mx-2 border-gray-300 hover:bg-white">
+      <div className=" px-2 border-2 border-dashed mx-2 border-gray-300 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-800">
         <Button
           onClick={enableEditing}
-          className="h-auto px-2 py-1.5 w-full justify-center hover:bg-white text-muted-foreground text-sm"
+          className="h-auto px-2 py-1.5 w-full justify-center hover:bg-white dark:hover:bg-gray-800 text-muted-foreground text-sm"
           size="sm"
           variant="ghost"
         >
-          <Plus className="h-4 w-4  border-2 border-gray-300 border-dashed rounded-full" />
+          <Plus className="h-4 w-4  border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-full" />
           Add a card
         </Button>
       </div>

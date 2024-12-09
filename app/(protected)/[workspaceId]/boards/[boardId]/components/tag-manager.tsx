@@ -104,7 +104,7 @@ export const TagManager = ({ boardId }: TagManagerProps) => {
         {tags?.map((tag: any) => (
           <div
             key={tag.id}
-            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
           >
             <div className="flex items-center space-x-3">
               <Badge className={`${getRandomColor(tag.id)} text-white`}>

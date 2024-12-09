@@ -48,7 +48,7 @@ export const BoardList = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Card className="bg-white shadow-sm rounded-md">
+      <Card className="shadow-sm rounded-md">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">All Boards {boards && (<span>({boards?.length})</span>)}</CardTitle>
           {workspaceId && (
@@ -86,7 +86,7 @@ export const BoardList = () => {
                     }
                   }}
                 >
-                  <Card className="hover:bg-gray-50 transition duration-300">
+                  <Card className="hover:bg-gray-50 dark:hover:bg-transparent transition duration-300">
                     <CardContent className="flex items-center justify-between p-4">
                       <div className="flex items-center space-x-4">
                         <Avatar className="h-10 w-10">
@@ -97,12 +97,13 @@ export const BoardList = () => {
                           <AvatarFallback>{board.title.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div>
-                          <h3 className="text-lg font-semibold text-gray-800">{board.title}</h3>
+                          <h3 className="text-lg text-gray-800 dark:text-white font-semibold">{board.title}</h3>
                         </div>
                       </div>
                       <Button variant="ghost">View Board</Button>
                     </CardContent>
                   </Card>
+
                 </Link>
               ))
             ) : (

@@ -70,7 +70,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
 
 
   return (
-    <div className="bg-white w-full">
+    <div className="w-full">
       <main className="relative w-full h-full mx-auto p-8">
         <div className="flex flex-col h-full w-full">
           <div className="flex items-center justify-between">

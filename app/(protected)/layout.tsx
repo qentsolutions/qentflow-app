@@ -36,7 +36,7 @@ const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
       <BreadcrumbProvider>
         <AppSidebar />
         <main className="w-full">
-          <header className="flex z-50 bg-white w-full fixed h-16 shrink-0 items-center gap-2 border-b px-4">
+          <header className="flex z-50  w-full fixed h-16 shrink-0 items-center gap-2 border-b px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <BreadcrumbHeader />

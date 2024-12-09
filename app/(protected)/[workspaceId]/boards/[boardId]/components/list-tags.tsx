@@ -59,9 +59,9 @@ export const ListTags = ({ boardId }: ListTagsProps) => {
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Choose a tag" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="dark:bg-gray-700 dark:text-black">
                         {tags.map((tag) => (
-                            <SelectItem key={tag.id} value={tag.id}>
+                            <SelectItem className="dark:bg-gray-700 dark:text-black" key={tag.id} value={tag.id}>
                                 {tag.name}
                             </SelectItem>
                         ))}

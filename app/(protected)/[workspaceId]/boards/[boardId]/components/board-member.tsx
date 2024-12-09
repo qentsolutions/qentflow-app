@@ -102,7 +102,7 @@ export const BoardMembers = ({ boardId, users, createdById }: BoardMembersProps)
                         key={user.id}
                         className={cn(
                           "flex items-center justify-between p-3 rounded-lg transition-colors",
-                          "hover:bg-slate-100 group cursor-pointer"
+                          "hover:bg-slate-100 dark:hover:bg-gray-700 group cursor-pointer"
                         )}
                         onClick={() => handleAddUser(user)}
                       >
@@ -139,7 +139,7 @@ export const BoardMembers = ({ boardId, users, createdById }: BoardMembersProps)
         {boardUsers.map((user) => (
           <div
             key={user.id}
-            className="group flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-sm transition-all hover:shadow-md"
+            className="group flex items-center justify-between p-4 bg-white dark:bg-gray-800 dark:border-gray-600 rounded-lg border border-gray-200 shadow-sm transition-all hover:shadow-md"
           >
             <div className="flex items-center space-x-4">
               <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
@@ -150,7 +150,7 @@ export const BoardMembers = ({ boardId, users, createdById }: BoardMembersProps)
               </Avatar>
               <div>
                 <div className="flex items-center gap-2">
-                  <p className="font-medium text-gray-900">{user.name}</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{user.name}</p>
                   {user.id === createdById && (
                     <Badge variant="secondary" className="bg-blue-100 text-blue-800">
                       Creator

@@ -1,12 +1,15 @@
 "use client";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
+
 import { useEffect } from "react";
+import { useTheme } from "next-themes";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 export default function AppearanceSettings() {
-
+  const { theme, setTheme } = useTheme();
   const { setBreadcrumbs } = useBreadcrumbs();
 
   useEffect(() => {
@@ -16,6 +19,9 @@ export default function AppearanceSettings() {
     ]);
   }, [setBreadcrumbs]);
 
+  const handleThemeChange = (selectedTheme: string) => {
+    setTheme(selectedTheme);
+  };
 
   return (
     <div className="w-full max-w-3xl p-6 space-y-8">
@@ -27,33 +33,27 @@ export default function AppearanceSettings() {
       </div>
 
       <div className="space-y-4">
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold tracking-tight">Font</h2>
-          <Select defaultValue="inter">
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Select a font" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="inter">Inter</SelectItem>
-              <SelectItem value="system">System</SelectItem>
-              <SelectItem value="roboto">Roboto</SelectItem>
-              <SelectItem value="helvetica">Helvetica</SelectItem>
-            </SelectContent>
-          </Select>
-          <p className="text-sm text-muted-foreground">
-            Set the font you want to use in the dashboard.
-          </p>
-        </div>
+       
 
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold tracking-tight">Theme</h2>
-          <p className="text-sm text-muted-foreground">
-            Select the theme for the dashboard.
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold tracking-tight">Theme</h2>
+              <p className="text-sm text-muted-foreground">
+                Select the theme for the dashboard.
+              </p>
+            </div>
+            <ThemeToggle />
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Card className="border-2 p-4 hover:border-primary cursor-pointer">
+              <Card 
+                className={`border-2 p-4 cursor-pointer ${
+                  theme === "light" ? "border-primary" : "hover:border-primary"
+                }`}
+                onClick={() => handleThemeChange("light")}
+              >
                 <div className="space-y-2">
                   <div className="bg-gray-100 h-2 w-3/4 rounded" />
                   <div className="bg-gray-100 h-2 w-1/2 rounded" />
@@ -73,7 +73,12 @@ export default function AppearanceSettings() {
             </div>
 
             <div className="space-y-2">
-              <Card className="border-2 bg-slate-950 p-4 hover:border-primary cursor-pointer">
+              <Card 
+                className={`border-2 bg-slate-950 p-4 cursor-pointer ${
+                  theme === "dark" ? "border-primary" : "hover:border-primary"
+                }`}
+                onClick={() => handleThemeChange("dark")}
+              >
                 <div className="space-y-2">
                   <div className="bg-slate-800 h-2 w-3/4 rounded" />
                   <div className="bg-slate-800 h-2 w-1/2 rounded" />
@@ -89,7 +94,7 @@ export default function AppearanceSettings() {
                   </div>
                 </div>
               </Card>
-              <p className="text-sm text-center font-medium">Dark</p>
+              <p className="text-sm text-center font-medium dark:text-white">Dark</p>
             </div>
           </div>
         </div>
@@ -99,6 +104,5 @@ export default function AppearanceSettings() {
         Update preferences
       </Button>
     </div>
-  )
+  );
 }
-

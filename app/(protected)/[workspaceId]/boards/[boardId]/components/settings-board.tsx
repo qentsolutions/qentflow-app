@@ -49,8 +49,8 @@ const Settings = ({ boardId, boardTitle, users, createdById }: BoardSettingsProp
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-md transition-colors ${activeTab === tab.id
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-gray-700 hover:bg-gray-100"
+                      ? "bg-blue-50 dark:bg-gray-700 dark:text-blue-500 text-blue-700"
+                      : "text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-300"
                     }`}
                 >
                   <tab.icon className="w-5 h-5" />
@@ -62,8 +62,8 @@ const Settings = ({ boardId, boardTitle, users, createdById }: BoardSettingsProp
 
           <div className="col-span-9">
             <Card className="shadow-sm">
-              <div className="border-b border-gray-200 bg-gray-50 px-6 py-5 rounded-t-lg">
-                <h3 className="text-lg font-medium text-gray-900">
+              <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-black px-6 py-5 rounded-t-lg">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                   {tabs.find((tab) => tab.id === activeTab)?.label} Settings
                 </h3>
               </div>

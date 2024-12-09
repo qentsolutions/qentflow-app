@@ -154,7 +154,7 @@ const CommentForm = ({
     >
       <div onClick={() => setIsEditing(true)} role="button">
         {!isEditing ? (
-          <div className="pb-12 border mt-2 pt-2 pl-2 rounded-lg bg-gray-50">
+          <div className="pb-12 border mt-2 pt-2 pl-2 rounded-lg bg-gray-50 dark:text-gray-200 dark:bg-gray-700">
             <p className="text-gray-500 text-sm">{newComment ? "" : "Write a comment..."}</p>
           </div>
         ) : (
@@ -162,7 +162,7 @@ const CommentForm = ({
             <FormTextarea
               id="new-comment"
               placeholder="Write a comment..."
-              className="pb-20 mt-2 pt-2 pl-2 rounded-lg bg-gray-50"
+              className="pb-20 mt-2 pt-2 pl-2 rounded-lg bg-gray-50 dark:text-gray-200 dark:bg-gray-700"
               errors={fieldErrors}
             />
           </div>

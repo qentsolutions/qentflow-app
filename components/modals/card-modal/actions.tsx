@@ -223,7 +223,7 @@ export const Actions = ({
               </Tooltip>
             </div>
             <div
-              className={`relative border rounded-md p-2 bg-gray-50 cursor-pointer group ${isEditMode ? "ring-2 ring-blue-500" : ""}`}
+              className={`relative border rounded-md p-2 bg-gray-50 dark:bg-gray-700 cursor-pointer group ${isEditMode ? "ring-2 ring-blue-500" : ""}`}
               onClick={() => setIsEditMode((prev) => !prev)} // Toggle l'état
             >
               <div className="flex flex-wrap gap-2">
