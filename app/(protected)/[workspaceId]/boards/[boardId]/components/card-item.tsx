@@ -45,18 +45,23 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
 
   const handleAssignUser = async (userId: string) => {
     try {
-      // Assigner l'utilisateur à la carte côté backend
+      // Met à jour l'utilisateur assigné côté backend
       await assignUserToCard(data.id, userId);
 
       // Mise à jour de l'état local pour refléter l'utilisateur assigné
-      const assignedUser = users.find(user => user.id === userId);
-      setAssignedUserState(assignedUser || null);
+      const assignedUser = users.find(user => user.id === userId) || null;
+      setAssignedUserState(assignedUser);
 
-      toast.success("User assigned to card");
+      toast.success(
+        userId ? "User assigned to card" : "User unassigned from card"
+      );
     } catch (error) {
-      toast.error("Failed to assign user to card");
+      toast.error(
+        userId ? "Failed to assign user to card" : "Failed to unassign user"
+      );
     }
   };
+
 
   function getRandomColor(id: string): string {
     const colors = [
@@ -117,7 +122,11 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                         </AvatarFallback>
                       </Avatar>
                     ) : (
-                      <UserPlus className="h-5 w-5 text-muted-foreground" />
+                      <Avatar className="h-6 w-6">
+                        <AvatarFallback className="text-gray-500 text-sm">
+                          <UserPlus size={12} />
+                        </AvatarFallback>
+                      </Avatar>
                     )}
                   </button>
                 </PopoverTrigger>
@@ -130,6 +139,36 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                   <ScrollArea className="h-28">
 
                     <div className="space-y-2">
+                      {/* Option "Unassign" */}
+                      <button
+                        onClick={() => handleAssignUser("null")}
+                        className="w-full flex items-center gap-x-2 hover:bg-slate-100 p-2 rounded-md transition"
+                      >
+                        <Avatar className="h-6 w-6">
+                          <AvatarFallback className="text-gray-500">
+                            <UserIcon className="h-4 w-4" />
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm">Unassign</span>
+                        {!assignedUserState && (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 text-green-500"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        )}
+                      </button>
+
+                      {/* Liste des utilisateurs */}
                       {users.map((user) => (
                         <button
                           key={user.id}
@@ -162,6 +201,7 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                         </button>
                       ))}
                     </div>
+
                   </ScrollArea>
                 </PopoverContent>
               </Popover>

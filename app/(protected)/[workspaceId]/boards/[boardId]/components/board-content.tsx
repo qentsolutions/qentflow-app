@@ -59,10 +59,10 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                 {availableTags?.map((tag: any) => (
                   <div
                     key={tag.id}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+                    className="flex items-center justify-between py-1  rounded-md"
                   >
-                    <div className="flex items-center space-x-3">
-                      <TagIcon className="w-5 h-5" style={{ color: tag.color }} />
+                    <div className="flex items-center text-sm space-x-3">
+                      <TagIcon size={14} />
                       <span className="font-medium">{tag.name}</span>
                     </div>
                   </div>
