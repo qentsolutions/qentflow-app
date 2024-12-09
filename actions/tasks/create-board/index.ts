@@ -32,6 +32,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       data: {
         title,
         workspaceId,
+        createdById: user.id,
         // Ajouter l'utilisateur dans la relation User du board
         User: {
           connect: {

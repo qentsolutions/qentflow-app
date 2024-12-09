@@ -92,6 +92,7 @@ model Board {
   workspaceId String
   title       String
   lists       List[]
+  createdById String 
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 

@@ -1,4 +1,3 @@
-// app/(protected)/[workspaceId]/boards/[boardId]/components/settings-board.tsx
 "use client";
 
 import { Settings2, Tag, Users } from "lucide-react";
@@ -12,9 +11,10 @@ interface BoardSettingsProps {
   boardId: string;
   boardTitle: string;
   users: any[];
+  createdById: string;
 }
 
-const Settings = ({ boardId, boardTitle, users }: BoardSettingsProps) => {
+const Settings = ({ boardId, boardTitle, users, createdById }: BoardSettingsProps) => {
   const [activeTab, setActiveTab] = useState("general");
 
   const tabs = [
@@ -22,7 +22,7 @@ const Settings = ({ boardId, boardTitle, users }: BoardSettingsProps) => {
       id: "general",
       label: "General",
       icon: Settings2,
-      component: <GeneralSettings boardId={boardId} boardTitle={boardTitle} />,
+      component: <GeneralSettings boardId={boardId} boardTitle={boardTitle} createdById={createdById} />,
     },
     {
       id: "tags",
@@ -34,7 +34,7 @@ const Settings = ({ boardId, boardTitle, users }: BoardSettingsProps) => {
       id: "members",
       label: "Members",
       icon: Users,
-      component: <BoardMembers boardId={boardId} users={users} />,
+      component: <BoardMembers boardId={boardId} users={users} createdById={createdById} />,
     },
   ];
 

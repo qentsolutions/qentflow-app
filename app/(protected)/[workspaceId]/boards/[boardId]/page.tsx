@@ -91,6 +91,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                   boardId={board.id}
                   boardTitle={board.title}
                   users={board.User}
+                  createdById={board.createdById}
                 />
               </TabsContent>
             </Tabs>
