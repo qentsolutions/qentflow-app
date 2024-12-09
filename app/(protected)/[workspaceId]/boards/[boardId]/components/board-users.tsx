@@ -22,15 +22,20 @@ interface User {
 interface BoardUsersProps {
     users: User[] | undefined
     boardId: string
+    onUserSelect?: (userId: string) => void
+    selectedUser?: string | null
 }
 
-const BoardUsers: React.FC<BoardUsersProps> = ({ users, boardId }) => {
-
+const BoardUsers: React.FC<BoardUsersProps> = ({
+    users,
+    boardId,
+    onUserSelect,
+    selectedUser
+}) => {
     const { currentWorkspace } = useCurrentWorkspace()
     const [isAdding, setIsAdding] = useState(false)
     const [boardUsers, setBoardUsers] = useState(users)
 
-    
     const workspaceUsers = currentWorkspace?.members?.map(({ user }) => user).filter(Boolean) ?? []
 
     const handleToggleUser = useCallback(async (user: User) => {
@@ -65,7 +70,12 @@ const BoardUsers: React.FC<BoardUsersProps> = ({ users, boardId }) => {
                         {displayedUsers.map((user, index) => (
                             <Tooltip key={user.id}>
                                 <TooltipTrigger>
-                                    <Avatar className={`w-8 h-8 ${index !== 0 ? '-ml-2' : ''} ring-2 ring-background`}>
+                                    <Avatar
+                                        className={`w-8 h-8 ${index !== 0 ? '-ml-2' : ''} ring-2 ring-background cursor-pointer
+                                            ${selectedUser === user.id ? 'ring-blue-500' : ''}
+                                            hover:ring-blue-500 transition-all duration-200`}
+                                        onClick={() => onUserSelect?.(user.id)}
+                                    >
                                         <div className="bg-gray-200 w-full h-full rounded-full flex items-center justify-center overflow-hidden transition-all duration-300 ease-in-out hover:scale-110 hover:z-10">
                                             {user.image ? (
                                                 <AvatarImage
@@ -81,7 +91,10 @@ const BoardUsers: React.FC<BoardUsersProps> = ({ users, boardId }) => {
                                         </div>
                                     </Avatar>
                                 </TooltipTrigger>
-                                <TooltipContent>{user.name}</TooltipContent>
+                                <TooltipContent>
+                                    {user.name}
+                                    {selectedUser === user.id && " (Filtered)"}
+                                </TooltipContent>
                             </Tooltip>
                         ))}
                         {remainingUsers.length > 0 && (
@@ -121,59 +134,58 @@ const BoardUsers: React.FC<BoardUsersProps> = ({ users, boardId }) => {
                                 </PopoverContent>
                             </Popover>
                         )}
-                    </div>
-
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Avatar className="w-8 h-8 -ml-2 ring-2 ring-background cursor-pointer">
-                                <div className="bg-gray-300 w-full h-full rounded-full flex items-center justify-center">
-                                    <Plus className="h-4 w-4 text-gray-700" />
-                                </div>
-                            </Avatar>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-56">
-                            <ScrollArea className="h-52">
-                                {workspaceUsers.length === 0 ? (
-                                    <div className="flex items-center justify-center text-gray-500">
-                                        No users to add
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Avatar className="w-8 h-8 -ml-2 ring-2 ring-background cursor-pointer">
+                                    <div className="bg-gray-300 w-full h-full rounded-full flex items-center justify-center">
+                                        <Plus className="h-4 w-4 text-gray-700" />
                                     </div>
-                                ) : (
-                                    workspaceUsers.map(user => {
-                                        const isInBoard = boardUsers.some(boardUser => boardUser.id === user.id)
-                                        return (
-                                            <div
-                                                key={user.id}
-                                                className="flex items-center justify-between p-2 hover:bg-gray-100 cursor-pointer"
-                                                onClick={() => handleToggleUser(user)}
-                                            >
-                                                <div className="flex items-center space-x-2">
-                                                    <Avatar className={`w-8 h-8 ring-2 ring-background`}>
-                                                        {user.image ? (
-                                                            <AvatarImage
-                                                                src={user.image}
-                                                                alt={user.name || "User"}
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                        ) : (
-                                                            <span className="text-sm flex items-center justify-center w-full h-full bg-gray-200 font-medium text-gray-500 rounded-full">
-                                                                {user.name
-                                                                    ?.split(" ")
-                                                                    .slice(0, 2)
-                                                                    .map(part => part.charAt(0).toUpperCase())
-                                                                    .join("") || "U"}
-                                                            </span>
-                                                        )}
-                                                    </Avatar>
-                                                    <span className="text-sm">{user.name}</span>
+                                </Avatar>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-56">
+                                <ScrollArea className="h-52">
+                                    {workspaceUsers.length === 0 ? (
+                                        <div className="flex items-center justify-center text-gray-500">
+                                            No users to add
+                                        </div>
+                                    ) : (
+                                        workspaceUsers.map(user => {
+                                            const isInBoard = boardUsers.some(boardUser => boardUser.id === user.id)
+                                            return (
+                                                <div
+                                                    key={user.id}
+                                                    className="flex items-center justify-between p-2 hover:bg-gray-100 cursor-pointer"
+                                                    onClick={() => handleToggleUser(user)}
+                                                >
+                                                    <div className="flex items-center space-x-2">
+                                                        <Avatar className={`w-8 h-8 ring-2 ring-background`}>
+                                                            {user.image ? (
+                                                                <AvatarImage
+                                                                    src={user.image}
+                                                                    alt={user.name || "User"}
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <span className="text-sm flex items-center justify-center w-full h-full bg-gray-200 font-medium text-gray-500 rounded-full">
+                                                                    {user.name
+                                                                        ?.split(" ")
+                                                                        .slice(0, 2)
+                                                                        .map(part => part.charAt(0).toUpperCase())
+                                                                        .join("") || "U"}
+                                                                </span>
+                                                            )}
+                                                        </Avatar>
+                                                        <span className="text-sm">{user.name}</span>
+                                                    </div>
+                                                    {isInBoard && <Check className="h-4 w-4 text-green-500" />}
                                                 </div>
-                                                {isInBoard && <Check className="h-4 w-4 text-green-500" />}
-                                            </div>
-                                        )
-                                    })
-                                )}
-                            </ScrollArea>
-                        </PopoverContent>
-                    </Popover>
+                                            )
+                                        })
+                                    )}
+                                </ScrollArea>
+                            </PopoverContent>
+                        </Popover>
+                    </div>
                 </>
             ) : (
                 <p>No users in this board.</p>
@@ -183,4 +195,3 @@ const BoardUsers: React.FC<BoardUsersProps> = ({ users, boardId }) => {
 }
 
 export default BoardUsers
-
