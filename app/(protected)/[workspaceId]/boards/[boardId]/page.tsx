@@ -64,7 +64,13 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
   if (!board) {
     return <div>Board not found</div>;
   }
-  
+
+  const isBoardMember = board.User.some((boardUser) => boardUser.id === user?.id);
+
+  if (!isBoardMember) {
+    redirect(`/${params.workspaceId}/boards`);
+  }
+
 
   return (
     <div className="bg-white w-full">
