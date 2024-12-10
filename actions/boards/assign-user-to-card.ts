@@ -33,16 +33,15 @@ export async function assignUserToCard(cardId: string, userId: string) {
       return { success: false, error: "Card not found" };
     }
 
-    // Check if user is member of the board
-    const isBoardMember = card.list.board.User.some(user => user.id === userId);
-    if (!isBoardMember) {
-      return { success: false, error: "User is not a member of this board" };
-    }
+    // Si userId est "null", on désassigne l'utilisateur
+    const updateData = userId === "null" 
+      ? { assignedUserId: null }
+      : { assignedUserId: userId };
 
-    // Update card with assigned user
+    // Update card with assigned user or remove assignment
     const updatedCard = await db.card.update({
       where: { id: cardId },
-      data: { assignedUserId: userId },
+      data: updateData,
     });
 
     return { success: true, data: updatedCard };

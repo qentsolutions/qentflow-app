@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { UserPlus, User as UserIcon } from "lucide-react";
-import { useState } from "react";
+import { UserPlus, User as UserIcon, UserX } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { assignUserToCard } from "@/actions/boards/assign-user-to-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -37,31 +37,30 @@ interface CardItemProps {
 
 export const CardItem = ({ data, index, users }: CardItemProps) => {
   const cardModal = useCardModal();
+  const [assignedUserState, setAssignedUserState] = useState<User | null>(null);
 
-  // Etat local pour l'utilisateur assigné
-  const [assignedUserState, setAssignedUserState] = useState<User | null>(
-    users.find(user => user.id === data.assignedUserId) || null
-  );
+  // Synchroniser l'état avec les données du serveur
+  useEffect(() => {
+    const assignedUser = users.find(user => user.id === data.assignedUserId) || null;
+    setAssignedUserState(assignedUser);
+  }, [data.assignedUserId, users]);
 
-  const handleAssignUser = async (userId: string) => {
+  const handleAssignUser = async (userId: string | null) => {
     try {
-      // Met à jour l'utilisateur assigné côté backend
-      await assignUserToCard(data.id, userId);
+      await assignUserToCard(data.id, userId || "null");
 
-      // Mise à jour de l'état local pour refléter l'utilisateur assigné
-      const assignedUser = users.find(user => user.id === userId) || null;
-      setAssignedUserState(assignedUser);
-
-      toast.success(
-        userId ? "User assigned to card" : "User unassigned from card"
-      );
+      if (userId === null) {
+        setAssignedUserState(null);
+        toast.success("User unassigned from card");
+      } else {
+        const assignedUser = users.find(user => user.id === userId) || null;
+        setAssignedUserState(assignedUser);
+        toast.success("User assigned to card");
+      }
     } catch (error) {
-      toast.error(
-        userId ? "Failed to assign user to card" : "Failed to unassign user"
-      );
+      toast.error("Failed to update user assignment");
     }
   };
-
 
   function getRandomColor(id: string): string {
     const colors = [
@@ -137,23 +136,21 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                   onClick={(e) => e.stopPropagation()}
                 >
                   <ScrollArea className="h-28">
-
                     <div className="space-y-2">
-                      {/* Option "Unassign" */}
                       <button
-                        onClick={() => handleAssignUser("null")}
+                        onClick={() => handleAssignUser(null)}
                         className="w-full flex items-center gap-x-2 hover:bg-slate-100 p-2 rounded-md transition"
                       >
                         <Avatar className="h-6 w-6">
                           <AvatarFallback className="text-gray-500">
-                            <UserIcon className="h-4 w-4" />
+                            <UserX className="h-4 w-4" />
                           </AvatarFallback>
                         </Avatar>
-                        <span className="text-sm">Unassign</span>
+                        <span className="text-sm">Not assigned</span>
                         {!assignedUserState && (
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5 text-green-500"
+                            className="h-5 w-5 text-green-500 ml-auto"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -168,7 +165,6 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                         )}
                       </button>
 
-                      {/* Liste des utilisateurs */}
                       {users.map((user) => (
                         <button
                           key={user.id}
@@ -185,7 +181,7 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                           {assignedUserState?.id === user.id && (
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5 text-green-500"
+                              className="h-5 w-5 text-green-500 ml-auto"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -201,7 +197,6 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                         </button>
                       ))}
                     </div>
-
                   </ScrollArea>
                 </PopoverContent>
               </Popover>
