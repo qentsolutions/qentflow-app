@@ -18,10 +18,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SettingsSchema } from "@/schemas";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useSession } from "next-auth/react";
-import { AlertTriangle, CheckCircle2, KeyRound, Mail, Shield, User2, UserCog2 } from "lucide-react";
+import { CheckCircle2, KeyRound, Mail, Shield, User2, UserCog2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { format } from "date-fns";
 import { z } from "zod";
 
 const AccountPage = () => {
