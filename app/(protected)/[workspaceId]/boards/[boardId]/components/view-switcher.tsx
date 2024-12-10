@@ -13,7 +13,6 @@ export const ViewSwitcher = ({ onViewChange, selectedView }: ViewSwitcherProps) 
   const views: { label: string; value: ViewType; icon: React.ElementType }[] = [
     { label: "Kanban", value: "kanban", icon: Columns3 },
     { label: "Table", value: "table", icon: Table2 },
-    { label: "List", value: "list", icon: ListTodo },
   ];
 
   return (

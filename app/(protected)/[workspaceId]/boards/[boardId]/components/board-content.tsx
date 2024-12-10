@@ -3,7 +3,6 @@
 import { ViewSwitcher, ViewType } from "./view-switcher";
 import { KanbanView } from "./kanban-view";
 import { TableView } from "./table-view";
-import { ListView } from "./list-view";
 import { useState } from "react";
 import BoardUsers from "./board-users";
 import { useQuery } from "@tanstack/react-query";
@@ -59,8 +58,6 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
         return <KanbanView boardId={boardId} data={filteredLists} users={users} />;
       case "table":
         return <TableView boardId={boardId} data={filteredLists} />;
-      case "list":
-        return <ListView boardId={boardId} data={filteredLists} />;
       default:
         return <KanbanView boardId={boardId} data={filteredLists} users={users} />;
     }
@@ -96,7 +93,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search cards..."
-                className="w-[200px] pl-9"
+                className="w-[250px] pl-9"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -129,7 +126,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                     />
                   </div>
                 </div>
-                <ScrollArea className="h-72">
+                <ScrollArea className="h-44">
                   <div className="p-2">
                     {filteredTags?.length === 0 ? (
                       <div className="text-center p-4 text-sm text-muted-foreground">
@@ -173,9 +170,9 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                         Create new tag
                       </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="flex items-center justify-center flex-col">
                       <DialogHeader>
-                        <DialogTitle>Create New Tag</DialogTitle>
+                        <DialogTitle className="my-2">Create New Tag</DialogTitle>
                       </DialogHeader>
                       <CreateTagForm boardId={boardId} />
                     </DialogContent>

@@ -2,13 +2,11 @@
 
 import { useState, useCallback } from "react"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Check, Plus, UserPlus, X, Loader2, UserX } from 'lucide-react'
+import { UserX } from 'lucide-react'
 import { toast } from "sonner"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { addUserToBoard } from "@/actions/boards/add-users-to-board"
 import { removeUserFromBoard } from "@/actions/boards/remove-user-from-board"
@@ -67,7 +65,6 @@ const BoardUsers: React.FC<BoardUsersProps> = ({
             {boardUsers && boardUsers.length > 0 ? (
                 <>
                     <div className="flex items-center">
-                        {/* Option "Not Assigned" */}
                         <Tooltip>
                             <TooltipTrigger>
                                 <Avatar

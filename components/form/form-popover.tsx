@@ -3,19 +3,13 @@
 import { ElementRef, useRef } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { useAction } from "@/hooks/use-action";
-
 import { FormInput } from "./form-input";
 import { FormSubmit } from "./form-submit";
 import { createBoard } from "@/actions/tasks/create-board";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { PlusCircle } from "lucide-react";
 
 interface FormPopoverProps {
   children: React.ReactNode;
@@ -62,7 +56,7 @@ export const FormPopover = ({
         className="w-80 pt-3"
       >
         <DialogTitle>
-          <div className="text-sm font-medium text-center text-neutral-600 pb-4">
+          <div className="text-xl mt-4 font-medium text-center text-neutral-600 pb-4">
             Create board
           </div>
         </DialogTitle>
@@ -71,13 +65,15 @@ export const FormPopover = ({
           <div className="space-y-4">
             <FormInput
               id="title"
-              label="Board title"
+              label=""
               type="text"
               errors={fieldErrors}
+              className="text-xs font-normal"
+              placeholder="Board title"
             />
           </div>
-          <FormSubmit className="w-full">
-            Create
+          <FormSubmit className="w-full bg-blue-500 text-white">
+            <PlusCircle /> Create
           </FormSubmit>
         </form>
       </DialogContent>

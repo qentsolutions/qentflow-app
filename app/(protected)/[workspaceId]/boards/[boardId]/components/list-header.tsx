@@ -8,7 +8,6 @@ import { FormInput } from "@/components/form/form-input";
 import { ListOptions } from "./list-options";
 import { updateList } from "@/actions/tasks/update-list";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
-import { Pencil } from "lucide-react";
 
 interface ListWithCards extends List {
   cards: { id: string }[]; // Définir la structure des cartes

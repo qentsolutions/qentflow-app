@@ -64,7 +64,7 @@ export const BoardList = () => {
           <div className="relative mb-6">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              className="pl-10"
+              className="pl-10 mt-4"
               placeholder="Search boards"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}

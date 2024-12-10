@@ -16,10 +16,9 @@ import {
 } from "@/components/ui/dialog";
 import { useCallback, useState } from "react";
 import { addUserToBoard } from "@/actions/boards/add-users-to-board";
-import { Check, PlusCircle, UserPlus, X } from "lucide-react";
+import { UserPlus, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { User } from "@prisma/client";
 import { cn } from "@/lib/utils";
 
 interface BoardMembersProps {

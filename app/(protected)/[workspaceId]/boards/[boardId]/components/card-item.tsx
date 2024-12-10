@@ -13,11 +13,6 @@ import { toast } from "sonner";
 import { assignUserToCard } from "@/actions/boards/assign-user-to-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-interface CardWithTags extends Card {
-  tags: Tag[];
-  index: number;
-}
-
 interface CardItemProps {
   data: {
     id: string;

@@ -25,7 +25,6 @@ const SettingsNavbar = () => {
             <nav className="space-y-2">
                 {[
                     { icon: Settings2, label: "Account", href: "/settings/account" },
-                    { icon: Shield, label: "Security", href: "/settings/security" },
                     { icon: Palette, label: "Appearance", href: "/settings/appearance" },
                 ].map((item) => {
 
