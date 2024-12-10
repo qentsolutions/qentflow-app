@@ -62,7 +62,7 @@ const Settings = ({ boardId, boardTitle, users, createdById }: BoardSettingsProp
 
           <div className="col-span-9">
             <Card className="shadow-sm">
-              <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-dark-background px-6 py-5 rounded-t-lg">
+              <div className="border-b border-gray-200 dark:border-gray-700 bg-background px-6 py-5 rounded-t-lg">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                   {tabs.find((tab) => tab.id === activeTab)?.label} Settings
                 </h3>
