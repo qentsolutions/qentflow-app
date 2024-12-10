@@ -99,10 +99,6 @@ export default function AppearanceSettings() {
           </div>
         </div>
       </div>
-
-      <Button size="lg" className="mt-6">
-        Update preferences
-      </Button>
     </div>
   );
 }

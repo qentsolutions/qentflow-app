@@ -13,7 +13,7 @@ const SettingsNavbar = () => {
     useEffect(() => {
         setBreadcrumbs([
             { label: "Settings" },
-            { label: "Profile" }
+            { label: "Account" }
         ]);
     }, [setBreadcrumbs]);
 
@@ -24,7 +24,6 @@ const SettingsNavbar = () => {
             </div>
             <nav className="space-y-2">
                 {[
-                    { icon: User, label: "Profile", href: "/settings/profile" },
                     { icon: Settings2, label: "Account", href: "/settings/account" },
                     { icon: Shield, label: "Security", href: "/settings/security" },
                     { icon: Palette, label: "Appearance", href: "/settings/appearance" },

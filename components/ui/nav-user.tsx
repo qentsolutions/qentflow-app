@@ -89,7 +89,7 @@ export function NavUser({
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
-                            <DropdownMenuItem onClick={() => handleNavigation('/settings/profile')}>
+                            <DropdownMenuItem onClick={() => handleNavigation('/settings/account')}>
                                 <Settings />
                                 Settings
                             </DropdownMenuItem>
