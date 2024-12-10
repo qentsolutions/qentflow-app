@@ -48,7 +48,7 @@ const AccountPage = () => {
             password: undefined,
             newPassword: undefined,
             role: user?.role || undefined,
-            isTwoFactorEnabled: user?.isTwoFactorEnabled || undefined,
+            isTwoFactorEnabled: user?.isTwoFactorEnabled || false,
         }
     });
 
@@ -157,25 +157,6 @@ const AccountPage = () => {
                 </CardContent>
             </Card>
 
-            {/* Email Section */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Mail className="h-5 w-5" /> Email Settings
-                    </CardTitle>
-                    <CardDescription>
-                        Manage your email preferences and notifications
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="font-medium">{user?.email}</p>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-
             {/* Security Section */}
             <Card>
                 <CardHeader>
@@ -274,29 +255,6 @@ const AccountPage = () => {
                                 form.handleSubmit(onSubmit)();
                             }}
                         />
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* Account Status */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-destructive">Danger Zone</CardTitle>
-                    <CardDescription>
-                        Irreversible and destructive actions
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h3 className="font-medium">Delete Account</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    Permanently delete your account and all associated data
-                                </p>
-                            </div>
-                            <Button variant="destructive">Delete Account</Button>
-                        </div>
                     </div>
                 </CardContent>
             </Card>
