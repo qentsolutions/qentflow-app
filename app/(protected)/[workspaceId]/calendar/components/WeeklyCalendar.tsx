@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { format, startOfWeek, addDays, addHours, isSameDay, subWeeks, addWeeks, startOfMonth, endOfMonth, eachDayOfInterval, subMonths, addMonths, isWithinInterval, parseISO, setMilliseconds, setSeconds, setMinutes, setHours } from 'date-fns';
+import { format, startOfWeek, addDays, isSameDay, subWeeks, addWeeks, startOfMonth, endOfMonth, eachDayOfInterval, subMonths, addMonths, isWithinInterval, parseISO, setMilliseconds, setSeconds, setMinutes, setHours } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -11,6 +11,9 @@ import { fetcher } from '@/lib/fetcher';
 import { Card } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { CalendarEvent } from '@prisma/client';
+import { Button } from '@/components/ui/button';
+import CreateEventDialog from './create-event-dialog';
+import { EventDetails } from './event-details';
 
 interface Event {
   id: string;
@@ -27,14 +30,20 @@ interface WeeklyCalendarProps {
   onEventClick?: (event: Event) => void;
 }
 
-const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ onEventClick }) => {
+const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const { currentWorkspace } = useCurrentWorkspace();
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   const hours = Array.from({ length: 24 }, (_, i) => i);
+  const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
+
+  const handleEventClick = (event: Event) => {
+    setSelectedEvent(event);
+  };
 
   const { data: events = [] } = useQuery({
     queryKey: ["calendar-events", currentWorkspace?.id],
@@ -126,7 +135,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ onEventClick }) => {
         <Tooltip key={event.id}>
           <TooltipTrigger asChild>
             <div
-              onClick={() => onEventClick?.(event)}
+              onClick={() => handleEventClick(event)}
               className={cn(
                 "absolute inset-x-0 mx-1 rounded p-1 text-xs cursor-pointer truncate",
                 "hover:opacity-90 transition-opacity",
@@ -161,7 +170,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ onEventClick }) => {
 
 
   return (
-    <div className="flex bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+    <div className="flex bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden mt-4">
       <div className="flex-grow">
         <div className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-900">
           <button onClick={() => navigateWeek('prev')} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
@@ -222,6 +231,20 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ onEventClick }) => {
         </div>
       </div>
       <div className="w-64 p-4 border-l hidden lg:block">
+        <div className="text-center">
+          <Button
+            onClick={() => setIsCreateEventOpen(true)}
+            className="bg-blue-600 hover:bg-blue-700 mb-8"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Event
+          </Button>
+        </div>
+
+        <CreateEventDialog
+          open={isCreateEventOpen}
+          onClose={() => setIsCreateEventOpen(false)}
+        />
         <div className="flex justify-between items-center mb-4">
           <button onClick={() => navigateMonth('prev')} className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
             <ChevronLeft className="w-4 h-4" />
@@ -263,7 +286,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ onEventClick }) => {
                 <Card
                   key={event.id}
                   className="p-2 cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => onEventClick?.(event)}
+                  onClick={() => handleEventClick(event)}
                 >
                   <p className="font-medium text-sm">{event.title}</p>
                   <p className="text-xs text-gray-500">
@@ -274,6 +297,11 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ onEventClick }) => {
           </div>
         </div>
       </div>
+      <EventDetails
+        event={selectedEvent}
+        isOpen={!!selectedEvent}
+        onClose={() => setSelectedEvent(null)}
+      />
     </div>
   );
 };

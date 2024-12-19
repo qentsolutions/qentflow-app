@@ -12,7 +12,6 @@ import { fetcher } from "@/lib/fetcher";
 import WeeklyCalendar from "./components/WeeklyCalendar";
 
 const CalendarPage = () => {
-  const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
   const { currentWorkspace } = useCurrentWorkspace();
   const { setBreadcrumbs } = useBreadcrumbs();
 
@@ -29,36 +28,13 @@ const CalendarPage = () => {
     enabled: !!currentWorkspace?.id,
   });
 
-  const cards = ""
-
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <p className="text-muted-foreground">
-            Manage your schedule and view your tasks
-          </p>
-        </div>
-        <Button
-          onClick={() => setIsCreateEventOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Event
-        </Button>
-      </div>
-
-      <Card className="p-4">
+    <div className="container mx-auto pt-2 space-y-6">
+      <Card className="p-4 border-none shadow-none">
         <WeeklyCalendar
           events={events || []}
         />
       </Card>
-
-      <CreateEventDialog
-        open={isCreateEventOpen}
-        onClose={() => setIsCreateEventOpen(false)}
-        cards={cards || ["ok"]}
-      />
     </div>
   );
 };

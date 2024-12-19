@@ -51,7 +51,6 @@ const formSchema = z.object({
 interface CreateEventDialogProps {
     open: boolean;
     onClose: () => void;
-    cards: any[];
 }
 
 const COLORS = [
@@ -62,7 +61,7 @@ const COLORS = [
     { value: "#9333ea", label: "Purple" },
 ];
 
-const CreateEventDialog = ({ open, onClose, cards }: CreateEventDialogProps) => {
+const CreateEventDialog = ({ open, onClose }: CreateEventDialogProps) => {
     const { currentWorkspace } = useCurrentWorkspace();
     const queryClient = useQueryClient();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -229,7 +228,7 @@ const CreateEventDialog = ({ open, onClose, cards }: CreateEventDialogProps) => 
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            {(userCards || cards).map((card: any) => (
+                                            {userCards.map((card: any) => (
                                                 <SelectItem key={card.id} value={card.id}>
                                                     <div className="flex flex-col">
                                                         <span>{card.title}</span>
