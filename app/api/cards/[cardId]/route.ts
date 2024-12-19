@@ -5,7 +5,7 @@ import { currentUser } from "@/lib/auth";
 
 export async function GET(
   req: Request,
-  { params }: { params: { cardId: string, workspaceId: string } }
+  { params }: { params: { cardId: string; workspaceId: string } }
 ) {
   try {
     const user = currentUser();
@@ -19,7 +19,7 @@ export async function GET(
         id: params.cardId,
         list: {
           board: {
-            workspaceId : params.workspaceId,
+            workspaceId: params.workspaceId,
           },
         },
       },
@@ -34,7 +34,13 @@ export async function GET(
             id: true,
             name: true,
           },
-        }, 
+        },
+        documents: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
       },
     });
 

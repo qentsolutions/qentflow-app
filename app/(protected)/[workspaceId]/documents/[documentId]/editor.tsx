@@ -10,12 +10,14 @@ import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Button } from "@/components/ui/button";
 import { Bold, Italic, List, ListOrdered } from "lucide-react";
 import { updateDocument } from "@/actions/documents/update-document";
+import { useAction } from "@/hooks/use-action";
 
 interface EditorProps {
   document: any;
+  onContentChange: () => void;
 }
 
-export function Editor({ document }: EditorProps) {
+export function Editor({ document, onContentChange }: EditorProps) {
   const [content, setContent] = useState(document.content || "");
   const debouncedContent = useDebounce(content, 1000);
   const { currentWorkspace } = useCurrentWorkspace();
@@ -26,11 +28,12 @@ export function Editor({ document }: EditorProps) {
     content: document.content,
     editorProps: {
       attributes: {
-        class: "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none",
+        class: "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none p-6",
       },
     },
     onUpdate: ({ editor }) => {
       setContent(editor.getHTML());
+      onContentChange();
     },
   });
 
@@ -62,7 +65,7 @@ export function Editor({ document }: EditorProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 border-b pb-4">
+      <div className="flex items-center gap-2 border-b p-2">
         <Button
           variant="ghost"
           size="sm"
