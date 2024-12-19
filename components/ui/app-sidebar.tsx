@@ -5,6 +5,7 @@ import {
   AudioWaveform,
   BookOpen,
   Bot,
+  Calendar,
   Command,
   Frame,
   GalleryVerticalEnd,
@@ -40,6 +41,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const workspaceId = currentWorkspace?.id;
 
   const data = {
+    calendar: [
+      {
+        name: "Calendar",
+        url: `/${workspaceId}/calendar`,
+        icon: Calendar
+      },
+    ],
     navMain: [
       {
         title: "Projects",
@@ -54,7 +62,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ],
       },
     ],
-   
+
   }
   return (
     <Sidebar collapsible="icon" {...props} className="bg-background">
@@ -62,6 +70,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher />
       </SidebarHeader>
       <SidebarContent>
+        <NavProjects projects={data.calendar} />
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
