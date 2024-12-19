@@ -50,7 +50,7 @@ export const BoardList = () => {
     <div className="container mx-auto px-4 py-8">
       <Card className="shadow-sm rounded-md">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-2xl font-bold">All Boards {boards && (<span>({boards?.length})</span>)}</CardTitle>
+          <CardTitle className="text-2xl font-bold">All Boards {boards && (<span>({boards?.length > 0 ?(<>{boards.length}</>):(<>0</>)})</span>)}</CardTitle>
           {workspaceId && (
             <FormPopover sideOffset={10} side="right" workspaceId={String(workspaceId)}>
               <Button variant="outline">
