@@ -42,18 +42,49 @@ model User {
   auditLogs             AuditLog[]
   Comment               Comment[]
   Card                  Card[]
+  calendarEvents        CalendarEvent[]
 }
 
 model Workspace {
-  id          String            @id @default(cuid())
-  name        String
-  logo        String?
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  createdById String
-  createdBy   User              @relation("CreatedBy", fields: [createdById], references: [id])
-  members     WorkspaceMember[]
-  boards      Board[]
+  id             String            @id @default(cuid())
+  name           String
+  logo           String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  createdById    String
+  createdBy      User              @relation("CreatedBy", fields: [createdById], references: [id])
+  members        WorkspaceMember[]
+  boards         Board[]
+  calendarEvents CalendarEvent[]
+}
+
+model CalendarEvent {
+  id          String   @id @default(uuid())
+  title       String
+  description String?  @db.Text
+  startDate   DateTime
+  endDate     DateTime
+  color       String? // Pour la personnalisation visuelle
+  isAllDay    Boolean  @default(false)
+
+  // Relation avec Card (optionnelle)
+  cardId String?
+  card   Card?   @relation(fields: [cardId], references: [id], onDelete: SetNull)
+
+  // Relation avec User
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relation avec Workspace
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([cardId])
 }
 
 model WorkspaceSubscription {
@@ -92,7 +123,7 @@ model Board {
   workspaceId String
   title       String
   lists       List[]
-  createdById String 
+  createdById String
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
@@ -133,6 +164,8 @@ model Card {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   comments  Comment[]
+
+  calendarEvents CalendarEvent[]
 
   tags Tag[] @relation("CardTags")
   Tag  Tag[]
