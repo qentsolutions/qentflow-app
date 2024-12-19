@@ -14,6 +14,7 @@ import { CalendarEvent } from '@prisma/client';
 import { Button } from '@/components/ui/button';
 import CreateEventDialog from './create-event-dialog';
 import { EventDetails } from './event-details';
+import { useCurrentUser } from '@/hooks/use-current-user';
 
 interface Event {
   id: string;
@@ -39,17 +40,20 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
   const hours = Array.from({ length: 24 }, (_, i) => i);
   const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-
+  const user = useCurrentUser();
 
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
   };
 
+
+  // Update the useQuery hook to include the user filter
   const { data: events = [] } = useQuery({
     queryKey: ["calendar-events", currentWorkspace?.id],
     queryFn: async () => {
       if (!currentWorkspace?.id) return [];
-      const data = await fetcher(`/api/calendar/events?workspaceId=${currentWorkspace.id}`);
+      // Add userId to the query params
+      const data = await fetcher(`/api/calendar/events?workspaceId=${currentWorkspace.id}&userId=${user?.id}`);
       return data.map((event: CalendarEvent) => ({
         ...event,
         startDate: new Date(event.startDate),
@@ -235,7 +239,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
                       )}
                     >
                       {renderEvents(day, hour, events)}
-                     
+
                       {isSameDay(day, new Date()) && hour === new Date().getHours() && (
                         <div
                           className="absolute top-0 left-0 w-full h-[2px] bg-blue-500 z-20"

@@ -228,7 +228,7 @@ const CreateEventDialog = ({ open, onClose }: CreateEventDialogProps) => {
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            {userCards.map((card: any) => (
+                                            {userCards?.map((card: any) => (
                                                 <SelectItem key={card.id} value={card.id}>
                                                     <div className="flex flex-col">
                                                         <span>{card.title}</span>

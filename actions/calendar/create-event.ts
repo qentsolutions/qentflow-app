@@ -13,10 +13,14 @@ const CreateEventSchema = z.object({
   isAllDay: z.boolean().default(false),
   cardId: z.string().optional(),
   color: z.string().optional(),
-  workspaceId: z.string()
+  workspaceId: z.string(),
 });
 
-export const createCalendarEvent = async (values: z.infer<typeof CreateEventSchema>) => {
+// actions/calendar/create-event.ts
+
+export const createCalendarEvent = async (
+  values: z.infer<typeof CreateEventSchema>
+) => {
   try {
     const user = await currentUser();
     if (!user) {
@@ -28,7 +32,16 @@ export const createCalendarEvent = async (values: z.infer<typeof CreateEventSche
       return { error: "Invalid fields" };
     }
 
-    const { title, description, startDate, endDate, isAllDay, cardId, color, workspaceId } = validatedFields.data;
+    const {
+      title,
+      description,
+      startDate,
+      endDate,
+      isAllDay,
+      cardId,
+      color,
+      workspaceId,
+    } = validatedFields.data;
 
     const event = await db.calendarEvent.create({
       data: {
@@ -38,10 +51,10 @@ export const createCalendarEvent = async (values: z.infer<typeof CreateEventSche
         endDate: new Date(endDate),
         isAllDay,
         color,
-        cardId: "51ba059b-3ca4-4138-a85a-ee1662fd87ee",
-        userId: user.id,
-        workspaceId
-      }
+        cardId,
+        userId: user.id, // Add the user ID
+        workspaceId,
+      },
     });
 
     revalidatePath(`/${workspaceId}/calendar`);

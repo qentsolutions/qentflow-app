@@ -1,3 +1,5 @@
+// app/api/calendar/events/route.ts
+
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
@@ -19,9 +21,18 @@ export async function GET(req: Request) {
     const events = await db.calendarEvent.findMany({
       where: {
         workspaceId,
+        userId: user.id, // Filter events by the current user
       },
       include: {
-        card: true,
+        card: {
+          include: {
+            list: {
+              include: {
+                board: true,
+              },
+            },
+          },
+        },
       },
       orderBy: {
         startDate: 'asc',
