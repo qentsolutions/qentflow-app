@@ -1,7 +1,7 @@
 "use client";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
-import { useState, useRef, ElementRef } from "react";
+import { useState, useRef, useEffect, ElementRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEventListener } from "usehooks-ts";
 import { TextAlignLeftIcon } from "@radix-ui/react-icons";
@@ -12,51 +12,49 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import RichTextEditor from "./components/rich-text-editor";
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Color from '@tiptap/extension-color';
-import TextStyle from '@tiptap/extension-text-style';
-import FontSize from 'tiptap-extension-font-size';
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Color from "@tiptap/extension-color";
+import TextStyle from "@tiptap/extension-text-style";
+import FontSize from "tiptap-extension-font-size";
 
 interface DescriptionProps {
   data: CardWithList;
 }
-export const Description = ({
-  data
-}: DescriptionProps) => {
+
+export const Description = ({ data }: DescriptionProps) => {
   const params = useParams();
   const queryClient = useQueryClient();
   const { currentWorkspace } = useCurrentWorkspace();
   const [description, setDescription] = useState(data.description || "");
   const [isEditing, setIsEditing] = useState(false);
   const formRef = useRef<ElementRef<"form">>(null);
-  const enableEditing = () => {
-    setIsEditing(true);
-  }
-  const disableEditing = () => {
-    setIsEditing(false);
-  };
+
+  const enableEditing = () => setIsEditing(true);
+  const disableEditing = () => setIsEditing(false);
+
   const onKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Escape") {
-      disableEditing();
-    }
+    if (e.key === "Escape") disableEditing();
   };
   useEventListener("keydown", onKeyDown);
+
   const { execute } = useAction(updateCard, {
-    onSuccess: (data) => {
+    onSuccess: (updatedData) => {
       queryClient.invalidateQueries({
-        queryKey: ["card", data.id],
+        queryKey: ["card", updatedData.id],
       });
       queryClient.invalidateQueries({
-        queryKey: ["card-logs", data.id]
+        queryKey: ["card-logs", updatedData.id],
       });
-      toast.success(`Card "${data.title}" updated`);
+      toast.success(`Card "${updatedData.title}" updated`);
+      setDescription(updatedData.description || ""); // Update description
       disableEditing();
     },
     onError: (error) => {
       toast.error(error);
     },
   });
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const boardId = params.boardId as string;
@@ -73,24 +71,28 @@ export const Description = ({
       boardId,
       workspaceId,
     });
-  }
+  };
 
   const readOnlyEditor = useEditor({
     extensions: [
       StarterKit,
       Color.configure({ types: [TextStyle.name] }),
       TextStyle,
-      FontSize.configure({
-        types: ['textStyle'],
-      }),
+      FontSize.configure({ types: ["textStyle"] }),
     ],
-    content: description || 'Add a more detailed description...',
+    content: description || "Add a more detailed description...",
     editable: false,
     parseOptions: {
-      preserveWhitespace: true
-    }
+      preserveWhitespace: true,
+    },
   });
 
+  // Update readOnlyEditor when description changes
+  useEffect(() => {
+    if (readOnlyEditor && description) {
+      readOnlyEditor.commands.setContent(description);
+    }
+  }, [description, readOnlyEditor]);
 
   return (
     <div className="flex items-start gap-x-3 w-full">
@@ -99,15 +101,8 @@ export const Description = ({
           <TextAlignLeftIcon className="mr-2" /> Description
         </span>
         {isEditing ? (
-          <form
-            onSubmit={onSubmit}
-            ref={formRef}
-            className="space-y-2"
-          >
-            <RichTextEditor
-              content={description}
-              onChange={setDescription}
-            />
+          <form onSubmit={onSubmit} ref={formRef} className="space-y-2">
+            <RichTextEditor content={description} onChange={setDescription} />
             <div className="flex items-center gap-x-2">
               <Button
                 type="submit"
@@ -136,6 +131,7 @@ export const Description = ({
     </div>
   );
 };
+
 Description.Skeleton = function DescriptionSkeleton() {
   return (
     <div className="flex items-start gap-x-3 w-full">
