@@ -167,7 +167,7 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                           className="w-full flex items-center gap-x-2 hover:bg-slate-100 p-2 rounded-md transition"
                         >
                           <Avatar className="h-6 w-6">
-                            <AvatarImage src={user.image || ""} />
+                            <AvatarImage src={user?.image || ""} />
                             <AvatarFallback className="text-gray-500">
                               {user.name?.charAt(0) || <UserIcon className="h-2 w-2" />}
                             </AvatarFallback>

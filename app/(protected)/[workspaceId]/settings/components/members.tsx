@@ -133,7 +133,7 @@ export default function Members() {
                         <CardContent className="flex items-center justify-between p-4">
                             <div className="flex items-center space-x-4">
                                 <Avatar>
-                                    <AvatarImage src={member.user.image || ""} />
+                                    <AvatarImage src={member.user?.image || ""} />
                                     <AvatarFallback>{member.user.name ? member.user.name[0] : ""}</AvatarFallback>
                                 </Avatar>
                                 <div>

@@ -22,17 +22,8 @@ import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
 import Image from "next/image"
 import Link from "next/link"
 
-export function TeamSwitcher({
-    teams,
-}: {
-    teams: {
-        name: string
-        logo: React.ElementType
-        plan: string
-    }[]
-}) {
+export function TeamSwitcher() {
     const { isMobile } = useSidebar()
-    const [activeTeam, setActiveTeam] = React.useState(teams[0])
     const router = useRouter();
     const { currentWorkspace, workspaces, setCurrentWorkspace } = useCurrentWorkspace();
 

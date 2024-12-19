@@ -94,9 +94,9 @@ const BoardUsers: React.FC<BoardUsersProps> = ({
                                         onClick={() => onUserSelect?.(user.id)}
                                     >
                                         <div className="bg-gray-200 w-full h-full rounded-full flex items-center justify-center overflow-hidden transition-all duration-300 ease-in-out hover:scale-110 hover:z-10">
-                                            {user.image ? (
+                                            {user?.image ? (
                                                 <AvatarImage
-                                                    src={user.image}
+                                                    src={user?.image}
                                                     alt={user.name || "User"}
                                                     className="w-full h-full object-cover"
                                                 />
@@ -131,9 +131,9 @@ const BoardUsers: React.FC<BoardUsersProps> = ({
                                             <div key={user.id} className="flex items-center space-x-2 p-2 hover:bg-gray-100">
                                                 <Avatar className="h-6 w-6">
                                                     <div className="bg-gray-200 w-full h-full rounded-full flex items-center justify-center overflow-hidden">
-                                                        {user.image ? (
+                                                        {user?.image ? (
                                                             <AvatarImage
-                                                                src={user.image}
+                                                                src={user?.image}
                                                                 alt={user.name || "User"}
                                                                 className="w-full h-full object-cover"
                                                             />

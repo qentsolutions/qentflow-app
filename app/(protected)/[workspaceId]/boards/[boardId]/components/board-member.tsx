@@ -142,7 +142,7 @@ export const BoardMembers = ({ boardId, users, createdById }: BoardMembersProps)
           >
             <div className="flex items-center space-x-4">
               <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
-                <AvatarImage src={user.image} />
+                <AvatarImage src={user?.image} />
                 <AvatarFallback className="bg-blue-600 text-white">
                   {user.name?.charAt(0).toUpperCase()}
                 </AvatarFallback>

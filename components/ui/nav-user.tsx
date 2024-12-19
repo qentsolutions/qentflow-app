@@ -97,14 +97,7 @@ export function NavUser({
                                 <Settings />
                                 Settings
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleNavigation('/billing')}>
-                                <CreditCard />
-                                Billing
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleNavigation('/notifications')}>
-                                <Bell />
-                                Notifications
-                            </DropdownMenuItem>
+
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <LogoutButton>
