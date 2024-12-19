@@ -12,6 +12,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Save, Link2 } from "lucide-react";
 import { LinkCardsDialog } from "./links-cards-dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DocumentPage() {
   const params = useParams();
@@ -51,7 +52,7 @@ export default function DocumentPage() {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Skeleton />;
   }
 
   if (!document) {

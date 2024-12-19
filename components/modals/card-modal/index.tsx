@@ -13,12 +13,14 @@ import { Activity } from "./activity";
 import { Comments } from "./comments"; // Nouveau composant
 import { fetcher } from "@/lib/fetcher";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { ActivityIcon, FileText, Logs, MessageSquareText } from "lucide-react";
+import { ActivityIcon, ExternalLink, FileText, Logs, MessageSquareText, Paperclip, Plus } from "lucide-react";
 import { Tabs, TabsTrigger, TabsContent, TabsList } from "@/components/ui/tabs";
 import { useParams } from "next/navigation";
 import Details from "./details";
 import { Card } from "@/components/ui/card";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 export const CardModal = () => {
   const id = useCardModal((state) => state.id);
@@ -69,32 +71,73 @@ export const CardModal = () => {
               ) : (
                 <Description data={cardData} />
               )}
-              <span className="font-bold text-lg flex items-center">
-                <FileText size={12} className="mr-2" /> Linked Documents
-              </span>
-              <div className="space-y-3">
-                {cardData?.documents && cardData.documents.length > 0 ? (
-                  <>
-                    {cardData?.documents.map((doc: any) => (
-                      <Card
-                        key={doc.id}
-                        className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition"
-                        onClick={() => handleDocumentClick(doc.id)}
-                      >
-                        <div className="flex items-center gap-2">
-                          <FileText className="h-4 w-4 text-blue-500" />
-                          <div>
-                            <p className="font-medium text-sm">{doc.title}</p>
+              <div className="flex items-center">
+                <div className="flex-1 mr-8">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-lg flex items-center">
+                      <FileText size={12} className="mr-2" /> Linked Documents
+                    </span>
+                    <Button className="border-none shadow-none" variant={"outline"}>
+                      <Plus />
+                    </Button>
+                  </div>
+                  <div className="space-y-3 mt-2">
+                    {cardData?.documents && cardData.documents.length > 0 ? (
+                      <>
+                        {cardData?.documents.map((doc: any) => (
+                          <Card
+                            key={doc.id}
+                            className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition"
+                            onClick={() => handleDocumentClick(doc.id)}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-x-2">
+                                <FileText className="h-4 w-4 text-blue-500" />
+                                <div>
+                                  <p className="font-medium text-sm">{doc.title}</p>
+                                </div>
+                              </div>
+                              <ExternalLink className="h-4 w-4 text-blue-500" />
+                            </div>
+                          </Card>
+                        ))}
+                      </>) : (
+                      <div className="text-gray-600">
+                        No documents linked.
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <Separator orientation="vertical" className="h-20 border mt-2"  />
+                <div className="flex-1 ml-8">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-lg flex items-center">
+                      <Paperclip size={12} className="mr-2" /> Attachments
+                    </span>
+                    <Button className="border-none shadow-none" variant={"outline"}>
+                      <Plus />
+                    </Button>
+                  </div>
 
+                  <div className="space-y-3 mt-2">
+                    <>
+                      <Card
+                        className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition"
+                        onClick={() => handleDocumentClick("")}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-x-2">
+                            <Paperclip className="h-4 w-4 text-blue-500" />
+                            <div>
+                              <p className="font-medium text-sm">Attachments title</p>
+                            </div>
                           </div>
+                          <ExternalLink className="h-4 w-4 text-blue-500" />
                         </div>
                       </Card>
-                    ))}
-                  </>) : (
-                  <div className="text-gray-600">
-                    No documents linked.
-                  </div>)}
-
+                    </>
+                  </div>
+                </div>
 
               </div>
               <span className="font-bold text-lg  flex items-center"><ActivityIcon size={12} className="mr-2" /> Activity</span>
