@@ -218,7 +218,7 @@ const CreateEventDialog = ({ open, onClose, cards }: CreateEventDialogProps) => 
                             name="cardId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Link to Card</FormLabel>
+                                    <FormLabel>Link to Card (optional)</FormLabel>
                                     <Select
                                         onValueChange={field.onChange}
                                         defaultValue={field.value}

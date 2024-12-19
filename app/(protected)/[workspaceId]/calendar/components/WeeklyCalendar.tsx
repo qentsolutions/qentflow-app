@@ -60,7 +60,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ onEventClick }) => {
       console.log("Événements transformés :", processedEvents);
     }
   }, [events]);
-  
+
 
   const normalizeDate = (date: Date | string): Date => {
     const parsedDate = typeof date === 'string' ? parseISO(date) : date;
@@ -69,20 +69,20 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ onEventClick }) => {
 
   const getEventsForDateAndHour = (date: Date, hour: number, events: Event[]) => {
     if (!events?.length) return [];
-  
+
     // Create a date object for the specific hour
     const timeSlotStart = setMilliseconds(setSeconds(setMinutes(setHours(date, hour), 0), 0), 0);
     const timeSlotEnd = setMilliseconds(setSeconds(setMinutes(setHours(date, hour + 1), 0), 0), 0);
-  
+
     return events.filter((event: Event) => {
       const eventStart = normalizeDate(event.startDate);
       const eventEnd = normalizeDate(event.endDate);
-  
+
       // Check if the event overlaps with the time slot
       return eventStart <= timeSlotEnd && eventEnd > timeSlotStart;
     });
   };
-  
+
 
   const navigateWeek = (direction: 'prev' | 'next') => {
     setCurrentDate(prevDate =>
@@ -104,6 +104,61 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ onEventClick }) => {
     setCurrentDate(date);
     setCurrentMonth(date);
   };
+
+  const getEventHeight = (event: Event) => {
+    const start = normalizeDate(event.startDate);
+    const end = normalizeDate(event.endDate);
+    const durationInHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // Durée en heures
+    return `${durationInHours * 4}rem`; // On suppose qu'une heure équivaut à 4rem de hauteur
+  };
+
+  const renderEvents = (day: Date, hour: number, events: Event[]) => {
+    const eventsForTimeSlot = getEventsForDateAndHour(day, hour, events);
+    return eventsForTimeSlot.map((event: Event) => {
+      const eventStart = normalizeDate(event.startDate);
+      const eventEnd = normalizeDate(event.endDate);
+
+      const eventHeight = getEventHeight(event);
+
+      const topPosition = ((eventStart.getHours() - hour) + (eventStart.getMinutes() / 60)) * 4; // Calcul de la position verticale
+
+      return (
+        <Tooltip key={event.id}>
+          <TooltipTrigger asChild>
+            <div
+              onClick={() => onEventClick?.(event)}
+              className={cn(
+                "absolute inset-x-0 mx-1 rounded p-1 text-xs cursor-pointer truncate",
+                "hover:opacity-90 transition-opacity",
+                event.isAllDay ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
+              )}
+              style={{
+                backgroundColor: event.color ? `${event.color}20` : undefined,
+                color: event.color,
+                borderLeft: `3px solid ${event.color}`,
+                top: `${topPosition}rem`, // Position en fonction de l'heure de début
+                height: eventHeight, // Hauteur basée sur la durée de l'événement
+              }}
+            >
+              {event.title}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <div className="p-2">
+              <p className="font-bold">{event.title}</p>
+              {event.description && (
+                <p className="text-sm text-gray-500">{event.description}</p>
+              )}
+              <p className="text-xs text-gray-400 mt-1">
+                {format(new Date(event.startDate), "HH:mm")} - {format(new Date(event.endDate), "HH:mm")}
+              </p>
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      );
+    });
+  };
+
 
   return (
     <div className="flex bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
@@ -142,56 +197,24 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ onEventClick }) => {
                   </div>
                 </div>
               ))}
+            </div>
+            <div className="grid grid-cols-8">
               {hours.map((hour) => (
                 <React.Fragment key={hour}>
                   <div className="text-right pr-2 py-4 text-sm text-gray-600 dark:text-gray-400 border-r">
                     {hour}:00
                   </div>
-                  {weekDays.map((day, dayIndex) => {
-                    const eventsForTimeSlot = getEventsForDateAndHour(new Date(day), hour, events);
-                    return (
-                      <div
-                        key={`${hour}-${dayIndex}`}
-                        className={cn(
-                          "border-l border-t relative min-h-[4rem]",
-                          isSameDay(day, new Date()) && hour === new Date().getHours() && "bg-blue-50/50 dark:bg-blue-900/10"
-                        )}
-                      >
-                        {eventsForTimeSlot.map((event: any) => (
-                          <Tooltip key={event.id}>
-                            <TooltipTrigger asChild>
-                              <div
-                                onClick={() => onEventClick?.(event)}
-                                className={cn(
-                                  "absolute inset-x-0 mx-1 rounded p-1 text-xs cursor-pointer truncate",
-                                  "hover:opacity-90 transition-opacity",
-                                  event.isAllDay ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
-                                )}
-                                style={{
-                                  backgroundColor: event.color ? `${event.color}20` : undefined,
-                                  color: event.color,
-                                  borderLeft: `3px solid ${event.color}`,
-                                }}
-                              >
-                                {event.title}
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <div className="p-2">
-                                <p className="font-bold">{event.title}</p>
-                                {event.description && (
-                                  <p className="text-sm text-gray-500">{event.description}</p>
-                                )}
-                                <p className="text-xs text-gray-400 mt-1">
-                                  {format(new Date(event.startDate), "HH:mm")} - {format(new Date(event.endDate), "HH:mm")}
-                                </p>
-                              </div>
-                            </TooltipContent>
-                          </Tooltip>
-                        ))}
-                      </div>
-                    );
-                  })}
+                  {weekDays.map((day, dayIndex) => (
+                    <div
+                      key={`${hour}-${dayIndex}`}
+                      className={cn(
+                        "border-l border-t relative min-h-[4rem]",
+                        isSameDay(day, new Date()) && hour === new Date().getHours() && "bg-blue-50/50 dark:bg-blue-900/10"
+                      )}
+                    >
+                      {renderEvents(day, hour, events)}
+                    </div>
+                  ))}
                 </React.Fragment>
               ))}
             </div>
@@ -236,7 +259,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({ onEventClick }) => {
           <h3 className="font-semibold mb-2">Upcoming Events</h3>
           <div className="space-y-2">
             {events
-              .map((event:Event) => (
+              .map((event: Event) => (
                 <Card
                   key={event.id}
                   className="p-2 cursor-pointer hover:shadow-md transition-shadow"

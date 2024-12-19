@@ -22,8 +22,8 @@ const CalendarPage = () => {
 
   const { data: events } = useQuery({
     queryKey: ["calendar-events", currentWorkspace?.id],
-    queryFn: () => 
-      currentWorkspace?.id 
+    queryFn: () =>
+      currentWorkspace?.id
         ? fetcher(`/api/calendar/events?workspaceId=${currentWorkspace.id}`)
         : Promise.resolve([]),
     enabled: !!currentWorkspace?.id,
@@ -35,12 +35,11 @@ const CalendarPage = () => {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Calendar</h1>
           <p className="text-muted-foreground">
             Manage your schedule and view your tasks
           </p>
         </div>
-        <Button 
+        <Button
           onClick={() => setIsCreateEventOpen(true)}
           className="bg-blue-600 hover:bg-blue-700"
         >
@@ -51,11 +50,11 @@ const CalendarPage = () => {
 
       <Card className="p-4">
         <WeeklyCalendar
-          events={events || []} 
+          events={events || []}
         />
       </Card>
 
-      <CreateEventDialog 
+      <CreateEventDialog
         open={isCreateEventOpen}
         onClose={() => setIsCreateEventOpen(false)}
         cards={cards || ["ok"]}
