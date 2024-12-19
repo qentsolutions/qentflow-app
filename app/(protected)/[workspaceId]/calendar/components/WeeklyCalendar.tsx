@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { format, startOfWeek, addDays, isSameDay, subWeeks, addWeeks, startOfMonth, endOfMonth, eachDayOfInterval, subMonths, addMonths, isWithinInterval, parseISO, setMilliseconds, setSeconds, setMinutes, setHours } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
@@ -168,6 +168,19 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
     });
   };
 
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const now = new Date();
+      const currentHour = now.getHours();
+      // Scroll to 30 minutes before current time for better context
+      const scrollPosition = (currentHour - 0.5) * 4 * 16; // 4rem * 16px per rem
+      scrollContainerRef.current.scrollTop = scrollPosition;
+    }
+  }, []);
+
+
 
   return (
     <div className="flex bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden mt-4">
@@ -183,7 +196,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>
-        <div className="overflow-auto max-h-[calc(100vh-12rem)]">
+        <div ref={scrollContainerRef} className="overflow-auto max-h-[calc(100vh-12rem)]">
           <div className="min-w-[800px]">
             <div className="grid grid-cols-8 border-b">
               <div className="sticky top-0 bg-white dark:bg-gray-800 z-10"></div>
@@ -222,6 +235,17 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
                       )}
                     >
                       {renderEvents(day, hour, events)}
+                     
+                      {isSameDay(day, new Date()) && hour === new Date().getHours() && (
+                        <div
+                          className="absolute top-0 left-0 w-full h-[2px] bg-blue-500 z-20"
+                          style={{
+                            top: `${(new Date().getMinutes() / 60) * 100}%`, // Position verticale en fonction de la minute actuelle
+                            position: 'absolute',
+                          }}
+                        />
+                      )}
+
                     </div>
                   ))}
                 </React.Fragment>

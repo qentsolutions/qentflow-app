@@ -30,11 +30,9 @@ const CalendarPage = () => {
 
   return (
     <div className="container mx-auto pt-2 space-y-6">
-      <Card className="p-4 border-none shadow-none">
         <WeeklyCalendar
           events={events || []}
         />
-      </Card>
     </div>
   );
 };
