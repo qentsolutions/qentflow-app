@@ -47,7 +47,7 @@ export const BoardList = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-2 py-8">
       <Card className="shadow-sm rounded-md">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">All Boards {boards && (<span>({boards?.length > 0 ?(<>{boards.length}</>):(<>0</>)})</span>)}</CardTitle>
