@@ -16,6 +16,7 @@ import { createDocument } from "@/actions/documents/create-document";
 import { format } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DocumentCard } from "./components/document-card";
 
 export default function DocsPage() {
   const router = useRouter();
@@ -169,39 +170,14 @@ export default function DocsPage() {
             </div>
           ) : viewMode === "grid" ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredDocs.map((doc: any) => (
-                <div
-                  key={doc.id}
-                  className="group cursor-pointer"
-                  onClick={() => router.push(`/${workspaceId}/documents/${doc.id}`)}
-                >
-                  <div className="aspect-square bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200 group-hover:shadow-lg">
-                    <div className="h-full flex flex-col">
-                      <div className="flex-1 overflow-hidden">
-                        <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-6">
-                          {getDocumentPreview(doc.content)}
-                        </p>
-                      </div>
-                      <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
-                        <div className="flex items-center">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {format(new Date(doc.updatedAt), "MMM d, yyyy")}
-                        </div>
-                        <div className="flex items-center">
-                          <Calendar className="h-3 w-3 mr-1" />
-                          {format(new Date(doc.createdAt), "MMM d, yyyy")}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-2">
-                    <h3 className="font-medium text-sm truncate group-hover:text-blue-600">
-                      {doc.title}
-                    </h3>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {filteredDocs.map((doc: any) => (
+              <DocumentCard
+                key={doc.id}
+                document={doc}
+                onClick={() => router.push(`/${workspaceId}/documents/${doc.id}`)}
+              />
+            ))}
+          </div>
           ) : (
             <div className="space-y-2">
               {filteredDocs.map((doc: any) => (

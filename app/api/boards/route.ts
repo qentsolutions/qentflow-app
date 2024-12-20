@@ -39,30 +39,37 @@ export async function GET(request: Request) {
       );
     }
 
-    // Récupérer tous les boards et vérifier si l'utilisateur est membre
+    // Récupérer tous les boards et le créateur ainsi que le nombre de membres
     const boards = await db.board.findMany({
       where: { workspaceId },
       orderBy: { createdAt: "desc" },
       include: {
-        User: {
-          where: {
-            id: user.id, // Vérifie si l'utilisateur est associé au board
-          },
-        },
+        User: true, // Inclut tous les utilisateurs pour chaque board
       },
     });
 
-    // Ajouter une propriété isMember pour chaque board
-    const boardsWithMemberStatus = boards.map((board) => ({
-      ...board,
-      isMember: board.User.length > 0, // Si l'utilisateur est dans la liste des utilisateurs du board
-    }));
+    // Ajouter le créateur (name, id, imageUrl), le nombre de membres et la date de création pour chaque board
+    const boardsWithCreatorAndMemberCount = boards.map((board) => {
+      const creator = board.User.find((user) => user.id === board.createdById); // Trouver le créateur
+      const isMember = board.User.some((boardUser) => boardUser.id === user.id); // Comparer avec l'utilisateur actuel
+      return {
+        id: board.id,
+        title: board.title,
+        createdAt: board.createdAt,
+        creator: {
+          name: creator?.name,
+          imageUrl: creator?.image || null, // URL de l'image du créateur
+        },
+        memberCount: board.User.length,
+        isMember, // Ajouter l'information sur l'adhésion
+      };
+    });
 
-    if (boardsWithMemberStatus.length === 0) {
+    if (boardsWithCreatorAndMemberCount.length === 0) {
       return NextResponse.json({ error: "No boards found" }, { status: 404 });
     }
 
-    return NextResponse.json(boardsWithMemberStatus);
+    return NextResponse.json(boardsWithCreatorAndMemberCount);
   } catch (error) {
     console.error("Error fetching boards:", error);
     return NextResponse.json(

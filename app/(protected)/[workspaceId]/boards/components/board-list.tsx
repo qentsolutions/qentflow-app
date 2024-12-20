@@ -1,22 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
-import Link from "next/link";
+import React, { useState, useEffect } from "react";
 import { Search, Plus } from "lucide-react";
 import { FormPopover } from "@/components/form/form-popover";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
+import { BoardCard } from "./board-card";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 type Board = {
   id: string;
   title: string;
   updatedAt: string;
-  isMember: boolean; // Ajout de la propriété isMember
+  isMember: boolean;
 };
 
 export const dynamic = "force-dynamic";
@@ -24,8 +26,9 @@ export const dynamic = "force-dynamic";
 export const BoardList = () => {
   const { currentWorkspace } = useCurrentWorkspace();
   const workspaceId = currentWorkspace?.id;
-
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   const { data: boards, isLoading, error } = useQuery({
     queryKey: ["boards", workspaceId],
@@ -38,9 +41,17 @@ export const BoardList = () => {
 
   const filteredBoards = Array.isArray(boards)
     ? boards.filter((board: Board) =>
-      board.title.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+        board.title.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     : [];
+
+  // Introduire un délai avant d'afficher "No boards available"
+  useEffect(() => {
+    if (!isLoading) {
+      const timer = setTimeout(() => setIsFirstLoad(false), 500); // 500 ms de délai
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
 
   if (error) {
     return <div>Error loading boards. Please try again later.</div>;
@@ -50,9 +61,20 @@ export const BoardList = () => {
     <div className="container mx-auto px-2 py-8">
       <Card className="shadow-sm rounded-md">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-2xl font-bold">All Boards {boards && (<span>({boards?.length > 0 ?(<>{boards.length}</>):(<>0</>)})</span>)}</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            All Boards{" "}
+            {boards && (
+              <span>
+                ({boards?.length > 0 ? <>{boards.length}</> : <>0</>})
+              </span>
+            )}
+          </CardTitle>
           {workspaceId && (
-            <FormPopover sideOffset={10} side="right" workspaceId={String(workspaceId)}>
+            <FormPopover
+              sideOffset={10}
+              side="right"
+              workspaceId={String(workspaceId)}
+            >
               <Button variant="outline">
                 <Plus className="mr-2 h-4 w-4" />
                 Create New Board
@@ -70,45 +92,39 @@ export const BoardList = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <div className="space-y-4">
-            {isLoading ? (
-              <p>Loading boards...</p>
-            ) : filteredBoards.length > 0 ? (
-              filteredBoards.map((board: Board) => (
-                <Link
-                  key={board.id}
-                  href={`/${workspaceId}/boards/${board.id}`}
-                  className={`block ${!board.isMember ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                  onClick={(e) => {
-                    if (!board.isMember) {
-                      e.preventDefault(); // Empêche la navigation si l'utilisateur n'est pas membre
-                    }
-                  }}
-                >
-                  <Card className="hover:bg-gray-50 dark:hover:bg-transparent transition duration-300">
-                    <CardContent className="flex items-center justify-between p-4">
-                      <div className="flex items-center space-x-4">
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage
-                            src={`https://avatar.vercel.sh/${board.id}.png`}
-                            alt={board.title}
-                          />
-                          <AvatarFallback>{board.title.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <h3 className="text-lg text-gray-800 dark:text-white font-semibold">{board.title}</h3>
-                        </div>
-                      </div>
-                      <Button variant="ghost">View Board</Button>
-                    </CardContent>
-                  </Card>
 
-                </Link>
-              ))
-            ) : (
-              <p>No boards available</p>
-            )}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {isLoading || isFirstLoad
+              ? Array.from({ length: 4 }).map((_, idx) => (
+                  <Skeleton
+                    key={idx}
+                    className="h-56 rounded-md bg-gray-200 dark:bg-gray-700"
+                  />
+                ))
+              : filteredBoards.length > 0
+              ? filteredBoards.map((board: any) => (
+                  <BoardCard
+                    key={board.id}
+                    board={board}
+                    onClick={() => {
+                      const handleClick = (e: React.MouseEvent) => {
+                        if (!board.isMember) {
+                          e.preventDefault();
+                          toast.error("You are not a member of this board.");
+                          return;
+                        }
+                        router.push(`/${workspaceId}/boards/${board.id}`);
+                      };
+
+                      // Simuler un événement pour `handleClick`
+                      const simulatedEvent = { preventDefault: () => {} } as React.MouseEvent;
+                      handleClick(simulatedEvent);
+                    }}
+                  />
+                ))
+              : (
+                <p>No boards available</p>
+              )}
           </div>
         </CardContent>
       </Card>
