@@ -46,7 +46,7 @@ export const BoardCard = ({ board, onClick }: BoardCardProps) => {
             {[1, 2, 3].map((column) => (
               <div
                 key={column}
-                className="w-24 mt-12 bg-white/90 dark:bg-gray-800/90 rounded p-2 shadow-sm"
+                className="w-24 mt-16 bg-white/90 dark:bg-gray-800/90 rounded p-2 shadow-sm"
               >
                 <div className="text-[8px] font-medium mb-2">List {column}</div>
                 {[1, 2].map((card) => (
@@ -99,7 +99,12 @@ export const BoardCard = ({ board, onClick }: BoardCardProps) => {
 
             <div className="flex items-center text-xs text-gray-500">
               <Users className="h-3 w-3 mr-1" />
-              {board.memberCount} members
+              {board.memberCount > 1 ? (
+                <p> {board.memberCount} members</p>
+              ) : (
+                <p> {board.memberCount} member</p>
+              )}
+
             </div>
           </div>
 

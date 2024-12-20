@@ -96,7 +96,15 @@ export default function DocsPage() {
         <div className="flex flex-col space-y-4">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold">Documents</h1>
+              <div className="flex items-center gap-x-2">
+                <h1 className="text-2xl font-bold">Documents</h1>
+                {documents && (
+                  <span>
+                    ({documents?.length > 0 ? <>{documents.length}</> : <>0</>})
+                  </span>
+                )}
+              </div>
+
               <p className="text-muted-foreground">
                 Manage and organize your workspace documents
               </p>
@@ -170,14 +178,14 @@ export default function DocsPage() {
             </div>
           ) : viewMode === "grid" ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredDocs.map((doc: any) => (
-              <DocumentCard
-                key={doc.id}
-                document={doc}
-                onClick={() => router.push(`/${workspaceId}/documents/${doc.id}`)}
-              />
-            ))}
-          </div>
+              {filteredDocs.map((doc: any) => (
+                <DocumentCard
+                  key={doc.id}
+                  document={doc}
+                  onClick={() => router.push(`/${workspaceId}/documents/${doc.id}`)}
+                />
+              ))}
+            </div>
           ) : (
             <div className="space-y-2">
               {filteredDocs.map((doc: any) => (
@@ -210,34 +218,6 @@ export default function DocsPage() {
               <p className="mt-1 text-sm text-gray-500">
                 Get started by creating a new document.
               </p>
-              <div className="mt-6">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <Plus className="mr-2 h-4 w-4" />
-                      New Document
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Create New Document</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4 py-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Document Title</label>
-                        <Input
-                          placeholder="Enter document title"
-                          value={title}
-                          onChange={(e) => setTitle(e.target.value)}
-                        />
-                      </div>
-                      <Button onClick={handleCreateDocument} className="w-full">
-                        Create Document
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
             </div>
           )}
         </div>
