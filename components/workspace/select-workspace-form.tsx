@@ -126,7 +126,7 @@ export const SelectWorkspaceForm = () => {
 
     return (
         <div className="bg-background">
-            <div className="container mx-auto grid md:grid-cols-2 gap-8 p-8">
+            <div className="mx-auto grid md:grid-cols-2 gap-8 p-8">
                 {/* Left Column - Payment Form */}
                 <div>
                     <Card className="shadow-sm">

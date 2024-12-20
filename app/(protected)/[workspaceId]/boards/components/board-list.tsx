@@ -58,8 +58,8 @@ export const BoardList = () => {
   }
 
   return (
-    <div className="container mx-auto px-2 py-8">
-      <Card className="shadow-sm rounded-md">
+    <div className="py-8">
+      <Card className="shadow-sm rounded-md w-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">
             All Boards{" "}

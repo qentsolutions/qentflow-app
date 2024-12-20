@@ -29,7 +29,7 @@ const CalendarPage = () => {
   });
 
   return (
-    <div className="container mx-auto pt-2 space-y-6">
+    <div className=" mx-auto pt-1 space-y-6">
         <WeeklyCalendar
           events={events || []}
         />

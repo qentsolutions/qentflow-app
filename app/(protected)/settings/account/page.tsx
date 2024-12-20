@@ -81,7 +81,7 @@ const AccountPage = () => {
     return (
         <div className="space-y-6 pb-12">
             {/* Profile Section */}
-            <Card>
+            <Card className="mt-4">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <User2 className="h-5 w-5" /> Profile Information

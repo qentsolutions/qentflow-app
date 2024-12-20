@@ -11,7 +11,7 @@ const BoardPage = () => {
   const { currentWorkspace } = useCurrentWorkspace();
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Boards", href: `${currentWorkspace?.id}/boards` }]);
+    setBreadcrumbs([{ label: "Boards", href: `/${currentWorkspace?.id}/boards` }]);
   }, [setBreadcrumbs]);
 
   return (
