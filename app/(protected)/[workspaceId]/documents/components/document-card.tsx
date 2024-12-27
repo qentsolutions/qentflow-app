@@ -15,34 +15,35 @@ export const DocumentCard = ({ document, onClick }: DocumentCardProps) => {
 
   return (
     <div className="group cursor-pointer" onClick={onClick}>
-      <div className="aspect-square relative bg-white dark:bg-gray-800 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200 group-hover:shadow-lg">
-        {/* Paper effect */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f1f1_1px,transparent_1px),linear-gradient(to_bottom,#f1f1f1_1px,transparent_1px)] bg-[size:20px_20px]"></div>
-        
-        {/* Content container */}
-        <div className="relative h-full p-4 flex flex-col">
-          <div className="flex-1 overflow-hidden">
-            {/* Miniature content preview */}
-            <div className="transform scale-[0.7] origin-top-left">
-              <p className="text-[10px] text-gray-600 dark:text-gray-300 leading-tight">
-                {getDocumentPreview(document.content)}
-              </p>
+      <div className=" h-52 relative bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200 group-hover:shadow-lg">
+        {/* A4 effect */}
+        <div className="absolute mx-12 inset-2 bg-white shadow-md rounded-lg overflow-hidden">
+          {/* Content container */}
+          <div className="relative h-full p-4 flex flex-col">
+            <div className="flex-1 overflow-hidden">
+              {/* Miniature content preview */}
+              <div className="transform scale-[0.7] origin-top-left">
+                <p className="text-[10px] text-gray-600 dark:text-gray-300 leading-tight">
+                  {getDocumentPreview(document.content)}
+                </p>
+              </div>
             </div>
-          </div>
-          
-          {/* Document info */}
-          <div className="mt-2 flex items-center justify-between text-xs text-gray-500 border-t pt-2">
-            <div className="flex items-center">
-              <Clock className="h-3 w-3 mr-1" />
-              {format(new Date(document.updatedAt), "MMM d")}
-            </div>
-            <div className="flex items-center">
-              <Calendar className="h-3 w-3 mr-1" />
-              {format(new Date(document.createdAt), "MMM d")}
+
+            {/* Document info */}
+            <div className="mt-2 flex items-center justify-between text-xs text-gray-500 border-t pt-2">
+              <div className="flex items-center">
+                <Clock className="h-3 w-3 mr-1" />
+                {format(new Date(document.updatedAt), "MMM d")}
+              </div>
+              <div className="flex items-center">
+                <Calendar className="h-3 w-3 mr-1" />
+                {format(new Date(document.createdAt), "MMM d")}
+              </div>
             </div>
           </div>
         </div>
       </div>
+
       <div className="mt-2">
         <h3 className="font-medium text-sm truncate group-hover:text-blue-600">
           {document.title}

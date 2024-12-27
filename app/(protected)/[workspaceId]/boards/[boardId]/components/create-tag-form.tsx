@@ -48,7 +48,7 @@ const CreateTagForm = ({ boardId }: CreateTagFormProps) => {
   };
 
   return (
-    <form action={onSubmit} ref={formRef} className="flex items-center gap-2">
+    <form action={onSubmit} ref={formRef} className="flex items-center gap-2 p-4">
       <FormInput
         ref={inputRef}
         id="tagName"

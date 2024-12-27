@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { createDocument } from "@/actions/documents/create-document";
 import { format } from "date-fns";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DocumentCard } from "./components/document-card";
 
@@ -188,20 +188,18 @@ export default function DocsPage() {
                 ))}
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-4">
                 {filteredDocs.map((doc: any) => (
                   <Card
                     key={doc.id}
-                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                    className="cursor-pointer py-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                     onClick={() => router.push(`/${workspaceId}/documents/${doc.id}`)}
                   >
                     <CardContent className="flex items-center p-4">
                       <FileText className="h-5 w-5 text-blue-500 mr-3" />
                       <div className="flex-1">
                         <h3 className="font-medium">{doc.title}</h3>
-                        <p className="text-sm text-muted-foreground line-clamp-1">
-                          {getDocumentPreview(doc.content)}
-                        </p>
+                       
                       </div>
                       <div className="text-sm text-muted-foreground">
                         Updated {format(new Date(doc.updatedAt), "MMM d, yyyy")}
