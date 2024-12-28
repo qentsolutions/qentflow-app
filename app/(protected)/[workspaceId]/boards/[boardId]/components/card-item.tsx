@@ -103,7 +103,7 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                   <circle cx="12" cy="12" r="10" />
                   <polyline points="12 6 12 12 16 14" />
                 </svg>
-                {format(new Date(data.createdAt), "MMM d")}
+               
               </div>
               <Popover>
                 <PopoverTrigger onClick={(e) => e.stopPropagation()} asChild>

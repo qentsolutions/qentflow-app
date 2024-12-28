@@ -19,7 +19,9 @@ const Details: React.FC<DetailsProps> = ({ card }) => {
                         <ListTodo size={14} />
                         <span className="ml-1 text-sm text-muted-foreground">Status</span>
                     </div>
-                    <Badge className="bg-blue-500 text-white text-xs">{card.list.title}</Badge>
+                    <div>
+                        <Badge className="bg-blue-500 text-white text-sm py-1">{card.list.title}</Badge>
+                    </div>
                 </div>
 
                 <div className="space-y-2">

@@ -15,6 +15,9 @@ import { deleteCard } from "@/actions/tasks/delete-card";
 import { useAction } from "@/hooks/use-action";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
+import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
+import { copyList } from "@/actions/tasks/copy-list";
+import { copyCard } from "@/actions/tasks/copy-card";
 
 interface ListItemProps {
   data: ListWithCards;
@@ -26,6 +29,7 @@ export const ListItem = ({ data, index, users }: ListItemProps) => {
   const textareaRef = useRef<ElementRef<"textarea">>(null);
   const [isEditing, setIsEditing] = useState(false);
   const params = useParams();
+  const { currentWorkspace } = useCurrentWorkspace();
 
   const disableEditing = () => {
     setIsEditing(false);
@@ -57,6 +61,32 @@ export const ListItem = ({ data, index, users }: ListItemProps) => {
     }
 
     executeDeleteCard({
+      id: cardId,
+      boardId,
+      workspaceId,
+    });
+  };
+
+  const {
+    execute: executeCopyCard,
+    isLoading: isLoadingCopy,
+  } = useAction(copyCard, {
+    onSuccess: (data) => {
+      toast.success(`Card "${data.title}" copied`);
+    },
+    onError: (error) => {
+      toast.error(error);
+    },
+  });
+
+  const onCopy = (cardId:string) => {
+    const boardId = params.boardId as string;
+    const workspaceId = currentWorkspace?.id;
+    if (!workspaceId) {
+      toast.error("Workspace ID is required.");
+      return;
+    }
+    executeCopyCard({
       id: cardId,
       boardId,
       workspaceId,
@@ -100,7 +130,12 @@ export const ListItem = ({ data, index, users }: ListItemProps) => {
                             <CardItem index={index} data={card} users={users} />
                           </ContextMenuTrigger>
                           <ContextMenuContent>
-                            <ContextMenuItem>
+                            <ContextMenuItem
+                              onClick={() => {
+                                onCopy(card.id);
+                              }}
+                              className="w-full justify-start"
+                            >
                               Duplicate
                             </ContextMenuItem>
                             <ContextMenuSeparator />

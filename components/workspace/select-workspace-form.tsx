@@ -166,7 +166,6 @@ export const SelectWorkspaceForm = () => {
                     </Card>
                 </div>
 
-                {/* Right Column - Plan Details */}
                 <div className="bg-slate-50 rounded-lg p-8">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-lg font-medium">Choose Your Plan</h2>

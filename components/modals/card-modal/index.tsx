@@ -71,7 +71,7 @@ export const CardModal = () => {
               ) : (
                 <Description data={cardData} />
               )}
-              <div className="flex items-center">
+              <div className="flex items-start">
                 <div className="flex-1 mr-8">
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-lg flex items-center">
@@ -82,33 +82,39 @@ export const CardModal = () => {
                     </Button>
                   </div>
                   <div className="space-y-3 mt-2">
-                    {cardData?.documents && cardData.documents.length > 0 ? (
-                      <>
-                        {cardData?.documents.map((doc: any) => (
-                          <Card
-                            key={doc.id}
-                            className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition"
-                            onClick={() => handleDocumentClick(doc.id)}
-                          >
-                            <div className="flex items-center justify-between gap-2">
-                              <div className="flex items-center gap-x-2">
-                                <FileText className="h-4 w-4 text-blue-500" />
-                                <div>
-                                  <p className="font-medium text-sm">{doc.title}</p>
+                    {!cardData ? (
+                      <Description.Skeleton />
+                    ) : (
+                      <div>
+                        {cardData?.documents && cardData.documents.length > 0 ? (
+                          <>
+                            {cardData?.documents.map((doc: any) => (
+                              <Card
+                                key={doc.id}
+                                className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition"
+                                onClick={() => handleDocumentClick(doc.id)}
+                              >
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-x-2">
+                                    <FileText className="h-4 w-4 text-blue-500" />
+                                    <div>
+                                      <p className="font-medium text-sm">{doc.title}</p>
+                                    </div>
+                                  </div>
+                                  <ExternalLink className="h-4 w-4 text-blue-500" />
                                 </div>
-                              </div>
-                              <ExternalLink className="h-4 w-4 text-blue-500" />
-                            </div>
-                          </Card>
-                        ))}
-                      </>) : (
-                      <div className="text-gray-600">
-                        No documents linked.
+                              </Card>
+                            ))}
+                          </>) : (
+                          <div className="text-gray-500 text-sm">
+                            No documents linked.
+                          </div>
+                        )}
                       </div>
                     )}
+
                   </div>
                 </div>
-                <Separator orientation="vertical" className="h-20 border mt-2"  />
                 <div className="flex-1 ml-8">
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-lg flex items-center">

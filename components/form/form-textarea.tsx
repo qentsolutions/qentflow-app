@@ -22,6 +22,8 @@ interface FormTextareaProps {
   onClick?: () => void;
   onKeyDown?: KeyboardEventHandler<HTMLTextAreaElement> | undefined;
   defaultValue?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 };
 
 export const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(({
@@ -35,7 +37,9 @@ export const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>((
   onClick,
   onKeyDown,
   className,
-  defaultValue
+  defaultValue,
+  value,
+  onChange
 }, ref) => {
   const { pending } = useFormStatus();
 
@@ -66,6 +70,8 @@ export const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>((
           )}
           aria-describedby={`${id}-error`}
           defaultValue={defaultValue}
+          value={value} // Passez la `value` pour l'édition
+          onChange={onChange} // Gérez le changement de texte
         />
       </div>
       <FormErrors
@@ -73,7 +79,7 @@ export const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>((
         errors={errors}
       />
     </div>
-  )
+  );
 })
 
 FormTextarea.displayName = "FormTextarea";

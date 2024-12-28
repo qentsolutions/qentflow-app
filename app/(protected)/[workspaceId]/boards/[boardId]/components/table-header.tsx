@@ -14,7 +14,7 @@ export const TableViewHeader = ({
 }: TableViewHeaderProps) => {
   return (
     <TableHeader>
-      <TableRow className="hover:bg-gray-50/50 transition-colors">
+      <TableRow className="hover:bg-gray-50/50 transition-colors rounded-lg bg-gray-50 pl-8">
         <TableHead
           className="cursor-pointer font-semibold text-sm hover:text-black transition-colors"
           onClick={() => onSort("title")}
