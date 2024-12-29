@@ -1,4 +1,6 @@
 // components/file-upload.tsx
+"use client";
+
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
@@ -29,6 +31,9 @@ export const FileUpload = ({ cardId, workspaceId, onUploadComplete }: FileUpload
 
     setIsUploading(true);
     try {
+      const formData = new FormData();
+      formData.append("file", acceptedFiles[0]);
+      
       await execute({
         file: acceptedFiles[0],
         cardId,
@@ -43,6 +48,12 @@ export const FileUpload = ({ cardId, workspaceId, onUploadComplete }: FileUpload
     onDrop,
     maxFiles: 1,
     maxSize: 5 * 1024 * 1024, // 5MB
+    accept: {
+      'image/*': ['.png', '.jpg', '.jpeg', '.gif'],
+      'application/pdf': ['.pdf'],
+      'application/msword': ['.doc'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+    }
   });
 
   return (

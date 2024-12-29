@@ -29,37 +29,41 @@ export const AttachmentList = ({ cardId }: AttachmentListProps) => {
 
   return (
     <div className="space-y-2">
-      {attachments?.map((attachment: any) => (
-        <Card
-          key={attachment.id}
-          className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition"
-        >
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-x-2">
-              <Paperclip className="h-4 w-4 text-blue-500" />
-              <div>
-                <p className="font-medium text-sm">{attachment.name}</p>
+      {attachments && attachments.length > 0 ? (
+        attachments.map((attachment: any) => (
+          <Card
+            key={attachment.id}
+            className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-x-2">
+                <Paperclip className="h-4 w-4 text-blue-500" />
+                <div>
+                  <p className="font-medium text-sm">{attachment.name}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-x-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => window.open(attachment.url, "_blank")}
+                >
+                  <ExternalLink className="h-4 w-4 text-blue-500" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDelete(attachment.id)}
+                >
+                  <X className="h-4 w-4 text-red-500" />
+                </Button>
               </div>
             </div>
-            <div className="flex items-center gap-x-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => window.open(attachment.url, "_blank")}
-              >
-                <ExternalLink className="h-4 w-4 text-blue-500" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleDelete(attachment.id)}
-              >
-                <X className="h-4 w-4 text-red-500" />
-              </Button>
-            </div>
-          </div>
-        </Card>
-      ))}
+          </Card>
+        ))
+      ) : (
+        <p className="text-sm text-gray-500">No attachments linked.</p>
+      )}
     </div>
   );
 };

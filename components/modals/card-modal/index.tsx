@@ -22,7 +22,9 @@ import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Button } from "@/components/ui/button";
 import { AttachmentList } from "./attachment-list";
 import { FileUpload } from "@/components/file-upload";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useState } from "react";
+import { DocumentSelector } from "./document-selector";
 
 export const CardModal = () => {
   const id = useCardModal((state) => state.id);
@@ -30,6 +32,7 @@ export const CardModal = () => {
   const onClose = useCardModal((state) => state.onClose);
   const { boardId } = useParams();
   const { currentWorkspace } = useCurrentWorkspace();
+  const [isDocumentSelectorOpen, setIsDocumentSelectorOpen] = useState(false);
 
   const { data: cardData } = useQuery<CardWithList>({
     queryKey: ["card", id],
@@ -82,23 +85,33 @@ export const CardModal = () => {
                 <div className="flex-1 mr-8">
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-lg flex items-center">
-                      <FileText size={12} className="mr-2" /> Linked Documents
+                      <FileText size={12} className="mr-2" /> Documents
                     </span>
-                    <Button className="border-none shadow-none" variant={"outline"}>
+                    <Button
+                      className="border-none shadow-none"
+                      variant="outline"
+                      onClick={() => setIsDocumentSelectorOpen(true)}
+                    >
                       <Plus />
                     </Button>
                   </div>
+                  <DocumentSelector
+                    isOpen={isDocumentSelectorOpen}
+                    onClose={() => setIsDocumentSelectorOpen(false)}
+                    cardId={cardData?.id || ""}
+                    workspaceId={currentWorkspace?.id!}
+                  />
                   <div className="space-y-3 mt-2">
                     {!cardData ? (
                       <Description.Skeleton />
                     ) : (
-                      <div>
+                      <div className="space-y-2">
                         {cardData?.documents && cardData.documents.length > 0 ? (
                           <>
                             {cardData?.documents.map((doc: any) => (
                               <Card
                                 key={doc.id}
-                                className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition"
+                                className="p-3 hover:bg-gray-100 shadow-none dark:hover:bg-gray-800 cursor-pointer transition"
                                 onClick={() => handleDocumentClick(doc.id)}
                               >
                                 <div className="flex items-center justify-between gap-2">
@@ -134,6 +147,7 @@ export const CardModal = () => {
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
+                        <DialogTitle>Add Attachment to Card</DialogTitle>
                         <FileUpload
                           cardId={cardData?.id || ""}
                           workspaceId={currentWorkspace?.id!}
@@ -146,7 +160,11 @@ export const CardModal = () => {
                   </div>
 
                   <div className="space-y-3 mt-2">
-                    <AttachmentList cardId={cardData?.id || ""} />
+                    {!cardData ? (
+                      <Description.Skeleton />
+                    ) : (
+                      <AttachmentList cardId={cardData?.id || ""} />
+                    )}
                   </div>
 
                 </div>
