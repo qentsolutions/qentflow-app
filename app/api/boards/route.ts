@@ -5,9 +5,10 @@ import { currentUser } from "@/lib/auth";
 export async function GET(request: Request) {
   try {
     const user = await currentUser();
-    if (!user) {
+    if (!user || !user.id) {
+      // Vérification que user et user.id sont définis
       return NextResponse.json(
-        { error: "User is not authenticated" },
+        { error: "User is not authenticated or user ID is missing" },
         { status: 401 }
       );
     }

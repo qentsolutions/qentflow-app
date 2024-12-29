@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { Copy, Trash, Check, Plus, X, PlusCircle, Info, Pencil } from "lucide-react";
+import { Copy, Trash, Check, Plus, X, PlusCircle, Info, Pencil, UserIcon, UserPlus, UserX, ChevronDown, UserRound, Tags, Pen } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -19,6 +19,13 @@ import { removeTagFromCard } from "@/actions/tasks/delete-tag-from-card";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { User } from "next-auth";
+import { useQuery } from "@tanstack/react-query";
+import { fetcher } from "@/lib/fetcher";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { assignUserToCard } from "@/actions/boards/assign-user-to-card";
 
 interface ActionsProps {
   data: CardWithList;
@@ -35,9 +42,21 @@ export const Actions = ({
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  // Gérer l'état des tags associés à la carte
+  const [assignedUser, setAssignedUser] = useState<User | null>(null); // Utilisateur assigné
   const [linkedTags, setLinkedTags] = useState<string[]>(data.tags.map(tag => tag.name));
-  const [isSelectVisible, setIsSelectVisible] = useState(false);
+  const boardId = params.boardId as string;
+
+  const { data: usersInBoard } = useQuery({
+    queryKey: ["usersInBoard", boardId],
+    queryFn: () => fetcher(`/api/boards/assigned-user?boardId=${boardId}`),
+  });
+
+
+
+  useEffect(() => {
+    const assignedState = Array.isArray(usersInBoard) ? usersInBoard.find((user: { id: string | null; }) => user.id === data.assignedUserId) : null;
+    setAssignedUser(assignedState);
+  }, [data.assignedUserId, usersInBoard]);
 
 
   const {
@@ -204,16 +223,96 @@ export const Actions = ({
   };
 
 
+  const handleAssignUser = async (userId: string | null) => {
+    try {
+      await assignUserToCard(data.id, userId || "null");
+      const newAssignedUser = usersInBoard.find((user: { id: string }) => user.id === userId) || null;
+      setAssignedUser(newAssignedUser);
+      toast.success(userId ? "User assigned to card" : "User unassigned from card");
+    } catch (error) {
+      toast.error("Failed to update user assignment");
+    }
+  };
+
   return (
     <Card className="mt-4 shadow-none">
-      <CardContent>
-        <div className="space-y-4 mt-4">
-          <div>
+      <CardContent className="h-full pb-8">
+        <div className="space-y-2 mt-4">
+
+          <p className="text-lg font-semibold flex items-center gap-x-2 "><UserRound size={16} /> Assigned</p>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="transition hover:bg-gray-50 p-1 py-1 w-full">
+                {assignedUser ? (
+                  <div className="flex items-center justify-between gap-x-2">
+                    <div className="flex items-center gap-x-2">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={assignedUser.image || ""} />
+                        <AvatarFallback className="text-gray-500 text-sm">
+                          {assignedUser.name?.charAt(0) || <UserIcon className="h-4 w-4" />}
+                        </AvatarFallback>
+                      </Avatar>
+                      <p>{assignedUser.name}</p>
+                    </div>
+
+                    <ChevronDown size={14} />
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between gap-x-2">
+                    <div className="flex items-center gap-x-2">
+                      <Avatar className="h-10 w-10 border-2">
+                        <AvatarFallback className="text-gray-500 text-sm">
+                          <UserPlus size={14} />
+                        </AvatarFallback>
+                      </Avatar>
+                      <p>Unassigned</p>
+                    </div>
+                    <ChevronDown size={14} />
+                  </div>
+
+                )}
+
+              </button>
+            </PopoverTrigger>
+            <PopoverContent side="bottom" align="end" className="z-50">
+              <ScrollArea className="h-40 overflow-y-auto">
+                <div className="space-y-2">
+                  <button
+                    onClick={() => handleAssignUser(null)}
+                    className="w-full flex items-center gap-x-2 hover:bg-slate-100 p-2 rounded-md transition"
+                  >
+                    <Avatar className="h-6 w-6">
+                      <AvatarFallback>
+                        <UserX className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm">Not assigned</span>
+                  </button>
+                  {usersInBoard?.map((user: { id: string; name: string; image: string }) => (
+                    <button
+                      key={user.id}
+                      onClick={() => handleAssignUser(user.id)}
+                      className="w-full flex items-center gap-x-2 hover:bg-slate-100 p-2 rounded-md transition"
+                    >
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={user.image || ""} />
+                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm">{user.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </ScrollArea>
+            </PopoverContent>
+          </Popover>
+
+          <div className="space-y-2">
             <div className="flex items-center">
-              <p className="text-lg font-semibold my-2">Tags</p>
+              <p className="text-lg font-semibold my-2 flex items-center gap-x-2"><Tags size={16} /> Tags</p>
               <Tooltip>
                 <TooltipTrigger>
-                  <Info size={14} className="ml-1 cursor-pointer" />
+                  <Info size={14} className="ml-2 cursor-pointer" />
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-sm text-muted-foreground">
@@ -223,7 +322,7 @@ export const Actions = ({
               </Tooltip>
             </div>
             <div
-              className={`relative border rounded-md p-2 bg-gray-50 dark:bg-gray-700 cursor-pointer group ${isEditMode ? "ring-2 ring-blue-500" : ""}`}
+              className={`relative border rounded-md p-2 mx-1 bg-gray-50 dark:bg-gray-700 cursor-pointer group ${isEditMode ? "ring-2 ring-blue-500" : ""}`}
               onClick={() => setIsEditMode((prev) => !prev)} // Toggle l'état
             >
               <div className="flex flex-wrap gap-2">
@@ -295,7 +394,7 @@ export const Actions = ({
                   ) : (
                     <SelectItem value="no-tags" disabled>
                       <div className="flex items-center justify-center">
-                        No tags available 
+                        No tags available
                       </div>
                     </SelectItem>
                   )}
@@ -305,7 +404,8 @@ export const Actions = ({
             )}
 
           </div>
-          <p className="text-lg font-semibold">Actions</p>
+          <div className="h-2" />
+          <p className="text-lg font-semibold mt-4 flex items-center gap-x-2"><Pen size={16} /> Actions</p>
           <Button
             onClick={onCopy}
             disabled={isLoadingCopy}

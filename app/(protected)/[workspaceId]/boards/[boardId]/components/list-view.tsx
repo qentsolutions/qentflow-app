@@ -3,7 +3,7 @@
 import { useCardModal } from "@/hooks/use-card-modal";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { Clock, Calendar, ChevronDown, ChevronUp, Plus, Text, Tags, TargetIcon, UserRound, UserIcon } from "lucide-react";
+import { Clock, Calendar, ChevronDown, ChevronUp, Plus, Text, Tags, TargetIcon, UserRound, UserIcon, EllipsisVertical, Trash } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import {
@@ -18,6 +18,7 @@ import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { ListForm } from "./list-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface ListViewProps {
     boardId: string;
@@ -130,15 +131,15 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
-            <div className="space-y-6">
+            <div className="space-y-6 p-4">
                 {lists.map((list) => (
                     <Collapsible
                         key={list.id}
                         open={openLists.includes(list.id)}
                         onOpenChange={() => toggleList(list.id)}
-                        className="bg-white rounded-lg shadow-sm border-1"
+                        className="bg-white rounded-lg border-2 border-gray-100"
                     >
-                        <CollapsibleTrigger className="w-full p-4 flex items-center bg-gray-50 justify-between hover:bg-gray-50">
+                        <CollapsibleTrigger className="w-full p-4 flex items-center bg-gray-50 justify-between hover:bg-gray-50 rounded-lg">
                             <div className="flex items-center gap-x-2">
                                 {openLists.includes(list.id) ? (
                                     <ChevronUp className="h-5 w-5 text-gray-500" />
@@ -166,8 +167,6 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
                                             <thead>
                                                 <tr className="border-b">
                                                     <th className="p-4 text-left font-medium text-gray-500"><div className="flex items-center gap-x-1"><TargetIcon size={14} /> Task Name</div></th>
-                                                    <th className="p-4 text-left font-medium text-gray-500">Estimation</th>
-                                                    <th className="p-4 text-left font-medium text-gray-500">Type</th>
                                                     <th className="p-4 text-left font-medium text-gray-500"><div className="flex items-center gap-x-1"><UserRound size={14} /> Assigned</div></th>
                                                     <th className="p-4 text-left font-medium text-gray-500"><div className="flex items-center gap-x-1"><Tags size={14} /> Tags</div></th>
                                                     <th className="p-4 text-left font-medium text-gray-500"></th>
@@ -185,29 +184,21 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
                                                                 ref={provided.innerRef}
                                                                 {...provided.draggableProps}
                                                                 {...provided.dragHandleProps}
-                                                                className="group hover:bg-gray-50 cursor-pointer border-b border-gray-200"
+                                                                className="group hover:bg-gray-50 bg-white cursor-pointer border-b border-gray-200"
                                                                 onClick={() => cardModal.onOpen(card.id)}
                                                             >
-                                                                <td className="px-4 py-2">
+                                                                <td className="px-4 py-2 border-r border-gray-200"> {/* Bordure à droite de chaque cellule */}
                                                                     <div className="font-medium">{card.title}</div>
                                                                 </td>
 
-                                                                <td className="px-4 py-2">
-                                                                    <div className="text-gray-600">
-                                                                        {format(new Date(card.createdAt), "MMM d, yyyy")} - {format(new Date(card.updatedAt), "MMM d, yyyy")}
-                                                                    </div>
-                                                                </td>
-                                                                <td className="px-4 py-2">
-                                                                    <Badge variant="secondary">Dashboard</Badge>
-                                                                </td>
-                                                                <td className="px-4 py-2">
-                                                                    <div className="flex -space-x-2">
+                                                                <td className="px-4 py-2 border-r border-gray-200"> {/* Bordure à droite de chaque cellule */}
+                                                                    <div className="flex">
                                                                         <td className="p-4">
                                                                             <div className="flex items-center gap-2">
                                                                                 {card.assignedUserId ? (
                                                                                     users.map((user: any) =>
                                                                                         user.id === card.assignedUserId ? (
-                                                                                            <Tooltip>
+                                                                                            <Tooltip key={user.id}>
                                                                                                 <TooltipTrigger>
                                                                                                     <Avatar className="h-6 w-6">
                                                                                                         <AvatarImage src={user.image || ""} />
@@ -244,17 +235,24 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
                                                                     </div>
                                                                 </td>
 
-                                                                <td className="px-4 py-2">
+                                                                <td className="px-4 py-2 border-r border-gray-200"> {/* Bordure à droite de chaque cellule */}
                                                                     <Badge
                                                                         variant={card.tags?.[0]?.name === "High" ? "destructive" : "default"}
                                                                     >
                                                                         {card.tags?.[0]?.name || "Medium"}
                                                                     </Badge>
                                                                 </td>
-                                                                <td className="px-4 py-2">
-                                                                    <button className="opacity-0 group-hover:opacity-100">
-                                                                        ⋮
-                                                                    </button>
+                                                                <td onClick={(e) => e.stopPropagation()}>
+                                                                    <DropdownMenu>
+                                                                        <DropdownMenuTrigger className="p-4 w-full flex items-center justify-center">
+                                                                            <EllipsisVertical size={20} />
+                                                                        </DropdownMenuTrigger>
+                                                                        <DropdownMenuContent>
+                                                                            <DropdownMenuItem className="flex items-center justify-between">
+                                                                                Delete <Trash />
+                                                                            </DropdownMenuItem>
+                                                                        </DropdownMenuContent>
+                                                                    </DropdownMenu>
                                                                 </td>
                                                             </tr>
                                                         )}
@@ -269,6 +267,7 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
                         </CollapsibleContent>
                     </Collapsible>
                 ))}
+                <ListForm />
             </div>
         </DragDropContext>
     );
