@@ -5,9 +5,9 @@ import { currentUser } from "@/lib/auth";
 export async function GET(request: Request) {
   try {
     const user = await currentUser();
-    if (!user) {
+    if (!user || !user.id) {
       return NextResponse.json(
-        { error: "User is not authenticated" },
+        { error: "User is not authenticated or user id is missing" },
         { status: 401 }
       );
     }
@@ -39,16 +39,18 @@ export async function GET(request: Request) {
       );
     }
 
-    // Récupérer tous les boards avec leurs listes et cartes
+    // Récupérer tous les boards du workspace auxquels l'utilisateur appartient
     const boards = await db.board.findMany({
-      where: { workspaceId },
-      orderBy: { createdAt: "desc" },
-      include: {
+      where: {
+        workspaceId,
         User: {
-          where: {
+          some: {
             id: user.id,
           },
         },
+      },
+      orderBy: { createdAt: "desc" },
+      include: {
         lists: {
           orderBy: {
             order: "asc",
@@ -64,17 +66,11 @@ export async function GET(request: Request) {
       },
     });
 
-    // Ajouter une propriété isMember pour chaque board
-    const boardsWithMemberStatus = boards.map((board) => ({
-      ...board,
-      isMember: board.User.length > 0,
-    }));
-
-    if (boardsWithMemberStatus.length === 0) {
+    if (boards.length === 0) {
       return NextResponse.json({ error: "No boards found" }, { status: 404 });
     }
 
-    return NextResponse.json(boardsWithMemberStatus);
+    return NextResponse.json(boards);
   } catch (error) {
     console.error("Error fetching boards:", error);
     return NextResponse.json(
