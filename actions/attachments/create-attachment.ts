@@ -1,4 +1,5 @@
 // actions/tasks/attachment/create-attachment.ts
+"use server"
 import { z } from "zod";
 import { createSafeAction } from "@/lib/create-safe-action";
 import { db } from "@/lib/db";

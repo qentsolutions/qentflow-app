@@ -244,52 +244,27 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
                                                                             }
                                                                         }}
                                                                     >
-                                                                        <PopoverTrigger asChild>
-                                                                            <Button
-                                                                                variant="outline"
-                                                                                role="combobox"
-                                                                                className="w-[200px] justify-between"
-                                                                            >
-                                                                                {card.assignedUserId ? (
-                                                                                    <div className="flex items-center gap-2">
-                                                                                        <Avatar className="h-6 w-6">
-                                                                                            <AvatarImage src={users.find((u: { id: string | null | undefined; }) => u.id === card.assignedUserId)?.image || ""} />
-                                                                                            <AvatarFallback>
-                                                                                                {users.find((u: { id: string | null | undefined; }) => u.id === card.assignedUserId)?.name?.[0] || <UserRound size={12} />}
-                                                                                            </AvatarFallback>
-                                                                                        </Avatar>
-                                                                                        <span>{users.find((u: { id: string | null | undefined; }) => u.id === card.assignedUserId)?.name}</span>
-                                                                                    </div>
-                                                                                ) : (
-                                                                                    "Assign user..."
-                                                                                )}
-                                                                                <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                                            </Button>
-                                                                        </PopoverTrigger>
-                                                                        <PopoverContent className="w-[200px] p-0">
-                                                                            <Command>
-                                                                                <CommandInput placeholder="Search user..." />
-                                                                                <CommandEmpty>No user found.</CommandEmpty>
-                                                                                <CommandGroup>
-                                                                                    {users.map((user: any) => (
-                                                                                        <CommandItem
-                                                                                            key={user.id}
-                                                                                            onSelect={() => handleAssignUser(card.id, user.id)}
-                                                                                            className="flex items-center gap-2"
-                                                                                        >
-                                                                                            <Avatar className="h-6 w-6">
-                                                                                                <AvatarImage src={user.image || ""} />
-                                                                                                <AvatarFallback>{user.name[0]}</AvatarFallback>
-                                                                                            </Avatar>
-                                                                                            {user.name}
-                                                                                            {card.assignedUserId === user.id && (
-                                                                                                <Check className="ml-auto h-4 w-4" />
-                                                                                            )}
-                                                                                        </CommandItem>
-                                                                                    ))}
-                                                                                </CommandGroup>
-                                                                            </Command>
-                                                                        </PopoverContent>
+                                                                        <Button
+                                                                            variant="outline"
+                                                                            role="combobox"
+                                                                            className="w-[200px] justify-between"
+                                                                        >
+                                                                            {card.assignedUserId ? (
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <Avatar className="h-6 w-6">
+                                                                                        <AvatarImage src={users.find((u: { id: string | null | undefined; }) => u.id === card.assignedUserId)?.image || ""} />
+                                                                                        <AvatarFallback>
+                                                                                            {users.find((u: { id: string | null | undefined; }) => u.id === card.assignedUserId)?.name?.[0] || <UserRound size={12} />}
+                                                                                        </AvatarFallback>
+                                                                                    </Avatar>
+                                                                                    <span>{users.find((u: { id: string | null | undefined; }) => u.id === card.assignedUserId)?.name}</span>
+                                                                                </div>
+                                                                            ) : (
+                                                                                "Assign user..."
+                                                                            )}
+                                                                        </Button>
+
+
                                                                     </Popover>
                                                                 </td>
 
