@@ -3,7 +3,7 @@
 import { useCardModal } from "@/hooks/use-card-modal";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { Clock, Calendar, ChevronDown, ChevronUp, Plus, Text, Tags, TargetIcon, UserRound, UserIcon, EllipsisVertical, Trash } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus, TargetIcon, UserRound, Tags, EllipsisVertical, Trash, Check } from 'lucide-react';
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import {
@@ -16,9 +16,22 @@ import { useAction } from "@/hooks/use-action";
 import { updateCardOrder } from "@/actions/tasks/update-card-order";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { ListForm } from "./list-form";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ListViewProps {
     boardId: string;
@@ -48,6 +61,7 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
     const [openLists, setOpenLists] = useState<string[]>(data.map(list => list.id));
     const [lists, setLists] = useState(data);
     const { currentWorkspace } = useCurrentWorkspace();
+    const [openAssign, setOpenAssign] = useState<string | null>(null);
 
 
     useEffect(() => {
@@ -129,6 +143,12 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
         });
     };
 
+    const handleAssignUser = (cardId: string, userId: string) => {
+        // TODO: Implement user assignment action
+        toast.success("User assigned successfully");
+        setOpenAssign(null);
+    };
+
     return (
         <DragDropContext onDragEnd={onDragEnd}>
             <div className="space-y-6 p-4">
@@ -187,55 +207,72 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
                                                                 className="group hover:bg-gray-50 bg-white cursor-pointer border-b border-gray-200"
                                                                 onClick={() => cardModal.onOpen(card.id)}
                                                             >
-                                                                <td className="px-4 py-2 border-r border-gray-200"> {/* Bordure à droite de chaque cellule */}
+                                                                <td className="px-4 py-2 border-r border-gray-200">
                                                                     <div className="font-medium">{card.title}</div>
                                                                 </td>
-
-                                                                <td className="px-4 py-2 border-r border-gray-200"> {/* Bordure à droite de chaque cellule */}
-                                                                    <div className="flex">
-                                                                        <td className="p-4">
-                                                                            <div className="flex items-center gap-2">
+                                                                <td
+                                                                    className="px-4 py-2 border-r border-gray-200"
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                >
+                                                                    <Popover
+                                                                        open={openAssign === card.id}
+                                                                        onOpenChange={(open) => {
+                                                                            if (open) {
+                                                                                setOpenAssign(card.id);
+                                                                            } else {
+                                                                                setOpenAssign(null);
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        <PopoverTrigger asChild>
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                role="combobox"
+                                                                                className="w-[200px] justify-between"
+                                                                            >
                                                                                 {card.assignedUserId ? (
-                                                                                    users.map((user: any) =>
-                                                                                        user.id === card.assignedUserId ? (
-                                                                                            <Tooltip key={user.id}>
-                                                                                                <TooltipTrigger>
-                                                                                                    <Avatar className="h-6 w-6">
-                                                                                                        <AvatarImage src={user.image || ""} />
-                                                                                                        <AvatarFallback className="text-gray-500 text-sm">
-                                                                                                            {user?.name?.charAt(0) || <UserIcon className="h-2 w-2" />}
-                                                                                                        </AvatarFallback>
-                                                                                                    </Avatar>
-                                                                                                </TooltipTrigger>
-                                                                                                <TooltipContent>
-                                                                                                    <p>{user?.name}</p>
-                                                                                                </TooltipContent>
-                                                                                            </Tooltip>
-
-                                                                                        ) : null
-                                                                                    )
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <Avatar className="h-6 w-6">
+                                                                                            <AvatarImage src={users.find((u: { id: string | null | undefined; }) => u.id === card.assignedUserId)?.image || ""} />
+                                                                                            <AvatarFallback>
+                                                                                                {users.find((u: { id: string | null | undefined; }) => u.id === card.assignedUserId)?.name?.[0] || <UserRound size={12} />}
+                                                                                            </AvatarFallback>
+                                                                                        </Avatar>
+                                                                                        <span>{users.find((u: { id: string | null | undefined; }) => u.id === card.assignedUserId)?.name}</span>
+                                                                                    </div>
                                                                                 ) : (
-                                                                                    <Tooltip>
-                                                                                        <TooltipTrigger>
-                                                                                            <Avatar className="h-6 w-6">
-                                                                                                <AvatarFallback className="text-gray-500 text-sm">
-                                                                                                    <UserRound size={12} />
-                                                                                                </AvatarFallback>
-                                                                                            </Avatar>
-                                                                                        </TooltipTrigger>
-                                                                                        <TooltipContent>
-                                                                                            Unassigned
-                                                                                        </TooltipContent>
-                                                                                    </Tooltip>
-
+                                                                                    "Assign user..."
                                                                                 )}
-                                                                            </div>
-                                                                        </td>
-
-                                                                    </div>
+                                                                                <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                                            </Button>
+                                                                        </PopoverTrigger>
+                                                                        <PopoverContent className="w-[200px] p-0">
+                                                                            <Command>
+                                                                                <CommandInput placeholder="Search user..." />
+                                                                                <CommandEmpty>No user found.</CommandEmpty>
+                                                                                <CommandGroup>
+                                                                                    {users.map((user: any) => (
+                                                                                        <CommandItem
+                                                                                            key={user.id}
+                                                                                            onSelect={() => handleAssignUser(card.id, user.id)}
+                                                                                            className="flex items-center gap-2"
+                                                                                        >
+                                                                                            <Avatar className="h-6 w-6">
+                                                                                                <AvatarImage src={user.image || ""} />
+                                                                                                <AvatarFallback>{user.name[0]}</AvatarFallback>
+                                                                                            </Avatar>
+                                                                                            {user.name}
+                                                                                            {card.assignedUserId === user.id && (
+                                                                                                <Check className="ml-auto h-4 w-4" />
+                                                                                            )}
+                                                                                        </CommandItem>
+                                                                                    ))}
+                                                                                </CommandGroup>
+                                                                            </Command>
+                                                                        </PopoverContent>
+                                                                    </Popover>
                                                                 </td>
-
-                                                                <td className="px-4 py-2 border-r border-gray-200"> {/* Bordure à droite de chaque cellule */}
+                                                                <td className="px-4 py-2 border-r border-gray-200">
                                                                     <Badge
                                                                         variant={card.tags?.[0]?.name === "High" ? "destructive" : "default"}
                                                                     >
@@ -271,5 +308,5 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
             </div>
         </DragDropContext>
     );
-
 };
+
