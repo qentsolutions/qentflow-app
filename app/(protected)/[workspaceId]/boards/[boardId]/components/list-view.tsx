@@ -200,8 +200,8 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
                                             <thead>
                                                 <tr className="border-b">
                                                     <th className="p-4 text-left font-medium text-gray-500"><div className="flex items-center gap-x-1"><TargetIcon size={14} /> Task Name</div></th>
-                                                    <th className="p-4 text-left font-medium text-gray-500"><div className="flex items-center gap-x-1"><UserRound size={14} /> Assigned</div></th>
                                                     <th className="p-4 text-left font-medium text-gray-500"><div className="flex items-center gap-x-1"><Tags size={14} /> Tags</div></th>
+                                                    <th className="p-4 text-left font-medium text-gray-500"><div className="flex items-center gap-x-1"><UserRound size={14} /> Assigned</div></th>
                                                     <th className="p-4 text-left font-medium text-gray-500"></th>
                                                 </tr>
                                             </thead>
@@ -222,6 +222,13 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
                                                             >
                                                                 <td className="px-4 py-2 border-r border-gray-200">
                                                                     <div className="font-medium">{card.title}</div>
+                                                                </td>
+                                                                <td className="px-4 py-2 border-r border-gray-200">
+                                                                    <Badge
+                                                                        variant={card.tags?.[0]?.name === "High" ? "destructive" : "default"}
+                                                                    >
+                                                                        {card.tags?.[0]?.name || "Medium"}
+                                                                    </Badge>
                                                                 </td>
                                                                 <td
                                                                     className="px-4 py-2 border-r border-gray-200"
@@ -285,13 +292,7 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
                                                                         </PopoverContent>
                                                                     </Popover>
                                                                 </td>
-                                                                <td className="px-4 py-2 border-r border-gray-200">
-                                                                    <Badge
-                                                                        variant={card.tags?.[0]?.name === "High" ? "destructive" : "default"}
-                                                                    >
-                                                                        {card.tags?.[0]?.name || "Medium"}
-                                                                    </Badge>
-                                                                </td>
+
                                                                 <td onClick={(e) => e.stopPropagation()}>
                                                                     <DropdownMenu>
                                                                         <DropdownMenuTrigger className="p-4 w-full flex items-center justify-center">
