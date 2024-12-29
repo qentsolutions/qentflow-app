@@ -1,6 +1,6 @@
 "use client";
 
-import { ListTodo, Columns3, Table2 } from "lucide-react"; // Importation des icônes
+import { ListTodo, Columns3, Table2, List } from "lucide-react"; // Importation des icônes
 
 export type ViewType = "kanban" | "table" | "list";
 
@@ -12,7 +12,7 @@ interface ViewSwitcherProps {
 export const ViewSwitcher = ({ onViewChange, selectedView }: ViewSwitcherProps) => {
   const views: { label: string; value: ViewType; icon: React.ElementType }[] = [
     { label: "Kanban", value: "kanban", icon: Columns3 },
-    { label: "Table", value: "table", icon: Table2 },
+    { label: "List", value: "list", icon: List }
   ];
 
   return (

@@ -2,7 +2,6 @@
 
 import { ViewSwitcher, ViewType } from "./view-switcher";
 import { KanbanView } from "./kanban-view";
-import { TableView } from "./table-view";
 import { useState } from "react";
 import BoardUsers from "./board-users";
 import { useQuery } from "@tanstack/react-query";
@@ -19,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import CreateTagForm from "./create-tag-form";
+import { ListView } from "./list-view";
 
 interface BoardContentProps {
   boardId: string;
@@ -56,10 +56,8 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     switch (selectedView) {
       case "kanban":
         return <KanbanView boardId={boardId} data={filteredLists} users={users} />;
-      case "table":
-        return <TableView boardId={boardId} data={filteredLists} />;
       default:
-        return <KanbanView boardId={boardId} data={filteredLists} users={users} />;
+        return <ListView boardId={boardId} data={filteredLists} users={users} />;
     }
   };
 
