@@ -20,7 +20,6 @@ import Details from "./details";
 import { Card } from "@/components/ui/card";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 
 export const CardModal = () => {
   const id = useCardModal((state) => state.id);

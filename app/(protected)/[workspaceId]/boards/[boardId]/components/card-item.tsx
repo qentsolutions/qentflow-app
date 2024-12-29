@@ -7,11 +7,18 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { UserPlus, User as UserIcon, UserX } from "lucide-react";
+import { UserPlus, User as UserIcon, UserX, MessageSquareText } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { assignUserToCard } from "@/actions/boards/assign-user-to-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useQuery } from "@tanstack/react-query";
+import { fetcher } from "@/lib/fetcher";
+
+
+interface CommentCountResponse {
+  commentCount: number; // Définit le type comme un objet avec commentCount
+}
 
 interface CardItemProps {
   data: {
@@ -39,6 +46,11 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
     const assignedUser = users.find(user => user.id === data.assignedUserId) || null;
     setAssignedUserState(assignedUser);
   }, [data.assignedUserId, users]);
+
+  const { data: commentsData } = useQuery<CommentCountResponse>({
+    queryKey: ["card-comments", data?.id],
+    queryFn: () => fetcher(`/api/cards/${data?.id}/comments/count-in-card`),
+  });
 
   const handleAssignUser = async (userId: string | null) => {
     try {
@@ -99,10 +111,7 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
             <p className="text-sm font-medium">{data.title}</p>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-x-1 text-muted-foreground text-xs">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12 6 12 12 16 14" />
-                </svg>
+                <MessageSquareText size={14} /> {commentsData ? commentsData?.commentCount : 0}
 
               </div>
               <Popover>
