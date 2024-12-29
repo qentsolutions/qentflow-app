@@ -9,6 +9,7 @@ import {
   Command,
   Frame,
   GalleryVerticalEnd,
+  LayoutDashboard,
   Map,
   PieChart,
   Settings2,
@@ -41,7 +42,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const workspaceId = currentWorkspace?.id;
 
   const data = {
+
     calendar: [
+      {
+        name: "Dashboard",
+        url: "/dashboard",
+        icon: LayoutDashboard
+      },
       {
         name: "Calendar",
         url: `/${workspaceId}/calendar`,

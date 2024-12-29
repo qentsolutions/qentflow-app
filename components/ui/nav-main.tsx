@@ -49,7 +49,7 @@ export function NavMain({
                   tooltip={item.title}
                   className={`${
                     item.isActive
-                      ? "bg-blue-500 text-white"
+                      ? "bg-blue-400 text-white"
                       : "hover:bg-gray-100"
                   } flex items-center gap-3 rounded-md`}
                 >
@@ -61,7 +61,7 @@ export function NavMain({
               <CollapsibleContent>
                 <SidebarMenuSub>
                   {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
+                    <SidebarMenuSubItem key={subItem.title} className="hover:bg-blue-100 rounded-lg pl-2">
                       <SidebarMenuSubButton asChild>
                         <a
                           href={subItem.url}
