@@ -2,7 +2,6 @@
 
 import { useCardModal } from "@/hooks/use-card-modal";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
 import { ChevronDown, ChevronUp, Plus, TargetIcon, UserRound, Tags, EllipsisVertical, Trash, Check } from 'lucide-react';
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -17,21 +16,21 @@ import { updateCardOrder } from "@/actions/tasks/update-card-order";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { ListForm } from "./list-form";
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
 } from "@/components/ui/command";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { assignUserToCard } from "@/actions/boards/assign-user-to-card";
 
 interface ListViewProps {
     boardId: string;
@@ -143,8 +142,22 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
         });
     };
 
-    const handleAssignUser = (cardId: string, userId: string) => {
-        // TODO: Implement user assignment action
+    const handleAssignUser = async (cardId: string, userId: string) => {
+        await assignUserToCard(cardId, userId!);
+        setLists(prevLists => prevLists.map(list => {
+            return {
+                ...list,
+                cards: list.cards.map(card => {
+                    if (card.id === cardId) {
+                        return {
+                            ...card,
+                            assignedUserId: userId,
+                        };
+                    }
+                    return card;
+                }),
+            };
+        }));
         toast.success("User assigned successfully");
         setOpenAssign(null);
     };
