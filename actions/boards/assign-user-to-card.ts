@@ -5,7 +5,7 @@ import { z } from "zod";
 
 const assignUserSchema = z.object({
   cardId: z.string(),
-  userId: z.string(),
+  userId: z.string().nullable().optional(),
 });
 
 export async function assignUserToCard(cardId: string, userId: string) {
@@ -21,12 +21,12 @@ export async function assignUserToCard(cardId: string, userId: string) {
           include: {
             board: {
               include: {
-                User: true
-              }
-            }
-          }
-        }
-      }
+                User: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!card) {
@@ -34,9 +34,8 @@ export async function assignUserToCard(cardId: string, userId: string) {
     }
 
     // Si userId est "null", on désassigne l'utilisateur
-    const updateData = userId === "null" 
-      ? { assignedUserId: null }
-      : { assignedUserId: userId };
+    const updateData =
+      userId === "null" ? { assignedUserId: null } : { assignedUserId: userId };
 
     // Update card with assigned user or remove assignment
     const updatedCard = await db.card.update({

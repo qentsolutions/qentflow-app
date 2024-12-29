@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { Copy, Trash, Check, Plus, X, PlusCircle, Info, Pencil, UserIcon, UserPlus, UserX, ChevronDown, UserRound, Tags, Pen } from "lucide-react";
+import { Copy, Trash, Check, Plus, X, PlusCircle, Info, Pencil, UserPlus, ChevronDown, UserRound, Tags, Pen } from 'lucide-react';
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -22,10 +22,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { User } from "next-auth";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { assignUserToCard } from "@/actions/boards/assign-user-to-card";
+import { UserIcon, UserX } from 'lucide-react';
+
 
 interface ActionsProps {
   data: CardWithList;
@@ -225,8 +225,8 @@ export const Actions = ({
 
   const handleAssignUser = async (userId: string | null) => {
     try {
-      await assignUserToCard(data.id, userId || "null");
-      const newAssignedUser = usersInBoard.find((user: { id: string }) => user.id === userId) || null;
+      await assignUserToCard(data.id, userId!);
+      const newAssignedUser = userId ? usersInBoard.find((user: User) => user.id === userId) : null;
       setAssignedUser(newAssignedUser);
       toast.success(userId ? "User assigned to card" : "User unassigned from card");
     } catch (error) {
@@ -241,71 +241,46 @@ export const Actions = ({
 
           <p className="text-lg font-semibold flex items-center gap-x-2 "><UserRound size={16} /> Assigned</p>
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <button className="transition hover:bg-gray-50 p-1 py-1 w-full">
+          <Select
+            value={assignedUser?.id || "none"}
+            onValueChange={(value) => handleAssignUser(value === "none" ? null : value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue>
                 {assignedUser ? (
-                  <div className="flex items-center justify-between gap-x-2">
-                    <div className="flex items-center gap-x-2">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={assignedUser.image || ""} />
-                        <AvatarFallback className="text-gray-500 text-sm">
-                          {assignedUser.name?.charAt(0) || <UserIcon className="h-4 w-4" />}
-                        </AvatarFallback>
-                      </Avatar>
-                      <p>{assignedUser.name}</p>
-                    </div>
-
-                    <ChevronDown size={14} />
+                  <div className="flex items-center gap-x-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={assignedUser.image || ""} />
+                      <AvatarFallback>{assignedUser.name?.charAt(0) || <UserIcon className="h-4 w-4" />}</AvatarFallback>
+                    </Avatar>
+                    <span>{assignedUser.name}</span>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-between gap-x-2">
-                    <div className="flex items-center gap-x-2">
-                      <Avatar className="h-10 w-10 border-2">
-                        <AvatarFallback className="text-gray-500 text-sm">
-                          <UserPlus size={14} />
-                        </AvatarFallback>
-                      </Avatar>
-                      <p>Unassigned</p>
-                    </div>
-                    <ChevronDown size={14} />
-                  </div>
-
+                  "Assign user"
                 )}
-
-              </button>
-            </PopoverTrigger>
-            <PopoverContent side="bottom" align="end" className="z-50">
-              <ScrollArea className="h-40 overflow-y-auto">
-                <div className="space-y-2">
-                  <button
-                    onClick={() => handleAssignUser(null)}
-                    className="w-full flex items-center gap-x-2 hover:bg-slate-100 p-2 rounded-md transition"
-                  >
-                    <Avatar className="h-6 w-6">
-                      <AvatarFallback>
-                        <UserX className="h-4 w-4" />
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm">Not assigned</span>
-                  </button>
-                  {usersInBoard?.map((user: { id: string; name: string; image: string }) => (
-                    <button
-                      key={user.id}
-                      onClick={() => handleAssignUser(user.id)}
-                      className="w-full flex items-center gap-x-2 hover:bg-slate-100 p-2 rounded-md transition"
-                    >
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage src={user.image || ""} />
-                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm">{user.name}</span>
-                    </button>
-                  ))}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">
+                <div className="flex items-center gap-x-2">
+                  <UserX className="h-4 w-4" />
+                  <span>Unassign</span>
                 </div>
-              </ScrollArea>
-            </PopoverContent>
-          </Popover>
+              </SelectItem>
+              {usersInBoard?.map((user: User) => (
+                <SelectItem key={user.id!} value={user.id!}>
+                  <div className="flex items-center gap-x-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={user.image || ""} />
+                      <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <span>{user.name}</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
 
           <div className="space-y-2">
             <div className="flex items-center">
@@ -473,3 +448,4 @@ Actions.Skeleton = function ActionsSkeleton() {
     </div>
   );
 };
+
