@@ -77,7 +77,6 @@ model Document {
   @@index([workspaceId])
 }
 
-
 model CalendarEvent {
   id          String   @id @default(uuid())
   title       String
@@ -181,10 +180,11 @@ model Card {
   assignedUserId String? // Ajout du champ pour stocker l'ID de l'utilisateur assigné
   assignedUser   User?   @relation(fields: [assignedUserId], references: [id])
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  comments  Comment[]
-  documents Document[] @relation("CardDocuments") // Nouvelle relation
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  comments    Comment[]
+  documents   Document[]   @relation("CardDocuments") // Nouvelle relation
+  attachments Attachment[]
 
   calendarEvents CalendarEvent[]
 
@@ -207,6 +207,19 @@ model Tag {
   cardId    String?
 
   @@unique([name, boardId]) // Un tag doit être unique dans un board
+}
+
+model Attachment {
+  id   String @id @default(uuid())
+  name String
+  url  String
+  key  String // S3 key for deletion
+  cardId    String
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cardId])
 }
 
 model Comment {

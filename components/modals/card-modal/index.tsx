@@ -20,6 +20,9 @@ import Details from "./details";
 import { Card } from "@/components/ui/card";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Button } from "@/components/ui/button";
+import { AttachmentList } from "./attachment-list";
+import { FileUpload } from "@/components/file-upload";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 export const CardModal = () => {
   const id = useCardModal((state) => state.id);
@@ -51,6 +54,11 @@ export const CardModal = () => {
   const handleDocumentClick = (documentId: string) => {
     window.open(`/${currentWorkspace?.id}/documents/${documentId}`, '_blank');
   };
+
+  const { data: attachments, refetch: refetchAttachments } = useQuery({
+    queryKey: ["card-attachments", id],
+    queryFn: () => fetcher(`/api/cards/${id}/attachments`),
+  });
 
 
 
@@ -119,29 +127,28 @@ export const CardModal = () => {
                     <span className="font-bold text-lg flex items-center">
                       <Paperclip size={12} className="mr-2" /> Attachments
                     </span>
-                    <Button className="border-none shadow-none" variant={"outline"}>
-                      <Plus />
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger>
+                        <Button className="border-none shadow-none" variant={"outline"}>
+                          <Plus />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <FileUpload
+                          cardId={cardData?.id || ""}
+                          workspaceId={currentWorkspace?.id!}
+                          onUploadComplete={() => {
+                            refetchAttachments();
+                          }}
+                        />
+                      </DialogContent>
+                    </Dialog>
                   </div>
 
                   <div className="space-y-3 mt-2">
-                    <>
-                      <Card
-                        className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition"
-                        onClick={() => handleDocumentClick("")}
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-x-2">
-                            <Paperclip className="h-4 w-4 text-blue-500" />
-                            <div>
-                              <p className="font-medium text-sm">Attachments title</p>
-                            </div>
-                          </div>
-                          <ExternalLink className="h-4 w-4 text-blue-500" />
-                        </div>
-                      </Card>
-                    </>
+                    <AttachmentList cardId={cardData?.id || ""} />
                   </div>
+
                 </div>
 
               </div>
