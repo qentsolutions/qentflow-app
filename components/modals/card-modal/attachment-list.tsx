@@ -16,15 +16,10 @@ export const AttachmentList = ({ cardId }: AttachmentListProps) => {
     queryFn: () => fetcher(`/api/cards/${cardId}/attachments`),
   });
 
+
+
   const handleDelete = async (attachmentId: string) => {
-    try {
-      await fetch(`/api/cards/${cardId}/attachments/${attachmentId}`, {
-        method: "DELETE",
-      });
-      toast.success("Attachment deleted");
-    } catch (error) {
-      toast.error("Failed to delete attachment");
-    }
+    //
   };
 
   return (

@@ -9,24 +9,39 @@ const s3 = new AWS.S3({
   },
 });
 
-// lib/s3.ts
-export const uploadToS3 = async (file: any, key: string) => {
-  // Convertir le File/Blob en Buffer
-  let buffer;
-  if (file instanceof Blob) {
-    buffer = Buffer.from(await file.arrayBuffer());
-  } else {
-    buffer = file;
+interface UploadParams {
+  buffer: Buffer;
+  key: string;
+  contentType: string;
+}
+
+export const uploadToS3 = async ({
+  buffer,
+  key,
+  contentType,
+}: UploadParams) => {
+  const bucketName = process.env.NEXT_AWS_S3_BUCKET_NAME;
+
+  if (!bucketName) {
+    throw new Error("NEXT_AWS_S3_BUCKET_NAME is not defined.");
   }
 
   const params = {
-    Bucket: process.env.NEXT_AWS_S3_BUCKET_NAME!,
+    Bucket: bucketName,
     Key: key,
     Body: buffer,
-    ContentType: file.type || "application/octet-stream",
-    ACL: "public-read",
+    ContentType: contentType,
   };
 
   const result = await s3.upload(params).promise();
   return result.Location;
+};
+
+export const deleteFromS3 = async (key: string) => {
+  const params = {
+    Bucket: process.env.NEXT_AWS_S3_BUCKET_NAME!,
+    Key: key,
+  };
+
+  await s3.deleteObject(params).promise();
 };

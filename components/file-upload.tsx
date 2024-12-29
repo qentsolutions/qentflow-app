@@ -1,4 +1,6 @@
 // components/file-upload.tsx
+"use client";
+
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
@@ -30,8 +32,29 @@ export const FileUpload = ({ cardId, workspaceId, onUploadComplete }: FileUpload
     setIsUploading(true);
     try {
       const file = acceptedFiles[0];
+
+      // Convertir le fichier en objet simple
+      const fileData = {
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        // Convertir le fichier en ArrayBuffer puis en Base64
+        content: await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            if (typeof reader.result === 'string') {
+              resolve(reader.result);
+            } else {
+              reject(new Error("Failed to read file as Base64 string"));
+            }
+          };
+          reader.onerror = () => reject(new Error("File reading failed"));
+          reader.readAsDataURL(file);
+        }),
+      };
+
       await execute({
-        file,
+        file: fileData,
         cardId,
         workspaceId,
       });
