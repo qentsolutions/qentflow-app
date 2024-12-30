@@ -27,6 +27,7 @@ import { useState } from "react";
 import { DocumentSelector } from "./document-selector";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const CardModal = () => {
   const id = useCardModal((state) => state.id);
@@ -242,7 +243,7 @@ export const CardModal = () => {
                 </TabsList>
                 <TabsContent value="comments">
                   {!commentsData ? (
-                    <div>Loading comments...</div>
+                    <Description.Skeleton />
                   ) : (
                     <Comments items={commentsData} cardId={cardData?.id ?? ''} />
                   )}

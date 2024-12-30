@@ -91,7 +91,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search cards..."
-                className="w-[250px] pl-9"
+                className="w-[250px] pl-9 bg-background"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -222,11 +222,11 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
           </div>
         </div>
         <ViewSwitcher
-          selectedView={selectedView}
+          selectedView={selectedView} 
           onViewChange={setSelectedView}
         />
       </div>
-      <main className="w-full max-w-screen dark:bg-gray-800 border overflow-x-auto">
+      <main className="w-full max-w-screen bg-background shadow-sm border overflow-x-auto">
         {renderView()}
       </main>
     </>

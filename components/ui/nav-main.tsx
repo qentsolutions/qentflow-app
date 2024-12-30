@@ -49,19 +49,19 @@ export function NavMain({
                   tooltip={item.title}
                   className={`${
                     item.isActive
-                      ? "bg-blue-400 text-white"
+                      ? "bg-blue-100 font-medium text-black"
                       : "hover:bg-gray-100"
                   } flex items-center gap-3 rounded-md`}
                 >
                   {item.icon && <item.icon />}
-                  <span>{item.title}</span>
+                  <span className="text-base">{item.title}</span>
                   <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <SidebarMenuSub>
+                <SidebarMenuSub className="mt-2">
                   {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title} className="hover:bg-blue-100 rounded-lg pl-2">
+                    <SidebarMenuSubItem key={subItem.title} className="pl-2 my-1 hover:font-semibold font-medium">
                       <SidebarMenuSubButton asChild>
                         <a
                           href={subItem.url}

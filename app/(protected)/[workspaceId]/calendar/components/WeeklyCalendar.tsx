@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import { format, startOfWeek, addDays, isSameDay, subWeeks, addWeeks, startOfMonth, endOfMonth, eachDayOfInterval, subMonths, addMonths, isWithinInterval, parseISO, setMilliseconds, setSeconds, setMinutes, setHours } from 'date-fns';
+import { format, startOfWeek, addDays, isSameDay, subWeeks, addWeeks, startOfMonth, endOfMonth, eachDayOfInterval, subMonths, addMonths, isWithinInterval, parseISO, setMilliseconds, setSeconds, setMinutes, setHours, isFuture, isPast } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import CreateEventDialog from './create-event-dialog';
 import { EventDetails } from './event-details';
 import { useCurrentUser } from '@/hooks/use-current-user';
+import { EventCard } from './event-card';
 
 interface Event {
   id: string;
@@ -34,6 +35,7 @@ interface WeeklyCalendarProps {
 const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [showPastEvents, setShowPastEvents] = useState(false); // Added state for showing past events
   const { currentWorkspace } = useCurrentWorkspace();
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
@@ -187,9 +189,9 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
 
 
   return (
-    <div className="flex bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden mt-4 pb-12">
+    <div className="flex flex-col lg:flex-row bg-gray-50 dark:bg-gray-900 rounded-lg overflow-hidden mt-4 pb-12">
       <div className="flex-grow">
-        <div className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-900">
+        <div className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-900 border-b">
           <button onClick={() => navigateWeek('prev')} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -258,11 +260,11 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
           </div>
         </div>
       </div>
-      <div className="w-64 p-4 border-l hidden lg:block">
-        <div className="text-center">
+      <div className="w-full lg:w-80 p-4 bg-white dark:bg-gray-800 shadow-lg">
+        <div className="text-center mb-6">
           <Button
             onClick={() => setIsCreateEventOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 mb-8"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Event
@@ -273,54 +275,70 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
           open={isCreateEventOpen}
           onClose={() => setIsCreateEventOpen(false)}
         />
-        <div className="flex justify-between items-center mb-4">
-          <button onClick={() => navigateMonth('prev')} className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <div className="text-lg font-semibold">
-            {format(currentMonth, 'MMMM yyyy', { locale: fr })}
-          </div>
-          <button onClick={() => navigateMonth('next')} className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-        <div className="grid grid-cols-7 gap-1">
-          {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, index) => (
-            <div key={index} className="text-center text-sm font-medium text-gray-500">
-              {day}
-            </div>
-          ))}
-          {monthDays.map((day, index) => (
-            <button
-              key={index}
-              onClick={() => selectDate(day)}
-              className={cn(
-                "text-center p-1 text-sm rounded-full hover:bg-gray-100 dark:hover:bg-gray-700",
-                isSameDay(day, currentDate) && "bg-blue-500 text-white hover:bg-blue-600",
-                isSameDay(day, new Date()) && "font-bold",
-                day.getMonth() !== currentMonth.getMonth() && "text-gray-300 dark:text-gray-600"
-              )}
-            >
-              {format(day, 'd')}
+
+        <div className="mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <button onClick={() => navigateMonth('prev')} className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+              <ChevronLeft className="w-4 h-4" />
             </button>
-          ))}
+            <div className="text-lg font-semibold">
+              {format(currentMonth, 'MMMM yyyy', { locale: fr })}
+            </div>
+            <button onClick={() => navigateMonth('next')} className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="grid grid-cols-7 gap-1">
+            {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, index) => (
+              <div key={index} className="text-center text-sm font-medium text-gray-500">
+                {day}
+              </div>
+            ))}
+            {monthDays.map((day, index) => (
+              <button
+                key={index}
+                onClick={() => selectDate(day)}
+                className={cn(
+                  "text-center p-1 text-sm rounded-full hover:bg-gray-100 dark:hover:bg-gray-700",
+                  isSameDay(day, currentDate) && "bg-blue-500 text-white hover:bg-blue-600",
+                  isSameDay(day, new Date()) && "font-bold",
+                  day.getMonth() !== currentMonth.getMonth() && "text-gray-300 dark:text-gray-600"
+                )}
+              >
+                {format(day, 'd')}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="mt-6">
-          <h3 className="font-semibold mb-2">Upcoming Events</h3>
-          <div className="space-y-2">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-semibold text-lg text-gray-800 dark:text-gray-200">
+              {showPastEvents ? "Passed Events" : "Upcoming Events"}
+            </h3>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowPastEvents(!showPastEvents)}
+              className="text-sm"
+            >
+              {showPastEvents ? "Show Upcoming" : "Show Passed"}
+            </Button>
+          </div>
+          <div className="space-y-3 max-h-[calc(100vh-24rem)] overflow-y-auto pr-2">
             {events
+              .filter((event: Event) =>
+                showPastEvents ? isPast(new Date(event.endDate)) : isFuture(new Date(event.startDate))
+              )
+              .sort((a: Event, b: Event) =>
+                new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+              )
               .map((event: Event) => (
-                <Card
+                <EventCard
                   key={event.id}
-                  className="p-2 cursor-pointer hover:shadow-md transition-shadow"
+                  event={event}
                   onClick={() => handleEventClick(event)}
-                >
-                  <p className="font-medium text-sm">{event.title}</p>
-                  <p className="text-xs text-gray-500">
-                    {format(new Date(event.startDate), "d MMM, HH:mm")}
-                  </p>
-                </Card>
+                />
               ))}
           </div>
         </div>

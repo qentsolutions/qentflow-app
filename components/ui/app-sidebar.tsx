@@ -2,21 +2,10 @@
 
 import * as React from "react"
 import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
   Calendar,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
   LayoutDashboard,
-  Map,
-  PieChart,
-  Settings2,
   SquareTerminal,
 } from "lucide-react"
-
-
 import {
   Sidebar,
   SidebarContent,
@@ -30,9 +19,8 @@ import { NavProjects } from "./nav-projects"
 import { NavUser } from "./nav-user"
 import { useCurrentUser } from "@/hooks/use-current-user"
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
-import Link from "next/link"
+import { Separator } from "./separator"
 
-// This is sample data.
 
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -42,8 +30,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const workspaceId = currentWorkspace?.id;
 
   const data = {
-
-    calendar: [
+    main: [
       {
         name: "Dashboard",
         url: "/dashboard",
@@ -81,7 +68,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher />
       </SidebarHeader>
       <SidebarContent>
-        <NavProjects projects={data.calendar} />
+        <NavProjects projects={data.main} />
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>

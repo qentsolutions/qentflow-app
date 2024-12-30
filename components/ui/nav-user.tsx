@@ -29,6 +29,10 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar"
 import { LogoutButton } from "../auth/logout-button"
+import { Separator } from "./separator"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs"
+import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
+import Image from "next/image"
 
 export function NavUser({
     user,
@@ -37,6 +41,7 @@ export function NavUser({
 }) {
     const { isMobile } = useSidebar()
     const router = useRouter() // Utilisation de useRouter
+    const { currentWorkspace, workspaces, setCurrentWorkspace } = useCurrentWorkspace();
 
     // Fonction pour rediriger vers une page spécifique
     const handleNavigation = (url: string) => {
@@ -45,6 +50,56 @@ export function NavUser({
 
     return (
         <SidebarMenu>
+            <SidebarMenuItem>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <SidebarMenuButton className="flex items-center gap-3 my-1 px-4 py-5 rounded-lg hover:bg-gray-100">
+                            <Bell className="text-gray-500" />
+                            <span className="font-medium text-base">Notifications</span>
+                        </SidebarMenuButton>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="right">
+                        <Tabs defaultValue={currentWorkspace?.id || "all"} className="px-2 pb-12 h-60 w-80">
+                            <div className="flex items-center">
+                                <p className="px-2 py-4 font-medium">Notifications</p>
+                                <div className="text-sm flex items-center justify-center h-6 w-6 bg-blue-400 text-white rounded-sm">
+                                    2
+                                </div>
+                            </div>
+                            <TabsList>
+                                <TabsTrigger value="all" className="text-base">All</TabsTrigger>
+
+                                {/* Générer les onglets dynamiquement en fonction des workspaces */}
+                                {workspaces.map((workspace) => (
+                                    <TabsTrigger key={workspace.id} value={workspace.id} className="text-base">
+                                        {workspace.name}
+                                    </TabsTrigger>
+                                ))}
+                            </TabsList>
+                            <Separator />
+
+                            {/* Contenu pour l'onglet "All" */}
+                            <TabsContent value="all">
+                                <p>All Notifications</p>
+                            </TabsContent>
+
+                            {/* Générer dynamiquement le contenu des onglets pour chaque workspace */}
+                            {workspaces.map((workspace) => (
+                                <TabsContent key={workspace.id} value={workspace.id}>
+                                    <div className="flex flex-col items-start space-y-2">
+                                        <div className="flex items-center gap-2">
+                                            No notifications.
+                                        </div>
+                                    </div>
+                                </TabsContent>
+                            ))}
+                        </Tabs>
+
+                    </DropdownMenuContent>
+                </DropdownMenu>
+
+            </SidebarMenuItem>
+            <Separator />
             <SidebarMenuItem>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>

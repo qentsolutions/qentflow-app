@@ -91,7 +91,7 @@ export default function DocsPage() {
   };
 
   return (
-    <div className="py-8 px-4">
+    <div className="py-8 px-4 h-screen">
       <Card className="shadow-sm rounded-md w-full">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <div className="flex flex-col space-y-4">

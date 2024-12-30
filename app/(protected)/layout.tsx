@@ -41,7 +41,7 @@ const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
             <Separator orientation="vertical" className="mr-2 h-4" />
             <BreadcrumbHeader />
           </header>
-          <div className="mt-12">
+          <div className="mt-12 bg-gray-50">
             {children}
           </div>
         </main>

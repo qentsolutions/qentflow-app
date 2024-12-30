@@ -3,15 +3,12 @@
 import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
 import { BoardList } from "./components/board-list";
 import { useEffect } from "react";
-import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
-
 
 const BoardPage = () => {
   const { setBreadcrumbs } = useBreadcrumbs();
-  const { currentWorkspace } = useCurrentWorkspace();
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Boards", href: `/${currentWorkspace?.id}/boards` }]);
+    setBreadcrumbs([{ label: "Boards" }]);
   }, [setBreadcrumbs]);
 
   return (
