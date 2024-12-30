@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -10,7 +9,6 @@ import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Button } from "@/components/ui/button";
 import { Bold, Italic, List, ListOrdered } from "lucide-react";
 import { updateDocument } from "@/actions/documents/update-document";
-import { useAction } from "@/hooks/use-action";
 
 interface EditorProps {
   document: any;
@@ -21,7 +19,6 @@ export function Editor({ document, onContentChange }: EditorProps) {
   const [content, setContent] = useState(document.content || "");
   const debouncedContent = useDebounce(content, 1000);
   const { currentWorkspace } = useCurrentWorkspace();
-  const params = useParams();
 
   const editor = useEditor({
     extensions: [StarterKit],

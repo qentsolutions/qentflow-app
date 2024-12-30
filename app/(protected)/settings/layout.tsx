@@ -1,7 +1,5 @@
 
 import SettingsNavbar from "./components/navbar";
-
-// Create a layout
 interface SettingsLayoutProps {
     children: React.ReactNode;
 };

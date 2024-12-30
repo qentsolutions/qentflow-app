@@ -2,8 +2,6 @@
 
 import { useEffect } from "react";
 import { useTheme } from "next-themes";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
 import { ThemeToggle } from "@/components/theme/theme-toggle";

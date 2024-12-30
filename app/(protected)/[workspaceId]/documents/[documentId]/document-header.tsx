@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,6 @@ export function DocumentHeader({ document }: DocumentHeaderProps) {
   const [title, setTitle] = useState(document.title);
   const [isEditing, setIsEditing] = useState(false);
   const { currentWorkspace } = useCurrentWorkspace();
-  const params = useParams();
 
   const handleUpdateTitle = async () => {
     try {

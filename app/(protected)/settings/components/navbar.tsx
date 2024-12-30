@@ -1,6 +1,6 @@
 "use client";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
-import { Palette, Settings2, Shield, User, Video } from "lucide-react";
+import { Palette, Settings2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";

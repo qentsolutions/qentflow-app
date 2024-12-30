@@ -1,11 +1,10 @@
 "use client";
 
-import { Card, Tag, User } from "@prisma/client";
+import { Tag, User } from "@prisma/client";
 import { Draggable } from "@hello-pangea/dnd";
 import { useCardModal } from "@/hooks/use-card-modal";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { format } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { UserPlus, User as UserIcon, UserX, MessageSquareText } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -15,9 +14,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
 
-
 interface CommentCountResponse {
-  commentCount: number; // Définit le type comme un objet avec commentCount
+  commentCount: number; 
 }
 
 interface CardItemProps {
@@ -41,7 +39,6 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
   const cardModal = useCardModal();
   const [assignedUserState, setAssignedUserState] = useState<User | null>(null);
 
-  // Synchroniser l'état avec les données du serveur
   useEffect(() => {
     const assignedUser = users.find(user => user.id === data.assignedUserId) || null;
     setAssignedUserState(assignedUser);

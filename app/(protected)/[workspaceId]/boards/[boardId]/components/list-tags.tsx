@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { Select, SelectItem, SelectTrigger, SelectContent, SelectValue } from "@/components/ui/select";
-import { useSearchParams } from "next/navigation";
 
 interface ListTagsProps {
     boardId: string;
@@ -17,13 +16,10 @@ export const ListTags = ({ boardId }: ListTagsProps) => {
     const [tags, setTags] = useState<Tag[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedTag, setSelectedTag] = useState<string | null>(null);
-    const searchParams = useSearchParams();
     const [error, setError] = useState<string | null>(null);
-
 
     useEffect(() => {
         if (!boardId) return;
-
         const fetchTags = async () => {
             try {
                 const response = await fetch(`/api/boards/tags?boardId=${boardId}`, {
@@ -38,7 +34,6 @@ export const ListTags = ({ boardId }: ListTagsProps) => {
                 setLoading(false);
             }
         };
-
         fetchTags();
     }, [boardId]);
 

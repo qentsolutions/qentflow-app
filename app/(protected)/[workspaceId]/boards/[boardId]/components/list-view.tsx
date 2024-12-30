@@ -5,28 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronUp, Plus, TargetIcon, UserRound, Tags, EllipsisVertical, Trash, Check } from 'lucide-react';
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useAction } from "@/hooks/use-action";
 import { updateCardOrder } from "@/actions/tasks/update-card-order";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { ListForm } from "./list-form";
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-} from "@/components/ui/command";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
+
+import { Popover } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

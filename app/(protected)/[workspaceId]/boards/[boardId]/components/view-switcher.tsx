@@ -1,6 +1,6 @@
 "use client";
 
-import { ListTodo, Columns3, Table2, List } from "lucide-react"; // Importation des icônes
+import { ListTodo, Columns3, Table2, List } from "lucide-react";
 
 export type ViewType = "kanban" | "table" | "list";
 

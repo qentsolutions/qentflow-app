@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -11,21 +10,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { toast } from "sonner";
 import { settings } from "@/actions/settings";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SettingsSchema } from "@/schemas";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useSession } from "next-auth/react";
-import { CheckCircle2, KeyRound, Mail, Shield, User2, UserCog2 } from "lucide-react";
+import { CheckCircle2, KeyRound, Shield, User2, UserCog2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { z } from "zod";
 
 const AccountPage = () => {
     const user = useCurrentUser();
-    const { currentWorkspace } = useCurrentWorkspace();
     const [isPending, setIsPending] = useState(false);
     const [error, setError] = useState<string | undefined>();
     const [success, setSuccess] = useState<string | undefined>();

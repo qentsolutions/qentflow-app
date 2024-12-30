@@ -3,7 +3,6 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Tag } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
 import { Button } from "@/components/ui/button";

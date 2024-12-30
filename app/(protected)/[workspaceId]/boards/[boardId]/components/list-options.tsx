@@ -3,8 +3,7 @@
 import { toast } from "sonner";
 import { List } from "@prisma/client";
 import { ElementRef, useRef } from "react";
-import { Copy, Delete, MoreHorizontal, PlusCircle, Trash } from "lucide-react";
-
+import { Copy, MoreHorizontal, PlusCircle, Trash } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -13,8 +12,6 @@ import {
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { useAction } from "@/hooks/use-action";
 import { Button } from "@/components/ui/button";
-
-import { FormSubmit } from "@/components/form/form-submit";
 import { Separator } from "@/components/ui/separator";
 import { deleteList } from "@/actions/tasks/delete-list";
 import { copyList } from "@/actions/tasks/copy-list";

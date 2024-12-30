@@ -1,7 +1,7 @@
 "use client";
 
 import { ElementRef, useRef, useState } from "react";
-import { toast } from "sonner"; // Si tu utilises un système de notification
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/form/form-input";
 import { createTag } from "@/actions/tasks/create-tag";

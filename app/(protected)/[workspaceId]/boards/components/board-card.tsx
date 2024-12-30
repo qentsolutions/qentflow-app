@@ -21,7 +21,7 @@ interface BoardCardProps {
 }
 
 export const BoardCard = ({ board, onClick }: BoardCardProps) => {
-  // Vérification si createdAt est une date valide
+
   const createdAtDate = new Date(board.createdAt);
   const formattedDate = isNaN(createdAtDate.getTime()) ? 'Invalid date' : format(createdAtDate, "MMM d, yyyy");
 

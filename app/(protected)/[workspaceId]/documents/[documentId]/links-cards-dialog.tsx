@@ -9,7 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { fetcher } from "@/lib/fetcher";
 import { toast } from "sonner";
-import { Search, ChevronDown } from "lucide-react";
+import { Search } from "lucide-react";
 import {
   Accordion,
   AccordionContent,

@@ -10,7 +10,7 @@ import { updateList } from "@/actions/tasks/update-list";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 
 interface ListWithCards extends List {
-  cards: { id: string }[]; // Définir la structure des cartes
+  cards: { id: string }[];
 }
 
 interface ListHeaderProps {

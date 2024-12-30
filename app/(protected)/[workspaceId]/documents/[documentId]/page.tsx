@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
@@ -10,13 +10,12 @@ import { DocumentHeader } from "./document-header";
 import { Editor } from "./editor";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Save, Link2, Check, RotateCw } from "lucide-react";
+import { Link2, Check, RotateCw } from "lucide-react";
 import { LinkCardsDialog } from "./links-cards-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DocumentPage() {
     const params = useParams();
-    const router = useRouter();
     const { currentWorkspace } = useCurrentWorkspace();
     const { setBreadcrumbs } = useBreadcrumbs();
     const documentId = params.documentId as string;
@@ -60,7 +59,7 @@ export default function DocumentPage() {
     }
 
     return (
-        <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900">
+        <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900">
             <div className="border-b bg-white dark:bg-gray-800 shadow-sm">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between">
@@ -86,7 +85,7 @@ export default function DocumentPage() {
             </div>
             <div className="flex-1 overflow-y-auto">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <Card className="bg-white dark:bg-gray-800 shadow-sm">
+                    <Card className="bg-white dark:bg-gray-800 shadow-sm h-screen">
                         <Editor
                             document={document}
                             onContentChange={handleAutoSave}

@@ -2,10 +2,8 @@
 
 import { ElementRef, useRef, useState } from "react";
 import { Draggable, Droppable } from "@hello-pangea/dnd";
-
 import { cn } from "@/lib/utils";
 import { ListWithCards } from "@/types";
-
 import { CardForm } from "./card-form";
 import { CardItem } from "./card-item";
 import { ListHeader } from "./list-header";
@@ -16,7 +14,6 @@ import { useAction } from "@/hooks/use-action";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
-import { copyList } from "@/actions/tasks/copy-list";
 import { copyCard } from "@/actions/tasks/copy-card";
 
 interface ListItemProps {

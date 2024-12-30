@@ -8,7 +8,7 @@ import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 
 const BoardPage = () => {
   const { setBreadcrumbs } = useBreadcrumbs();
-  const { currentWorkspace } = useCurrentWorkspace();
+  const { currentWorkspace } = useCurrentWorkspace();
 
   useEffect(() => {
     setBreadcrumbs([{ label: "Boards", href: `/${currentWorkspace?.id}/boards` }]);

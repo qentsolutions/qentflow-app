@@ -68,7 +68,6 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
     redirect(`/${params.workspaceId}/boards`);
   }
 
-
   return (
     <div className="w-full">
       <main className="relative w-full h-full mx-auto p-8">
