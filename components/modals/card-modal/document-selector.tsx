@@ -91,7 +91,7 @@ export const DocumentSelector = ({ isOpen, onClose, cardId, workspaceId }: Docum
                             </div>
                             {/* Afficher CheckIcon si le document est déjà lié */}
                             {isDocumentLinked(doc.id) ? (
-                                <CheckIcon className="text-green-500" />
+                                <CheckIcon className="text-green-500 mr-6" size={14} />
                             ) : (
                                 <Button variant="ghost">Link</Button>
                             )}

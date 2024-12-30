@@ -81,7 +81,7 @@ export const FileUpload = ({ cardId, workspaceId, onUploadComplete }: FileUpload
   return (
     <div
       {...getRootProps()}
-      className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:border-primary transition-colors
+      className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer hover:border-primary transition-colors
         ${isDragActive ? 'border-primary bg-primary/10' : ''}`}
     >
       <input {...getInputProps()} />
