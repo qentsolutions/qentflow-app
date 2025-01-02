@@ -30,6 +30,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         ...tag,
         title: "",
         order: 0,
+        priority: null,
         description: null,
         listId: "",
         assignedUserId: null

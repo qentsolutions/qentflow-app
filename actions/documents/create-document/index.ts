@@ -39,6 +39,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       ...document,
       order: 0,
       description: null,
+      priority: null,
       listId: "",
       assignedUserId: null,
     },
