@@ -1,16 +1,16 @@
 import { Card, List, Tag, Document } from "@prisma/client";
 
-export type ListWithCards = List & { 
+export type ListWithCards = List & {
   cards: Card[];
 };
 
 export type CardWithList = Card & {
   list: List;
-  tags: Tag[]; 
+  tags: Tag[];
   documents: Document[];
 };
 export type Comment = {
-  id: string;
+  id: string; 
   text: string;
   createdAt: string;
   user: {

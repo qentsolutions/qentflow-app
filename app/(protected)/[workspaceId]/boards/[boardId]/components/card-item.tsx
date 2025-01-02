@@ -6,16 +6,17 @@ import { useCardModal } from "@/hooks/use-card-modal";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { UserPlus, User as UserIcon, UserX, MessageSquareText } from "lucide-react";
+import { UserPlus, User as UserIcon, UserX, MessageSquareText, ArrowDown, ArrowRight, ArrowUp, AlertTriangle, SignalLow, SignalMedium, SignalHigh } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { assignUserToCard } from "@/actions/boards/assign-user-to-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface CommentCountResponse {
-  commentCount: number; 
+  commentCount: number;
 }
 
 interface CardItemProps {
@@ -29,6 +30,7 @@ interface CardItemProps {
     updatedAt: Date;
     assignedUserId?: string | null;
     tags?: Tag[];
+    priority: string;
     index?: number;
   };
   index: number;
@@ -83,6 +85,24 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
     return colors[index];
   }
 
+  const PriorityIcon = (priority: string) => {
+    if (priority == "LOW") {
+      return <SignalLow className="text-green-500" size={25} />
+    }
+    if (priority == "MEDIUM") {
+      return <SignalMedium className="text-yellow-500" size={24} />
+    }
+    if (priority == "HIGH") {
+      return <SignalHigh className="text-red-500" size={24} />
+    }
+    if (priority == "CRITICAL") {
+      return <AlertTriangle className="text-red-500" size={16} />
+    }
+    else {
+      return null
+    }
+  }
+
   return (
     <Draggable draggableId={data.id} index={index}>
       {(provided) => (
@@ -109,77 +129,56 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-x-1 text-muted-foreground text-xs">
                 <MessageSquareText size={14} /> {commentsData ? commentsData?.commentCount : 0}
-
               </div>
-              <Popover>
-                <PopoverTrigger onClick={(e) => e.stopPropagation()} asChild>
-                  <button className="hover:opacity-75 transition">
-                    {assignedUserState ? (
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage src={assignedUserState.image || ""} />
-                        <AvatarFallback className="text-gray-500 text-sm">
-                          {assignedUserState.name?.charAt(0) || <UserIcon className="h-2 w-2" />}
-                        </AvatarFallback>
-                      </Avatar>
-                    ) : (
-                      <Avatar className="h-6 w-6">
-                        <AvatarFallback className="text-gray-500 text-sm">
-                          <UserPlus size={12} />
-                        </AvatarFallback>
-                      </Avatar>
-                    )}
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent
-                  className="w-50 p-2"
-                  side="bottom"
-                  align="end"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <ScrollArea className="h-28">
-                    <div className="space-y-2">
-                      <button
-                        onClick={() => handleAssignUser(null)}
-                        className="w-full flex items-center gap-x-2 hover:bg-slate-100 p-2 rounded-md transition"
-                      >
+              <div className="flex items-center justify-center">
+                <div className="mr-1 flex items-center justify-center">
+                  <Tooltip>
+                    <TooltipTrigger>
+                      {PriorityIcon(data.priority)}
+                    </TooltipTrigger>
+                    <TooltipContent className="flex items-center justify-center">
+                      {data.priority}
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <Popover>
+                  <PopoverTrigger onClick={(e) => e.stopPropagation()} asChild>
+                    <button className="hover:opacity-75 transition">
+                      {assignedUserState ? (
                         <Avatar className="h-6 w-6">
-                          <AvatarFallback className="text-gray-500">
-                            <UserX className="h-4 w-4" />
+                          <AvatarImage src={assignedUserState.image || ""} />
+                          <AvatarFallback className="text-gray-500 text-sm">
+                            {assignedUserState.name?.charAt(0) || <UserIcon className="h-2 w-2" />}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="text-sm">Not assigned</span>
-                        {!assignedUserState && (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5 text-green-500 ml-auto"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M5 13l4 4L19 7"
-                            />
-                          </svg>
-                        )}
-                      </button>
-
-                      {users.map((user) => (
+                      ) : (
+                        <Avatar className="h-6 w-6">
+                          <AvatarFallback className="text-gray-500 text-sm">
+                            <UserPlus size={12} />
+                          </AvatarFallback>
+                        </Avatar>
+                      )}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-50 p-2"
+                    side="bottom"
+                    align="end"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ScrollArea className="h-28">
+                      <div className="space-y-2">
                         <button
-                          key={user.id}
-                          onClick={() => handleAssignUser(user.id)}
+                          onClick={() => handleAssignUser(null)}
                           className="w-full flex items-center gap-x-2 hover:bg-slate-100 p-2 rounded-md transition"
                         >
                           <Avatar className="h-6 w-6">
-                            <AvatarImage src={user?.image || ""} />
                             <AvatarFallback className="text-gray-500">
-                              {user.name?.charAt(0) || <UserIcon className="h-2 w-2" />}
+                              <UserX className="h-4 w-4" />
                             </AvatarFallback>
                           </Avatar>
-                          <span className="text-sm">{user.name}</span>
-                          {assignedUserState?.id === user.id && (
+                          <span className="text-sm">Not assigned</span>
+                          {!assignedUserState && (
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               className="h-5 w-5 text-green-500 ml-auto"
@@ -196,11 +195,45 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                             </svg>
                           )}
                         </button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </PopoverContent>
-              </Popover>
+
+
+                        {users.map((user) => (
+                          <button
+                            key={user.id}
+                            onClick={() => handleAssignUser(user.id)}
+                            className="w-full flex items-center gap-x-2 hover:bg-slate-100 p-2 rounded-md transition"
+                          >
+                            <Avatar className="h-6 w-6">
+                              <AvatarImage src={user?.image || ""} />
+                              <AvatarFallback className="text-gray-500">
+                                {user.name?.charAt(0) || <UserIcon className="h-2 w-2" />}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="text-sm">{user.name}</span>
+                            {assignedUserState?.id === user.id && (
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5 text-green-500 ml-auto"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </svg>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </PopoverContent>
+                </Popover>
+              </div>
+
             </div>
           </div>
         </div>

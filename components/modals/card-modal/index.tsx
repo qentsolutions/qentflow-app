@@ -28,6 +28,7 @@ import { DocumentSelector } from "./document-selector";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Priority } from "./priority";
 
 export const CardModal = () => {
   const id = useCardModal((state) => state.id);
@@ -263,6 +264,7 @@ export const CardModal = () => {
           ) : (
             <div>
               <Details card={cardData} />
+              <Priority data={cardData} />
               <Actions data={cardData} availableTags={availableTags ?? []} />
             </div>
           )}
