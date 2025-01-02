@@ -98,11 +98,11 @@ export const ListItem = ({ data, index, users }: ListItemProps) => {
             <li
               {...provided.draggableProps}
               ref={provided.innerRef}
-              className="shrink-0 h-full w-[272px] select-none"
+              className="shrink-0 h-full w-[350px] select-none"
             >
               <div
                 {...provided.dragHandleProps}
-                className="w-full rounded-xl bg-background bg-gray-50 border pb-6 shadow-md"
+                className="w-full rounded-xl bg-background border pb-6 shadow-md"
               >
                 <ListHeader onAddCard={enableEditing} data={data} />
                 <CardForm

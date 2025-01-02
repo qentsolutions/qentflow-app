@@ -226,7 +226,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
           onViewChange={setSelectedView}
         />
       </div>
-      <main className="w-full max-w-screen bg-background shadow-sm border overflow-x-auto">
+      <main className="w-full max-w-screen shadow-sm overflow-x-auto">
         {renderView()}
       </main>
     </>

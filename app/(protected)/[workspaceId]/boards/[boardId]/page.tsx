@@ -70,9 +70,9 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
 
   return (
     <div className="w-full">
-      <main className="relative w-full h-full mx-auto p-8">
+      <main className="relative w-full mx-auto p-8 h-screen">
         <div className="flex flex-col h-full w-full">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center mt-2 justify-between">
             <BoardNavbar board={board} />
           </div>
           <div className="flex w-full items-center gap-4 mb-6 mt-4">
