@@ -61,7 +61,7 @@ export const Priority = ({ data }: PriorityProps) => {
   ];
 
   return (
-    <Card>
+    <Card className="mt-4 shadow-none">
       <CardHeader>
         <CardTitle>Priority</CardTitle>
       </CardHeader>

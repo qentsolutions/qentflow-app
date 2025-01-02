@@ -30,8 +30,8 @@ interface CardItemProps {
     updatedAt: Date;
     assignedUserId?: string | null;
     tags?: Tag[];
-    priority: string;
-    index?: number;
+    priority: string | null;
+     index?: number;
   };
   index: number;
   users: User[];
@@ -85,23 +85,25 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
     return colors[index];
   }
 
-  const PriorityIcon = (priority: string) => {
-    if (priority == "LOW") {
-      return <SignalLow className="text-green-500" size={25} />
+  const PriorityIcon = (priority: string | null) => {
+    if (!priority) {
+      return null; // Si priority est null, ne rien afficher
     }
-    if (priority == "MEDIUM") {
-      return <SignalMedium className="text-yellow-500" size={24} />
+    if (priority === "LOW") {
+      return <SignalLow className="text-green-500" size={25} />;
     }
-    if (priority == "HIGH") {
-      return <SignalHigh className="text-red-500" size={24} />
+    if (priority === "MEDIUM") {
+      return <SignalMedium className="text-yellow-500" size={24} />;
     }
-    if (priority == "CRITICAL") {
-      return <AlertTriangle className="text-red-500" size={16} />
+    if (priority === "HIGH") {
+      return <SignalHigh className="text-red-500" size={24} />;
     }
-    else {
-      return null
+    if (priority === "CRITICAL") {
+      return <AlertTriangle className="text-red-500" size={16} />;
     }
-  }
+    return null; // Si aucune correspondance, ne rien afficher
+  };
+  
 
   return (
     <Draggable draggableId={data.id} index={index}>
