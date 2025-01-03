@@ -1,11 +1,13 @@
 "use client";
 
-import { Settings2, Tag, Users } from "lucide-react";
+import { Image, Settings2, Tag, Users } from "lucide-react";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { GeneralSettings } from "./general-settings";
 import { TagManager } from "./tag-manager";
 import { BoardMembers } from "./board-member";
+import UploadBoardImage from "./board-image";
+import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 
 interface BoardSettingsProps {
   boardId: string;
@@ -16,6 +18,7 @@ interface BoardSettingsProps {
 
 const Settings = ({ boardId, boardTitle, users, createdById }: BoardSettingsProps) => {
   const [activeTab, setActiveTab] = useState("general");
+  const { currentWorkspace } = useCurrentWorkspace();
 
   const tabs = [
     {
@@ -23,6 +26,12 @@ const Settings = ({ boardId, boardTitle, users, createdById }: BoardSettingsProp
       label: "General",
       icon: Settings2,
       component: <GeneralSettings boardId={boardId} boardTitle={boardTitle} createdById={createdById} />,
+    },
+    {
+      id: "image",
+      label: "Image",
+      icon: Image,
+      component: <UploadBoardImage boardId={boardId} workspaceId={currentWorkspace?.id || ""} />,
     },
     {
       id: "members",
@@ -49,8 +58,8 @@ const Settings = ({ boardId, boardTitle, users, createdById }: BoardSettingsProp
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-md transition-colors ${activeTab === tab.id
-                      ? "bg-blue-50 dark:bg-gray-700 dark:text-blue-500 text-blue-700"
-                      : "text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-300"
+                    ? "bg-blue-50 dark:bg-gray-700 dark:text-blue-500 text-blue-700"
+                    : "text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-300"
                     }`}
                 >
                   <tab.icon className="w-5 h-5" />

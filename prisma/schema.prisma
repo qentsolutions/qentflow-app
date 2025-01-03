@@ -138,11 +138,12 @@ model StripeCustomer {
 }
 
 model Board {
-  id          String @id @default(uuid())
+  id          String  @id @default(uuid())
   workspaceId String
   title       String
   lists       List[]
   createdById String
+  image       String?
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
@@ -313,4 +314,11 @@ model TwoFactorConfirmation {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId])
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  content   String
+  userId    String? // Le ? indique que ce champ peut être null ou undefined
+  createdAt DateTime @default(now())
 }

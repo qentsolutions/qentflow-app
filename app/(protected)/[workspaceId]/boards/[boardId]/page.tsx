@@ -5,6 +5,7 @@ import Settings from "./components/settings-board";
 import { BoardContent } from "./components/board-content";
 import { currentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 
 interface BoardIdPageProps {
   params: {
@@ -70,7 +71,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
 
   return (
     <div className="w-full">
-      <main className="relative w-full mx-auto p-8 h-screen">
+      <main className="relative w-full mx-auto p-8 h-full">
         <div className="flex flex-col h-full w-full">
           <div className="flex items-center mt-2 justify-between">
             <BoardNavbar board={board} />

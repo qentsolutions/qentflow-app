@@ -4,6 +4,7 @@ import { AppSidebar } from "@/components/ui/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { BreadcrumbProvider, useBreadcrumbs } from "@/hooks/use-breadcrumb";
+import { FeedbackButton } from "@/components/feedback-button";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -41,8 +42,9 @@ const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
             <Separator orientation="vertical" className="mr-2 h-4" />
             <BreadcrumbHeader />
           </header>
-          <div className="mt-12 bg-gray-50">
+          <div className="mt-12 bg-gray-50 h-full">
             {children}
+            <FeedbackButton />
           </div>
         </main>
       </BreadcrumbProvider>

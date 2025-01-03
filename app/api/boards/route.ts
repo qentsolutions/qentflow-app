@@ -63,6 +63,7 @@ export async function GET(request: Request) {
         },
         memberCount: board.User.length,
         isMember, // Ajouter l'information sur l'adhésion
+        image: board.image,
       };
     });
 

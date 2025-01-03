@@ -33,7 +33,7 @@ export const BoardNavbar = ({ board }: BoardNavbarProps) => {
       <div className="flex items-center justify-between">
         <Avatar className="h-10 w-10 mr-2">
           <AvatarImage
-            src={`https://avatar.vercel.sh/${board.id}.png`}
+            src={board?.image || `https://avatar.vercel.sh/${board.id}.png`}
             alt={board.title}
           />
           <AvatarFallback>{board.title.charAt(0)}</AvatarFallback>
@@ -48,10 +48,10 @@ export const BoardNavbar = ({ board }: BoardNavbarProps) => {
         </SheetTrigger>
         <SheetContent className="overflow-y-auto w-[400px] sm:w-[540px]">
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-center mb-6">How to Use Our SaaS</h2>
+            <h2 className="text-2xl font-bold text-center mb-6">How to Use the Board</h2>
             
             {tutorialSteps.map((step, index) => (
-              <div key={index} className="bg-gray-100 rounded-lg p-4 space-y-4">
+              <div key={index} className="rounded-lg space-y-4">
                 <h3 className="text-lg font-semibold flex items-center">
                   <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">
                     {index + 1}
