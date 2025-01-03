@@ -31,10 +31,11 @@ export const BoardNavbar = ({ board }: BoardNavbarProps) => {
   return (
     <div className="flex items-center justify-between w-full">
       <div className="flex items-center justify-between">
-        <Avatar className="h-10 w-10 mr-2">
+        <Avatar className="h-10 w-10 mr-2 border">
           <AvatarImage
             src={board?.image || `https://avatar.vercel.sh/${board.id}.png`}
             alt={board.title}
+            className="object-cover"
           />
           <AvatarFallback>{board.title.charAt(0)}</AvatarFallback>
         </Avatar>

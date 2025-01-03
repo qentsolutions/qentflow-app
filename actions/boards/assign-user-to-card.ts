@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { z } from "zod";
+import { createNotification } from "../notifications/create-notification";
 
 const assignUserSchema = z.object({
   cardId: z.string(),
@@ -42,6 +43,13 @@ export async function assignUserToCard(cardId: string, userId: string) {
       where: { id: cardId },
       data: updateData,
     });
+
+    const workspaceId = card.list.board.workspaceId;
+    await createNotification(
+      userId,
+      workspaceId,
+      `You have been assigned a new card: ${card.title}`
+    );
 
     return { success: true, data: updatedCard };
   } catch (error) {

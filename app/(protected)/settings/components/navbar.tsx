@@ -13,7 +13,7 @@ const SettingsNavbar = () => {
     useEffect(() => {
         setBreadcrumbs([
             { label: "Settings" },
-            { label: "Account" }
+            { label: "Account" }
         ]);
     }, [setBreadcrumbs]);
 
@@ -33,7 +33,7 @@ const SettingsNavbar = () => {
                     return (
                         <Link href={item.href} key={item.label}>
                             <p className={`flex items-center w-full gap-3 px-3 py-2 rounded-lg text-sm ${isActive
-                                ? "bg-primary/10 text-primary"
+                                ? "bg-gray-100 dark:bg-gray-800 text-primary"
                                 : "text-muted-foreground hover:bg-muted"
                                 }`}>
                                 <item.icon className="w-5 h-5" />

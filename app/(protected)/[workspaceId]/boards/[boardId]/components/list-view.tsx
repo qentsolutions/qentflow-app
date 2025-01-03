@@ -158,7 +158,7 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
                         onOpenChange={() => toggleList(list.id)}
                         className="bg-white rounded-lg border-2 border-gray-100"
                     >
-                        <CollapsibleTrigger className="w-full p-4 flex items-center bg-gray-50 justify-between hover:bg-gray-50 rounded-lg">
+                        <CollapsibleTrigger className="w-full p-4 flex items-center bg-gray-100 justify-between  border-b">
                             <div className="flex items-center gap-x-2">
                                 {openLists.includes(list.id) ? (
                                     <ChevronUp className="h-5 w-5 text-gray-500" />

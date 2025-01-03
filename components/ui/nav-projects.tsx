@@ -22,13 +22,14 @@ export function NavProjects({
 }) {
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+      
       <SidebarMenu>
         {projects.map((item) => (
-          <SidebarMenuItem key={item.name} className="py-1 hover:bg-gray-100 text-gray-700 rounded-sm hover:font-semibold">
+          <SidebarMenuItem key={item.name} className="py-1 hover:bg-gray-100 rounded-sm hover:font-semibold">
             <SidebarMenuButton asChild>
               <a href={item.url}>
                 <item.icon />
-                <span className="text-base">{item.name}</span>
+                <span>{item.name}</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

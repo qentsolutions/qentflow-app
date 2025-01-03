@@ -45,6 +45,7 @@ model User {
   calendarEvents        CalendarEvent[]
   documents             Document[]             @relation("DocumentEditors")
   createdDocuments      Document[]
+  Notification          Notification[]
 }
 
 model Workspace {
@@ -59,6 +60,7 @@ model Workspace {
   boards         Board[]
   calendarEvents CalendarEvent[]
   documents      Document[]
+  Notification   Notification[]
 }
 
 model Document {
@@ -321,4 +323,19 @@ model Feedback {
   content   String
   userId    String? // Le ? indique que ce champ peut être null ou undefined
   createdAt DateTime @default(now())
+}
+
+model Notification {
+  id          String    @id @default(cuid()) // ID unique pour la notification
+  userId      String // L'utilisateur auquel la notification appartient
+  user        User      @relation(fields: [userId], references: [id]) // Relation avec l'utilisateur
+  workspaceId String // ID du workspace associé à la notification
+  workspace   Workspace @relation(fields: [workspaceId], references: [id]) // Relation avec le workspace
+  message     String // Message de la notification
+  read        Boolean   @default(false) // Statut de lecture de la notification
+  createdAt   DateTime  @default(now()) // Date de création de la notification
+  updatedAt   DateTime  @updatedAt // Date de mise à jour de la notification
+
+  @@index([userId]) // Index pour l'utilisateur
+  @@index([workspaceId]) // Index pour le workspace
 }

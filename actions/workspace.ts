@@ -38,7 +38,7 @@ export const updateWorkspace = async (
         members: {
           some: {
             userId: user.id,
-            role: UserRole.ADMIN,
+            role: UserRole.OWNER,
           },
         },
       },

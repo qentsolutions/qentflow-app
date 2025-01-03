@@ -3,6 +3,7 @@
 import * as React from "react"
 import {
   Calendar,
+  Globe,
   LayoutDashboard,
   SquareTerminal,
 } from "lucide-react"
@@ -20,6 +21,7 @@ import { NavUser } from "./nav-user"
 import { useCurrentUser } from "@/hooks/use-current-user"
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
 import { Separator } from "./separator"
+import { NavIntegrations } from "./nav-integrations"
 
 
 
@@ -47,7 +49,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: "Projects",
         url: "#",
         icon: SquareTerminal,
-        isActive: true,
+        isActive: false,
         items: [
           {
             title: "Boards",
@@ -59,8 +61,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           }
         ],
       },
-    ],
 
+    ],
+    integrations: [
+      {
+        title: "Website",
+        url: "#",
+        icon: Globe,
+        isActive: false,
+        items: [
+          {
+            title: "Calendar",
+            url: `/${workspaceId}/calendar`,
+          },
+          {
+            title: "CRM",
+            url: `/${workspaceId}/documents`,
+          }
+        ],
+      },
+    ]
   }
   return (
     <Sidebar collapsible="icon" {...props} className="bg-background">
@@ -70,6 +90,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavProjects projects={data.main} />
         <NavMain items={data.navMain} />
+        <NavIntegrations items={data.integrations} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />
