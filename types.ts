@@ -10,9 +10,10 @@ export type CardWithList = Card & {
   documents: Document[];
 };
 export type Comment = {
-  id: string; 
+  id: string;
   text: string;
   createdAt: string;
+  modified: boolean;
   user: {
     id: any;
     image: string;

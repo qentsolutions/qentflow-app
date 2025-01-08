@@ -44,6 +44,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       data: {
         text, // Met à jour le texte du commentaire
         updatedAt: new Date(), // Met à jour l'horodatage
+        modified: true,
       },
     });
 

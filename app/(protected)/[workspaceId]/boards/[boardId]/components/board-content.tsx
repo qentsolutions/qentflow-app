@@ -186,7 +186,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
               </PopoverContent>
             </Popover>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               {selectedUser && users.find((u: any) => u.id === selectedUser) && (
                 <Badge
                   variant="secondary"

@@ -55,12 +55,11 @@ export const Comments = ({ items, cardId }: CommentsProps) => {
 
   const { execute: executeUpdateComment } = useAction(updateComment, {
     onSuccess: (data) => {
-      console.log("Update successful", data); // Vérifiez ici si la mise à jour est réussie
       toast.success("Comment updated!");
       setComments((prevComments) =>
         prevComments.map((comment) =>
           comment.id === editingCommentId
-            ? { ...comment, text: editingText }
+            ? { ...comment, text: editingText, modified: true } // Ajouter `modified: true`
             : comment
         )
       );
@@ -253,7 +252,7 @@ export const Comments = ({ items, cardId }: CommentsProps) => {
                   </Avatar>
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-semibold">{comment.user.name}</h4>
+                      <p className="text-sm font-semibold flex items-center gap-x-2">{comment.user.name} {comment.modified == true && <p className="font-normal text-xs text-gray-500">(modified)</p>}</p>
                       <span className="text-xs text-muted-foreground">
                         {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
                       </span>

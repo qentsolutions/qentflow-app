@@ -234,10 +234,11 @@ model Attachment {
 }
 
 model Comment {
-  id     String @id @default(uuid())
-  text   String @db.Text
+  id     String  @id @default(uuid())
+  text   String  @db.Text
   cardId String
   userId String
+  modified   Boolean @default(false) // Statut de lecture de la notification
 
   card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
