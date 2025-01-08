@@ -22,7 +22,6 @@ export function NavProjects({
 }) {
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      
       <SidebarMenu>
         {projects.map((item) => (
           <SidebarMenuItem key={item.name} className=" hover:bg-gray-100 rounded-sm hover:font-semibold">

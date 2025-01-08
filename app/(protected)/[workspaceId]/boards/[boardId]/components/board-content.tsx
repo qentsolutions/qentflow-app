@@ -4,9 +4,9 @@ import { ViewSwitcher, ViewType } from "./view-switcher";
 import { KanbanView } from "./kanban-view";
 import { useState } from "react";
 import BoardUsers from "./board-users";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
-import { CheckIcon, ChevronDown, Plus, Search, TagIcon, X } from "lucide-react";
+import { CheckIcon, ChevronDown, Plus, RefreshCcw, Search, TagIcon, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -19,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import CreateTagForm from "./create-tag-form";
 import { ListView } from "./list-view";
+import { useRouter } from "next/navigation";
 
 interface BoardContentProps {
   boardId: string;
@@ -30,6 +31,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
   const [selectedView, setSelectedView] = useState<ViewType>("kanban");
   const [tagSearchTerm, setTagSearchTerm] = useState("");
   const [isCreateTagOpen, setIsCreateTagOpen] = useState(false);
+  const router = useRouter();
 
   const {
     searchTerm,
@@ -40,6 +42,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     toggleTag,
     getFilteredLists,
   } = useBoardFilters({ lists });
+
 
   const { data: availableTags } = useQuery({
     queryKey: ["available-tags", boardId],
@@ -80,6 +83,10 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
       .split("")
       .reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
     return colors[index];
+  }
+
+  const RefreshPage = () => {
+    router.refresh();
   }
 
   return (
@@ -222,9 +229,12 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
           </div>
         </div>
         <ViewSwitcher
-          selectedView={selectedView} 
+          selectedView={selectedView}
           onViewChange={setSelectedView}
         />
+        <Button onClick={RefreshPage} variant="outline">
+          <RefreshCcw />
+        </Button>
       </div>
       <main className="w-full max-w-screen shadow-sm overflow-x-auto bg-background border">
         {renderView()}
