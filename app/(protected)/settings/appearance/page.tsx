@@ -11,6 +11,10 @@ export default function AppearanceSettings() {
   const { setBreadcrumbs } = useBreadcrumbs();
 
   useEffect(() => {
+    document.title = "Appearance - QentSolutions";
+  }, []);
+
+  useEffect(() => {
     setBreadcrumbs([
       { label: "Settings" },
       { label: "Appearance" }
@@ -31,7 +35,7 @@ export default function AppearanceSettings() {
       </div>
 
       <div className="space-y-4">
-       
+
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -43,13 +47,12 @@ export default function AppearanceSettings() {
             </div>
             <ThemeToggle />
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Card 
-                className={`border-2 p-4 cursor-pointer ${
-                  theme === "light" ? "border-primary" : "hover:border-primary"
-                }`}
+              <Card
+                className={`border-2 p-4 cursor-pointer ${theme === "light" ? "border-primary" : "hover:border-primary"
+                  }`}
                 onClick={() => handleThemeChange("light")}
               >
                 <div className="space-y-2">
@@ -71,10 +74,9 @@ export default function AppearanceSettings() {
             </div>
 
             <div className="space-y-2">
-              <Card 
-                className={`border-2 bg-slate-950 p-4 cursor-pointer ${
-                  theme === "dark" ? "border-primary" : "hover:border-primary"
-                }`}
+              <Card
+                className={`border-2 bg-slate-950 p-4 cursor-pointer ${theme === "dark" ? "border-primary" : "hover:border-primary"
+                  }`}
                 onClick={() => handleThemeChange("dark")}
               >
                 <div className="space-y-2">

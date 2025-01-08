@@ -23,6 +23,7 @@ export default function DocumentPage() {
     const [isSaving, setIsSaving] = useState(false);
     const [autoSaveTimer, setAutoSaveTimer] = useState<NodeJS.Timeout | null>(null);
 
+    
     const { data: document, isLoading } = useQuery({
         queryKey: ["document", documentId],
         queryFn: () => fetcher(`/api/documents/${documentId}`),

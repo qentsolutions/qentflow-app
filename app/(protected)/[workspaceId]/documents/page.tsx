@@ -29,6 +29,10 @@ export default function DocsPage() {
   const workspaceId = currentWorkspace?.id;
 
   useEffect(() => {
+    document.title = "Documents - QentSolutions";
+  }, []);
+
+  useEffect(() => {
     setBreadcrumbs([{ label: "Documents" }]);
   }, [setBreadcrumbs]);
 
@@ -199,7 +203,7 @@ export default function DocsPage() {
                       <FileText className="h-5 w-5 text-blue-500 mr-3" />
                       <div className="flex-1">
                         <h3 className="font-medium">{doc.title}</h3>
-                       
+
                       </div>
                       <div className="text-sm text-muted-foreground">
                         Updated {format(new Date(doc.updatedAt), "MMM d, yyyy")}

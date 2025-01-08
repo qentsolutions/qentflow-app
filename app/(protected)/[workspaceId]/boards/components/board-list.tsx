@@ -39,6 +39,10 @@ export const BoardList = () => {
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [recentlyOpened, setRecentlyOpened] = useState<Board[]>([]);
 
+  useEffect(() => {
+    document.title = "Boards - QentSolutions";
+  }, []);
+
   const { data: boards, isLoading, error } = useQuery({
     queryKey: ["boards", workspaceId],
     queryFn: () =>

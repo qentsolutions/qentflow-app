@@ -5,13 +5,27 @@ import Settings from "./components/settings-board";
 import { BoardContent } from "./components/board-content";
 import { currentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import Image from "next/image";
 
 interface BoardIdPageProps {
   params: {
     boardId: string;
     workspaceId: string;
   };
+}
+
+export async function generateMetadata({ params }: { params: { boardId: string; workspaceId: string } }) {
+  const board = await db.board.findUnique({
+    where: {
+      id: params.boardId,
+      workspaceId: params.workspaceId,
+    },
+  });
+
+  if (!board) {
+    return { title: "Board Not Found | MyApp" };
+  }
+
+  return { title: `${board.title} - QentSolutions` };
 }
 
 const BoardIdPage = async ({ params }: BoardIdPageProps) => {

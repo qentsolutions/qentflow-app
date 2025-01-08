@@ -25,7 +25,7 @@ export function NavProjects({
       
       <SidebarMenu>
         {projects.map((item) => (
-          <SidebarMenuItem key={item.name} className="py-1 hover:bg-gray-100 rounded-sm hover:font-semibold">
+          <SidebarMenuItem key={item.name} className=" hover:bg-gray-100 rounded-sm hover:font-semibold">
             <SidebarMenuButton asChild>
               <a href={item.url}>
                 <item.icon />

@@ -12,6 +12,10 @@ const CalendarPage = () => {
   const { setBreadcrumbs } = useBreadcrumbs();
 
   useEffect(() => {
+    document.title = "Calendar - QentSolutions";
+  }, []);
+
+  useEffect(() => {
     setBreadcrumbs([{ label: "Calendar" }]);
   }, [setBreadcrumbs]);
 

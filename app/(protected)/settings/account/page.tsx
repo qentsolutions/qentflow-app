@@ -31,6 +31,10 @@ const AccountPage = () => {
     const { setBreadcrumbs } = useBreadcrumbs();
 
     useEffect(() => {
+        document.title = "Account - QentSolutions";
+    }, []);
+
+    useEffect(() => {
         setBreadcrumbs([
             { label: "Settings" },
             { label: "Account" }
