@@ -19,13 +19,18 @@ export async function POST(req: Request) {
         userId: profile.id,
         name,
         imageUrl,
+        workspaceId: "",
         inviteCode: uuidv4(),
         channels: {
           create: [{ name: "general", userId: profile.id }],
         },
         workspaceMembers: {
           create: [
-            { userId: profile.id, role: UserRole.OWNER, workspaceId: "cm5ojiadz0003879nrkws7pnd" },
+            {
+              userId: profile.id,
+              role: UserRole.OWNER,
+              workspaceId: "cm5ojiadz0003879nrkws7pnd",
+            },
           ],
         },
       },

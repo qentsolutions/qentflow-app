@@ -63,6 +63,7 @@ model Workspace {
   calendarEvents CalendarEvent[]
   documents      Document[]
   Notification   Notification[]
+  servers         Server[]
 }
 
 model Document {
@@ -140,6 +141,7 @@ model WorkspaceMember {
   @@unique([workspaceId, userId])
 }
 
+// Modification du modèle Server
 model Server {
   id         String @id @default(uuid())
   name       String
@@ -149,6 +151,9 @@ model Server {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
   workspaceMembers WorkspaceMember[]
   channels         Channel[]
 
@@ -156,6 +161,7 @@ model Server {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@index([workspaceId])
 }
 
 enum ChannelType {
@@ -185,9 +191,8 @@ model Channel {
 }
 
 model Message {
-  id      String @id @default(uuid())
-  content String @db.Text
-
+  id      String  @id @default(uuid())
+  content String  @db.Text
   fileUrl String? @db.Text
 
   workspaceMemberId String

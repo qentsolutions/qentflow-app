@@ -5,11 +5,13 @@ import { auth } from '@/auth'
 import './globals.css'
 import { Toaster } from "@/components/ui/sonner"
 import { WorkspaceProvider } from '@/hooks/use-current-workspace'
-import { ModalProvider } from '@/providers/modal-provider'
+import { CardModalProvider } from '@/providers/card-modal-provider'
 import { QueryProvider } from '@/providers/query-provider'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { ThemeProvider } from '@/providers/theme-provider'
-import { SocketProvider } from './(protected)/[workspaceId]/servers/components/providers/socket-provider'
+import { SocketProvider } from './(protected)/[workspaceId]/conversations/components/providers/socket-provider'
+import { ModalProvider } from './(protected)/[workspaceId]/conversations/components/providers/modal-provider'
+import { PersistentChat } from '@/components/chat/persistent-chat'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -38,11 +40,13 @@ export default async function RootLayout({
           <SessionProvider session={session}>
             <WorkspaceProvider>
               <SocketProvider>
+                <ModalProvider />
                 <QueryProvider>
                   <TooltipProvider>
                     <Toaster />
-                    <ModalProvider />
+                    <CardModalProvider />
                     {children}
+                    {session?.user && <PersistentChat />}
                   </TooltipProvider>
                 </QueryProvider>
               </SocketProvider>

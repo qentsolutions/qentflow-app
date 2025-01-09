@@ -4,6 +4,7 @@ import * as z from "zod";
 import { db } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
 import { UserRole } from "@prisma/client";
+import { v4 as uuidv4 } from "uuid";
 
 const WorkspaceSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -79,6 +80,7 @@ export const createWorkspace = async (
       return { error: "Unauthorized" };
     }
 
+    // Création du workspace avec un serveur par défaut
     const workspace = await db.workspace.create({
       data: {
         name: values.name,
@@ -90,10 +92,28 @@ export const createWorkspace = async (
           },
         },
       },
-      select: {
-        id: true,
-        name: true,
-        createdAt: true,
+    });
+
+    // Création du serveur "General" après la création du workspace
+    const server = await db.server.create({
+      data: {
+        name: "General",
+        imageUrl: `https://avatar.vercel.sh/${uuidv4()}.png`,
+        inviteCode: uuidv4(),
+        userId: user.id,
+        workspaceId: workspace.id,
+        channels: {
+          create: [{ name: "general", userId: user.id }],
+        },
+        // Ajouter tous les membres du workspace au serveur
+        workspaceMembers: {
+          connect: {
+            workspaceId_userId: {
+              workspaceId: workspace.id,
+              userId: user.id,
+            },
+          },
+        },
       },
     });
 

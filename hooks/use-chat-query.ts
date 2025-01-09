@@ -1,6 +1,6 @@
 import qs from "query-string";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useSocket } from "@/app/(protected)/[workspaceId]/servers/components/providers/socket-provider";
+import { useSocket } from "@/app/(protected)/[workspaceId]/conversations/components/providers/socket-provider";
 
 interface ChatQueryProps {
   queryKey: string;
@@ -29,7 +29,9 @@ export const useChatQuery = ({
       { skipNull: true }
     );
 
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      next: { revalidate: 10 }, // Mise en cache pendant 10 secondes
+    });
     return res.json();
   };
 
@@ -39,7 +41,8 @@ export const useChatQuery = ({
       queryFn: fetchMessages,
       getNextPageParam: (lastPage) => lastPage?.nextCursor,
       refetchInterval: isConnected ? false : 1000,
-      initialPageParam: undefined, // Ajout de cette propriété pour résoudre l'erreur
+      staleTime: 60000, // Données considérées comme fraîches pendant 1 minute
+      initialPageParam: undefined,
     });
 
   return {

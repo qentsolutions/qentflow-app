@@ -5,6 +5,7 @@ import {
   Calendar,
   Globe,
   LayoutDashboard,
+  MessageCircle,
   SquareTerminal,
 } from "lucide-react"
 import {
@@ -42,6 +43,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         name: "Calendar",
         url: `/${workspaceId}/calendar`,
         icon: Calendar
+      },
+      {
+        name: "Conversations",
+        url: `/${workspaceId}/conversations`,
+        icon: MessageCircle
       },
     ],
     navMain: [

@@ -73,7 +73,7 @@ export function FeedbackButton() {
     return (
         <>
             <Button
-                className="fixed bottom-10 right-6 rounded-full p-0 w-12 h-12 bg-primary hover:bg-primary/90"
+                className="fixed bottom-20 right-10 rounded-full p-0 w-12 h-12 bg-primary hover:bg-primary/90"
                 onClick={() => setIsOpen(!isOpen)}
             >
                 {isOpen ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
@@ -85,7 +85,7 @@ export function FeedbackButton() {
                         initial={{ opacity: 0, y: 50 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 50 }}
-                        className="fixed bottom-28 right-4 w-96 bg-background border rounded-lg shadow-lg p-4"
+                        className="fixed bottom-36 right-8 w-96 bg-background border rounded-lg shadow-lg p-4"
                     >
                         <Tabs defaultValue="share" className="w-full">
                             <TabsList className="grid w-full grid-cols-2">

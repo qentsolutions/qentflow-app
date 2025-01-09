@@ -4,9 +4,10 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Paperclip, ExternalLink } from 'lucide-react';
+import { Paperclip, ExternalLink, Download } from 'lucide-react';
 import { fetcher } from "@/lib/fetcher";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface AttachmentListProps {
   cardId: string;
@@ -14,6 +15,7 @@ interface AttachmentListProps {
 
 export const AttachmentList = ({ cardId }: AttachmentListProps) => {
   const [showAll, setShowAll] = useState(false);
+  const [selectedAttachment, setSelectedAttachment] = useState<any>(null);
   const { data: attachments } = useQuery({
     queryKey: ["card-attachments", cardId],
     queryFn: () => fetcher(`/api/cards/${cardId}/attachments`),
@@ -26,10 +28,46 @@ export const AttachmentList = ({ cardId }: AttachmentListProps) => {
   const displayedAttachments = showAll ? attachments : attachments?.slice(0, 2);
   const remainingCount = attachments ? attachments.length - 2 : 0;
 
+  const isImage = (url: string) => {
+    return /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+  };
+
+  const isPDF = (url: string) => {
+    return /\.pdf$/i.test(url);
+  };
+
+  const renderAttachmentPreview = (attachment: any) => {
+    if (isImage(attachment.url)) {
+      return (
+        <div className="relative w-full h-[400px]">
+          <img
+            src={attachment.url}
+            alt={attachment.name}
+            className="w-full h-full object-contain"
+          />
+        </div>
+      );
+    } else if (isPDF(attachment.url)) {
+      return (
+        <iframe
+          src={`${attachment.url}#view=FitH`}
+          className="w-full h-[600px]"
+          title={attachment.name}
+        />
+      );
+    } else {
+      return (
+        <div className="flex items-center justify-center p-8 bg-gray-100 rounded-lg">
+          <p>Preview not available for this file type</p>
+        </div>
+      );
+    }
+  };
+
   const renderAttachment = (attachment: any) => (
     <Card
       key={attachment.id}
-      onClick={() => window.open(attachment.url, "_blank")}
+      onClick={() => setSelectedAttachment(attachment)}
       className="p-2 hover:bg-gray-100 text-xs shadow-none dark:hover:bg-gray-800 cursor-pointer transition"
     >
       <div className="flex items-center justify-between gap-2">
@@ -67,7 +105,6 @@ export const AttachmentList = ({ cardId }: AttachmentListProps) => {
       {displayedAttachments && displayedAttachments.length > 0 ? (
         <>
           {displayedAttachments.map(renderAttachment)}
-          {/* Show "See more" button only if there are more than 2 attachments */}
           {attachments && attachments.length > 2 && (
             <Button
               variant="ghost"
@@ -82,6 +119,42 @@ export const AttachmentList = ({ cardId }: AttachmentListProps) => {
       ) : (
         <p className="text-sm text-gray-500">No attachments linked.</p>
       )}
+
+      <Dialog open={!!selectedAttachment} onOpenChange={() => setSelectedAttachment(null)}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>{selectedAttachment?.name}</span>
+              <div className="flex gap-2 mr-8">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.href = selectedAttachment.url;
+                    link.download = selectedAttachment.name;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(selectedAttachment.url, "_blank")}
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Open in new tab
+                </Button>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          {selectedAttachment && renderAttachmentPreview(selectedAttachment)}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

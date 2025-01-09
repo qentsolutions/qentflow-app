@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { WorkspaceMember, Message, User } from "@prisma/client";
-import { useSocket } from "@/app/(protected)/[workspaceId]/servers/components/providers/socket-provider";
+import { useSocket } from "@/app/(protected)/[workspaceId]/conversations/components/providers/socket-provider";
 
 
 type ChatSocketProps = {
