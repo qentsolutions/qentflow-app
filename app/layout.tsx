@@ -9,6 +9,7 @@ import { ModalProvider } from '@/providers/modal-provider'
 import { QueryProvider } from '@/providers/query-provider'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { ThemeProvider } from '@/providers/theme-provider'
+import { SocketProvider } from './(protected)/[workspaceId]/servers/components/providers/socket-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -36,13 +37,15 @@ export default async function RootLayout({
         >
           <SessionProvider session={session}>
             <WorkspaceProvider>
-              <QueryProvider>
-                <TooltipProvider>
-                  <Toaster />
-                  <ModalProvider />
-                  {children}
-                </TooltipProvider>
-              </QueryProvider>
+              <SocketProvider>
+                <QueryProvider>
+                  <TooltipProvider>
+                    <Toaster />
+                    <ModalProvider />
+                    {children}
+                  </TooltipProvider>
+                </QueryProvider>
+              </SocketProvider>
             </WorkspaceProvider>
           </SessionProvider>
         </ThemeProvider>

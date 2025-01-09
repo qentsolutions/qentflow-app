@@ -46,6 +46,8 @@ model User {
   documents             Document[]             @relation("DocumentEditors")
   createdDocuments      Document[]
   Notification          Notification[]
+  Server                Server[]
+  Channel               Channel[]
 }
 
 model Workspace {
@@ -127,7 +129,115 @@ model WorkspaceMember {
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   joinedAt    DateTime  @default(now())
 
+  messages       Message[]
+  directMessages DirectMessage[]
+
+  conversationsInitiated Conversation[] @relation("MemberOne")
+  conversationsReceived  Conversation[] @relation("MemberTwo")
+  Server                 Server?        @relation(fields: [serverId], references: [id])
+  serverId               String?
+
   @@unique([workspaceId, userId])
+}
+
+model Server {
+  id         String @id @default(uuid())
+  name       String
+  imageUrl   String @db.Text
+  inviteCode String @unique
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  workspaceMembers WorkspaceMember[]
+  channels         Channel[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+enum ChannelType {
+  TEXT
+  AUDIO
+  VIDEO
+}
+
+model Channel {
+  id   String      @id @default(uuid())
+  name String
+  type ChannelType @default(TEXT)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  serverId String
+  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  messages Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([serverId])
+}
+
+model Message {
+  id      String @id @default(uuid())
+  content String @db.Text
+
+  fileUrl String? @db.Text
+
+  workspaceMemberId String
+  workspaceMembers  WorkspaceMember @relation(fields: [workspaceMemberId], references: [id], onDelete: Cascade)
+
+  channelId String
+  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  deleted Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([channelId])
+  @@index([workspaceMemberId])
+}
+
+model Conversation {
+  id String @id @default(uuid())
+
+  memberOneId String
+  memberOne   WorkspaceMember @relation("MemberOne", fields: [memberOneId], references: [id], onDelete: Cascade)
+
+  memberTwoId String
+  memberTwo   WorkspaceMember @relation("MemberTwo", fields: [memberTwoId], references: [id], onDelete: Cascade)
+
+  directMessages DirectMessage[]
+
+  @@unique([memberOneId, memberTwoId])
+  @@index([memberTwoId])
+}
+
+model DirectMessage {
+  id      String  @id @default(uuid())
+  content String  @db.Text
+  fileUrl String? @db.Text
+
+  workspaceMemberId String
+  workspaceMembers  WorkspaceMember @relation(fields: [workspaceMemberId], references: [id], onDelete: Cascade)
+
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  deleted Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([workspaceMemberId])
+  @@index([conversationId])
 }
 
 model StripeCustomer {
@@ -234,11 +344,11 @@ model Attachment {
 }
 
 model Comment {
-  id     String  @id @default(uuid())
-  text   String  @db.Text
-  cardId String
-  userId String
-  modified   Boolean @default(false) // Statut de lecture de la notification
+  id       String  @id @default(uuid())
+  text     String  @db.Text
+  cardId   String
+  userId   String
+  modified Boolean @default(false) // Statut de lecture de la notification
 
   card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
