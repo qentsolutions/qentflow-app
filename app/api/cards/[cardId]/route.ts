@@ -41,6 +41,17 @@ export async function GET(
             title: true,
           },
         },
+        tasks: {
+          orderBy: {
+            order: "asc",
+          },
+          select: {
+            id: true,
+            title: true,
+            completed: true,
+            order: true,
+          },
+        },
       },
     });
 

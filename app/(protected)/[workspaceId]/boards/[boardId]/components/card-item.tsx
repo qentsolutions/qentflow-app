@@ -14,6 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Progress } from "@/components/ui/progress";
 
 interface CommentCountResponse {
   commentCount: number;
@@ -32,6 +33,10 @@ interface CardItemProps {
     tags?: Tag[];
     priority: string | null;
     index?: number;
+    tasks?: {
+      id: string;
+      completed: boolean;
+    }[];
   };
   index: number;
   users: User[];
@@ -245,9 +250,18 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                 </Tooltip>
 
               </div>
-
             </div>
           </div>
+          {data.tasks && data.tasks.length > 0 && (
+            <div className="mt-2">
+              <Progress
+                value={
+                  (data.tasks.filter(task => task.completed).length / data.tasks.length) * 100
+                }
+                className="h-1"
+              />
+            </div>
+          )}
         </div>
       )}
     </Draggable>

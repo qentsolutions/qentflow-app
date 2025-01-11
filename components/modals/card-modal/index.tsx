@@ -29,6 +29,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Priority } from "./priority";
+import { Tasks } from "./tasks";
 
 export const CardModal = () => {
   const id = useCardModal((state) => state.id);
@@ -84,6 +85,11 @@ export const CardModal = () => {
                 <Description.Skeleton />
               ) : (
                 <Description data={cardData} />
+              )}
+              {!cardData ? (
+                <Description.Skeleton />
+              ) : (
+                <Tasks cardId={cardData.id} />
               )}
               <div className="flex items-start space-x-8">
                 <div className="w-1/2">
@@ -148,7 +154,7 @@ export const CardModal = () => {
                             )}
                           </>
                         ) : (
-                          <div className="text-gray-500 text-sm">No documents linked.</div>
+                          <div className="text-gray-700 text-xs">No documents linked.</div>
                         )}
                       </div>
                     )}
@@ -212,7 +218,7 @@ export const CardModal = () => {
                                 </Card>
                               ))
                             ) : (
-                              <div className="text-gray-500 text-sm">No attachments found.</div>
+                              <div className="text-gray-700 text-xs">No attachments found.</div>
                             )}
                           </div>
                         </ScrollArea>

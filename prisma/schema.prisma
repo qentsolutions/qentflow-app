@@ -63,7 +63,7 @@ model Workspace {
   calendarEvents CalendarEvent[]
   documents      Document[]
   Notification   Notification[]
-  servers         Server[]
+  servers        Server[]
 }
 
 model Document {
@@ -314,10 +314,24 @@ model Card {
 
   calendarEvents CalendarEvent[]
 
-  tags Tag[] @relation("CardTags")
+  tags Tag[]  @relation("CardTags")
   Tag  Tag[]
+  tasks Task[]
 
   @@index([listId])
+}
+
+model Task {
+  id        String   @id @default(uuid())
+  title     String
+  completed Boolean  @default(false)
+  order     Int
+  cardId    String
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cardId])
 }
 
 model Tag {

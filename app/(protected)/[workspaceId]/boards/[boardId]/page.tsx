@@ -53,6 +53,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
         include: {
           cards: {
             include: {
+              tasks: true,
               tags: {
                 select: {
                   id: true,
