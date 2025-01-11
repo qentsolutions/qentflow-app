@@ -1,7 +1,7 @@
-"use server"
-import { currentUser } from "@/lib/auth";
+"use server";
+
 import { db } from "@/lib/db";
-import { revalidatePath } from "next/cache"; // Optionnel pour revalidation après action
+import { currentUser } from "@/lib/auth";
 
 interface InviteMemberParams {
   workspaceId: string;
@@ -9,98 +9,74 @@ interface InviteMemberParams {
 }
 
 export async function inviteMember({ workspaceId, email }: InviteMemberParams) {
-  // Récupère l'utilisateur actuel
-  const user = await currentUser();
-  if (!user || !user.id) {
-    throw new Error("Unauthorized");
-  }
+  try {
+    const user = await currentUser();
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
 
-  // Vérifie si l'utilisateur actuel est un membre autorisé (OWNER ou ADMIN)
-  const currentMember = await db.workspaceMember.findUnique({
-    where: {
-      workspaceId_userId: {
-        workspaceId,
-        userId: user.id,
-      },
-    },
-  });
-
-  if (!currentMember || !["OWNER", "ADMIN"].includes(currentMember.role)) {
-    throw new Error("You do not have permission to invite members");
-  }
-
-  // Vérifie si l'utilisateur à inviter existe déjà dans la base de données
-  const existingUser = await db.user.findUnique({
-    where: { email },
-  });
-
-  if (existingUser) {
-    // Vérifie si l'utilisateur est déjà membre du workspace
+    // Check if user is already a member
     const existingMember = await db.workspaceMember.findFirst({
       where: {
-        workspaceId,
-        userId: existingUser.id,
+        workspace: { id: workspaceId },
+        user: { email },
       },
     });
 
     if (existingMember) {
-      throw new Error("This user is already a member of the workspace");
+      throw new Error("User is already a member of this workspace");
     }
 
-    // Ajoute l'utilisateur en tant que membre du workspace
-    await db.workspaceMember.create({
-      data: {
+    // Check if there's already a pending invitation
+    const existingInvitation = await db.invitation.findFirst({
+      where: {
+        email,
         workspaceId,
-        userId: existingUser.id,
-        role: "USER", // Les utilisateurs invités auront le rôle "USER"
+        status: "PENDING",
       },
     });
 
-    // Ajouter l'utilisateur aux workspaceMembers du serveur associé
+    if (existingInvitation) {
+      throw new Error("An invitation is already pending for this email");
+    }
+
+    // Get workspace details
     const workspace = await db.workspace.findUnique({
       where: { id: workspaceId },
-      include: { servers: true }, // Inclure les serveurs du workspace
     });
 
-    if (!workspace || workspace.servers.length === 0) {
-      throw new Error("No servers found for this workspace");
+    if (!workspace) {
+      throw new Error("Workspace not found");
     }
 
-    // On suppose ici que le serveur "General" existe déjà pour ce workspace
-    const server = workspace.servers.find(
-      (server) => server.name === "General"
-    );
-
-    if (!server) {
-      throw new Error("General server not found for this workspace");
-    }
-
-    // Ajoute l'utilisateur au modèle workspaceMembers du serveur "General"
-    await db.workspaceMember.update({
-      where: {
-        workspaceId_userId: {
-          workspaceId,
-          userId: existingUser.id,
-        },
-      },
+    // Create invitation
+    const invitation = await db.invitation.create({
       data: {
-        Server: {
-          connect: {
-            id: server.id,
-          },
-        },
+        email,
+        workspaceId,
+        inviterId: user.id,
       },
     });
-  } else {
-    // Logique pour gérer l'invitation d'un nouvel utilisateur
-    // Exemple : envoyer un email d'invitation ou créer un compte temporaire
-    throw new Error(
-      "User does not exist. Please invite registered users only."
-    );
+
+    // Find invited user
+    const invitedUser = await db.user.findUnique({
+      where: { email },
+    });
+
+    // If user exists, create notification
+    if (invitedUser) {
+      await db.notification.create({
+        data: {
+          userId: invitedUser.id,
+          workspaceId,
+          message: `${user.name} has invited you to join the workspace "${workspace.name}"`,
+        },
+      });
+    }
+
+    return { message: "Invitation sent successfully" };
+  } catch (error) {
+    console.error("Error in inviteMember:", error);
+    throw error;
   }
-
-  // Optionnel : Revalider les données de la page pour une mise à jour immédiate
-  revalidatePath(`/${workspaceId}/settings`);
-
-  return { message: "Invitation has been sent." };
 }

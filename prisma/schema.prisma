@@ -48,6 +48,7 @@ model User {
   Notification          Notification[]
   Server                Server[]
   Channel               Channel[]
+  sentInvitations       Invitation[] // Add this line
 }
 
 model Workspace {
@@ -64,6 +65,23 @@ model Workspace {
   documents      Document[]
   Notification   Notification[]
   servers        Server[]
+  invitations    Invitation[] // Add this line
+}
+
+model Invitation {
+  id          String    @id @default(cuid())
+  email       String
+  status      String    @default("PENDING") // PENDING, ACCEPTED, DECLINED
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  inviterId   String
+  inviter     User      @relation(fields: [inviterId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([email, workspaceId])
+  @@index([workspaceId])
+  @@index([inviterId])
 }
 
 model Document {
