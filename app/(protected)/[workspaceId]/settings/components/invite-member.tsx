@@ -35,7 +35,7 @@ export function InviteMemberDialog() {
       refetch(); // Refresh invitations list
     } catch (error: any) {
       toast.error(error.message);
-    } 
+    }
   };
 
   return (
@@ -50,7 +50,7 @@ export function InviteMemberDialog() {
         <DialogHeader>
           <DialogTitle>Invite Member</DialogTitle>
           <DialogDescription>
-            Send an invitation to join your workspace. They'll receive an email with instructions.
+            Send an invitation to join your workspace. They&apos;ll receive an email with instructions.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -63,7 +63,7 @@ export function InviteMemberDialog() {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          
+
           {/* Pending Invitations Section */}
           {invitations && invitations.length > 0 && (
             <div className="mt-4">
