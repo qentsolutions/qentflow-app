@@ -145,9 +145,21 @@ export const Tasks = ({ cardId }: TasksProps) => {
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <div className="flex-1">
-                    <div className="flex items-center gap-x-1">
-                        <ListTodo size={14} />
-                        <p className="text-lg font-semibold">Tasks</p>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-x-1">
+                            <ListTodo size={14} />
+                            <p className="text-lg font-semibold">Tasks</p>
+                            <div className="ml-2">{progress == 100 ? (<p className="text-xs text-green-600">Completed</p>) : (<></>)}</div>
+                        </div>
+
+                        <Button
+                            variant="outline"
+                            className="shadow-none border-none"
+                            onClick={() => setIsAddingTask(true)}
+                        >
+                            <Plus className="h-4 w-4" />
+                        </Button>
+
                     </div>
                     <div className="flex items-center gap-2 mt-2">
                         <Progress value={progress} className="h-2" />
@@ -202,7 +214,8 @@ export const Tasks = ({ cardId }: TasksProps) => {
                 </Droppable>
             </DragDropContext>
 
-            {isAddingTask ? (
+
+            {isAddingTask && (
                 <div className="flex items-center gap-2">
                     <Input
                         placeholder="Enter task title..."
@@ -219,19 +232,8 @@ export const Tasks = ({ cardId }: TasksProps) => {
                         Cancel
                     </Button>
                 </div>
-            ) : (
-                <div className="flex justify-between">
-                    <p className="text-gray-700 text-xs">Follow your tasks</p>
-                    <Button
-                        variant="outline"
-                        className=""
-                        onClick={() => setIsAddingTask(true)}
-                    >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Task
-                    </Button>
-                </div>
             )}
+
         </div>
     );
 };

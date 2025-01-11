@@ -1,10 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-
 import { db } from "@/lib/db";
 import { createSafeAction } from "@/lib/create-safe-action";
-
 import { UpdateCard } from "./schema";
 import { InputType, ReturnType } from "./types";
 import { createAuditLog } from "@/lib/create-audit-log";
@@ -33,6 +31,8 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       },
       data: {
         ...values,
+        startDate: values.startDate ? new Date(values.startDate) : undefined,
+        dueDate: values.dueDate ? new Date(values.dueDate) : undefined,
       },
     });
 
@@ -49,7 +49,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  revalidatePath(`/${workspaceId}board/${boardId}`);
+  revalidatePath(`/${workspaceId}/board/${boardId}`);
   return { data: card };
 };
 

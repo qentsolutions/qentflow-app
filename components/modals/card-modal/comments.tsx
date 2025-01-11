@@ -240,7 +240,7 @@ export const Comments = ({ items, cardId }: CommentsProps) => {
 
       <div>
         {comments.length === 0 ? (
-          <p className="text-muted-foreground">No comments yet.</p>
+          <p className="text-muted-foreground text-gray-700 text-xs">No comments yet.</p>
         ) : (
           <ul className="space-y-8">
             {sortedComments.map((comment) => (

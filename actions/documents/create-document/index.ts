@@ -7,7 +7,7 @@ import { CreateDocument } from "./schema";
 import { InputType, ReturnType } from "./types";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
-  const user = await currentUser(); 
+  const user = await currentUser();
 
   if (!user) {
     return {
@@ -34,9 +34,11 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  return { 
+  return {
     data: {
       ...document,
+      startDate: null,
+      dueDate: null,
       order: 0,
       description: null,
       priority: null,

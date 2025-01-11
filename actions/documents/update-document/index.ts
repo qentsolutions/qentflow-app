@@ -36,15 +36,17 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  return { 
+  return {
     data: {
       ...document,
       order: 0,
+      startDate: null,
+      dueDate: null,
       priority: null,
       description: null,
       listId: "",
-      assignedUserId: null
-    }
+      assignedUserId: null,
+    },
   };
 };
 

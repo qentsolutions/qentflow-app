@@ -308,14 +308,16 @@ model Card {
 
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  startDate   DateTime?
+  dueDate     DateTime?
   comments    Comment[]
   documents   Document[]   @relation("CardDocuments") // Nouvelle relation
   attachments Attachment[]
 
   calendarEvents CalendarEvent[]
 
-  tags Tag[]  @relation("CardTags")
-  Tag  Tag[]
+  tags  Tag[]  @relation("CardTags")
+  Tag   Tag[]
   tasks Task[]
 
   @@index([listId])

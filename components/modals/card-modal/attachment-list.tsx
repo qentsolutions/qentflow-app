@@ -117,7 +117,7 @@ export const AttachmentList = ({ cardId }: AttachmentListProps) => {
           )}
         </>
       ) : (
-        <p className="text-xs text-gray-700">No attachments linked.</p>
+        <p className="text-xs text-gray-700 py-1">No attachments linked.</p>
       )}
 
       <Dialog open={!!selectedAttachment} onOpenChange={() => setSelectedAttachment(null)}>

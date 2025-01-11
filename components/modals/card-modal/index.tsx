@@ -91,6 +91,7 @@ export const CardModal = () => {
               ) : (
                 <Tasks cardId={cardData.id} />
               )}
+
               <div className="flex items-start space-x-8">
                 <div className="w-1/2">
                   <div className="flex items-center justify-between">
@@ -154,7 +155,7 @@ export const CardModal = () => {
                             )}
                           </>
                         ) : (
-                          <div className="text-gray-700 text-xs">No documents linked.</div>
+                          <div className="text-gray-700 text-xs py-1">No documents linked.</div>
                         )}
                       </div>
                     )}

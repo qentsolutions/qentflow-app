@@ -5,6 +5,7 @@ import Settings from "./components/settings-board";
 import { BoardContent } from "./components/board-content";
 import { currentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { TimelineView } from "./components/timeline-view";
 
 interface BoardIdPageProps {
   params: {
@@ -94,12 +95,16 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
           <div className="flex w-full items-center gap-4 mb-6 mt-4">
             <Tabs defaultValue="board" className="w-full">
               <TabsList>
-                <TabsTrigger value="board">Tasks</TabsTrigger>
+                <TabsTrigger value="board">Board</TabsTrigger>
+                <TabsTrigger value="timeline">Timeline</TabsTrigger>
                 <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
               <div className="mt-4"></div>
               <TabsContent value="board">
                 <BoardContent users={board.User} boardId={board.id} lists={board.lists} />
+              </TabsContent>
+              <TabsContent value="timeline">
+                <TimelineView boardId={board.id} data={board.lists} />
               </TabsContent>
               <TabsContent value="settings">
                 <Settings
