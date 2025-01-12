@@ -2,7 +2,7 @@
 
 import { useCardModal } from "@/hooks/use-card-modal";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Plus, TargetIcon, UserRound, Tags, EllipsisVertical, Trash, Check } from 'lucide-react';
+import { ChevronDown, ChevronUp, Plus, TargetIcon, UserRound, Tags, EllipsisVertical, Trash, Check, GripVertical } from 'lucide-react';
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -150,7 +150,7 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
-            <div className="space-y-6 p-4">
+            <div className="space-y-4 p-4">
                 {lists.map((list) => (
                     <Collapsible
                         key={list.id}
@@ -158,14 +158,14 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
                         onOpenChange={() => toggleList(list.id)}
                         className="bg-white rounded-lg border-2 border-gray-100"
                     >
-                        <CollapsibleTrigger className="w-full p-4 flex items-center bg-gray-100 justify-between  border-b">
+                        <CollapsibleTrigger className="w-full px-4 py-2 flex items-center bg-gray-100 justify-between  border-b">
                             <div className="flex items-center gap-x-2">
                                 {openLists.includes(list.id) ? (
                                     <ChevronUp className="h-5 w-5 text-gray-500" />
                                 ) : (
                                     <ChevronDown className="h-5 w-5 text-gray-500" />
                                 )}
-                                <h2 className="text-lg font-semibold flex items-center gap-x-1">
+                                <h2 className="text-base font-semibold flex items-center gap-x-1">
                                     {list.title}
                                     <span className="ml-1 flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-500 text-xs font-bold rounded-full">
                                         {list.cards.length}
@@ -207,7 +207,7 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
                                                                 onClick={() => cardModal.onOpen(card.id)}
                                                             >
                                                                 <td className="px-4 py-2 border-r border-gray-200">
-                                                                    <div className="font-medium">{card.title}</div>
+                                                                    <div className="flex items-center gap-x-2 font-medium"><GripVertical size={14} /> {card.title}</div>
                                                                 </td>
                                                                 <td className="px-4 py-2 border-r border-gray-200">
                                                                     <Badge

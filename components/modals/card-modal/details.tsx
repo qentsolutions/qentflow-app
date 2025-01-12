@@ -4,7 +4,7 @@ import React from "react";
 import { CardWithList } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, Clock, ListTodo } from "lucide-react";
+import { CalendarDays, Clock, ListTodo, StickyNote } from "lucide-react";
 
 import { updateCard } from "@/actions/tasks/update-card";
 import { useParams } from "next/navigation";
@@ -54,11 +54,11 @@ const Details: React.FC<DetailsProps> = ({ card }) => {
 
     return (
         <Card className="w-full shadow-none">
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4">
                 <div className="flex flex-col">
                     <p className="text-lg font-semibold mt-4">Details</p>
                     <div className="flex items-center mb-2 mt-2">
-                        <ListTodo size={14} />
+                        <StickyNote size={14} />
                         <span className="ml-1 text-sm text-muted-foreground">Status</span>
                     </div>
                     <div>

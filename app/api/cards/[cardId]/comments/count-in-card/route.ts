@@ -20,9 +20,16 @@ export async function GET(
       },
     });
 
-    return NextResponse.json({ commentCount });
+    // Récupérer les attachments liés à la carte spécifiée
+    const attachmentsCount = await db.attachment.count({
+      where: {
+        cardId: params.cardId,
+      },
+    });
+
+    return NextResponse.json({ commentCount, attachmentsCount });
   } catch (error) {
-    console.error("Error fetching comment count:", error);
+    console.error("Error fetching data:", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

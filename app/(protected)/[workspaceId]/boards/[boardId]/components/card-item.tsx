@@ -6,7 +6,7 @@ import { useCardModal } from "@/hooks/use-card-modal";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { UserPlus, User as UserIcon, UserX, MessageSquareText, ArrowDown, ArrowRight, ArrowUp, AlertTriangle, SignalLow, SignalMedium, SignalHigh } from "lucide-react";
+import { UserPlus, User as UserIcon, UserX, MessageSquareText, ArrowDown, ArrowRight, ArrowUp, AlertTriangle, SignalLow, SignalMedium, SignalHigh, Paperclip } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { assignUserToCard } from "@/actions/boards/assign-user-to-card";
@@ -18,6 +18,7 @@ import { Progress } from "@/components/ui/progress";
 
 interface CommentCountResponse {
   commentCount: number;
+  attachmentsCount: number;
 }
 
 interface CardItemProps {
@@ -119,7 +120,7 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
           ref={provided.innerRef}
           role="button"
           onClick={() => cardModal.onOpen(data.id)}
-          className="border bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm hover:border-black m-1"
+          className="border bg-background dark:bg-gray-700 rounded-lg shadow-sm hover:border-black m-1"
         >
           <div className="p-3 space-y-3">
             <div className="flex items-start gap-x-2 gap-y-2 flex-wrap">
@@ -136,6 +137,7 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-x-1 text-muted-foreground text-xs">
                 <MessageSquareText size={14} /> {commentsData ? commentsData?.commentCount : 0}
+                <Paperclip className="ml-2" size={14} /> {commentsData ? commentsData?.attachmentsCount : 0}
               </div>
               <div className="flex items-center justify-center">
                 <div className="mr-1 flex items-center justify-center">
@@ -155,14 +157,14 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                       <PopoverTrigger onClick={(e) => e.stopPropagation()} asChild>
                         <button className="hover:opacity-75 transition">
                           {assignedUserState ? (
-                            <Avatar className="h-6 w-6">
+                            <Avatar className="h-8 w-8">
                               <AvatarImage src={assignedUserState.image || ""} />
                               <AvatarFallback className="text-gray-500 text-sm">
                                 {assignedUserState.name?.charAt(0) || <UserIcon className="h-2 w-2" />}
                               </AvatarFallback>
                             </Avatar>
                           ) : (
-                            <Avatar className="h-6 w-6">
+                            <Avatar className="h-8 w-8">
                               <AvatarFallback className="text-gray-500 text-sm">
                                 <UserPlus size={12} />
                               </AvatarFallback>
@@ -182,7 +184,7 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                               onClick={() => handleAssignUser(null)}
                               className="w-full flex items-center gap-x-2 hover:bg-slate-100 p-2 rounded-md transition"
                             >
-                              <Avatar className="h-6 w-6">
+                              <Avatar className="h-8 w-8">
                                 <AvatarFallback className="text-gray-500">
                                   <UserX className="h-4 w-4" />
                                 </AvatarFallback>
@@ -253,7 +255,7 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
             </div>
           </div>
           {data.tasks && data.tasks.length > 0 && (
-            <div className="mt-2">
+            <div>
               <Progress
                 value={
                   (data.tasks.filter(task => task.completed).length / data.tasks.length) * 100

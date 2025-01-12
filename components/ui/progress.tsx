@@ -9,7 +9,7 @@ const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
 >(({ className, value, ...props }, ref) => {
-  const progressClass = value === 100 ? "bg-green-600" : "bg-blue-600";
+  const progressClass = value === 100 ? "bg-green-500" : "bg-blue-600";
 
   return (
     <ProgressPrimitive.Root

@@ -98,7 +98,7 @@ export const CardForm = forwardRef<HTMLTextAreaElement, CardFormProps>(
       <div className=" px-2 border-2 border-dashed mx-2 border-gray-300 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-800">
         <Button
           onClick={enableEditing}
-          className="h-auto px-2 py-1.5 w-full justify-center hover:bg-white dark:hover:bg-gray-800 text-muted-foreground text-sm"
+          className="h-auto px-2 py-1.5 w-full justify-center bg-background hover:bg-white dark:hover:bg-gray-800 text-muted-foreground text-sm"
           size="sm"
           variant="ghost"
         >

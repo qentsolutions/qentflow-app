@@ -12,7 +12,7 @@ const BoardPage = () => {
   }, [setBreadcrumbs]);
 
   return (
-    <div className="w-full mb-20">
+    <div className="w-full ">
       <div className="px-2 md:px-4 w-full">
         <BoardList />
       </div>

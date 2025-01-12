@@ -98,7 +98,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search cards..."
-                className="w-[250px] pl-9 bg-background"
+                className="w-[300px] pl-9 bg-background"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />

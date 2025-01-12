@@ -7,7 +7,7 @@ import { useAction } from "@/hooks/use-action";
 import { updatePriority } from "@/actions/tasks/update-priority";
 import { CardWithList } from "@/types";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
-import { AlertTriangle, ArrowDown, ArrowRight, ArrowUp, SignalHigh, SignalLow, SignalMedium } from 'lucide-react';
+import { AlertTriangle, ArrowDown, ArrowRight, ArrowUp, OctagonAlert, Radio, SignalHigh, SignalLow, SignalMedium } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -62,8 +62,11 @@ export const Priority = ({ data }: PriorityProps) => {
 
   return (
     <Card className="mt-4 shadow-none">
-      <CardHeader>
-        <CardTitle>Priority</CardTitle>
+      <CardHeader className="pt-4 pb-2">
+        <div className="flex items-center gap-x-2">
+          <OctagonAlert size={16} />
+          <CardTitle className="font-semibold text-lg">Priority</CardTitle>
+        </div>
       </CardHeader>
       <CardContent>
         <Select defaultValue={data.priority?.toLowerCase()} onValueChange={onPriorityChange}>

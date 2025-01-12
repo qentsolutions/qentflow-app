@@ -72,7 +72,7 @@ export const PersistentChat = () => {
     const totalUnreadConversations = Object.values(unreadCounts).filter(count => count > 0).length;
 
     return (
-        <div className="fixed bottom-0 right-4 flex items-end space-x-2 z-50">
+        <div className="fixed bottom-0 right-8 flex items-end space-x-2 z-50">
             <div
                 className={cn(
                     "bg-background border rounded-t-lg shadow-lg transition-all duration-200 ease-in-out",
@@ -80,7 +80,7 @@ export const PersistentChat = () => {
                         ? isExpanded
                             ? "h-screen w-[600px]"
                             : "h-[500px] w-[400px]"
-                        : "h-12 w-48"
+                        : "h-10 w-32"
                 )}
             >
                 <div
@@ -89,7 +89,7 @@ export const PersistentChat = () => {
                 >
                     <button className="flex items-center text-black">
                         <MessageCircle size={14} className="mr-2" />
-                        <span className="font-semibold">Messages</span>
+                        <span className="text-sm font-medium">Messages</span>
                         {totalUnreadConversations > 0 && (
                             <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
                                 {totalUnreadConversations}

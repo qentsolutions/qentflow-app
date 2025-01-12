@@ -41,10 +41,10 @@ const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <BreadcrumbHeader />
+            <FeedbackButton />
           </header>
           <div className="mt-16 ">
             {children}
-            <FeedbackButton />
           </div>
         </main>
       </BreadcrumbProvider>

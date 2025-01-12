@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { format, addMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isWithinInterval, differenceInDays } from "date-fns";
 import { useCardModal } from "@/hooks/use-card-modal";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChartGantt, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface TimelineViewProps {
   boardId: string;
@@ -19,13 +19,13 @@ export const TimelineView = ({ data, boardId }: TimelineViewProps) => {
   const cardModal = useCardModal();
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
-  
-  const cardsWithDates = data.flatMap(list => 
+
+  const cardsWithDates = data.flatMap(list =>
     list.cards.filter((card: any) => card.startDate && card.dueDate)
   );
 
   const months = Array.from({ length: MONTHS_TO_SHOW }, (_, i) => addMonths(currentDate, i));
-  const allDays = months.flatMap(month => 
+  const allDays = months.flatMap(month =>
     eachDayOfInterval({ start: startOfMonth(month), end: endOfMonth(month) })
   );
 
@@ -48,7 +48,7 @@ export const TimelineView = ({ data, boardId }: TimelineViewProps) => {
   return (
     <Card className="p-6 overflow-hidden">
       <div className="mb-8 flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Timeline View</h2>
+        <p className="text-2xl font-bold flex items-center gap-x-2"><ChartGantt size={20} /> Timeline View</p>
         <div className="flex space-x-2">
           <button
             onClick={() => handleScroll('left')}
@@ -85,9 +85,8 @@ export const TimelineView = ({ data, boardId }: TimelineViewProps) => {
             {allDays.map((day, index) => (
               <div
                 key={day.toISOString()}
-                className={`flex-none text-center text-sm py-2 ${
-                  isSameDay(day, new Date()) ? "bg-blue-50 font-bold" : ""
-                }`}
+                className={`flex-none text-center text-sm py-2 ${isSameDay(day, new Date()) ? "bg-blue-50 font-bold" : ""
+                  }`}
                 style={{ width: `${DAY_WIDTH}px` }}
               >
                 {format(day, "d")}
@@ -100,13 +99,13 @@ export const TimelineView = ({ data, boardId }: TimelineViewProps) => {
             {cardsWithDates.map((card: any) => {
               const startDate = new Date(card.startDate);
               const endDate = new Date(card.dueDate);
-              
+
               const left = calculatePosition(startDate);
               const width = calculateWidth(startDate, endDate);
 
               return (
-                <motion.div 
-                  key={card.id} 
+                <motion.div
+                  key={card.id}
                   className="relative h-12"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}

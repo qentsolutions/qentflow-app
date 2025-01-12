@@ -161,7 +161,7 @@ export const Tasks = ({ cardId }: TasksProps) => {
                         </Button>
 
                     </div>
-                    <div className="flex items-center gap-2 mt-2">
+                    <div className="flex items-center gap-2 mt-4">
                         <Progress value={progress} className="h-2" />
                         <span className="text-sm text-muted-foreground">
                             {completedTasks}/{totalTasks}

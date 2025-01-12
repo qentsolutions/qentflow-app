@@ -64,7 +64,7 @@ const ManageWorkspacesPage = () => {
                 ...result.workspace,
                 members: currentWorkspace.members,
                 createdAt: result.workspace.createdAt.toISOString(),
-            });
+            });http://localhost:3000/dashboard
             setSuccess("Workspace updated successfully!");
         }
     };
@@ -77,7 +77,7 @@ const ManageWorkspacesPage = () => {
 
    
     return (
-        <div className="px-4 py-8">
+        <div className="px-4 py-4">
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7">
                     <div className="space-y-1">

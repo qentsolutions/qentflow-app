@@ -98,7 +98,7 @@ export const BoardList = () => {
   }
 
   return (
-    <div className="py-8 h-screen">
+    <div className="py-4">
       <Card className="shadow-sm rounded-md w-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">

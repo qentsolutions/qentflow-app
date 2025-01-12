@@ -48,8 +48,8 @@ const Settings = ({ boardId, boardTitle, users, createdById }: BoardSettingsProp
   ];
 
   return (
-    <div className="min-h-screen w-full">
-      <div className="px-4 py-2">
+    <div className="w-full">
+      <div className="py-2">
         <div className="grid grid-cols-12 gap-8">
           <div className="col-span-3">
             <nav className="space-y-1">
@@ -70,8 +70,8 @@ const Settings = ({ boardId, boardTitle, users, createdById }: BoardSettingsProp
           </div>
 
           <div className="col-span-9">
-            <Card className="shadow-sm">
-              <div className="border-b border-gray-200 dark:border-gray-700 bg-background px-6 py-5 rounded-t-lg">
+            <Card className="shadow-sm rounded-lg border">
+              <div className="border-b border-gray-200 dark:border-gray-700 bg-background px-6 py-5 rounded-lg">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                   {tabs.find((tab) => tab.id === activeTab)?.label} Settings
                 </h3>
