@@ -21,7 +21,6 @@ export default function UploadBoardImage({ boardId, workspaceId }: UploadBoardIm
             try {
                 const file = acceptedFiles[0];
 
-                // Convertir le fichier en base64
                 const base64String = await new Promise<string>((resolve, reject) => {
                     const reader = new FileReader();
                     reader.onloadend = () => {

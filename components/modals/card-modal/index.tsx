@@ -229,7 +229,7 @@ export const CardModal = () => {
                     </Dialog>
                   </div>
 
-                  <div className="space-y-3 mt-2">
+                  <div className="space-y-3 mt-2 mb-4">
                     {!cardData ? (
                       <Description.Skeleton />
                     ) : (
@@ -239,7 +239,7 @@ export const CardModal = () => {
                 </div>
               </div>
 
-              <span className="font-bold text-lg  flex items-center"><ActivityIcon size={12} className="mr-2" /> Activity</span>
+              <span className="font-bold text-lg flex items-center"><ActivityIcon size={12} className="mr-2" /> Activity</span>
               <Tabs defaultValue="comments">
                 <TabsList>
                   <TabsTrigger value="comments">

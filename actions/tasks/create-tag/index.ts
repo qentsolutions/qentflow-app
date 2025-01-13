@@ -14,14 +14,15 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     throw new Error("User not found!");
   }
 
-  const { name, boardId } = data;
+  const { name, boardId, color } = data; // Ajout de `color`
 
   try {
-    // Crée le tag dans la base de données
+    // Crée le tag dans la base de données avec la couleur
     const tag = await db.tag.create({
       data: {
         name: name,
         boardId: boardId,
+        color: color || null, // Si la couleur est fournie, l'utilise, sinon laisse la valeur nulle
       },
     });
 

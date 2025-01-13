@@ -8,8 +8,8 @@ import { FormInput } from "./form-input";
 import { FormSubmit } from "./form-submit";
 import { createBoard } from "@/actions/tasks/create-board";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "../ui/dialog";
-import { PlusCircle } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { PlusCircle } from 'lucide-react';
 
 interface FormPopoverProps {
   children: React.ReactNode;
@@ -17,7 +17,7 @@ interface FormPopoverProps {
   align?: "start" | "center" | "end";
   sideOffset?: number;
   workspaceId: string;
-};
+}
 
 export const FormPopover = ({
   children,
@@ -32,7 +32,7 @@ export const FormPopover = ({
 
   const { execute, fieldErrors } = useAction(createBoard, {
     onSuccess: (data) => {
-      toast.success("Board created!");
+      toast.success("Board created successfully!");
       closeRef.current?.click();
       router.push(`/${workspaceId}/boards/${data.id}`);
     },
@@ -43,7 +43,6 @@ export const FormPopover = ({
 
   const onSubmit = (formData: FormData) => {
     const title = formData.get("title") as string;
-
     execute({ title, workspaceId });
   }
 
@@ -52,31 +51,34 @@ export const FormPopover = ({
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent
-        className="w-80 pt-3"
-      >
-        <DialogTitle>
-          <div className="text-xl mt-4 font-medium text-center text-neutral-600 pb-4">
-            Create board
-          </div>
-        </DialogTitle>
-
-        <form action={onSubmit} className="space-y-4">
-          <div className="space-y-4">
-            <FormInput
-              id="title"
-              label=""
-              type="text"
-              errors={fieldErrors}
-              className="text-xs font-normal"
-              placeholder="Board title"
-            />
-          </div>
-          <FormSubmit className="w-full bg-blue-500 text-white">
-            <PlusCircle /> Create
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-semibold text-center text-gray-800">
+            Create New Board
+          </DialogTitle>
+          <DialogDescription className="text-center text-gray-600">
+            Add a new board to organize your projects and tasks.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          onSubmit(new FormData(e.currentTarget));
+        }} className="space-y-6 mt-4">
+          <FormInput
+            id="title"
+            label=""
+            type="text"
+            errors={fieldErrors}
+            className="text-sm focus-visible:ring-blue-400"
+            placeholder="Enter board title"
+          />
+          <FormSubmit className="w-full bg-blue-600 hover:bg-blue-700 hover:text-white text-white transition-colors duration-200 flex items-center justify-center gap-2 py-2 rounded-md">
+            <PlusCircle className="w-5 h-5" />
+            Create Board
           </FormSubmit>
         </form>
       </DialogContent>
     </Dialog>
   );
 };
+

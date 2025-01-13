@@ -37,7 +37,7 @@ export function NotificationCard({
   onMarkAsRead,
   onMarkAsUnRead,
   showWorkspace = false,
-  isInvitation = false,
+  isInvitation,
   onAcceptInvitation,
   onDeclineInvitation,
 }: NotificationCardProps) {

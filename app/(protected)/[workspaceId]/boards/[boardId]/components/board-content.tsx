@@ -4,7 +4,7 @@ import { ViewSwitcher, ViewType } from "./view-switcher";
 import { KanbanView } from "./kanban-view";
 import { useState } from "react";
 import BoardUsers from "./board-users";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
 import { CheckIcon, ChevronDown, Plus, RefreshCcw, Search, TagIcon, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -49,6 +49,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     queryFn: () => fetcher(`/api/boards/tags?boardId=${boardId}`),
   });
 
+
   const handleUserSelect = (userId: string) => {
     setSelectedUser(selectedUser === userId ? null : userId);
   };
@@ -68,22 +69,6 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     tag.name.toLowerCase().includes(tagSearchTerm.toLowerCase())
   );
 
-  function getRandomColor(id: string): string {
-    const colors = [
-      "bg-red-500",
-      "bg-green-500",
-      "bg-blue-500",
-      "bg-yellow-500",
-      "bg-purple-500",
-      "bg-pink-500",
-      "bg-indigo-500",
-      "bg-teal-500",
-    ];
-    const index = id
-      .split("")
-      .reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-    return colors[index];
-  }
 
   const RefreshPage = () => {
     router.refresh();
@@ -97,8 +82,8 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search cards..."
-                className="w-[300px] pl-9 bg-background"
+                placeholder="Search card title..."
+                className="w-[300px] pl-9 bg-background focus-visible:ring-blue-400"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -114,7 +99,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="gap-2">
-                  <TagIcon className="h-4 w-4" />
+                  <TagIcon className="h-4 w-4 text-gray-500" />
                   Tags
                   <ChevronDown className="h-3 w-3 opacity-50" />
                 </Button>
@@ -126,8 +111,8 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                     <Input
                       placeholder="Search tags..."
                       value={tagSearchTerm}
+                      className="h-8 focus-visible:ring-blue-400"
                       onChange={(e) => setTagSearchTerm(e.target.value)}
-                      className="h-8"
                     />
                   </div>
                 </div>
@@ -149,12 +134,12 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                               : "hover:bg-secondary/50"
                           )}
                         >
-                          <div className="flex items-center gap-2">
+                          <div className={`flex items-center gap-2 `}>
                             <div
                               className={cn(
-                                "w-2 h-2 rounded-full",
-                                getRandomColor(tag.id)
+                                `w-2 h-2 rounded-full`,
                               )}
+                              style={{ backgroundColor: tag?.color || '#ff0000' }}
                             />
                             <span className="text-sm font-medium">{tag.name}</span>
                           </div>
@@ -214,8 +199,8 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                     key={tagId}
                     className={cn(
                       "flex items-center gap-2 text-white",
-                      getRandomColor(tagId)
                     )}
+                    style={{ backgroundColor: tag?.color || '#ff0000' }} // Couleur dynamique
                   >
                     {tag.name}
                     <X

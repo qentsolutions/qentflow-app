@@ -355,11 +355,12 @@ model Task {
 }
 
 model Tag {
-  id      String @id @default(cuid())
+  id      String  @id @default(cuid())
   name    String
   boardId String
-  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  cards   Card[] @relation("CardTags")
+  color   String?
+  board   Board   @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  cards   Card[]  @relation("CardTags")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -476,15 +477,16 @@ model Feedback {
 }
 
 model Notification {
-  id          String    @id @default(cuid()) // ID unique pour la notification
-  userId      String // L'utilisateur auquel la notification appartient
-  user        User      @relation(fields: [userId], references: [id]) // Relation avec l'utilisateur
-  workspaceId String // ID du workspace associé à la notification
-  workspace   Workspace @relation(fields: [workspaceId], references: [id]) // Relation avec le workspace
-  message     String // Message de la notification
-  read        Boolean   @default(false) // Statut de lecture de la notification
-  createdAt   DateTime  @default(now()) // Date de création de la notification
-  updatedAt   DateTime  @updatedAt // Date de mise à jour de la notification
+  id           String    @id @default(cuid()) // ID unique pour la notification
+  userId       String // L'utilisateur auquel la notification appartient
+  user         User      @relation(fields: [userId], references: [id]) // Relation avec l'utilisateur
+  workspaceId  String // ID du workspace associé à la notification
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  message      String // Message de la notification
+  isInvitation Boolean   @default(false) // Indique si la notification est une invitation
+  read      Boolean  @default(false) // Statut de lecture de la notification
+  createdAt DateTime @default(now()) // Date de création de la notification
+  updatedAt DateTime @updatedAt // Date de mise à jour de la notification
 
   @@index([userId]) // Index pour l'utilisateur
   @@index([workspaceId]) // Index pour le workspace

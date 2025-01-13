@@ -20,6 +20,7 @@ import { CheckCircle2, KeyRound, Shield, User2, UserCog2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { z } from "zod";
+import { toast } from "sonner";
 
 const AccountPage = () => {
     const user = useCurrentUser();
@@ -57,7 +58,6 @@ const AccountPage = () => {
         try {
             setIsPending(true);
             setError(undefined);
-            setSuccess(undefined);
 
             const result = await settings(values);
 
@@ -68,7 +68,7 @@ const AccountPage = () => {
 
             if (result.success) {
                 await update();
-                setSuccess(result.success);
+                toast.success(result.success);
                 setIsPasswordDialogOpen(false);
                 form.reset({ password: undefined, newPassword: undefined });
             }
@@ -82,7 +82,7 @@ const AccountPage = () => {
     return (
         <div className="space-y-6 pb-12">
             {/* Profile Section */}
-            <Card className="mt-4">
+            <Card className="mt-4 shadow-none">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <User2 className="h-5 w-5" /> Profile Information
@@ -129,7 +129,7 @@ const AccountPage = () => {
             </Card>
 
             {/* Account Information */}
-            <Card>
+            <Card className="shadow-none">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <UserCog2 className="h-5 w-5" /> Account Information
@@ -150,16 +150,12 @@ const AccountPage = () => {
                                 {user?.isOAuth ? "OAuth Account" : "Email Account"}
                             </p>
                         </div>
-                        <div>
-                            <p className="text-sm font-medium">Role</p>
-                            <Badge variant="secondary">{user?.role}</Badge>
-                        </div>
                     </div>
                 </CardContent>
             </Card>
 
             {/* Security Section */}
-            <Card>
+            <Card className="shadow-none">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Shield className="h-5 w-5" /> Security Settings

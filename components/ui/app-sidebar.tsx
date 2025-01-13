@@ -64,6 +64,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           {
             title: "Documents",
             url: `/${workspaceId}/documents`,
+          },
+          {
+            title: "Draws",
+            url: `/${workspaceId}/documents`,
           }
         ],
       },

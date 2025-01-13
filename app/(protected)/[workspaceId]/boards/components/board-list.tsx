@@ -122,9 +122,9 @@ export const BoardList = () => {
               side="right"
               workspaceId={String(workspaceId)}
             >
-              <Button variant="outline">
-                <Plus className="mr-2 h-4 w-4" />
-                Create New Board
+              <Button variant="outline" className="bg-blue-500 text-white">
+                <Plus className=" h-4 w-4" />
+                New Board
               </Button>
             </FormPopover>
           )}

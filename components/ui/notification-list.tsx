@@ -7,7 +7,6 @@ import { useParams } from 'next/navigation';
 
 interface Notification extends PrismaNotification {
   workspaceName: string;
-  isInvitation?: boolean;
 }
 
 interface NotificationListProps {

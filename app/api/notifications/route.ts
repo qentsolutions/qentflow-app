@@ -33,13 +33,6 @@ export async function GET(request: Request) {
       },
     });
 
-    if (!isMember) {
-      return NextResponse.json(
-        { error: "User is not a member of the workspace" },
-        { status: 403 }
-      );
-    }
-
     // Récupérer toutes les notifications pour l'utilisateur dans le workspace spécifié
     const notifications = await db.notification.findMany({
       where: {
@@ -49,7 +42,6 @@ export async function GET(request: Request) {
         createdAt: "desc", // Trier par date de création (descendant)
       },
     });
-
 
     return NextResponse.json(notifications);
   } catch (error) {

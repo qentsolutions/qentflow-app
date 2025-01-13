@@ -59,6 +59,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                 select: {
                   id: true,
                   name: true,
+                  color: true,
                 },
               },
             },

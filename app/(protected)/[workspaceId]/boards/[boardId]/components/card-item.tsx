@@ -74,23 +74,6 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
     }
   };
 
-  function getRandomColor(id: string): string {
-    const colors = [
-      "bg-red-500",
-      "bg-green-500",
-      "bg-blue-500",
-      "bg-yellow-500",
-      "bg-purple-500",
-      "bg-pink-500",
-      "bg-indigo-500",
-      "bg-teal-500",
-    ];
-    const index = id
-      .split("")
-      .reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-    return colors[index];
-  }
-
   const PriorityIcon = (priority: string | null) => {
     if (!priority) {
       return null; // Si priority est null, ne rien afficher
@@ -120,14 +103,15 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
           ref={provided.innerRef}
           role="button"
           onClick={() => cardModal.onOpen(data.id)}
-          className="border bg-background dark:bg-gray-700 rounded-lg shadow-sm hover:border-black m-1"
+          className="border bg-background dark:bg-gray-700 rounded-lg shadow-sm hover:border-black z-50 m-1"
         >
           <div className="p-3 space-y-3">
             <div className="flex items-start gap-x-2 gap-y-2 flex-wrap">
               {data?.tags?.map((tag: Tag) => (
                 <Badge
                   key={tag.id}
-                  className={`${getRandomColor(tag.id)} text-white`}
+                  className={`text-white`}
+                  style={{ backgroundColor: tag?.color || '#ff0000' }}
                 >
                   {tag.name}
                 </Badge>
@@ -260,7 +244,7 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                 value={
                   (data.tasks.filter(task => task.completed).length / data.tasks.length) * 100
                 }
-                className="h-1"
+                className="h-1 w-[calc(100%-6px)] mx-auto"
               />
             </div>
           )}

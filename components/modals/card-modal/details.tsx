@@ -52,6 +52,7 @@ const Details: React.FC<DetailsProps> = ({ card }) => {
         }
     };
 
+
     return (
         <Card className="w-full shadow-none">
             <CardContent className="space-y-4">

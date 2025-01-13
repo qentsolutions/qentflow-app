@@ -18,8 +18,8 @@ const SettingsNavbar = () => {
     }, [setBreadcrumbs]);
 
     return (
-        <div className="w-64 border-r p-4">
-            <div className="flex items-center justify-between mb-6 mt-8">
+        <div className="w-64 bg-background h-full  fixed border-r p-4">
+            <div className="flex items-center justify-between mb-6 mt-4">
                 <h1 className="text-xl font-semibold">Settings</h1>
             </div>
             <nav className="space-y-2">
@@ -32,8 +32,8 @@ const SettingsNavbar = () => {
 
                     return (
                         <Link href={item.href} key={item.label}>
-                            <p className={`flex items-center w-full gap-3 px-3 py-2 rounded-lg text-sm ${isActive
-                                ? "bg-gray-100 dark:bg-gray-800 text-primary"
+                            <p className={`flex items-center my-2 w-full gap-3 px-3 py-2 rounded-lg text-sm ${isActive
+                                ? "bg-blue-100 text-blue-700 dark:bg-gray-800"
                                 : "text-muted-foreground hover:bg-muted"
                                 }`}>
                                 <item.icon className="w-5 h-5" />

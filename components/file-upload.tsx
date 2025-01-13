@@ -6,6 +6,7 @@ import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { useAction } from "@/hooks/use-action";
 import { createAttachment } from "@/actions/attachments/create-attachment";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface FileUploadProps {
   cardId: string;
@@ -15,9 +16,14 @@ interface FileUploadProps {
 
 export const FileUpload = ({ cardId, workspaceId, onUploadComplete }: FileUploadProps) => {
   const [isUploading, setIsUploading] = useState(false);
+  const queryClient = useQueryClient();
+
 
   const { execute } = useAction(createAttachment, {
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["card-comments", cardId],
+      });
       toast.success("File uploaded successfully");
       onUploadComplete?.();
     },

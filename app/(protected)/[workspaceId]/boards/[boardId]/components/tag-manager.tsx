@@ -1,4 +1,3 @@
-// app/(protected)/[workspaceId]/boards/[boardId]/components/settings/tag-manager.tsx
 "use client";
 
 import { useState } from "react";
@@ -19,6 +18,7 @@ interface TagManagerProps {
 
 export const TagManager = ({ boardId }: TagManagerProps) => {
   const [newTagName, setNewTagName] = useState("");
+  const [newTagColor, setNewTagColor] = useState("#3B82F6"); // Couleur par défaut
   const queryClient = useQueryClient();
   const { currentWorkspace } = useCurrentWorkspace();
 
@@ -32,9 +32,10 @@ export const TagManager = ({ boardId }: TagManagerProps) => {
       queryClient.invalidateQueries({ queryKey: ["available-tags", boardId] });
       toast.success("Tag created successfully!");
       setNewTagName("");
+      setNewTagColor("#3B82F6"); // Réinitialiser la couleur
     },
     onError: (error) => {
-      toast.error(error);
+      toast.error(error || "Failed to create tag");
     },
   });
 
@@ -44,7 +45,7 @@ export const TagManager = ({ boardId }: TagManagerProps) => {
       toast.success("Tag deleted successfully!");
     },
     onError: (error) => {
-      toast.error(error);
+      toast.error(error || "Failed to delete tag");
     },
   });
 
@@ -54,6 +55,7 @@ export const TagManager = ({ boardId }: TagManagerProps) => {
 
     executeCreateTag({
       name: newTagName,
+      color: newTagColor,
       boardId,
     });
   };
@@ -68,37 +70,28 @@ export const TagManager = ({ boardId }: TagManagerProps) => {
     });
   };
 
-  function getRandomColor(id: string): string {
-    const colors = [
-      "bg-red-500",
-      "bg-green-500",
-      "bg-blue-500",
-      "bg-yellow-500",
-      "bg-purple-500",
-      "bg-pink-500",
-      "bg-indigo-500",
-      "bg-teal-500",
-    ];
-    const index = id
-      .split("")
-      .reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-    return colors[index];
-  }
-
   return (
     <div className="p-6 space-y-6">
-      <form onSubmit={handleCreateTag} className="flex gap-2">
+      {/* Formulaire pour créer un tag */}
+      <form onSubmit={handleCreateTag} className="flex gap-2 items-center">
         <Input
           value={newTagName}
           onChange={(e) => setNewTagName(e.target.value)}
           placeholder="Enter tag name"
           className="flex-1"
         />
+        <input
+          type="color"
+          value={newTagColor}
+          onChange={(e) => setNewTagColor(e.target.value)}
+          className="w-10 h-10 border cursor-pointer"
+        />
         <Button type="submit" className="bg-blue-500 text-white">
           Add Tag
         </Button>
       </form>
 
+      {/* Liste des tags existants */}
       <div className="space-y-4">
         {tags?.map((tag: any) => (
           <div
@@ -106,7 +99,10 @@ export const TagManager = ({ boardId }: TagManagerProps) => {
             className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
           >
             <div className="flex items-center space-x-3">
-              <Badge className={`${getRandomColor(tag.id)} text-white`}>
+              <Badge
+                style={{ backgroundColor: tag.color }}
+                className="text-white px-3 py-1 rounded"
+              >
                 {tag.name}
               </Badge>
             </div>

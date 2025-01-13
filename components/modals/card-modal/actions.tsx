@@ -25,11 +25,12 @@ import { fetcher } from "@/lib/fetcher";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { assignUserToCard } from "@/actions/boards/assign-user-to-card";
 import { UserIcon, UserX } from 'lucide-react';
+import { cn } from "@/lib/utils";
 
 
 interface ActionsProps {
   data: CardWithList;
-  availableTags: { id: string; name: string }[]; // Tags disponibles dans le board
+  availableTags: { id: string; name: string; color: string }[]; // Tags disponibles dans le board
 }
 
 export const Actions = ({
@@ -173,23 +174,6 @@ export const Actions = ({
     });
   };
 
-  function getRandomColor(id: string): string {
-    const colors = [
-      "bg-red-500",
-      "bg-green-500",
-      "bg-blue-500",
-      "bg-yellow-500",
-      "bg-purple-500",
-      "bg-pink-500",
-      "bg-indigo-500",
-      "bg-teal-500",
-    ];
-    // Utiliser l'ID du tag pour calculer un index unique
-    const index = id
-      .split("")
-      .reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-    return colors[index];
-  }
 
   // Gérer les changements dans la sélection de tag
   useEffect(() => {
@@ -304,22 +288,25 @@ export const Actions = ({
                 {linkedTags.length === 0 ? (
                   <span className="text-gray-400 text-xs">Add tags</span>
                 ) : (
-                  linkedTags.map((tag) => {
-                    const tagId = availableTags.find((t) => t.name === tag)?.id || "";
+                  linkedTags.map((tagName) => {
+                    const tag = availableTags.find((t) => t.name === tagName); // Trouver le tag complet
+                    if (!tag) return null; // Si le tag n'est pas trouvé, ignorer
+
                     return (
                       <Badge
-                        key={tagId}
-                        className={`relative flex items-center ${getRandomColor(tagId)} group`}
+                        key={tag.id}
+                        className={`relative flex items-center group`}
+                        style={{ backgroundColor: tag.color }} // Utiliser la couleur du tag
                       >
-                        {tag}
+                        {tag.name}
                         <button
                           className="absolute -right-2 -top-2 h-4 w-4 bg-white rounded-full flex items-center justify-center shadow-lg border opacity-0 group-hover:opacity-100 transition-opacity"
                           onClick={(e) => {
                             e.stopPropagation();
-                            onRemoveTag(tagId);
+                            onRemoveTag(tag.id); // Utiliser l'ID du tag pour le supprimer
                           }}
                         >
-                          <X className="h-3 w-3 text-red-500" />
+                          <X size={10} className="text-black" />
                         </button>
                       </Badge>
                     );
@@ -360,6 +347,12 @@ export const Actions = ({
                       {availableTags.map((tag: any) => (
                         <SelectItem key={tag.id} value={tag.id} className="hover:bg-gray-50">
                           <div className="flex items-center">
+                            <div
+                              className={cn(
+                                `w-2 h-2 rounded-full mr-2`,
+                              )}
+                              style={{ backgroundColor: tag?.color || '#ff0000' }}
+                            />
                             {tag.name}
                             {linkedTags.includes(tag.name) && <Check className="ml-2 h-4 w-4 text-green-500" />}
                           </div>

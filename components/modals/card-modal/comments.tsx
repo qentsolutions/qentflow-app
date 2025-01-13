@@ -157,13 +157,15 @@ export const Comments = ({ items, cardId }: CommentsProps) => {
 
       setComments((prevComments) =>
         prevComments.map((comment) =>
-          comment.id === commentId ? { ...comment, text: editingText } : comment
+          comment.id === commentId
+            ? { ...comment, text: editingText, modified: true } // Ajoutez `modified: true` ici
+            : comment
         )
       );
 
       setEditingText("");
       setEditingCommentId(null);
-      toast.success("Comment updated!")
+      toast.success("Comment updated!");
     } catch (error) {
       toast.error("Failed to update comment.");
     }
@@ -252,7 +254,10 @@ export const Comments = ({ items, cardId }: CommentsProps) => {
                   </Avatar>
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold flex items-center gap-x-2">{comment.user.name} {comment.modified == true && <p className="font-normal text-xs text-gray-500">(modified)</p>}</p>
+                      <p className="text-sm font-semibold flex items-center gap-x-2">
+                        {comment.user.name}
+                        {comment.modified && <p className="font-normal text-xs text-gray-500">(modified)</p>}
+                      </p>
                       <span className="text-xs text-muted-foreground">
                         {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
                       </span>

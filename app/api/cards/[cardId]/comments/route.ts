@@ -9,7 +9,7 @@ export async function GET(
 ) {
   try {
     const user = currentUser();
-    
+
     if (!user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
@@ -23,7 +23,8 @@ export async function GET(
         createdAt: "desc", // Trier les commentaires du plus récent au plus ancien
       },
       include: {
-        user: { // Inclure les informations sur l'utilisateur qui a posté le commentaire
+        user: {
+          // Inclure les informations sur l'utilisateur qui a posté le commentaire
           select: {
             id: true,
             name: true,

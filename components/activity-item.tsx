@@ -1,5 +1,5 @@
-import { format } from "date-fns";
-import { AuditLog } from "@prisma/client"
+import { format, formatDistanceToNow } from "date-fns";
+import { AuditLog } from "@prisma/client";
 import { generateLogMessage } from "@/lib/generate-log-message";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,9 +9,10 @@ import { Clock } from 'lucide-react';
 
 interface ActivityItemProps {
   data: AuditLog;
+  isLast?: boolean;
 };
 
-export const ActivityItem = ({ data }: ActivityItemProps) => {
+export const ActivityItem = ({ data, isLast }: ActivityItemProps) => {
   const logMessage = generateLogMessage(data);
   const actionType = data.action.toLowerCase();
 
@@ -28,41 +29,51 @@ export const ActivityItem = ({ data }: ActivityItemProps) => {
     }
   };
 
+  const relativeTime = formatDistanceToNow(new Date(data.createdAt), { addSuffix: true });
+
   return (
-    <Card className="mb-4">
-      <CardContent className="p-4">
-        <div className="flex items-start space-x-4">
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={data.userImage} alt={data.userName} />
-            <AvatarFallback>{data.userName.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div className="flex-1 space-y-1">
-            <div className="flex items-center justify-between">
-              <h4 className="text-sm font-semibold">{data.userName}</h4>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Badge variant={getBadgeVariant(actionType)}>
-                      {actionType}
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Action type: {actionType}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            <p className="text-sm text-muted-foreground">{logMessage}</p>
-            <div className="flex items-center text-xs text-muted-foreground">
-              <Clock className="mr-1 h-3 w-3" />
-              <time dateTime={new Date(data.createdAt).toISOString()}>
-                {format(new Date(data.createdAt), "MMM d, yyyy 'at' h:mm a")}
-              </time>
+    <li className="relative ml-12 mt-8 pb-0 last:pb-0">
+      {!isLast && (
+        <div className="absolute left-7 top-5 -bottom-5 w-px bg-border" aria-hidden="true" />
+      )}
+      <Card className="ml-11 border-none shadow-none">
+        <CardContent className="p-4">
+          <div className="flex items-start space-x-4">
+            <Avatar className="h-10 w-10 -ml-[52px] ring-4 ring-background relative z-10">
+              <AvatarImage src={data.userImage} alt={data.userName} />
+              <AvatarFallback>{data.userName.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1 space-y-1">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold">{data.userName}</p>
+                <Badge variant={getBadgeVariant(actionType)}>
+                  {actionType}
+                </Badge>
+              </div>
+              <p className="text-sm text-muted-foreground">{logMessage}</p>
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="flex items-center text-xs text-muted-foreground">
+                    <Clock className="mr-1 h-3 w-3" />
+                    <span>{relativeTime}</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <time dateTime={new Date(data.createdAt).toISOString()}>
+                    {format(new Date(data.createdAt), "MMM d, yyyy 'at' h:mm a")}
+                  </time>
+                </TooltipContent>
+              </Tooltip>
 
             </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </li>
   );
 };
+
+
+
+
+

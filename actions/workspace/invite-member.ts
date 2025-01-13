@@ -70,6 +70,7 @@ export async function inviteMember({ workspaceId, email }: InviteMemberParams) {
           userId: invitedUser.id,
           workspaceId,
           message: `${user.name} has invited you to join the workspace "${workspace.name}"`,
+          isInvitation: true,
         },
       });
     }

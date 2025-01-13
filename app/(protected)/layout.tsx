@@ -43,7 +43,7 @@ const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
             <BreadcrumbHeader />
             <FeedbackButton />
           </header>
-          <div className="mt-16 ">
+          <div className="mt-16">
             {children}
           </div>
         </main>
