@@ -9,7 +9,9 @@ const ExcludeMemberSchema = z.object({
   memberId: z.string().min(1, "Member ID is required"),
 });
 
-export const excludeMember = async (data: z.infer<typeof ExcludeMemberSchema>) => {
+export const excludeMember = async (
+  data: z.infer<typeof ExcludeMemberSchema>
+) => {
   const validated = ExcludeMemberSchema.safeParse(data);
 
   if (!validated.success) {

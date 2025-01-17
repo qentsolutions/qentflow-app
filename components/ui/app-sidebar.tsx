@@ -52,26 +52,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ],
     navMain: [
       {
-        title: "Projects",
-        url: "#",
+        name: "Projects", // Changez 'title' en 'name'
+        url: `/${workspaceId}/boards`,
         icon: SquareTerminal,
-        isActive: false,
-        items: [
-          {
-            title: "Boards",
-            url: `/${workspaceId}/boards`,
-          },
-          {
-            title: "Documents",
-            url: `/${workspaceId}/documents`,
-          },
-          {
-            title: "Draws",
-            url: `/${workspaceId}/documents`,
-          }
-        ],
+        isActive: false, // Cette propriété peut rester, mais elle sera ignorée par NavMain
       },
-
     ],
     integrations: [
       {

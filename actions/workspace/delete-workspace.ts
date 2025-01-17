@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { currentUser } from "@/lib/auth";
+import { currentRole, currentUser } from "@/lib/auth";
 import { UserRole } from "@prisma/client";
 import { z } from "zod";
 
@@ -9,7 +9,15 @@ const DeleteWorkspaceSchema = z.object({
   workspaceId: z.string().min(1, "Workspace ID is required"),
 });
 
-export const deleteWorkspace = async (values: z.infer<typeof DeleteWorkspaceSchema>) => {
+export const deleteWorkspace = async (
+  values: z.infer<typeof DeleteWorkspaceSchema>
+) => {
+  const role = await currentRole();
+
+  if (role != UserRole.OWNER) {
+    throw new Error("Unauthorized");
+  }
+
   try {
     const validatedFields = DeleteWorkspaceSchema.safeParse(values);
 
@@ -42,7 +50,6 @@ export const deleteWorkspace = async (values: z.infer<typeof DeleteWorkspaceSche
       return { error: "Workspace not found or unauthorized" };
     }
 
-    // Compte le nombre de membres dans le workspace
     const memberCount = await db.workspaceMember.count({
       where: {
         workspaceId,
@@ -51,7 +58,8 @@ export const deleteWorkspace = async (values: z.infer<typeof DeleteWorkspaceSche
 
     if (memberCount > 1) {
       return {
-        error: "You cannot delete the workspace while other members are present.",
+        error:
+          "You cannot delete the workspace while other members are present.",
       };
     }
 

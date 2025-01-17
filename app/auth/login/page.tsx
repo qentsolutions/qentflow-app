@@ -4,10 +4,23 @@ import Image from "next/image";
 const LoginPage = () => {
   return (
     <div className="w-screen flex min-h-screen">
-      <div className="flex-1 flex-col flex items-center justify-center p-8 bg-[#F8FAFC]">
-        <div className="text-center mb-8">
-          <Image src="/logo.png" alt="QentSolutions logo" width={200} height={200} />
+      {/* Conteneur principal */}
+      <div className="absolute top-4 left-4 flex items-center gap-x-2">
+        <Image
+          src="/logo.png"
+          alt="QentFlow Logo"
+          height={30}
+          width={30}
+          className="rounded-lg"
+        />
+        <div className="relative font-black inline-block w-max [filter:drop-shadow(0px_1px_3px_rgba(27,_37,_80,_0.14))]">
+          <div className="relative bg-clip-text text-transparent bg-no-repeat bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500">
+            <span className="z-40 text-xl">QentFlow</span>
+          </div>
         </div>
+      </div>
+
+      <div className="flex-1 flex-col flex items-center justify-center p-8 bg-[#F8FAFC]">
         <LoginForm />
       </div>
       <div className="hidden lg:block flex-1 relative bg-gradient-to-br from-blue-600 to-blue-800">
@@ -23,8 +36,7 @@ const LoginPage = () => {
         </div>
       </div>
     </div>
-
   );
-}
+};
 
 export default LoginPage;

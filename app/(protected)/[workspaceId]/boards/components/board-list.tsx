@@ -103,7 +103,7 @@ export const BoardList = () => {
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">
             <div className="flex items-center mb-4 gap-x-2">
-              Boards
+              Projects
               <span
                 className={`flex items-center justify-center text-base font-semibold bg-blue-500 text-white rounded-full ${(boards?.length || 0) > 99
                   ? "w-12 h-12 text-sm" // Pour les nombres à 3 chiffres ou plus
@@ -160,7 +160,7 @@ export const BoardList = () => {
             <></>
           )}
 
-          <p className="text-lg font-semibold mb-4">All Boards</p>
+          <p className="text-lg font-semibold mb-4">All Projects</p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {isLoading || isFirstLoad
               ? Array.from({ length: 4 }).map((_, idx) => (
@@ -178,7 +178,7 @@ export const BoardList = () => {
                   />
                 ))
                 : (
-                  <p>No boards available</p>
+                  <p>No projects available</p>
                 )}
           </div>
         </CardContent>
