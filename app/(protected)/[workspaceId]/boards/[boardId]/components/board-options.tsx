@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Trash2 } from 'lucide-react';
+import { Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -33,16 +33,15 @@ export const BoardOptions = ({ boardId }: BoardOptionsProps) => {
     },
     onError: (error) => {
       toast.error(error);
-    }
+    },
   });
 
   const onDelete = () => {
-    const workspaceId = currentWorkspace?.id;
-    if (!workspaceId) {
+    if (!currentWorkspace?.id) {
       toast.error("Workspace ID is required.");
       return;
     }
-    execute({ id: boardId, workspaceId });
+    execute({ id: boardId, workspaceId: currentWorkspace.id });
   };
 
   return (
@@ -63,7 +62,7 @@ export const BoardOptions = ({ boardId }: BoardOptionsProps) => {
           <DialogHeader>
             <DialogTitle>Delete Board</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete the board ? This action cannot be undone.
+              Are you sure you want to delete the board? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="sm:justify-start">
@@ -76,7 +75,6 @@ export const BoardOptions = ({ boardId }: BoardOptionsProps) => {
               {isLoading ? "Deleting..." : "Delete Board"}
             </Button>
             <Button
-              type="button"
               variant="secondary"
               onClick={() => setIsDialogOpen(false)}
               className="w-full sm:w-auto"
@@ -87,7 +85,5 @@ export const BoardOptions = ({ boardId }: BoardOptionsProps) => {
         </DialogContent>
       </Dialog>
     </div>
-
   );
 };
-

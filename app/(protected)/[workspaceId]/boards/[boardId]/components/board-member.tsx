@@ -41,19 +41,22 @@ export const BoardMembers = ({ boardId, users, createdById }: BoardMembersProps)
 
   const isCreator = currentUser?.id === createdById;
 
-  const handleAddUser = useCallback(async (user: any) => {
-    setIsAdding(true);
-    try {
-      await addUserToBoard(user.id, boardId);
-      setBoardUsers(prevUsers => [...prevUsers, user]);
-      toast.success(`${user.name} added to board`);
-    } catch (error) {
-      console.error("Failed to update board users:", error);
-      toast.error("Failed to update board users");
-    } finally {
-      setIsAdding(false);
-    }
-  }, [boardId]);
+  const handleAddUser = useCallback(
+    async (user: any) => {
+      setIsAdding(true);
+      try {
+        await addUserToBoard(user.id, boardId);
+        setBoardUsers((prevUsers) => [...prevUsers, user]);
+        toast.success(`${user.name} added to board`);
+      } catch (error) {
+        console.error("Failed to update board users:", error);
+        toast.error("Failed to update board users");
+      } finally {
+        setIsAdding(false);
+      }
+    },
+    [boardId]
+  );
 
   const handleRemoveUser = async (userId: string) => {
     if (!isCreator) {
@@ -63,7 +66,7 @@ export const BoardMembers = ({ boardId, users, createdById }: BoardMembersProps)
 
     try {
       await removeUserFromBoard(userId, boardId);
-      setBoardUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+      setBoardUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
       toast.success("User removed from board");
     } catch (error) {
       toast.error("Failed to remove user");
@@ -96,7 +99,7 @@ export const BoardMembers = ({ boardId, users, createdById }: BoardMembersProps)
                       No available users to add
                     </div>
                   ) : (
-                    availableUsers.map(user => (
+                    availableUsers.map((user) => (
                       <div
                         key={user.id}
                         className={cn(

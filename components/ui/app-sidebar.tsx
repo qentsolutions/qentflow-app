@@ -21,7 +21,6 @@ import { NavProjects } from "./nav-projects"
 import { NavUser } from "./nav-user"
 import { useCurrentUser } from "@/hooks/use-current-user"
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
-import { Separator } from "./separator"
 import { NavIntegrations } from "./nav-integrations"
 
 

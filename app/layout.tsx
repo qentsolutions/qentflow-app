@@ -16,8 +16,8 @@ import { PersistentChat } from '@/components/chat/persistent-chat'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'QentSolutions',
-  description: 'Boost your team&apos;s productivity with QentSolutions! Discover our innovative WorkOS platform designed for seamless team collaboration, project management, and streamlined workflows.Work smarter, together.',
+  title: 'QentFlow',
+  description: 'Boost your team&apos;s productivity with QentFlow! Discover our innovative WorkOS platform designed for seamless team collaboration, project management, and streamlined workflows.Work smarter, together.',
 }
 
 export default async function RootLayout({

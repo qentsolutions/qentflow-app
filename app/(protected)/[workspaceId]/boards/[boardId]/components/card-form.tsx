@@ -1,3 +1,5 @@
+'use client'
+
 import { forwardRef, useRef, ElementRef, KeyboardEventHandler } from "react";
 import { Plus, X } from "lucide-react";
 import { useParams } from "next/navigation";
@@ -66,7 +68,6 @@ export const CardForm = forwardRef<HTMLTextAreaElement, CardFormProps>(
 
       execute({ title, listId, boardId, workspaceId });
     };
-
 
     if (isEditing) {
       return (

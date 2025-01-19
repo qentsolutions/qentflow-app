@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation" // Import de useRouter
-import { Bell, ChevronsUpDown, Settings, LogOut } from "lucide-react"
+import { Bell, ChevronsUpDown, Settings, LogOut, Inbox } from "lucide-react"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import {
     DropdownMenu,
@@ -138,6 +138,19 @@ export function NavUser({ user }: { user: any }) {
                         </Tabs>
                     </DropdownMenuContent>
                 </DropdownMenu>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton className="flex items-center justify-between gap-3 my-1 px-4 py-5 rounded-lg hover:bg-gray-100" onClick={() => handleNavigation(`/${currentWorkspace?.id}/mailbox`)}>
+                    <div className="flex items-center gap-x-2">
+                        <Inbox className="text-gray-500" size={20} />
+                        <span className="font-medium">Mailbox</span>
+                    </div>
+                    {unreadNotifications.length > 0 && (
+                        <div className="text-sm flex items-center justify-center h-6 w-6 bg-red-500 text-white rounded-sm">
+                            {unreadNotifications.length}
+                        </div>
+                    )}
+                </SidebarMenuButton>
             </SidebarMenuItem>
             <Separator />
             <SidebarMenuItem>

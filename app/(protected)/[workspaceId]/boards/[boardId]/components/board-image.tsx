@@ -5,6 +5,21 @@ import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { uploadBoardImage } from "@/actions/boards/upload-board-image";
 
+// Fonction utilitaire pour lire un fichier en base64
+const readFileAsBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            if (typeof reader.result === "string") {
+                resolve(reader.result);
+            } else {
+                reject(new Error("Failed to read file as Base64 string"));
+            }
+        };
+        reader.onerror = () => reject(new Error("File reading failed"));
+        reader.readAsDataURL(file);
+    });
+
 interface UploadBoardImageProps {
     boardId: string;
     workspaceId: string;
@@ -13,6 +28,7 @@ interface UploadBoardImageProps {
 export default function UploadBoardImage({ boardId, workspaceId }: UploadBoardImageProps) {
     const [isUploading, setIsUploading] = useState(false);
 
+    // Fonction de gestion du drop de fichier
     const onDrop = useCallback(
         async (acceptedFiles: File[]) => {
             if (acceptedFiles.length === 0) return;
@@ -20,19 +36,7 @@ export default function UploadBoardImage({ boardId, workspaceId }: UploadBoardIm
             setIsUploading(true);
             try {
                 const file = acceptedFiles[0];
-
-                const base64String = await new Promise<string>((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        if (typeof reader.result === "string") {
-                            resolve(reader.result);
-                        } else {
-                            reject(new Error("Failed to read file as Base64 string"));
-                        }
-                    };
-                    reader.onerror = () => reject(new Error("File reading failed"));
-                    reader.readAsDataURL(file);
-                });
+                const base64String = await readFileAsBase64(file);
 
                 await uploadBoardImage({
                     file: {
@@ -46,7 +50,7 @@ export default function UploadBoardImage({ boardId, workspaceId }: UploadBoardIm
                 });
 
                 toast.success("Image uploaded successfully!");
-                window.location.reload()
+                window.location.reload();
             } catch (error) {
                 console.error("Upload error:", error);
                 toast.error("Failed to upload the image");

@@ -29,7 +29,7 @@ export default function DocsPage() {
   const workspaceId = currentWorkspace?.id;
 
   useEffect(() => {
-    document.title = "Documents - QentSolutions";
+    document.title = "Documents - QentFlow";
   }, []);
 
   useEffect(() => {

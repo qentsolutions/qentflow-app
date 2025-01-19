@@ -8,11 +8,11 @@ const BoardPage = () => {
   const { setBreadcrumbs } = useBreadcrumbs();
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Boards" }]);
+    setBreadcrumbs([{ label: "Projects" }]);
   }, [setBreadcrumbs]);
 
   return (
-    <div className="w-full ">
+    <div className="w-full bg-gray-50">
       <div className="px-2 md:px-4 w-full">
         <BoardList />
       </div>

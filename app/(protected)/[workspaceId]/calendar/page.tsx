@@ -12,7 +12,7 @@ const CalendarPage = () => {
   const { setBreadcrumbs } = useBreadcrumbs();
 
   useEffect(() => {
-    document.title = "Calendar - QentSolutions";
+    document.title = "Calendar - QentFlow";
   }, []);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const CalendarPage = () => {
   });
 
   return (
-    <div className=" mx-auto pt-1 space-y-6">
+    <div className=" mx-auto space-y-6">
       <WeeklyCalendar
         events={events || []}
       />

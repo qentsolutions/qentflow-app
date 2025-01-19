@@ -7,14 +7,11 @@ interface BoardTitleFormProps {
   data: Board;
 }
 
-export const BoardTitleForm = ({ data }: BoardTitleFormProps) => {
-  
-  return (
-    <Button
-      variant="default"
-      className="bg-transparent text-xl font-bold shadow-none text-gray-700 hover:bg-transparent dark:text-white h-auto w-auto p-1"
-    >
-      {data.title}
-    </Button>
-  );
-};
+export const BoardTitleForm = ({ data }: BoardTitleFormProps) => (
+  <Button
+    variant="default"
+    className="text-xl font-bold text-gray-700 dark:text-white p-1 bg-transparent hover:bg-transparent shadow-none"
+  >
+    {data.title}
+  </Button>
+);

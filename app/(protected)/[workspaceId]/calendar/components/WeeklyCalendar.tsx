@@ -189,7 +189,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
 
 
   return (
-    <div className="flex flex-col lg:flex-row bg-gray-50 dark:bg-gray-900 rounded-lg overflow-hidden mt-4 pb-12">
+    <div className="flex flex-col lg:flex-row  dark:bg-gray-900 rounded-lg overflow-hidden mt-4 pb-12">
       <div className="flex-grow">
         <div className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-900 border-b">
           <button onClick={() => navigateWeek('prev')} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
@@ -260,7 +260,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
           </div>
         </div>
       </div>
-      <div className="w-full lg:w-80 p-4 bg-white dark:bg-gray-800 shadow-lg">
+      <div className="w-full lg:w-80 p-4 bg-white dark:bg-gray-800">
         <div className="text-center mb-6">
           <Button
             onClick={() => setIsCreateEventOpen(true)}

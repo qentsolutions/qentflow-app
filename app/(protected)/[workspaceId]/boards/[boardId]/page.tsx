@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: { boardId: string; 
     return { title: "Board Not Found | MyApp" };
   }
 
-  return { title: `${board.title} - QentSolutions` };
+  return { title: `${board.title} - QentFlow` };
 }
 
 const BoardIdPage = async ({ params }: BoardIdPageProps) => {

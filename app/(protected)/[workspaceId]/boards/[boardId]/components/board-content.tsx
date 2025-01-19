@@ -2,7 +2,7 @@
 
 import { ViewSwitcher, ViewType } from "./view-switcher";
 import { KanbanView } from "./kanban-view";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import BoardUsers from "./board-users";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
@@ -43,12 +43,22 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     getFilteredLists,
   } = useBoardFilters({ lists });
 
-
   const { data: availableTags } = useQuery({
     queryKey: ["available-tags", boardId],
     queryFn: () => fetcher(`/api/boards/tags?boardId=${boardId}`),
   });
 
+  const selectedUserData = useMemo(
+    () => users.find((user: any) => user.id === selectedUser),
+    [selectedUser, users]
+  );
+
+  const filteredTags = useMemo(
+    () => availableTags?.filter((tag: any) =>
+      tag.name.toLowerCase().includes(tagSearchTerm.toLowerCase())
+    ),
+    [availableTags, tagSearchTerm]
+  );
 
   const handleUserSelect = (userId: string) => {
     setSelectedUser(selectedUser === userId ? null : userId);
@@ -56,23 +66,16 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
 
   const renderView = () => {
     const filteredLists = getFilteredLists();
-
-    switch (selectedView) {
-      case "kanban":
-        return <KanbanView boardId={boardId} data={filteredLists} users={users} />;
-      default:
-        return <ListView boardId={boardId} data={filteredLists} users={users} />;
-    }
+    return selectedView === "kanban" ? (
+      <KanbanView boardId={boardId} data={filteredLists} users={users} />
+    ) : (
+      <ListView boardId={boardId} data={filteredLists} users={users} />
+    );
   };
-
-  const filteredTags = availableTags?.filter((tag: any) =>
-    tag.name.toLowerCase().includes(tagSearchTerm.toLowerCase())
-  );
-
 
   const RefreshPage = () => {
     router.refresh();
-  }
+  };
 
   return (
     <>
@@ -134,11 +137,9 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                               : "hover:bg-secondary/50"
                           )}
                         >
-                          <div className={`flex items-center gap-2 `}>
+                          <div className={`flex items-center gap-2`}>
                             <div
-                              className={cn(
-                                `w-2 h-2 rounded-full`,
-                              )}
+                              className={cn(`w-2 h-2 rounded-full`)}
                               style={{ backgroundColor: tag?.color || '#ff0000' }}
                             />
                             <span className="text-sm font-medium">{tag.name}</span>
@@ -172,7 +173,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
             </Popover>
 
             <div className="flex items-center gap-2 flex-wrap">
-              {selectedUser && users.find((u: any) => u.id === selectedUser) && (
+              {selectedUserData && (
                 <Badge
                   variant="secondary"
                   className="flex items-center gap-2"
@@ -180,11 +181,11 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                 >
                   <Avatar className="h-5 w-5">
                     <AvatarImage
-                      src={users.find((u: any) => u.id === selectedUser)?.image}
-                      alt={users.find((u: any) => u.id === selectedUser)?.name}
+                      src={selectedUserData?.image}
+                      alt={selectedUserData?.name}
                     />
                     <AvatarFallback>
-                      {users.find((u: any) => u.id === selectedUser)?.name?.[0]}
+                      {selectedUserData?.name?.[0]}
                     </AvatarFallback>
                   </Avatar>
                   <span>Filtered by user</span>
@@ -193,14 +194,11 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
               )}
               {selectedTags.map((tagId) => {
                 const tag = availableTags?.find((t: any) => t.id === tagId);
-                if (!tag) return null;
-                return (
+                return tag ? (
                   <Badge
                     key={tagId}
-                    className={cn(
-                      "flex items-center gap-2 text-white",
-                    )}
-                    style={{ backgroundColor: tag?.color || '#ff0000' }} // Couleur dynamique
+                    className={cn("flex items-center gap-2 text-white")}
+                    style={{ backgroundColor: tag?.color || '#ff0000' }}
                   >
                     {tag.name}
                     <X
@@ -208,7 +206,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                       onClick={() => toggleTag(tagId)}
                     />
                   </Badge>
-                );
+                ) : null;
               })}
             </div>
           </div>

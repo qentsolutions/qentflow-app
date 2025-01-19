@@ -17,7 +17,7 @@ export const BoardNavbar = ({ board }: BoardNavbarProps) => {
 
   useEffect(() => {
     setBreadcrumbs([
-      { label: "Boards", href: `/${currentWorkspace?.id}/boards` },
+      { label: "Projects", href: `/${currentWorkspace?.id}/boards` },
       { label: board.title },
     ]);
   }, [board, setBreadcrumbs, currentWorkspace?.id]);

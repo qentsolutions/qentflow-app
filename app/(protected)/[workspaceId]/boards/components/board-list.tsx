@@ -37,10 +37,9 @@ export const BoardList = () => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [isFirstLoad, setIsFirstLoad] = useState(true);
-  const [recentlyOpened, setRecentlyOpened] = useState<Board[]>([]);
 
   useEffect(() => {
-    document.title = "Boards - QentSolutions";
+    document.title = "Projects - QentFlow";
   }, []);
 
   const { data: boards, isLoading, error } = useQuery({
@@ -54,34 +53,19 @@ export const BoardList = () => {
 
   const filteredBoards = Array.isArray(boards)
     ? boards.filter((board: Board) =>
-      board.title.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+        board.title.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     : [];
 
-  // Gestion des boards récemment ouverts dans localStorage, spécifique à un workspace
-  useEffect(() => {
-    if (workspaceId) {
-      const storedBoards = localStorage.getItem(`recentlyOpenedBoards_${workspaceId}`);
-      if (storedBoards) {
-        setRecentlyOpened(JSON.parse(storedBoards));
-      }
-    }
-  }, [workspaceId]);
+  // Tri des boards ouverts en fonction de `isMember`
+  const openBoards = filteredBoards.filter(board => board.isMember);
 
-  // Mettre à jour localStorage quand un board est ouvert
+  // Gérer les clics sur les boards
   const handleBoardClick = (board: Board) => {
     if (!board.isMember) {
       toast.error("You are not a member of this board.");
       return;
     }
-
-    // Mettre à jour les boards récemment ouverts dans localStorage
-    const updatedRecentlyOpened = [board, ...recentlyOpened.filter(b => b.id !== board.id)].slice(0, 2); // Limiter à 5 boards
-    setRecentlyOpened(updatedRecentlyOpened);
-    if (workspaceId) {
-      localStorage.setItem(`recentlyOpenedBoards_${workspaceId}`, JSON.stringify(updatedRecentlyOpened));
-    }
-
     router.push(`/${workspaceId}/boards/${board.id}`);
   };
 
@@ -98,21 +82,21 @@ export const BoardList = () => {
   }
 
   return (
-    <div className="py-4">
+    <div className="py-4 bg-gray-50 h-screen">
       <Card className="shadow-sm rounded-md w-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">
             <div className="flex items-center mb-4 gap-x-2">
               Projects
               <span
-                className={`flex items-center justify-center text-base font-semibold bg-blue-500 text-white rounded-full ${(boards?.length || 0) > 99
+                className={`flex items-center justify-center text-base font-semibold bg-blue-500 text-white rounded-full ${(openBoards?.length || 0) > 99
                   ? "w-12 h-12 text-sm" // Pour les nombres à 3 chiffres ou plus
-                  : (boards?.length || 0) > 9
+                  : (openBoards?.length || 0) > 9
                     ? "w-10 h-10 text-sm" // Pour les nombres à 2 chiffres
                     : "w-6 h-6 text-base" // Pour les nombres à 1 chiffre
                   }`}
               >
-                {boards?.length || 0}
+                {openBoards?.length || 0}
               </span>
             </div>
           </CardTitle>
@@ -124,7 +108,7 @@ export const BoardList = () => {
             >
               <Button variant="outline" className="bg-blue-500 text-white">
                 <Plus className=" h-4 w-4" />
-                New Board
+                Create Project
               </Button>
             </FormPopover>
           )}
@@ -140,26 +124,6 @@ export const BoardList = () => {
             />
           </div>
 
-          {/* Recently Opened Section */}
-          {recentlyOpened.length > 0 ? (
-            <div className="mb-6">
-              <p className="text-lg font-semibold mb-4">Recently Opened</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {recentlyOpened.length > 0
-                  ? recentlyOpened.map((board) => (
-                    <BoardCard
-                      key={board.id}
-                      board={board}
-                      onClick={() => handleBoardClick(board)}
-                    />
-                  ))
-                  : <p>No recently opened boards.</p>}
-              </div>
-            </div>
-          ) : (
-            <></>
-          )}
-
           <p className="text-lg font-semibold mb-4">All Projects</p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {isLoading || isFirstLoad
@@ -169,8 +133,8 @@ export const BoardList = () => {
                   className="h-56 rounded-md bg-gray-200 dark:bg-gray-700"
                 />
               ))
-              : filteredBoards.length > 0
-                ? filteredBoards.map((board: any) => (
+              : openBoards.length > 0
+                ? openBoards.map((board: any) => (
                   <BoardCard
                     key={board.id}
                     board={board}

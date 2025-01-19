@@ -54,7 +54,7 @@ export const FormPopover = ({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold text-center text-gray-800">
-            Create New Board
+            Create New Project
           </DialogTitle>
           <DialogDescription className="text-center text-gray-600">
             Add a new board to organize your projects and tasks.
