@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, KanbanSquare } from "lucide-react";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -146,7 +146,6 @@ export const BoardList = () => {
             />
           </div>
 
-          <p className="text-lg font-semibold mb-4">All Boards</p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {isLoading || isFirstLoad
               ? Array.from({ length: 4 }).map((_, idx) => (
@@ -164,7 +163,10 @@ export const BoardList = () => {
                   />
                 ))
                 : (
-                  <p>No boards available</p>
+                  <div className="text-center py-10">
+                    <KanbanSquare className="h-10 w-10 mx-auto text-gray-400 mb-2" />
+                    <p className="text-muted-foreground">No boards found</p>
+                  </div>
                 )}
           </div>
         </CardContent>

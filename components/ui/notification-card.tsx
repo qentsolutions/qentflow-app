@@ -23,8 +23,7 @@ interface NotificationCardProps {
   onMarkAsUnRead?: () => void;
   showWorkspace?: boolean;
   isInvitation?: boolean;
-  onAcceptInvitation?: () => void;
-  onDeclineInvitation?: () => void;
+
 }
 
 export function NotificationCard({
@@ -37,9 +36,6 @@ export function NotificationCard({
   onMarkAsRead,
   onMarkAsUnRead,
   showWorkspace = false,
-  isInvitation,
-  onAcceptInvitation,
-  onDeclineInvitation,
 }: NotificationCardProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -135,30 +131,7 @@ export function NotificationCard({
             Workspace: {workspaceName}
           </p>
         )}
-        {isInvitation && (
-          <div className="flex gap-2 mt-2">
-            <Button
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onAcceptInvitation?.();
-              }}
-              className="bg-green-500 hover:bg-green-600 text-white"
-            >
-              Accept
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDeclineInvitation?.();
-              }}
-            >
-              Decline
-            </Button>
-          </div>
-        )}
+     
       </div>
       <div
         className={`

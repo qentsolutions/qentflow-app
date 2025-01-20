@@ -20,6 +20,10 @@ import { fetcher } from "@/lib/fetcher"
 import { ScrollArea, ScrollBar } from "./scroll-area"
 import { NotificationList } from "./notification-list"
 import { Notification as PrismaNotification } from "@prisma/client"
+import { Button } from "./button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./dialog"
+import { useState } from "react"
+import { toast } from "sonner"
 
 interface Notification extends PrismaNotification {
     workspaceName: string
@@ -29,6 +33,7 @@ export function NavUser({ user }: { user: any }) {
     const { isMobile } = useSidebar()
     const router = useRouter()
     const { currentWorkspace, workspaces, setCurrentWorkspace } = useCurrentWorkspace()
+    const [showInvitations, setShowInvitations] = useState(false);
 
     // Use TanStack Query to fetch notifications
     const { data: notifications, isLoading, refetch } = useQuery<Notification[]>({
@@ -65,14 +70,135 @@ export function NavUser({ user }: { user: any }) {
         )
     }
 
+    const { data: invitations, refetch: refetchInvitations } = useQuery({
+        queryKey: ["invitations"],
+        queryFn: async () => {
+            const response = await fetch(`/api/workspaces/${currentWorkspace?.id}/invitations`);
+            if (!response.ok) throw new Error("Failed to fetch invitations");
+            return response.json();
+        },
+        enabled: !!currentWorkspace?.id,
+    });
+
+    const handleNewWorkspace = () => {
+        router.push("/workspace/select");
+    };
+
+    const handleWorkspaceSelect = (workspace: any) => {
+        setCurrentWorkspace(workspace);
+        router.push(`/${workspace.id}`);
+    };
+
+    const handleAcceptInvitation = async (invitationId: string) => {
+        try {
+            const response = await fetch(`/api/invitations/accept`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ notificationId: invitationId }),
+            });
+
+            if (!response.ok) throw new Error("Failed to accept invitation");
+
+            toast.success("Invitation accepted successfully");
+            refetchInvitations();
+            router.refresh();
+        } catch (error) {
+            toast.error("Failed to accept invitation");
+        }
+    };
+
+    const handleDeclineInvitation = async (invitationId: string) => {
+        try {
+            const response = await fetch(`/api/invitations/decline`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ notificationId: invitationId }),
+            });
+
+            if (!response.ok) throw new Error("Failed to decline invitation");
+
+            toast.success("Invitation declined");
+            refetchInvitations();
+        } catch (error) {
+            toast.error("Failed to decline invitation");
+        }
+    };
+
+
     return (
         <SidebarMenu>
+            <SidebarMenuItem>
+                <Button
+                    onClick={() => setShowInvitations(true)}
+                    variant="ghost"
+                    className="w-full justify-start"
+                >
+                    <Inbox className="mr-1 h-4 w-4" />
+                    Invitations
+                    {invitations?.length > 0 && (
+                        <span className="ml-2 rounded-full bg-red-500 px-2 py-0.5 text-xs text-white">
+                            {invitations.length}
+                        </span>
+                    )}
+                </Button>
+
+                <Dialog open={showInvitations} onOpenChange={setShowInvitations}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Workspace Invitations</DialogTitle>
+                        </DialogHeader>
+                        <ScrollArea className="mt-4 max-h-[60vh]">
+                            ok
+                            {invitations?.length === 0 ? (
+                                <p className="text-center text-sm text-muted-foreground">
+                                    No pending invitations
+                                </p>
+                            ) : (
+                                <div className="space-y-4">
+                                    {invitations?.map((invitation: any) => (
+                                        <div
+                                            key={invitation.id}
+                                            className="flex items-center justify-between border p-4 rounded-lg"
+                                        >
+                                            <div>
+                                                <p className="font-medium">{invitation.workspace?.name}</p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Invited by: {invitation.inviter?.name}
+                                                </p>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    onClick={() => handleAcceptInvitation(invitation.id)}
+                                                    size="sm"
+                                                >
+                                                    Accept
+                                                </Button>
+                                                <Button
+                                                    onClick={() => handleDeclineInvitation(invitation.id)}
+                                                    variant="outline"
+                                                    size="sm"
+                                                >
+                                                    Decline
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </ScrollArea>
+                    </DialogContent>
+                </Dialog>
+            </SidebarMenuItem>
             <SidebarMenuItem>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <SidebarMenuButton className="flex items-center justify-between gap-3 my-1 px-4 py-5 rounded-lg hover:bg-gray-100">
                             <div className="flex items-center gap-x-2">
-                                <Bell className="text-gray-500" size={20} />
+                                <Bell className="mr-1 h-4 w-4" />
                                 <span className="font-medium">Notifications</span>
                             </div>
                             {unreadNotifications.length > 0 && (

@@ -2,10 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
 
-export async function POST(
-  req: Request,
-  { params }: { params: { workspaceId: string } }
-) {
+export async function POST(req: Request) {
   try {
     const user = await currentUser();
     if (!user) {
@@ -14,7 +11,7 @@ export async function POST(
 
     const { notificationId } = await req.json();
 
-    // Get the notification
+    // Get the notification with workspace details
     const notification = await db.notification.findUnique({
       where: { id: notificationId },
       include: {
@@ -30,7 +27,7 @@ export async function POST(
     const invitation = await db.invitation.findFirst({
       where: {
         email: user.email!,
-        workspaceId: params.workspaceId,
+        workspaceId: notification.workspaceId,
         status: "PENDING",
       },
     });
@@ -39,30 +36,33 @@ export async function POST(
       return new NextResponse("Invitation not found", { status: 404 });
     }
 
-    // Update invitation status
-    await db.invitation.update({
-      where: { id: invitation.id },
-      data: { status: "DECLINED" },
-    });
+    // Start a transaction
+    await db.$transaction(async (tx) => {
+      // 1. Update invitation status
+      await tx.invitation.update({
+        where: { id: invitation.id },
+        data: { status: "DECLINED" },
+      });
 
-    // Mark notification as read
-    await db.notification.update({
-      where: { id: notificationId },
-      data: { read: true },
-    });
+      // 2. Mark notification as read
+      await tx.notification.update({
+        where: { id: notificationId },
+        data: { read: true },
+      });
 
-    // Create notification for workspace owner
-    await db.notification.create({
-      data: {
-        userId: invitation.inviterId,
-        workspaceId: params.workspaceId,
-        message: `${user.name} has declined your invitation to join the workspace "${notification.workspace.name}"`,
-      },
+      // 3. Create notification for workspace owner
+      await tx.notification.create({
+        data: {
+          userId: invitation.inviterId,
+          workspaceId: invitation.workspaceId,
+          message: `${user.name} has declined your invitation to join the workspace "${notification.workspace.name}"`,
+        },
+      });
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error declining invitation:", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

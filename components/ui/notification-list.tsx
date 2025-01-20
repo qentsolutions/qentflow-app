@@ -19,49 +19,7 @@ export function NotificationList({ notifications: initialNotifications, onUpdate
   const [notifications, setNotifications] = useState(initialNotifications);
   const params = useParams();
 
-  const handleAcceptInvitation = async (notificationId: string) => {
-    try {
-      const response = await fetch(`/api/workspaces/${params.workspaceId}/invitations/accept`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ notificationId }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to accept invitation');
-      }
-
-      setNotifications(prev => prev.filter(n => n.id !== notificationId));
-      onUpdate?.();
-      window.location.reload(); // Recharge la page pour mettre à jour l'interface
-    } catch (error) {
-      console.error('Error accepting invitation:', error);
-    }
-  };
-
-  const handleDeclineInvitation = async (notificationId: string) => {
-    try {
-      const response = await fetch(`/api/workspaces/${params.workspaceId}/invitations/decline`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ notificationId }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to decline invitation');
-      }
-
-      setNotifications(prev => prev.filter(n => n.id !== notificationId));
-      onUpdate?.();
-    } catch (error) {
-      console.error('Error declining invitation:', error);
-    }
-  };
-
+ 
   if (notifications.length === 0) {
     return (
       <div className="p-4 text-center text-sm text-gray-400">
@@ -81,8 +39,6 @@ export function NotificationList({ notifications: initialNotifications, onUpdate
           isRead={notification.read}
           workspaceName={notification.workspaceName}
           isInvitation={notification.isInvitation}
-          onAcceptInvitation={() => handleAcceptInvitation(notification.id)}
-          onDeclineInvitation={() => handleDeclineInvitation(notification.id)}
           onDelete={() => {
             setNotifications(prev => prev.filter(n => n.id !== notification.id));
             onUpdate?.();
