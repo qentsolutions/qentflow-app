@@ -146,29 +146,30 @@ export const BoardList = () => {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {isLoading || isFirstLoad
-              ? Array.from({ length: 4 }).map((_, idx) => (
-                <Skeleton
-                  key={idx}
-                  className="h-56 rounded-md bg-gray-200 dark:bg-gray-700"
-                />
-              ))
-              : openBoards.length > 0
-                ? openBoards.map((board: any) => (
+          {isLoading || isFirstLoad
+            ? Array.from({ length: 4 }).map((_, idx) => (
+              <Skeleton
+                key={idx}
+                className="h-56 rounded-md bg-gray-200 dark:bg-gray-700"
+              />
+            ))
+            : openBoards.length > 0
+              ? openBoards.map((board: any) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+
                   <BoardCard
                     key={board.id}
                     board={board}
                     onClick={() => handleBoardClick(board)}
                   />
-                ))
-                : (
-                  <div className="text-center py-10">
-                    <KanbanSquare className="h-10 w-10 mx-auto text-gray-400 mb-2" />
-                    <p className="text-muted-foreground">No boards found</p>
-                  </div>
-                )}
-          </div>
+                </div>
+              ))
+              : (
+                <div className="text-center py-10 w-full bg-gray-50">
+                  <KanbanSquare className="h-10 w-10 mx-auto text-gray-400 mb-2" />
+                  <p className="text-muted-foreground">No boards found</p>
+                </div>
+              )}
         </CardContent>
       </Card>
 
@@ -178,6 +179,6 @@ export const BoardList = () => {
         workspaceId={workspaceId || ""}
         templateId={selectedTemplateId}
       />
-    </div>
+    </div >
   );
 };

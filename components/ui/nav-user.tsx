@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation" // Import de useRouter
-import { Bell, ChevronsUpDown, Settings, LogOut, Inbox } from "lucide-react"
+import { Bell, ChevronsUpDown, Settings, LogOut, Inbox, Users, Briefcase, CheckCircle, XCircle } from "lucide-react"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import {
     DropdownMenu,
@@ -24,6 +24,9 @@ import { Button } from "./button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./dialog"
 import { useState } from "react"
 import { toast } from "sonner"
+import { acceptInvitation } from "@/actions/workspace/accept-invitation"
+import { declineInvitation } from "@/actions/workspace/delete-invitation"
+import { AnimatePresence, motion } from "framer-motion"
 
 interface Notification extends PrismaNotification {
     workspaceName: string
@@ -34,6 +37,7 @@ export function NavUser({ user }: { user: any }) {
     const router = useRouter()
     const { currentWorkspace, workspaces, setCurrentWorkspace } = useCurrentWorkspace()
     const [showInvitations, setShowInvitations] = useState(false);
+    const [hoveredInvitation, setHoveredInvitation] = useState<string | null>(null)
 
     // Use TanStack Query to fetch notifications
     const { data: notifications, isLoading, refetch } = useQuery<Notification[]>({
@@ -73,11 +77,10 @@ export function NavUser({ user }: { user: any }) {
     const { data: invitations, refetch: refetchInvitations } = useQuery({
         queryKey: ["invitations"],
         queryFn: async () => {
-            const response = await fetch(`/api/workspaces/${currentWorkspace?.id}/invitations`);
+            const response = await fetch(`/api/workspaces/invitations`);
             if (!response.ok) throw new Error("Failed to fetch invitations");
             return response.json();
         },
-        enabled: !!currentWorkspace?.id,
     });
 
     const handleNewWorkspace = () => {
@@ -91,15 +94,11 @@ export function NavUser({ user }: { user: any }) {
 
     const handleAcceptInvitation = async (invitationId: string) => {
         try {
-            const response = await fetch(`/api/invitations/accept`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ notificationId: invitationId }),
-            });
+            // Supposons que AcceptInvitationParams attend un objet contenant plus d'informations que juste l'invitationId
+            const params = { invitationId };
 
-            if (!response.ok) throw new Error("Failed to accept invitation");
+            // Appel de la fonction acceptInvitation avec les paramètres appropriés
+            await acceptInvitation(params);
 
             toast.success("Invitation accepted successfully");
             refetchInvitations();
@@ -109,20 +108,12 @@ export function NavUser({ user }: { user: any }) {
         }
     };
 
+
     const handleDeclineInvitation = async (invitationId: string) => {
         try {
-            const response = await fetch(`/api/invitations/decline`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ notificationId: invitationId }),
-            });
-
-            if (!response.ok) throw new Error("Failed to decline invitation");
-
-            toast.success("Invitation declined");
-            refetchInvitations();
+            const params = { invitationId }
+            await declineInvitation(params); // Appel de la Server Action
+            refetchInvitations(); // Rafraîchir les invitations après le refus
         } catch (error) {
             toast.error("Failed to decline invitation");
         }
@@ -141,54 +132,92 @@ export function NavUser({ user }: { user: any }) {
                     Invitations
                     {invitations?.length > 0 && (
                         <span className="ml-2 rounded-full bg-red-500 px-2 py-0.5 text-xs text-white">
-                            {invitations.length}
+                            {invitations?.length}
                         </span>
                     )}
                 </Button>
 
                 <Dialog open={showInvitations} onOpenChange={setShowInvitations}>
-                    <DialogContent>
+                    <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
-                            <DialogTitle>Workspace Invitations</DialogTitle>
+                            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+                                <Users className="w-6 h-6 text-primary" />
+                                Invitations
+                            </DialogTitle>
                         </DialogHeader>
-                        <ScrollArea className="mt-4 max-h-[60vh]">
-                            ok
-                            {invitations?.length === 0 ? (
-                                <p className="text-center text-sm text-muted-foreground">
-                                    No pending invitations
-                                </p>
-                            ) : (
-                                <div className="space-y-4">
-                                    {invitations?.map((invitation: any) => (
-                                        <div
-                                            key={invitation.id}
-                                            className="flex items-center justify-between border p-4 rounded-lg"
-                                        >
-                                            <div>
-                                                <p className="font-medium">{invitation.workspace?.name}</p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    Invited by: {invitation.inviter?.name}
-                                                </p>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <Button
-                                                    onClick={() => handleAcceptInvitation(invitation.id)}
-                                                    size="sm"
-                                                >
-                                                    Accept
-                                                </Button>
-                                                <Button
-                                                    onClick={() => handleDeclineInvitation(invitation.id)}
-                                                    variant="outline"
-                                                    size="sm"
-                                                >
-                                                    Decline
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                        <ScrollArea className="mt-6 max-h-[60vh] pr-4">
+                            <AnimatePresence>
+                                {invitations?.length === 0 ? (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                        className="text-center py-8"
+                                    >
+                                        <Users className="w-12 h-12 mx-auto text-muted-foreground opacity-50 mb-4" />
+                                        <p className="text-lg font-medium text-muted-foreground">
+                                            No pending invitations
+                                        </p>
+                                        <p className="text-sm text-muted-foreground mt-2">
+                                            You'll see invitations here when someone invites you.
+                                        </p>
+                                    </motion.div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {invitations?.map((invitation: any) => (
+                                            <motion.div
+                                                key={invitation.id}
+                                                layout
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -20 }}
+                                                whileHover={{ scale: 1.02 }}
+                                                onHoverStart={() => setHoveredInvitation(invitation.id)}
+                                                onHoverEnd={() => setHoveredInvitation(null)}
+                                                className="relative bg-card rounded-lg shadow-md overflow-hidden"
+                                            >
+                                                <div className="p-4">
+                                                    <div className="flex items-start justify-between">
+                                                        <div>
+                                                            <h3 className="font-semibold text-lg flex items-center gap-2">
+                                                                <Briefcase className="w-4 h-4 text-primary" />
+                                                                {invitation.workspace.name}
+                                                            </h3>
+                                                            <p className="text-sm text-muted-foreground mt-1">
+                                                                Invited by: {invitation.inviter.name}
+                                                            </p>
+                                                        </div>
+                                                        <div className="flex gap-2">
+                                                            <Button
+                                                                onClick={() => handleAcceptInvitation(invitation.id)}
+                                                                size="sm"
+                                                                className="bg-green-500 hover:bg-green-600 text-white transition-colors duration-200"
+                                                            >
+                                                                <CheckCircle className="w-4 h-4 mr-1" />
+                                                                Accept
+                                                            </Button>
+                                                            <Button
+                                                                onClick={() => handleDeclineInvitation(invitation.id)}
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="text-red-500 border-red-500 hover:bg-red-50 transition-colors duration-200"
+                                                            >
+                                                                <XCircle className="w-4 h-4 mr-1" />
+                                                                Decline
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <motion.div
+                                                    initial={{ scaleX: 0 }}
+                                                    animate={{ scaleX: hoveredInvitation === invitation.id ? 1 : 0 }}
+                                                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary origin-left"
+                                                />
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                )}
+                            </AnimatePresence>
                         </ScrollArea>
                     </DialogContent>
                 </Dialog>
