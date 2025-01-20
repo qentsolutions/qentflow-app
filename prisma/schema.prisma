@@ -48,7 +48,9 @@ model User {
   Notification          Notification[]
   Server                Server[]
   Channel               Channel[]
-  sentInvitations       Invitation[] // Add this line
+  sentInvitations       Invitation[]
+  projects              Project[] // Ajout de la relation avec les projets
+  projectMemberships    ProjectMember[] // Nouvelle relation pour les membres du projet
 }
 
 model Workspace {
@@ -65,7 +67,8 @@ model Workspace {
   documents      Document[]
   Notification   Notification[]
   servers        Server[]
-  invitations    Invitation[] // Add this line
+  invitations    Invitation[]
+  projects       Project[] // Ajout de la relation avec les projets
 }
 
 model Invitation {
@@ -82,6 +85,52 @@ model Invitation {
   @@unique([email, workspaceId])
   @@index([workspaceId])
   @@index([inviterId])
+}
+
+model Project {
+  id          String          @id @default(uuid())
+  name        String
+  description String?         @db.Text
+  workspaceId String
+  workspace   Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdById String
+  createdBy   User            @relation(fields: [createdById], references: [id])
+  features    Feature[]
+  visibility  String          @default("public") // "public" ou "private"
+  members     ProjectMember[] // Nouvelle relation pour les membres du projet
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([workspaceId])
+  @@index([createdById])
+}
+
+model ProjectMember {
+  id        String   @id @default(uuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+}
+
+model Feature {
+  id        String   @id @default(uuid())
+  type      String // "board", "document", etc.
+  entityId  String // ID de l'entité liée (board ID, document ID, etc.)
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, type, entityId])
+  @@index([projectId])
 }
 
 model Document {
@@ -484,9 +533,9 @@ model Notification {
   workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   message      String // Message de la notification
   isInvitation Boolean   @default(false) // Indique si la notification est une invitation
-  read      Boolean  @default(false) // Statut de lecture de la notification
-  createdAt DateTime @default(now()) // Date de création de la notification
-  updatedAt DateTime @updatedAt // Date de mise à jour de la notification
+  read         Boolean   @default(false) // Statut de lecture de la notification
+  createdAt    DateTime  @default(now()) // Date de création de la notification
+  updatedAt    DateTime  @updatedAt // Date de mise à jour de la notification
 
   @@index([userId]) // Index pour l'utilisateur
   @@index([workspaceId]) // Index pour le workspace
