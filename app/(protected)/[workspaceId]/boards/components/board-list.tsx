@@ -13,6 +13,7 @@ import { fetcher } from "@/lib/fetcher";
 import { BoardCard } from "./board-card";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 type Board = {
   id: string;
@@ -53,8 +54,8 @@ export const BoardList = () => {
 
   const filteredBoards = Array.isArray(boards)
     ? boards.filter((board: Board) =>
-        board.title.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      board.title.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     : [];
 
   // Tri des boards ouverts en fonction de `isMember`
@@ -80,6 +81,17 @@ export const BoardList = () => {
   if (error) {
     return <div>Error loading boards. Please try again later.</div>;
   }
+
+  const templates = [
+    { id: "blank", title: "Blank Board", icon: "+" },
+    { id: "software", title: "Software", icon: "📊" },
+    { id: "marketing", title: "Marketing", icon: "🧠" },
+    { id: "kanban", title: "Kanban System", icon: "📋" },
+    { id: "retro", title: "Quick Retrospective", icon: "💭" },
+    { id: "brain", title: "Brainwriting", icon: "✍️" },
+    { id: "roadmap", title: "Road Planning", icon: "🗺️" },
+    { id: "journey", title: "Customer Journey", icon: "🚶" }
+  ];
 
   return (
     <div className="py-4 bg-gray-50 h-screen">
@@ -114,6 +126,53 @@ export const BoardList = () => {
           )}
         </CardHeader>
         <CardContent>
+          <div>
+            <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-2 md:-ml-4">
+                {templates.map((template) => (
+                  <CarouselItem key={template.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/4 lg:basis-1/5">
+                    <div
+                      className={`
+                          aspect-[16/10] relative group
+                          ${template.id === "blank"
+                          ? "bg-white"
+                          : "bg-gradient-to-br from-blue-50 to-indigo-50"} 
+                          rounded-lg border-2 border-dashed border-gray-200 
+                          hover:border-blue-500 transition-all duration-200
+                          flex flex-col items-center justify-center cursor-pointer
+                          p-4 overflow-hidden
+                        `}
+                      onClick={() => {
+                        if (template.id === "blank" && workspaceId) {
+                          // Use existing FormPopover functionality for blank template
+                        }
+                      }}
+                    >
+                      <div className="text-2xl mb-2">
+                        {template.id === "blank" ? (
+                          <Plus className="h-8 w-8 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                        ) : (
+                          <span>{template.icon}</span>
+                        )}
+                      </div>
+                      <p className="text-sm text-center font-medium text-gray-600 group-hover:text-gray-900">
+                        {template.title}
+                      </p>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent  >
+              <CarouselPrevious className="absolute top-1/2 -left-2 transform -translate-y-1/2 bg-white hover:bg-gray-300 rounded-full p-2 shadow-md" />
+              <CarouselNext className="absolute top-1/2 -right-2 transform -translate-y-1/2 bg-white hover:bg-gray-300 rounded-full p-2 shadow-md" />
+
+            </Carousel>
+          </div>
           <div className="relative mb-6">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input

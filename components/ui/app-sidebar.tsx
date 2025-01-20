@@ -5,6 +5,7 @@ import {
   Calendar,
   Globe,
   LayoutDashboard,
+  ListTodo,
   MessageCircle,
   SquareKanban,
   SquareTerminal,
@@ -38,6 +39,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         name: "Home",
         url: "/home",
         icon: LayoutDashboard
+      },
+      {
+        name: "My Tasks",
+        url: `/${workspaceId}/my-tasks`,
+        icon: ListTodo
       },
       {
         name: "Conversations",
