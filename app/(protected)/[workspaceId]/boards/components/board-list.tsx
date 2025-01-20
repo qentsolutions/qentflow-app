@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Search, Plus, KanbanSquare } from "lucide-react";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Input } from "@/components/ui/input";
@@ -15,17 +15,104 @@ import { toast } from "sonner";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { boardTemplates } from "@/constants/board-templates";
 import { CreateBoardModal } from "@/components/modals/create-board-modal";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
+// Dynamically force re-render
 export const dynamic = "force-dynamic";
 
-export const BoardList = () => {
+interface TemplateExplorerProps {
+  onSelectTemplate: (templateId: string) => void;
+}
+
+const TemplateExplorer: React.FC<TemplateExplorerProps> = ({ onSelectTemplate }) => {
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedType, setSelectedType] = useState("All")
+
+  const types = useMemo(() => {
+    const uniqueTypes = ["All"];
+    boardTemplates.forEach((template) => {
+      if (!uniqueTypes.includes(template.type)) {
+        uniqueTypes.push(template.type);
+      }
+    });
+    return uniqueTypes;
+  }, []);
+
+
+  const filteredTemplates = useMemo(() => {
+    return boardTemplates.filter((template) => {
+      const matchesSearch =
+        template.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        template.description.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesType = selectedType === "All" || template.type === selectedType
+      return matchesSearch && matchesType
+    })
+  }, [searchTerm, selectedType])
+
+  return (
+    <div className="flex h-[60vh]">
+      {/* Left sidebar with types */}
+      <div className="w-1/4 border-r p-4">
+        <h3 className="font-semibold mb-2">Types</h3>
+        <ScrollArea className="h-full">
+          {types.map((type) => (
+            <button
+              key={type}
+              className={cn(
+                "block w-full text-left px-2 py-1 rounded",
+                selectedType === type ? "bg-blue-100 text-blue-800" : "hover:bg-gray-100",
+              )}
+              onClick={() => setSelectedType(type)}
+            >
+              {type}
+            </button>
+          ))}
+        </ScrollArea>
+      </div>
+
+      {/* Right side with search and templates */}
+      <div className="w-3/4 p-4">
+        <div className="mb-4 relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            className="pl-10"
+            placeholder="Search templates"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <ScrollArea className="h-[calc(100%-60px)]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {filteredTemplates.map((template) => (
+              <div
+                key={template.id}
+                className="p-4 border rounded-lg hover:border-blue-500 cursor-pointer transition-all duration-200"
+                onClick={() => onSelectTemplate(template.id)}
+              >
+                <div className="text-2xl mb-2">{template.icon}</div>
+                <h4 className="font-medium">{template.title}</h4>
+                <p className="text-sm text-gray-500">{template.description}</p>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+    </div>
+  )
+}
+
+
+export const BoardList: React.FC = () => {
   const { currentWorkspace } = useCurrentWorkspace();
   const workspaceId = currentWorkspace?.id;
   const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
-  const [isCreateBoardModalOpen, setIsCreateBoardModalOpen] = useState(false);
-  const [selectedTemplateId, setSelectedTemplateId] = useState("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true);
+  const [isCreateBoardModalOpen, setIsCreateBoardModalOpen] = useState<boolean>(false);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
+  const [isExploreDialogOpen, setIsExploreDialogOpen] = useState<boolean>(false);
 
   useEffect(() => {
     document.title = "Boards - QentFlow";
@@ -46,10 +133,10 @@ export const BoardList = () => {
     )
     : [];
 
-  // Tri des boards ouverts en fonction de `isMember`
-  const openBoards = filteredBoards.filter(board => board.isMember);
+  // Filter boards where user is a member
+  const openBoards = filteredBoards.filter((board) => board.isMember);
 
-  // Gérer les clics sur les boards
+  // Handle board click
   const handleBoardClick = (board: any) => {
     if (!board.isMember) {
       toast.error("You are not a member of this board.");
@@ -58,7 +145,7 @@ export const BoardList = () => {
     router.push(`/${workspaceId}/boards/${board.id}`);
   };
 
-  // Introduire un délai avant d'afficher "No boards available"
+  // Delay showing "No boards available"
   useEffect(() => {
     if (!isLoading) {
       const timer = setTimeout(() => setIsFirstLoad(false), 500);
@@ -76,19 +163,32 @@ export const BoardList = () => {
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">
             <div className="flex items-center mb-4 gap-x-2">
-              Boards
-              <span
-                className={`flex items-center justify-center text-base font-semibold bg-blue-500 text-white rounded-full ${(openBoards?.length || 0) > 99
-                  ? "w-12 h-12 text-sm" // Pour les nombres à 3 chiffres ou plus
-                  : (openBoards?.length || 0) > 9
-                    ? "w-10 h-10 text-sm" // Pour les nombres à 2 chiffres
-                    : "w-6 h-6 text-base" // Pour les nombres à 1 chiffre
-                  }`}
-              >
+              <span className="text-xl font-semibold">Boards</span>
+              <span className={`text-base font-semibold text-blue-500 ${openBoards?.length > 99 ? "text-lg" : "text-xl"} ${openBoards?.length === 0 ? "text-gray-400" : "text-blue-600"}`}>
                 {openBoards?.length || 0}
               </span>
             </div>
+
           </CardTitle>
+          <div className="mt-4 text-center">
+            <Dialog open={isExploreDialogOpen} onOpenChange={setIsExploreDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline">Explore templates</Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-6xl">
+                <DialogHeader>
+                  <DialogTitle>Explore Board Templates</DialogTitle>
+                </DialogHeader>
+                <TemplateExplorer
+                  onSelectTemplate={(templateId) => {
+                    setSelectedTemplateId(templateId);
+                    setIsExploreDialogOpen(false);
+                    setIsCreateBoardModalOpen(true);
+                  }}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
         </CardHeader>
         <CardContent>
           <div>
@@ -100,33 +200,27 @@ export const BoardList = () => {
               className="w-full"
             >
               <CarouselContent className="-ml-2 md:-ml-4">
-                {boardTemplates.map((template) => (
+                {boardTemplates.slice(0, 8).map((template) => (
                   <CarouselItem key={template.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/4 lg:basis-1/5">
                     <div
                       className={`
-                          aspect-[16/10] relative group
-                          ${template.id === "blank"
-                          ? "bg-white"
-                          : "bg-gradient-to-br from-blue-50 to-indigo-50"} 
-                          rounded-lg border-2 border-dashed border-gray-200 
-                          hover:border-blue-500 transition-all duration-200
-                          flex flex-col items-center justify-center cursor-pointer
-                          p-4 overflow-hidden
-                        `}
+                        aspect-[16/10] relative group
+                        ${template.id === "blank" ? "bg-white" : "bg-gradient-to-br from-blue-50 to-indigo-50"} 
+                        rounded-lg border-2 border-dashed border-gray-200 
+                        hover:border-blue-500 transition-all duration-200
+                        flex flex-col items-center justify-center cursor-pointer
+                        p-4 overflow-hidden
+                      `}
                       onClick={() => {
                         setSelectedTemplateId(template.id);
                         setIsCreateBoardModalOpen(true);
                       }}
                     >
-                      <div className="text-2xl mb-2">
-                        {template.icon}
-                      </div>
+                      <div className="text-2xl mb-2">{template.icon}</div>
                       <p className="text-sm text-center font-medium text-gray-600 group-hover:text-gray-900">
                         {template.title}
                       </p>
-                      <p className="text-xs text-center text-gray-500 mt-1">
-                        {template.description}
-                      </p>
+                      <p className="text-xs text-center text-gray-500 mt-1">{template.description}</p>
                     </div>
                   </CarouselItem>
                 ))}
@@ -146,33 +240,22 @@ export const BoardList = () => {
             />
           </div>
 
-          {isLoading || isFirstLoad
-            ? Array.from({ length: 4 }).map((_, idx) => (
-              <Skeleton
-                key={idx}
-                className="h-56 rounded-md bg-gray-200 dark:bg-gray-700"
-              />
-            ))
-            : openBoards.length > 0
-              ? openBoards.map((board: any) => (
-                <div
-                  key={board.id}  // Ajoutez la clé ici pour l'élément div qui contient BoardCard
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-                >
-                  <BoardCard
-                    key={board.id}  // Il est important que BoardCard ait aussi un key
-                    board={board}
-                    onClick={() => handleBoardClick(board)}
-                  />
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {isLoading || isFirstLoad ? (
+              Array.from({ length: 4 }).map((_, idx) => (
+                <Skeleton key={idx} className="h-56 rounded-md bg-gray-200 dark:bg-gray-700" />
               ))
-              : (
-                <div className="text-center py-10 w-full bg-gray-50">
-                  <KanbanSquare className="h-10 w-10 mx-auto text-gray-400 mb-2" />
-                  <p className="text-muted-foreground">No boards found</p>
-                </div>
-              )}
-
+            ) : openBoards.length > 0 ? (
+              openBoards.map((board) => (
+                <BoardCard key={board.id} board={board} onClick={() => handleBoardClick(board)} />
+              ))
+            ) : (
+              <div className="text-center py-10 w-full bg-gray-50">
+                <KanbanSquare className="h-10 w-10 mx-auto text-gray-400 mb-2" />
+                <p className="text-muted-foreground">No boards found</p>
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -182,6 +265,6 @@ export const BoardList = () => {
         workspaceId={workspaceId || ""}
         templateId={selectedTemplateId}
       />
-    </div >
+    </div>
   );
 };
