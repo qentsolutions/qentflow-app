@@ -155,10 +155,12 @@ export const BoardList = () => {
             ))
             : openBoards.length > 0
               ? openBoards.map((board: any) => (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-
+                <div
+                  key={board.id}  // Ajoutez la clé ici pour l'élément div qui contient BoardCard
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+                >
                   <BoardCard
-                    key={board.id}
+                    key={board.id}  // Il est important que BoardCard ait aussi un key
                     board={board}
                     onClick={() => handleBoardClick(board)}
                   />
@@ -170,6 +172,7 @@ export const BoardList = () => {
                   <p className="text-muted-foreground">No boards found</p>
                 </div>
               )}
+
         </CardContent>
       </Card>
 

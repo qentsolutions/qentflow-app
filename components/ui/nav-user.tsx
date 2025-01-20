@@ -159,7 +159,7 @@ export function NavUser({ user }: { user: any }) {
                                             No pending invitations
                                         </p>
                                         <p className="text-sm text-muted-foreground mt-2">
-                                            You'll see invitations here when someone invites you.
+                                            You&apos;ll see invitations here when someone invites you.
                                         </p>
                                     </motion.div>
                                 ) : (
