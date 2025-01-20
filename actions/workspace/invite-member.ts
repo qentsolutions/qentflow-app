@@ -76,7 +76,7 @@ export async function inviteMember({ workspaceId, email }: InviteMemberParams) {
     }
 
     return { message: "Invitation sent successfully" };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in inviteMember:", error);
     throw error;
   }

@@ -35,6 +35,7 @@ export function NotificationList({ notifications: initialNotifications, onUpdate
 
       setNotifications(prev => prev.filter(n => n.id !== notificationId));
       onUpdate?.();
+      window.location.reload(); // Recharge la page pour mettre à jour l'interface
     } catch (error) {
       console.error('Error accepting invitation:', error);
     }

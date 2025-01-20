@@ -17,6 +17,9 @@ export async function POST(
     // Get the notification
     const notification = await db.notification.findUnique({
       where: { id: notificationId },
+      include: {
+        workspace: true,
+      },
     });
 
     if (!notification) {
@@ -62,7 +65,7 @@ export async function POST(
       data: {
         userId: invitation.inviterId,
         workspaceId: params.workspaceId,
-        message: `${user.name} has accepted your invitation to join the workspace`,
+        message: `${user.name} has accepted your invitation to join the workspace "${notification.workspace.name}"`,
       },
     });
 
