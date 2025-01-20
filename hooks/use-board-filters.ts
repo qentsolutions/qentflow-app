@@ -8,6 +8,7 @@ export const useBoardFilters = ({ lists }: UseCardFiltersProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
 
   const toggleTag = (tagId: string) => {
     setSelectedTags(prev => 
@@ -25,12 +26,11 @@ export const useBoardFilters = ({ lists }: UseCardFiltersProps) => {
           .toLowerCase()
           .includes(searchTerm.toLowerCase());
         
-        // Gestion spéciale pour les cartes non assignées
         const matchesUser = selectedUser === "unassigned" 
-          ? !card.assignedUserId // Vérifie si la carte n'est pas assignée
+          ? !card.assignedUserId 
           : selectedUser 
-            ? card.assignedUserId === selectedUser // Vérifie si la carte est assignée à l'utilisateur sélectionné
-            : true; // Aucun filtre utilisateur
+            ? card.assignedUserId === selectedUser 
+            : true;
         
         const matchesTags = selectedTags.length > 0
           ? selectedTags.every(tagId => 
@@ -38,10 +38,14 @@ export const useBoardFilters = ({ lists }: UseCardFiltersProps) => {
             )
           : true;
 
-        return matchesSearch && matchesUser && matchesTags;
+        const matchesPriority = selectedPriority
+          ? card.priority === selectedPriority
+          : true;
+
+        return matchesSearch && matchesUser && matchesTags && matchesPriority;
       }),
     }));
-  }, [lists, searchTerm, selectedUser, selectedTags]);
+  }, [lists, searchTerm, selectedUser, selectedTags, selectedPriority]);
 
   return {
     searchTerm,
@@ -50,6 +54,8 @@ export const useBoardFilters = ({ lists }: UseCardFiltersProps) => {
     setSelectedUser,
     selectedTags,
     toggleTag,
+    selectedPriority,
+    setSelectedPriority,
     getFilteredLists,
   };
 };
