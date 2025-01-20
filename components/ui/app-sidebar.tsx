@@ -51,7 +51,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ],
     navMain: [
       {
-        name: "Projects", // Changez 'title' en 'name'
+        name: "Boards", // Changez 'title' en 'name'
         url: `/${workspaceId}/boards`,
         icon: SquareTerminal,
         isActive: false, // Cette propriété peut rester, mais elle sera ignorée par NavMain

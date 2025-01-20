@@ -8,7 +8,7 @@ const BoardPage = () => {
   const { setBreadcrumbs } = useBreadcrumbs();
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Projects" }]);
+    setBreadcrumbs([{ label: "Boards" }]);
   }, [setBreadcrumbs]);
 
   return (
