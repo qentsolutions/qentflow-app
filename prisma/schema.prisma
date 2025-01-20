@@ -49,9 +49,6 @@ model User {
   Server                Server[]
   Channel               Channel[]
   sentInvitations       Invitation[]
-  projects              Project[] // Ajout de la relation avec les projets
-  projectMemberships    ProjectMember[] // Nouvelle relation pour les membres du projet
-  Whiteboard            Whiteboard[]
 }
 
 model Workspace {
@@ -69,8 +66,6 @@ model Workspace {
   Notification   Notification[]
   servers        Server[]
   invitations    Invitation[]
-  projects       Project[] // Ajout de la relation avec les projets
-  Whiteboard     Whiteboard[]
 }
 
 model Invitation {
@@ -89,51 +84,11 @@ model Invitation {
   @@index([inviterId])
 }
 
-model Project {
-  id          String          @id @default(uuid())
-  name        String
-  description String?         @db.Text
-  workspaceId String
-  workspace   Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  createdById String
-  createdBy   User            @relation(fields: [createdById], references: [id])
-  features    Feature[]
-  visibility  String          @default("public") // "public" ou "private"
-  members     ProjectMember[] // Nouvelle relation pour les membres du projet
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
 
-  @@index([workspaceId])
-  @@index([createdById])
-}
 
-model ProjectMember {
-  id        String   @id @default(uuid())
-  projectId String
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role      UserRole @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  @@unique([projectId, userId])
-  @@index([projectId])
-  @@index([userId])
-}
 
-model Feature {
-  id        String   @id @default(uuid())
-  type      String // "board", "document", etc.
-  entityId  String // ID de l'entité liée (board ID, document ID, etc.)
-  projectId String
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  @@unique([projectId, type, entityId])
-  @@index([projectId])
-}
 
 model Document {
   id          String    @id @default(cuid())
@@ -543,17 +498,3 @@ model Notification {
   @@index([workspaceId]) // Index pour le workspace
 }
 
-model Whiteboard {
-  id          String   @id @default(uuid())
-  title       String
-  elements    Json     // Stocke les éléments du whiteboard
-  workspaceId String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  createdById String
-  createdBy   User     @relation(fields: [createdById], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([workspaceId])
-  @@index([createdById])
-}

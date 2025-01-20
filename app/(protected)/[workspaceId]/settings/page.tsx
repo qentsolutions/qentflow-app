@@ -64,7 +64,7 @@ const ManageWorkspacesPage = () => {
                 ...result.workspace,
                 members: currentWorkspace.members,
                 createdAt: result.workspace.createdAt.toISOString(),
-            });http://localhost:3000/dashboard
+            });http://localhost:3000/home
             setSuccess("Workspace updated successfully!");
         }
     };

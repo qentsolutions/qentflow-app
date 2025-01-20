@@ -6,6 +6,7 @@ import {
   Globe,
   LayoutDashboard,
   MessageCircle,
+  SquareKanban,
   SquareTerminal,
 } from "lucide-react"
 import {
@@ -34,14 +35,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const data = {
     main: [
       {
-        name: "Dashboard",
-        url: "/dashboard",
+        name: "Home",
+        url: "/home",
         icon: LayoutDashboard
-      },
-      {
-        name: "Calendar",
-        url: `/${workspaceId}/calendar`,
-        icon: Calendar
       },
       {
         name: "Conversations",
@@ -51,36 +47,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ],
     navMain: [
       {
-        name: "Projects", // Changez 'title' en 'name'
-        url: `/${workspaceId}/projects`,
-        icon: SquareTerminal,
-        isActive: false, // Cette propriété peut rester, mais elle sera ignorée par NavMain
-      },
-      {
         name: "Boards", // Changez 'title' en 'name'
         url: `/${workspaceId}/boards`,
-        icon: SquareTerminal,
+        icon: SquareKanban,
         isActive: false, // Cette propriété peut rester, mais elle sera ignorée par NavMain
       },
     ],
-    integrations: [
-      {
-        title: "Website",
-        url: "#",
-        icon: Globe,
-        isActive: false,
-        items: [
-          {
-            title: "Calendar",
-            url: `/${workspaceId}/calendar`,
-          },
-          {
-            title: "CRM",
-            url: `/${workspaceId}/documents`,
-          }
-        ],
-      },
-    ]
   }
   return (
     <Sidebar collapsible="icon" {...props} className="bg-background">
@@ -90,7 +62,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavProjects projects={data.main} />
         <NavMain items={data.navMain} />
-        <NavIntegrations items={data.integrations} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />

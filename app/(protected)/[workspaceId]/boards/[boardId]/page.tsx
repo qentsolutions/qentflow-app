@@ -6,6 +6,7 @@ import { BoardContent } from "./components/board-content";
 import { currentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { TimelineView } from "./components/timeline-view";
+import { Card } from "@/components/ui/card";
 
 interface BoardIdPageProps {
   params: {
@@ -87,38 +88,40 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
   }
 
   return (
-    <div className="w-full">
-      <main className="relative w-full mx-auto p-6 h-full">
-        <div className="flex flex-col h-full w-full">
-          <div className="flex items-center justify-between">
-            <BoardNavbar board={board} />
+    <div className="w-full p-4 bg-gray-50 h-screen">
+      <Card>
+        <main className="relative w-full mx-auto p-6 h-full">
+          <div className="flex flex-col h-full w-full">
+            <div className="flex items-center justify-between">
+              <BoardNavbar board={board} />
+            </div>
+            <div className="flex w-full items-center gap-4 mb-6 mt-4">
+              <Tabs defaultValue="board" className="w-full">
+                <TabsList>
+                  <TabsTrigger value="board">Board</TabsTrigger>
+                  <TabsTrigger value="timeline">Timeline</TabsTrigger>
+                  <TabsTrigger value="settings">Settings</TabsTrigger>
+                </TabsList>
+                <div className="mt-4"></div>
+                <TabsContent value="board">
+                  <BoardContent users={board.User} boardId={board.id} lists={board.lists} />
+                </TabsContent>
+                <TabsContent value="timeline">
+                  <TimelineView boardId={board.id} data={board.lists} />
+                </TabsContent>
+                <TabsContent value="settings">
+                  <Settings
+                    boardId={board.id}
+                    boardTitle={board.title}
+                    users={board.User}
+                    createdById={board.createdById}
+                  />
+                </TabsContent>
+              </Tabs>
+            </div>
           </div>
-          <div className="flex w-full items-center gap-4 mb-6 mt-4">
-            <Tabs defaultValue="board" className="w-full">
-              <TabsList>
-                <TabsTrigger value="board">Board</TabsTrigger>
-                <TabsTrigger value="timeline">Timeline</TabsTrigger>
-                <TabsTrigger value="settings">Settings</TabsTrigger>
-              </TabsList>
-              <div className="mt-4"></div>
-              <TabsContent value="board">
-                <BoardContent users={board.User} boardId={board.id} lists={board.lists} />
-              </TabsContent>
-              <TabsContent value="timeline">
-                <TimelineView boardId={board.id} data={board.lists} />
-              </TabsContent>
-              <TabsContent value="settings">
-                <Settings
-                  boardId={board.id}
-                  boardTitle={board.title}
-                  users={board.User}
-                  createdById={board.createdById}
-                />
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
-      </main>
+        </main>
+      </Card>
     </div>
   );
 };

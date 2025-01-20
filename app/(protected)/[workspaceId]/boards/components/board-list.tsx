@@ -142,7 +142,7 @@ export const BoardList = () => {
                   />
                 ))
                 : (
-                  <p>No projects available</p>
+                  <p>No boards available</p>
                 )}
           </div>
         </CardContent>

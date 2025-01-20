@@ -111,7 +111,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-96 p-0" align="start">
+              <PopoverContent className="w-96 p-2" align="start">
                 <Tabs defaultValue="users" className="w-full">
                   <TabsList className="w-full">
                     <TabsTrigger value="users" className="flex-1">Users</TabsTrigger>
