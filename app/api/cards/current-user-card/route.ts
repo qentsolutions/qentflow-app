@@ -32,6 +32,7 @@ export async function GET(req: Request) {
             board: {
               select: {
                 title: true,
+                id: true,
               },
             },
           },

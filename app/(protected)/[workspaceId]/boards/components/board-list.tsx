@@ -296,7 +296,7 @@ export const BoardList: React.FC = () => {
 
             {isLoading || isFirstLoad ? (
               Array.from({ length: 4 }).map((_, idx) => (
-                <Skeleton key={idx} className="h-56 rounded-md bg-gray-200 dark:bg-gray-700" />
+                <Skeleton key={idx} className="h-36 rounded-md bg-gray-200 dark:bg-gray-700" />
               ))
             ) : openBoards.length > 0 ? (
               openBoards.map((board) => (
