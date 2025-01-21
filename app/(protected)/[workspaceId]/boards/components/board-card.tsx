@@ -12,11 +12,11 @@ interface BoardCardProps {
     creator: {
       id: string;
       name: string;
-      imageUrl: string; // Assurez-vous que cette propriété existe
+      imageUrl: string;
     };
     memberCount: number;
     createdAt: string;
-    isMember: boolean; // Nouvelle propriété pour indiquer si l'utilisateur est membre
+    isMember: boolean;
     image: string;
   };
   onClick: (e: React.MouseEvent) => void;
@@ -29,13 +29,12 @@ export const BoardCard = ({ board, onClick }: BoardCardProps) => {
   return (
     <Card
       onClick={onClick}
-      className={`group cursor-pointer hover:shadow-lg transition-all duration-200 overflow-hidden ${
-        !board.isMember ? "opacity-50 cursor-not-allowed" : ""
-      }`}
+      className={`group cursor-pointer hover:shadow-lg transition-all duration-200 overflow-hidden ${!board.isMember ? "opacity-50 cursor-not-allowed" : ""
+        }`}
     >
       <div className="relative">
         {/* Board preview background */}
-        <div className="h-32 bg-gradient-to-br from-blue-500/10 to-purple-500/10 flex justify-center items-center">
+        <div className="h-24 bg-gradient-to-br from-blue-500/10 to-blue-500/10 flex justify-center items-center">
           {/* Miniature board preview */}
           {board.image ? (
             <div className="relative w-full h-full">
@@ -54,7 +53,7 @@ export const BoardCard = ({ board, onClick }: BoardCardProps) => {
         {/* Board info */}
         <div className="p-4">
           <div className="flex items-center gap-x-2">
-            <h3 className="font-medium group-hover:text-blue-600 transition-colors">{board.title}</h3>
+            <h3 className="font-medium group-hover:text-blue-600 text-sm transition-colors">{board.title}</h3>
           </div>
 
           <div className="mt-4 flex items-center justify-between">
@@ -91,8 +90,6 @@ export const BoardCard = ({ board, onClick }: BoardCardProps) => {
               )}
             </div>
           </div>
-
-          <div className="mt-2 text-xs text-gray-500">Created {formattedDate}</div>
         </div>
       </div>
     </Card>

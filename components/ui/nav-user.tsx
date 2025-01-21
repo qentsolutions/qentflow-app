@@ -123,10 +123,9 @@ export function NavUser({ user }: { user: any }) {
     return (
         <SidebarMenu>
             <SidebarMenuItem>
-                <Button
+                <SidebarMenuButton
                     onClick={() => setShowInvitations(true)}
-                    variant="ghost"
-                    className="w-full justify-start"
+                    className="w-full justify-start hover:bg-gray-100"
                 >
                     <Inbox className="mr-1 h-4 w-4" />
                     Invitations
@@ -135,7 +134,7 @@ export function NavUser({ user }: { user: any }) {
                             {invitations?.length}
                         </span>
                     )}
-                </Button>
+                </SidebarMenuButton>
 
                 <Dialog open={showInvitations} onOpenChange={setShowInvitations}>
                     <DialogContent className="sm:max-w-[425px]">
@@ -181,10 +180,10 @@ export function NavUser({ user }: { user: any }) {
                                                         <div>
                                                             <h3 className="font-semibold text-lg flex items-center gap-2">
                                                                 <Briefcase className="w-4 h-4 text-primary" />
-                                                                {invitation.workspace.name}
+                                                                {invitation?.workspace?.name}
                                                             </h3>
                                                             <p className="text-sm text-muted-foreground mt-1">
-                                                                Invited by: {invitation.inviter.name}
+                                                                Invited by: {invitation?.inviter?.name}
                                                             </p>
                                                         </div>
                                                         <div className="flex gap-2">
@@ -225,7 +224,7 @@ export function NavUser({ user }: { user: any }) {
             <SidebarMenuItem>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <SidebarMenuButton className="flex items-center justify-between gap-3 my-1 px-4 py-5 rounded-lg hover:bg-gray-100">
+                        <SidebarMenuButton className="flex items-center justify-between gap-3 my-1 py-5 rounded-lg hover:bg-gray-100">
                             <div className="flex items-center gap-x-2">
                                 <Bell className="mr-1 h-4 w-4" />
                                 <span className="font-medium">Notifications</span>
@@ -251,7 +250,7 @@ export function NavUser({ user }: { user: any }) {
                                             value={workspace.id}
                                             className="px-3  relative whitespace-nowrap"
                                         >
-                                            {workspace.name}
+                                            {workspace?.name}
                                             <NotificationBadge count={countUnreadNotifications(workspace.id)} />
                                         </TabsTrigger>
                                     ))}

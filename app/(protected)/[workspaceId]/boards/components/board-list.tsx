@@ -1,29 +1,32 @@
-"use client";
+"use client"
 
-import React, { useState, useEffect, useMemo } from "react";
-import { Search, Plus, KanbanSquare } from "lucide-react";
-import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
-import { fetcher } from "@/lib/fetcher";
-import { BoardCard } from "./board-card";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { boardTemplates } from "@/constants/board-templates";
-import { CreateBoardModal } from "@/components/modals/create-board-modal";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
+import type React from "react"
+import { useState, useEffect, useMemo } from "react"
+import { Search, KanbanSquare, Clock } from "lucide-react"
+import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useQuery } from "@tanstack/react-query"
+import { fetcher } from "@/lib/fetcher"
+import { BoardCard } from "./board-card"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
+import { boardTemplates } from "@/constants/board-templates"
+import { CreateBoardModal } from "@/components/modals/create-board-modal"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { cn } from "@/lib/utils"
+import { addRecentBoard, getRecentBoards } from "@/utils/localStorage"
+import { Separator } from "@/components/ui/separator"
 
 // Dynamically force re-render
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"
 
 interface TemplateExplorerProps {
-  onSelectTemplate: (templateId: string) => void;
+  onSelectTemplate: (templateId: string) => void
 }
 
 const TemplateExplorer: React.FC<TemplateExplorerProps> = ({ onSelectTemplate }) => {
@@ -31,15 +34,14 @@ const TemplateExplorer: React.FC<TemplateExplorerProps> = ({ onSelectTemplate })
   const [selectedType, setSelectedType] = useState("All")
 
   const types = useMemo(() => {
-    const uniqueTypes = ["All"];
+    const uniqueTypes = ["All"]
     boardTemplates.forEach((template) => {
       if (!uniqueTypes.includes(template.type)) {
-        uniqueTypes.push(template.type);
+        uniqueTypes.push(template.type)
       }
-    });
-    return uniqueTypes;
-  }, []);
-
+    })
+    return uniqueTypes
+  }, [])
 
   const filteredTemplates = useMemo(() => {
     return boardTemplates.filter((template) => {
@@ -103,72 +105,86 @@ const TemplateExplorer: React.FC<TemplateExplorerProps> = ({ onSelectTemplate })
   )
 }
 
-
 export const BoardList: React.FC = () => {
-  const { currentWorkspace } = useCurrentWorkspace();
-  const workspaceId = currentWorkspace?.id;
-  const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true);
-  const [isCreateBoardModalOpen, setIsCreateBoardModalOpen] = useState<boolean>(false);
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
-  const [isExploreDialogOpen, setIsExploreDialogOpen] = useState<boolean>(false);
+  const { currentWorkspace } = useCurrentWorkspace()
+  const workspaceId = currentWorkspace?.id
+  const router = useRouter()
+  const [searchTerm, setSearchTerm] = useState<string>("")
+  const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true)
+  const [isCreateBoardModalOpen, setIsCreateBoardModalOpen] = useState<boolean>(false)
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("")
+  const [isExploreDialogOpen, setIsExploreDialogOpen] = useState<boolean>(false)
+  const [recentBoardIds, setRecentBoardIds] = useState<string[]>([])
 
   useEffect(() => {
-    document.title = "Boards - QentFlow";
-  }, []);
+    document.title = "Boards - QentFlow"
+    setRecentBoardIds(getRecentBoards())
+  }, [])
 
-  const { data: boards, isLoading, error } = useQuery({
+  const {
+    data: boards,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["boards", workspaceId],
-    queryFn: () =>
-      workspaceId
-        ? fetcher(`/api/boards?workspaceId=${workspaceId}`)
-        : Promise.resolve([]),
+    queryFn: () => (workspaceId ? fetcher(`/api/boards?workspaceId=${workspaceId}`) : Promise.resolve([])),
     enabled: !!workspaceId,
-  });
+  })
 
   const filteredBoards = Array.isArray(boards)
-    ? boards.filter((board: any) =>
-      board.title.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    : [];
+    ? boards.filter((board: any) => board.title.toLowerCase().includes(searchTerm.toLowerCase()))
+    : []
 
   // Filter boards where user is a member
-  const openBoards = filteredBoards.filter((board) => board.isMember);
+  const openBoards = filteredBoards.filter((board) => board.isMember)
 
   // Handle board click
   const handleBoardClick = (board: any) => {
     if (!board.isMember) {
-      toast.error("You are not a member of this board.");
-      return;
+      toast.error("You are not a member of this board.")
+      return
     }
-    router.push(`/${workspaceId}/boards/${board.id}`);
-  };
+    addRecentBoard(board.id)
+    setRecentBoardIds(getRecentBoards())
+    router.push(`/${workspaceId}/boards/${board.id}`)
+  }
 
   // Delay showing "No boards available"
   useEffect(() => {
     if (!isLoading) {
-      const timer = setTimeout(() => setIsFirstLoad(false), 500);
-      return () => clearTimeout(timer);
+      const timer = setTimeout(() => setIsFirstLoad(false), 500)
+      return () => clearTimeout(timer)
     }
-  }, [isLoading]);
+  }, [isLoading])
 
   if (error) {
-    return <div>Error loading boards. Please try again later.</div>;
+    return <div>Error loading boards. Please try again later.</div>
   }
 
+  const recentBoards = useMemo(() => {
+    if (!Array.isArray(boards)) return [];
+    const validBoards = recentBoardIds
+      .map((id) => boards.find((board: any) => board.id === id))
+      .filter((board): board is NonNullable<typeof board> => board !== undefined);
+    return validBoards;
+  }, [recentBoardIds, boards]);
+
   return (
-    <div className="py-4 bg-gray-50 h-screen">
+    <div className="py-4 bg-gray-50 h-full">
       <Card className="shadow-sm rounded-md w-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">
             <div className="flex items-center mb-4 gap-x-2">
-              <span className="text-xl font-semibold">Boards</span>
-              <span className={`text-base font-semibold text-blue-500 ${openBoards?.length > 99 ? "text-lg" : "text-xl"} ${openBoards?.length === 0 ? "text-gray-400" : "text-blue-600"}`}>
-                {openBoards?.length || 0}
+              <span className="text-2xl font-semibold flex items-center gap-x-2 "><KanbanSquare size={20} /> Boards
+                <span>-</span>
+                <span
+                  className={`text-2xl font-semibold text-blue-500 ${openBoards?.length > 99 ? "text-2xl" : "text-2xl"} ${openBoards?.length === 0 ? "text-gray-400" : "text-blue-600"}`}
+                >
+                  {openBoards?.length || 0}
+                </span>
               </span>
-            </div>
 
+            </div>
           </CardTitle>
           <div className="mt-4 text-center">
             <Dialog open={isExploreDialogOpen} onOpenChange={setIsExploreDialogOpen}>
@@ -181,9 +197,9 @@ export const BoardList: React.FC = () => {
                 </DialogHeader>
                 <TemplateExplorer
                   onSelectTemplate={(templateId) => {
-                    setSelectedTemplateId(templateId);
-                    setIsExploreDialogOpen(false);
-                    setIsCreateBoardModalOpen(true);
+                    setSelectedTemplateId(templateId)
+                    setIsExploreDialogOpen(false)
+                    setIsCreateBoardModalOpen(true)
                   }}
                 />
               </DialogContent>
@@ -212,8 +228,8 @@ export const BoardList: React.FC = () => {
                         p-4 overflow-hidden
                       `}
                       onClick={() => {
-                        setSelectedTemplateId(template.id);
-                        setIsCreateBoardModalOpen(true);
+                        setSelectedTemplateId(template.id)
+                        setIsCreateBoardModalOpen(true)
                       }}
                     >
                       <div className="text-2xl mb-2">{template.icon}</div>
@@ -240,7 +256,26 @@ export const BoardList: React.FC = () => {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {recentBoards.length > 0 && (
+            <div className="mb-6">
+              <p className="text-lg font-semibold mb-4 flex items-center gap-x-2">
+                <Clock size={18} />Recently Opened
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                {recentBoards.map((board) => (
+                  <BoardCard key={board.id} board={board} onClick={() => handleBoardClick(board)} />
+                ))}
+              </div>
+            </div>
+          )}
+
+
+
+          {recentBoardIds.length > 0 && (
+            <Separator className="mb-6" />
+          )}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+
             {isLoading || isFirstLoad ? (
               Array.from({ length: 4 }).map((_, idx) => (
                 <Skeleton key={idx} className="h-56 rounded-md bg-gray-200 dark:bg-gray-700" />
@@ -266,5 +301,6 @@ export const BoardList: React.FC = () => {
         templateId={selectedTemplateId}
       />
     </div>
-  );
-};
+  )
+}
+
