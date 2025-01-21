@@ -33,25 +33,25 @@ const TemplateExplorer: React.FC<TemplateExplorerProps> = ({ onSelectTemplate })
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedType, setSelectedType] = useState("All")
 
-  const types = useMemo(() => {
-    const uniqueTypes = ["All"]
+  const uniqueTypes = useMemo(() => {
+    const types = ["All"];
     boardTemplates.forEach((template) => {
-      if (!uniqueTypes.includes(template.type)) {
-        uniqueTypes.push(template.type)
+      if (!types.includes(template.type)) {
+        types.push(template.type);
       }
-    })
-    return uniqueTypes
-  }, [])
+    });
+    return types;
+  }, []);
 
   const filteredTemplates = useMemo(() => {
     return boardTemplates.filter((template) => {
       const matchesSearch =
         template.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        template.description.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesType = selectedType === "All" || template.type === selectedType
-      return matchesSearch && matchesType
-    })
-  }, [searchTerm, selectedType])
+        template.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesType = selectedType === "All" || template.type === selectedType;
+      return matchesSearch && matchesType;
+    });
+  }, [searchTerm, selectedType]);
 
   return (
     <div className="flex h-[60vh]">
@@ -59,7 +59,7 @@ const TemplateExplorer: React.FC<TemplateExplorerProps> = ({ onSelectTemplate })
       <div className="w-1/4 border-r p-4">
         <h3 className="font-semibold mb-2">Types</h3>
         <ScrollArea className="h-full">
-          {types.map((type) => (
+          {uniqueTypes.map((type) => (
             <button
               key={type}
               className={cn(
