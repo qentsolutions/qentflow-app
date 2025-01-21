@@ -105,6 +105,21 @@ const TemplateExplorer: React.FC<TemplateExplorerProps> = ({ onSelectTemplate })
   )
 }
 
+interface Board {
+  id: string;
+  title: string;
+  isMember: boolean;
+  creator: {
+    id: string;
+    name: string;
+    imageUrl: string;
+  };
+  memberCount: number;
+  createdAt: string;
+  image: string;
+}
+
+
 export const BoardList: React.FC = () => {
   const { currentWorkspace } = useCurrentWorkspace()
   const workspaceId = currentWorkspace?.id
@@ -131,12 +146,23 @@ export const BoardList: React.FC = () => {
     enabled: !!workspaceId,
   })
 
-  const filteredBoards = Array.isArray(boards)
-    ? boards.filter((board: any) => board.title.toLowerCase().includes(searchTerm.toLowerCase()))
-    : []
+  const safeBoards = Array.isArray(boards) ? boards : [];
 
-  // Filter boards where user is a member
-  const openBoards = filteredBoards.filter((board) => board.isMember)
+  const filteredBoards = useMemo(() => {
+    return safeBoards.filter((board: Board) =>
+      board.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [safeBoards, searchTerm]);
+
+  const openBoards = useMemo(() => {
+    return filteredBoards.filter((board: Board) => board.isMember);
+  }, [filteredBoards]);
+
+  const recentBoards = useMemo(() => {
+    return recentBoardIds
+      .map(id => safeBoards.find((board: Board) => board.id === id))
+      .filter((board): board is Board => board !== undefined);
+  }, [recentBoardIds, safeBoards]);
 
   // Handle board click
   const handleBoardClick = (board: any) => {
@@ -160,14 +186,6 @@ export const BoardList: React.FC = () => {
   if (error) {
     return <div>Error loading boards. Please try again later.</div>
   }
-
-  const recentBoards = useMemo(() => {
-    if (!Array.isArray(boards)) return [];
-    const validBoards = recentBoardIds
-      .map((id) => boards.find((board: any) => board.id === id))
-      .filter((board): board is NonNullable<typeof board> => board !== undefined);
-    return validBoards;
-  }, [recentBoardIds, boards]);
 
   return (
     <div className="py-4 bg-gray-50 h-full">
