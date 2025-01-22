@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { getUserWorkspaces } from "@/actions/workspace";
 import { UserRole } from "@prisma/client";
 
@@ -39,6 +39,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(null);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const loadWorkspaces = async () => {
@@ -50,6 +51,10 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
           const workspaceId = params?.workspaceId as string;
           const currentWs = loadedWorkspaces.find(w => w.id === workspaceId) || loadedWorkspaces[0];
           setCurrentWorkspace(currentWs || null);
+
+          if (loadedWorkspaces.length === 0) {
+            router.push("/workspace/select");
+          }
         }
       } catch (error) {
         console.error("Error loading workspaces:", error);
@@ -59,7 +64,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     };
 
     loadWorkspaces();
-  }, [params?.workspaceId]);
+  }, [params?.workspaceId, router]);
 
   return (
     <WorkspaceContext.Provider

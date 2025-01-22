@@ -11,7 +11,6 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { ThemeProvider } from '@/providers/theme-provider'
 import { SocketProvider } from './(protected)/[workspaceId]/conversations/components/providers/socket-provider'
 import { ModalProvider } from './(protected)/[workspaceId]/conversations/components/providers/modal-provider'
-import { PersistentChat } from '@/components/chat/persistent-chat'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -46,7 +45,6 @@ export default async function RootLayout({
                     <Toaster />
                     <CardModalProvider />
                     {children}
-                    {session?.user && <PersistentChat />}
                   </TooltipProvider>
                 </QueryProvider>
               </SocketProvider>

@@ -21,6 +21,7 @@ import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
 import ButtonCheckout from "@/app/(protected)/workspace/components/button-checkout";
+import { useRouter } from "next/navigation";
 
 const CreateWorkspaceSchema = z.object({
     name: z.string().min(1, "Workspace name is required"),
@@ -29,18 +30,25 @@ const CreateWorkspaceSchema = z.object({
 const plans = {
     monthly: [
         {
+            name: "Free",
+            members: "up to 5 members",
+            price: 0,
+            priceId: "1",
+            description: "Perfect for beginning"
+        },
+        {
             name: "Starter",
             members: "1 member",
             price: 4.99,
             priceId: "price_1QSQ4lJCavvHusTltoAiG987",
-            description: "Perfect for individual users"
+            description: "Perfect for small team"
         },
         {
             name: "Team",
             members: "2-5 members",
             price: 19.99,
             priceId: "price_1QSQ8bJCavvHusTlIKvid0Aj",
-            description: "Great for small teams"
+            description: "Great for large team"
         },
         {
             name: "Business",
@@ -52,18 +60,25 @@ const plans = {
     ],
     annual: [
         {
+            name: "Free",
+            members: "up to 5 members",
+            price: 0,
+            priceId: "1",
+            description: "Perfect for beginning"
+        },
+        {
             name: "Starter",
             members: "1 member",
             price: 50.00,
             priceId: "price_1QSQ5pJCavvHusTlfwBZcvid",
-            description: "Perfect for individual users"
+            description: "Perfect for small team"
         },
         {
             name: "Team",
             members: "2-5 members",
             price: 200.00,
             priceId: "price_1QSQ94JCavvHusTls0RQSyG1",
-            description: "Great for small teams"
+            description: "Great for large team"
         },
         {
             name: "Business",
@@ -81,6 +96,7 @@ export const SelectWorkspaceForm = () => {
     const [billingType, setBillingType] = useState<"monthly" | "annual">("monthly");
     const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
     const { setBreadcrumbs } = useBreadcrumbs();
+    const router = useRouter();
 
     useEffect(() => {
         setBreadcrumbs([{ label: "Create Workspace" }]);
@@ -106,6 +122,7 @@ export const SelectWorkspaceForm = () => {
             }
 
             if (result.workspaceId) {
+                router.push(`/${result.workspaceId}/home`);
                 return { workspaceId: result.workspaceId };
             }
 
@@ -124,10 +141,10 @@ export const SelectWorkspaceForm = () => {
         return plan?.priceId || "";
     };
 
+
     return (
         <div className="bg-background">
-            <div className="mx-auto grid md:grid-cols-2 gap-8 p-8">
-                {/* Left Column - Payment Form */}
+            <div className="mx-auto grid md:grid-cols-2 gap-4 p-4">
                 <div>
                     <Card className="shadow-sm">
                         <CardHeader>
@@ -166,9 +183,16 @@ export const SelectWorkspaceForm = () => {
                     </Card>
                 </div>
 
-                <div className="bg-slate-50 rounded-lg p-8">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-lg font-medium">Choose Your Plan</h2>
+                <div className="bg-slate-50 rounded-lg px-8 py-4 border">
+                    <div className="flex justify-between items-center mb-2">
+                        <h2 className="text-lg font-bold">Choose Your Plan</h2>
+                        {billingType === "annual" && (
+                            <div className="p-4 rounded-lg">
+                                <p className="text-green-700 text-sm flex items-center gap-2">
+                                    <span className="bg-green-600 text-white text-xs px-2 py-1 rounded">Save 15%</span>
+                                </p>
+                            </div>
+                        )}
                         <div className="flex items-center gap-4 bg-white rounded-lg p-2">
                             <button
                                 onClick={() => setBillingType("monthly")}
@@ -191,12 +215,12 @@ export const SelectWorkspaceForm = () => {
                         </div>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-2">
                         {plans[billingType].map((plan) => (
                             <div
                                 key={plan.priceId}
                                 onClick={() => setSelectedPlan(plan.priceId)}
-                                className={`p-6 rounded-lg border transition-all cursor-pointer ${selectedPlan === plan.priceId
+                                className={`py-4 px-6 rounded-lg border transition-all cursor-pointer ${selectedPlan === plan.priceId
                                     ? "border-blue-500 bg-blue-50"
                                     : "bg-white hover:border-blue-300"
                                     }`}
@@ -219,14 +243,7 @@ export const SelectWorkspaceForm = () => {
                         ))}
                     </div>
 
-                    {billingType === "annual" && (
-                        <div className="mt-4 p-4 bg-green-50 rounded-lg">
-                            <p className="text-green-700 text-sm flex items-center gap-2">
-                                <span className="bg-green-600 text-white text-xs px-2 py-1 rounded">Save 15%</span>
-                                Save by paying annually
-                            </p>
-                        </div>
-                    )}
+
                     <div className="flex items-center justify-center my-4">
                         <ButtonCheckout
                             mode="subscription"
@@ -236,9 +253,7 @@ export const SelectWorkspaceForm = () => {
                             onSubmit={() => onSubmit(form.getValues())}
                         />
                     </div>
-
-
-                    <div className="mt-2 text-center">
+                    <div className="my-2 text-center">
                         <p className="text-sm text-muted-foreground flex items-center gap-2">
                             Guaranteed to be safe & secure, ensuring that all transactions are protected with the highest level of security.
                         </p>

@@ -1,34 +1,27 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
-  Calendar,
-  Globe,
   LayoutDashboard,
   ListTodo,
   MessageCircle,
   SquareKanban,
-  SquareTerminal,
-} from "lucide-react"
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import { TeamSwitcher } from "./team-switcher"
-import { NavMain } from "./nav-main"
-import { NavProjects } from "./nav-projects"
-import { NavUser } from "./nav-user"
-import { useCurrentUser } from "@/hooks/use-current-user"
-import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
-import { NavIntegrations } from "./nav-integrations"
-
-
+} from "@/components/ui/sidebar";
+import { TeamSwitcher } from "./team-switcher";
+import { NavMain } from "./nav-main";
+import { NavProjects } from "./nav-projects";
+import { NavUser } from "./nav-user";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-
   const user = useCurrentUser();
   const { currentWorkspace } = useCurrentWorkspace();
   const workspaceId = currentWorkspace?.id;
@@ -38,41 +31,50 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {
         name: "Home",
         url: "/home",
-        icon: LayoutDashboard
+        icon: LayoutDashboard,
       },
       {
         name: "My Tasks",
         url: `/${workspaceId}/my-tasks`,
-        icon: ListTodo
+        icon: ListTodo,
       },
       {
         name: "Conversations",
         url: `/${workspaceId}/conversations`,
-        icon: MessageCircle
+        icon: MessageCircle,
       },
     ],
     navMain: [
       {
-        name: "Boards", // Changez 'title' en 'name'
+        name: "Boards",
         url: `/${workspaceId}/boards`,
         icon: SquareKanban,
-        isActive: false, // Cette propriété peut rester, mais elle sera ignorée par NavMain
+        isActive: false,
       },
     ],
-  }
+  };
+
   return (
-    <Sidebar collapsible="icon" {...props} className="bg-background">
+    <Sidebar
+      collapsible="icon"
+      {...props}
+      className="bg-background flex flex-col h-screen" // Utiliser Flexbox pour un layout en colonne
+    >
       <SidebarHeader>
         <TeamSwitcher />
       </SidebarHeader>
-      <SidebarContent>
-        <NavProjects projects={data.main} />
-        <NavMain items={data.navMain} />
-      </SidebarContent>
-      <SidebarFooter>
+      {/* Vérification de l'existence de `currentWorkspace` */}
+      {currentWorkspace ? (
+        <SidebarContent className="flex-1">
+          {/* `flex-1` permet d'occuper l'espace vertical restant */}
+          <NavProjects projects={data.main} />
+          <NavMain items={data.navMain} />
+        </SidebarContent>
+      ) : null}
+      <SidebarFooter className="mt-auto"> {/* `mt-auto` pousse le footer vers le bas */}
         <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

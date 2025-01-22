@@ -15,7 +15,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { CardWrapper } from "@/components/auth/card-wrapper"
+import { CardWrapper } from "@/components/auth/card-wrapper";
 import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
@@ -25,6 +25,7 @@ export const RegisterForm = () => {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
+  const [isTermsAccepted, setIsTermsAccepted] = useState(false);
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
@@ -36,6 +37,11 @@ export const RegisterForm = () => {
   });
 
   const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
+    if (!isTermsAccepted) {
+      setError("You must accept the Terms of Use and Privacy Policy.");
+      return;
+    }
+
     setError("");
     setSuccess("");
 
@@ -56,10 +62,7 @@ export const RegisterForm = () => {
       showSocial
     >
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-6"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
             <FormField
               control={form.control}
@@ -115,11 +118,29 @@ export const RegisterForm = () => {
               )}
             />
           </div>
+          <div className="flex items-center space-x-2">
+            <input
+              id="terms"
+              type="checkbox"
+              checked={isTermsAccepted}
+              onChange={(e) => setIsTermsAccepted(e.target.checked)}
+              className="form-checkbox"
+            />
+            <label htmlFor="terms" className="text-sm">
+              I agree to the{" "}
+              <a href="/terms-of-use" className="text-blue-500 underline">
+                Terms of Use
+              </a>{" "}
+              and{" "}
+              <a href="/privacy-policy" className="text-blue-500 underline">
+                Privacy Policy
+              </a>.
+            </label>
+          </div>
           <FormError message={error} />
           <FormSuccess message={success} />
-          <p className="text-xs">By signing up, you agree to our <a href="/terms-of-use" className="text-blue-500">Terms of Use</a> and <a href="/privacy-policy" className="text-blue-500">Privacy Policy</a></p>
           <Button
-            disabled={isPending}
+            disabled={isPending || !isTermsAccepted}
             type="submit"
             className="w-full"
           >
