@@ -121,7 +121,7 @@ export const sendBeautifulEmail = async (
           text-align: center;
           padding: 10px;
           background-color: #007bff;
-          color: #666;
+          color: white;
           font-size: 12px;
         }
       </style>
