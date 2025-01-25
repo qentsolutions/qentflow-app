@@ -38,6 +38,6 @@ npx prisma db push
 
 ```shell
 npm run dev
-```# qentsolutions-appp
-# qentsolutions-appp
-# qentsolutions-appp
+```# qentflow-app
+# qentflow-app
+# qentflow-app

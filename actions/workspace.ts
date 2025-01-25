@@ -7,11 +7,33 @@ import { UserRole } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 
 const WorkspaceSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(50, "Name must be at most 50 characters long")
+    .regex(
+      /^[a-zA-Z0-9\s\-_]+$/,
+      "Name can only contain letters, numbers, spaces, dashes, and underscores"
+    )
+    .refine(
+      (name) => !["use server", "use strict"].includes(name.toLowerCase()),
+      "Invalid name"
+    ),
 });
 
 const UpdateWorkspaceSchema = z.object({
-  name: z.string().min(1, "Workspace name is required"),
+  name: z
+    .string()
+    .min(1, "Workspace name is required")
+    .max(50, "Workspace name must be at most 50 characters long")
+    .regex(
+      /^[a-zA-Z0-9\s\-_]+$/,
+      "Workspace name can only contain letters, numbers, spaces, dashes, and underscores"
+    )
+    .refine(
+      (name) => !["use server", "use strict"].includes(name.toLowerCase()),
+      "Invalid workspace name"
+    ),
   workspaceId: z.string().min(1, "Workspace ID is required"),
   logo: z.string().optional(),
 });

@@ -193,8 +193,9 @@ export const BoardList: React.FC = () => {
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">
             <div className="flex items-center mb-4 gap-x-2">
-              <span className="text-2xl font-semibold flex items-center gap-x-2 "><KanbanSquare size={20} /> Boards
-                <span>-</span>
+
+              <span className="text-2xl font-semibold flex items-center gap-x-2 "><KanbanSquare size={20} />
+                Boards
                 <span
                   className={`text-2xl font-semibold text-blue-500 ${openBoards?.length > 99 ? "text-2xl" : "text-2xl"} ${openBoards?.length === 0 ? "text-gray-400" : "text-blue-600"}`}
                 >
@@ -286,9 +287,6 @@ export const BoardList: React.FC = () => {
               </div>
             </div>
           )}
-
-
-
           {recentBoardIds.length > 0 && (
             <Separator className="mb-6" />
           )}
@@ -305,13 +303,12 @@ export const BoardList: React.FC = () => {
             ) : (
               <div className="text-center py-10 w-full bg-gray-50">
                 <KanbanSquare className="h-10 w-10 mx-auto text-gray-400 mb-2" />
-                <p className="text-muted-foreground">No boards found</p>
+                <p className="text-muted-foreground text-xs">No boards found</p>
               </div>
             )}
           </div>
         </CardContent>
       </Card>
-
       <CreateBoardModal
         isOpen={isCreateBoardModalOpen}
         onClose={() => setIsCreateBoardModalOpen(false)}

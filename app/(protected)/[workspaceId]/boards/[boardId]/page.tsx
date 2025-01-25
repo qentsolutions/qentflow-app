@@ -73,13 +73,21 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
           order: "asc",
         },
       },
-      User: true,
+      User: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+        }
+      },
     },
   });
 
   if (!board) {
     return <div>Board not found</div>;
   }
+
 
   const isBoardMember = board.User.some((boardUser) => boardUser.id === user?.id);
 
@@ -88,16 +96,16 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
   }
 
   return (
-    <div className="w-full p-4 bg-gray-50 h-screen">
-      <Card className="shadow-none rounded-md">
-        <main className="relative w-full mx-auto p-6 h-full">
+    <div className="w-full p-4 bg-gray-50 h-[calc(100vh-70px)]">
+      <Card className="shadow-none rounded-md h-full">
+        <main className="relative w-full mx-auto h-full">
           <div className="flex flex-col h-full w-full">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between px-6 pt-6">
               <BoardNavbar board={board} />
             </div>
             <div className="flex w-full items-center gap-4 mb-6 mt-4">
-              <Tabs defaultValue="board" className="w-full">
-                <TabsList>
+              <Tabs defaultValue="board" className="w-full ">
+                <TabsList className="px-6">
                   <TabsTrigger value="board">Board</TabsTrigger>
                   <TabsTrigger value="timeline">Timeline</TabsTrigger>
                   <TabsTrigger value="settings">Settings</TabsTrigger>

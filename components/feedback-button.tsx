@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageCircle, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { motion, AnimatePresence } from "framer-motion";
 import { useCurrentRole } from '@/hooks/use-current-role';
 import { submitFeedback } from '@/actions/feedback/submit-feedback';

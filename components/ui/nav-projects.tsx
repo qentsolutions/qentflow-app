@@ -1,7 +1,4 @@
-"use client";
-
 import { type LucideIcon } from "lucide-react";
-
 import {
   SidebarGroup,
   SidebarMenu,
@@ -17,6 +14,7 @@ export function NavProjects({
     name: string;
     url: string;
     icon: LucideIcon;
+    count?: number; // Déclaration de la prop count, qui est optionnelle
   }[];
 }) {
   const pathname = usePathname(); // Récupérer le chemin actuel
@@ -24,21 +22,25 @@ export function NavProjects({
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarMenu>
-        {projects.map((item) => {
+        {projects.map((item, index) => {
           // Vérifier si le chemin actuel commence par l'URL
           const isActive = pathname.startsWith(item.url);
 
           return (
             <SidebarMenuItem
               key={item.name}
-              className={`rounded-sm hover:font-semibold ${
-                isActive ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"
-              }`} // Ajouter des styles conditionnels pour l'état actif
+              className={`rounded-sm hover:font-semibold w-full ${isActive ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"
+                }`} // Ajouter des styles conditionnels pour l'état actif
             >
               <SidebarMenuButton asChild>
-                <a href={item.url} className="flex items-center gap-2">
-                  <item.icon />
-                  <span>{item.name}</span>
+                <a href={item.url} className="flex items-center justify-between gap-2 w-full">
+                  <div className="flex items-center gap-2">
+                    <item.icon size={16} />
+                    <span>{item.name}</span>
+                  </div>
+                  {item.name === "My Tasks" && item.count !== undefined && (
+                    <span className="ml-2 text-gray-500 mr-2">{item.count > 0 ? (<>{item.count}</>):(<></>)}</span>
+                  )}
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>

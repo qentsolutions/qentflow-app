@@ -1,11 +1,10 @@
 "use client";
-
 import { useEffect, useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { format, addMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, differenceInDays, subMonths } from "date-fns";
 import { useCardModal } from "@/hooks/use-card-modal";
 import { motion } from "framer-motion";
-import { ChartGantt, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";

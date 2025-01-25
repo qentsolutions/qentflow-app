@@ -6,8 +6,7 @@ import { useBreadcrumbs } from "@/hooks/use-breadcrumb"
 import { fetcher } from "@/lib/fetcher"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Search, CheckCircle2, Circle, Calendar, Clock, AlertCircle, ChevronRight, Layout, ExternalLink } from "lucide-react"
-import { useCardModal } from "@/hooks/use-card-modal"
+import { Search, CheckCircle2, Circle, Calendar, Clock, AlertCircle, ExternalLink } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -117,7 +116,7 @@ export default function MyTasksPage() {
                 transition={{ duration: 0.2 }}
               >
                 <Card
-                  className={`m-2 cursor-pointer transition-all duration-200 hover:shadow-md ${selectedCard?.id === card.id ? "border-primary border-2" : ""
+                  className={`m-2 cursor-pointer transition-all duration-200 hover:shadow-md ${selectedCard?.id === card.id ? "border-primary border" : ""
                     }`}
                   onClick={() => setSelectedCard(card)}
                 >

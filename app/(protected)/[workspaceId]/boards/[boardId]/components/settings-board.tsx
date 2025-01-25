@@ -1,5 +1,4 @@
 "use client";
-
 import { Image, Settings2, Tag, Users } from "lucide-react";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
@@ -48,7 +47,7 @@ const Settings = ({ boardId, boardTitle, users, createdById }: BoardSettingsProp
   ];
 
   return (
-    <div className="w-full">
+    <div className="w-full px-6">
       <div className="py-2">
         <div className="grid grid-cols-12 gap-8">
           <div className="col-span-3">

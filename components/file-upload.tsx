@@ -1,6 +1,5 @@
 // components/file-upload.tsx
 "use client";
-
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";

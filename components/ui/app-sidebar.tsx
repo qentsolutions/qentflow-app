@@ -20,11 +20,19 @@ import { NavProjects } from "./nav-projects";
 import { NavUser } from "./nav-user";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
+import { useQuery } from "@tanstack/react-query";
+import { fetcher } from "@/lib/fetcher";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useCurrentUser();
   const { currentWorkspace } = useCurrentWorkspace();
   const workspaceId = currentWorkspace?.id;
+
+  const { data: taskCount, isLoading } = useQuery({
+    queryKey: ["assigned-cards", currentWorkspace?.id],
+    queryFn: () => fetcher(`/api/cards/current-user-card-nb?workspaceId=${currentWorkspace?.id}`),
+    enabled: !!currentWorkspace?.id,
+  })
 
   const data = {
     main: [
@@ -37,6 +45,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         name: "My Tasks",
         url: `/${workspaceId}/my-tasks`,
         icon: ListTodo,
+        count: taskCount,
       },
       {
         name: "Conversations",

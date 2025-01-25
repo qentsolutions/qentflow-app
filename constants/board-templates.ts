@@ -134,54 +134,6 @@ export const boardTemplates = [
     type: "Project Management",
   },
   {
-    id: "jira",
-    title: "Jira-style Agile Board",
-    description: "Track and manage agile development projects with sprint-based organization",
-    icon: "📅",
-    lists: [
-      {
-        title: "Backlog",
-        cards: [
-          { title: "Sprint Planning", description: "Prepare tasks for upcoming sprints" },
-          { title: "User Story Mapping", description: "Create user stories for upcoming features" },
-        ],
-      },
-      {
-        title: "To Do",
-        cards: [
-          { title: "Design User Interface", description: "Create wireframes and design specs" },
-          { title: "Implement API Endpoints", description: "Build the necessary backend services" },
-        ],
-      },
-      {
-        title: "In Progress",
-        cards: [
-          { title: "Frontend Development", description: "Build and test the user interface" },
-          { title: "Backend Development", description: "Work on the server-side logic" },
-        ],
-      },
-      {
-        title: "Code Review",
-        cards: [],
-      },
-      {
-        title: "Testing",
-        cards: [],
-      },
-      {
-        title: "Done",
-        cards: [],
-      },
-    ],
-    tags: [
-      { name: "Sprint 1", color: "#E11D48" },
-      { name: "Sprint 2", color: "#2563EB" },
-      { name: "Bug Fix", color: "#F59E0B" },
-      { name: "New Feature", color: "#16A34A" },
-    ],
-    type: "Project Management",
-  },
-  {
     id: "content",
     title: "Content Creation Workflow",
     description: "Manage content creation, editing, and publishing process",

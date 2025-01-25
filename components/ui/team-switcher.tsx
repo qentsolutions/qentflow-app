@@ -1,22 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { Bolt, ChevronsUpDown, Cog, Plus, Settings, Settings2, } from "lucide-react"
-
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    useSidebar,
-} from "@/components/ui/sidebar"
+import { ChevronsUpDown, Plus, Settings2, } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
 import { useRouter } from "next/navigation"
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
 import Image from "next/image"
@@ -71,7 +58,7 @@ export function TeamSwitcher() {
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
-                        className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                        className="w-[--radix-dropdown-menu-trigger-width] min-w-56 "
                         align="start"
                         side={isMobile ? "bottom" : "right"}
                         sideOffset={4}
@@ -81,11 +68,11 @@ export function TeamSwitcher() {
                         </DropdownMenuLabel>
 
                         {workspaces.map((workspace) => (
-                            <div key={workspace.id} className="flex items-center w-full">
+                            <div key={workspace.id} className="flex items-center w-full h-full">
                                 <DropdownMenuItem
                                     onClick={() => handleWorkspaceSelect(workspace)}
-                                    className={`${currentWorkspace?.id === workspace.id ? "bg-blue-50 text-black w-full" : "text-muted-foreground w-full"
-                                        }`}  // Condition pour appliquer le fond bleu si c'est le workspace sélectionné
+                                    className={`${currentWorkspace?.id === workspace.id ? "bg-blue-50 text-black w-full rounded-none" : "text-muted-foreground w-full"
+                                        }`}  
                                 >
                                     {workspace.logo ? (
                                         <div className="w-6 h-6 bg-gray-100 flex items-center justify-center rounded">
@@ -105,12 +92,11 @@ export function TeamSwitcher() {
                                         </div>
                                     )}
                                     <span>{workspace?.name}</span>
-
                                 </DropdownMenuItem>
                                 {currentWorkspace?.id === workspace.id && (
                                     <Link href={`/${workspace.id}/settings`}>
-                                        <p className="flex items-center justify-center w-6 h-6 rounded-ful text-gray-800">
-                                            <Settings2 size={14} className="ml-1" />
+                                        <p className="flex items-center bg-blue-50 justify-center h-9 text-gray-800">
+                                            <Settings2 size={14} className="ml-1 mr-2" />
                                         </p>
                                     </Link>
                                 )}

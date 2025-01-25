@@ -1,11 +1,8 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import { toast } from "sonner";
-
 import { useAction } from "@/hooks/use-action";
-
 import { ListForm } from "./list-form";
 import { ListItem } from "./list-item";
 import { updateListOrder } from "@/actions/tasks/update-list-order";
@@ -159,7 +156,7 @@ export const KanbanView = ({ data, boardId, users }: ListContainerProps) => {
           <ol
             {...provided.droppableProps}
             ref={provided.innerRef}
-            className="flex gap-x-3 h-full pb-12 p-4 md:max-w-6xl px-4"
+            className="flex gap-x-3 h-full pb-8 p-4 md:max-w-6xl px-4"
           >
             {orderedData.map((list, index) => (
               <ListItem key={list.id} index={index} data={list} users={users} />

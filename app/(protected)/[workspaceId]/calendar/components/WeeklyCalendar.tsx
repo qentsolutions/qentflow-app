@@ -72,7 +72,6 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
         startDate: new Date(event.startDate),
         endDate: new Date(event.endDate),
       }));
-      console.log("Événements transformés :", processedEvents);
     }
   }, [events]);
 

@@ -3,10 +3,9 @@
 import { ViewSwitcher, ViewType } from "./view-switcher";
 import { KanbanView } from "./kanban-view";
 import { useState, useMemo } from "react";
-import BoardUsers from "./board-users";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
-import { CheckIcon, ChevronDown, Plus, RefreshCcw, Search, TagIcon, X, SignalHigh, Filter } from "lucide-react";
+import { CheckIcon, Plus, RefreshCcw, Search, X, SignalHigh, Filter, SignalLow, SignalMedium, AlertTriangle, User } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -20,7 +19,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import CreateTagForm from "./create-tag-form";
 import { ListView } from "./list-view";
 import { useRouter } from "next/navigation";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface BoardContentProps {
   boardId: string;
@@ -31,6 +29,7 @@ interface BoardContentProps {
 export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
   const [selectedView, setSelectedView] = useState<ViewType>("kanban");
   const [tagSearchTerm, setTagSearchTerm] = useState("");
+  const [userSearchTerm, setUserSearchTerm] = useState("");
   const [isCreateTagOpen, setIsCreateTagOpen] = useState(false);
   const router = useRouter();
 
@@ -63,6 +62,13 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     [availableTags, tagSearchTerm]
   );
 
+  const filteredUsers = useMemo(
+    () => users.filter((user: any) =>
+      user.name.toLowerCase().includes(userSearchTerm.toLowerCase())
+    ),
+    [users, userSearchTerm]
+  );
+
   const renderView = () => {
     const filteredLists = getFilteredLists();
     return selectedView === "kanban" ? (
@@ -84,9 +90,24 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     return count;
   };
 
+  const getPriorityIcon = (priority: string) => {
+    switch (priority) {
+      case "LOW":
+        return <SignalLow className="h-4 w-4 text-green-600" />;
+      case "MEDIUM":
+        return <SignalMedium className="h-4 w-4 text-yellow-600" />;
+      case "HIGH":
+        return <SignalHigh className="h-4 w-4 text-red-600" />;
+      case "CRITICAL":
+        return <AlertTriangle className="h-4 w-4 text-red-600" />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <>
-      <div className="flex items-center justify-between gap-4 mb-4">
+      <div className="flex items-center justify-between gap-4 mb-4 px-6">
         <div className="flex-1">
           <div className="flex items-center gap-4">
             <div className="relative">
@@ -111,121 +132,94 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-96 p-2" align="start">
-                <Tabs defaultValue="users" className="w-full">
-                  <TabsList className="w-full">
-                    <TabsTrigger value="users" className="flex-1">Users</TabsTrigger>
-                    <TabsTrigger value="priority" className="flex-1">Priority</TabsTrigger>
-                    <TabsTrigger value="tags" className="flex-1">Tags</TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="users" className="p-4 space-y-4">
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium">Assigned Users</h4>
-                      <div className="grid grid-cols-1 gap-2">
-                        <div
-                          onClick={() => setSelectedUser("unassigned")}
-                          className={cn(
-                            "flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-secondary/50",
-                            selectedUser === "unassigned" && "bg-secondary"
-                          )}
-                        >
-                          <Avatar className="h-8 w-8">
-                            <AvatarFallback>UN</AvatarFallback>
-                          </Avatar>
-                          <span>Unassigned</span>
-                        </div>
-                        {users.map((user: any) => (
+              <PopoverContent className="w-[800px] p-6" align="start">
+                <div className="flex gap-8">
+                  {/* Users Section */}
+                  <div className="flex-1">
+                    <div className="mb-4">
+                      <h4 className="text-base font-semibold mb-3">Assigned Users</h4>
+                      <div className="relative mb-3">
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                          placeholder="Search users..."
+                          value={userSearchTerm}
+                          className="pl-9 h-9 bg-secondary/50 border-0 focus-visible:ring-1 focus-visible:ring-primary/30"
+                          onChange={(e) => setUserSearchTerm(e.target.value)}
+                        />
+                      </div>
+                      <ScrollArea className="h-[205px]">
+                        <div className="space-y-2">
                           <div
-                            key={user.id}
-                            onClick={() => setSelectedUser(user.id)}
+                            onClick={() => setSelectedUser(selectedUser === "unassigned" ? null : "unassigned")}
                             className={cn(
-                              "flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-secondary/50",
-                              selectedUser === user.id && "bg-secondary"
+                              "flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-all duration-200",
+                              selectedUser === "unassigned"
+                                ? "bg-gray-100 text-primary"
+                                : "hover:bg-secondary/80"
                             )}
                           >
-                            <Avatar className="h-8 w-8">
-                              <AvatarImage src={user.image} />
-                              <AvatarFallback>{user.name?.[0]}</AvatarFallback>
+                            <Avatar className="h-6 w-6 border-2 border-primary/20">
+                              <AvatarFallback><User /></AvatarFallback>
                             </Avatar>
-                            <span>{user.name}</span>
+                            <span className="font-medium">Unassigned</span>
                           </div>
-                        ))}
-                      </div>
+                          {filteredUsers.map((user: any) => (
+                            <div
+                              key={user.id}
+                              onClick={() => setSelectedUser(user.id)}
+                              className={cn(
+                                "flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-all duration-200",
+                                selectedUser === user.id
+                                  ? "bg-gray-100 text-primary"
+                                  : "hover:bg-secondary/80"
+                              )}
+                            >
+                              <Avatar className="h-6 w-6 border-2 border-primary/20">
+                                <AvatarImage src={user.image} />
+                                <AvatarFallback>{user.name?.[0]}</AvatarFallback>
+                              </Avatar>
+                              <span className="font-medium">{user.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
                     </div>
-                  </TabsContent>
+                  </div>
 
-                  <TabsContent value="priority" className="p-4 space-y-4">
+                  <Separator orientation="vertical" className="h-auto bg-border/60" />
+
+                  {/* Priority Section */}
+                  <div className="flex-1 space-y-2">
+                    <h4 className="text-base font-semibold ">Priority Level</h4>
                     <div className="space-y-2">
-                      <h4 className="text-sm font-medium">Priority Level</h4>
                       {["LOW", "MEDIUM", "HIGH", "CRITICAL"].map((priority) => (
                         <div
                           key={priority}
                           onClick={() => setSelectedPriority(selectedPriority === priority ? null : priority)}
                           className={cn(
-                            "flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-secondary/50",
-                            selectedPriority === priority && "bg-secondary"
+                            "flex items-center gap-2 p-2 rounded-md cursor-pointer transition-all duration-200",
+                            selectedPriority === priority
+                              ? "bg-gray-100"
+                              : "hover:bg-secondary/50"
                           )}
                         >
-                          <SignalHigh className="h-4 w-4" />
-                          <span>{priority}</span>
+                          {getPriorityIcon(priority)}
+                          <span className="font-medium">{priority}</span>
                         </div>
                       ))}
                     </div>
-                  </TabsContent>
+                  </div>
 
-                  <TabsContent value="tags" className="border-none p-0">
-                    <div className="p-3 border-b">
-                      <div className="flex items-center gap-2">
-                        <Search className="h-4 w-4 text-muted-foreground" />
-                        <Input
-                          placeholder="Search tags..."
-                          value={tagSearchTerm}
-                          className="h-8 focus-visible:ring-blue-400"
-                          onChange={(e) => setTagSearchTerm(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                    <ScrollArea className="h-72">
-                      <div className="p-2">
-                        {filteredTags?.length === 0 ? (
-                          <div className="text-center p-4 text-sm text-muted-foreground">
-                            No tags found
-                          </div>
-                        ) : (
-                          filteredTags?.map((tag: any) => (
-                            <div
-                              key={tag.id}
-                              onClick={() => toggleTag(tag.id)}
-                              className={cn(
-                                "flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors",
-                                selectedTags.includes(tag.id)
-                                  ? "bg-secondary"
-                                  : "hover:bg-secondary/50"
-                              )}
-                            >
-                              <div className={`flex items-center gap-2`}>
-                                <div
-                                  className={cn(`w-2 h-2 rounded-full`)}
-                                  style={{ backgroundColor: tag?.color || '#ff0000' }}
-                                />
-                                <span className="text-sm font-medium">{tag.name}</span>
-                              </div>
-                              {selectedTags.includes(tag.id) && (
-                                <CheckIcon className="h-4 w-4 text-primary" />
-                              )}
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </ScrollArea>
-                    <Separator />
-                    <div className="p-2">
+                  <Separator orientation="vertical" className="h-auto bg-border/60" />
+
+                  {/* Tags Section */}
+                  <div className="flex-1">
+                    <div className="flex justify-between mb-1">
+                      <h4 className="text-base font-semibold">Tags</h4>
                       <Dialog open={isCreateTagOpen} onOpenChange={setIsCreateTagOpen}>
                         <DialogTrigger asChild>
-                          <Button variant="ghost" className="w-full justify-start">
-                            <Plus className="mr-2 h-4 w-4" />
-                            Create new tag
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Plus className="h-4 w-4" />
                           </Button>
                         </DialogTrigger>
                         <DialogContent>
@@ -236,8 +230,50 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                         </DialogContent>
                       </Dialog>
                     </div>
-                  </TabsContent>
-                </Tabs>
+                    <div className="relative mb-2">
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        placeholder="Search tags..."
+                        value={tagSearchTerm}
+                        className="pl-9 h-9 bg-secondary/50 border-0 focus-visible:ring-1 focus-visible:ring-primary/30"
+                        onChange={(e) => setTagSearchTerm(e.target.value)}
+                      />
+                    </div>
+                    <ScrollArea className="h-[205px] pr-4">
+                      <div className="space-y-1.5">
+                        {filteredTags?.length === 0 ? (
+                          <div className="text-center p-4 text-sm text-muted-foreground">
+                            No tags found
+                          </div>
+                        ) : (
+                          filteredTags?.map((tag: any) => (
+                            <div
+                              key={tag.id}
+                              onClick={() => toggleTag(tag.id)}
+                              className={cn(
+                                "flex items-center justify-between p-2.5 rounded-lg cursor-pointer transition-all duration-200",
+                                selectedTags.includes(tag.id)
+                                  ? "bg-gray-100"
+                                  : "hover:bg-secondary/80"
+                              )}
+                            >
+                              <div className="flex items-center gap-3">
+                                <div
+                                  className="w-3 h-3 rounded-full"
+                                  style={{ backgroundColor: tag?.color || '#9b87f5' }}
+                                />
+                                <span className="font-medium">{tag.name}</span>
+                              </div>
+                              {selectedTags.includes(tag.id) && (
+                                <CheckIcon className="h-4 w-4 text-primary" />
+                              )}
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                </div>
               </PopoverContent>
             </Popover>
 
@@ -298,7 +334,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
           <RefreshCcw />
         </Button>
       </div>
-      <main className="w-full max-w-screen shadow-sm overflow-x-auto bg-background border">
+      <main className="w-full max-w-screen shadow-sm overflow-x-auto bg-background h-full px-2">
         {renderView()}
       </main>
     </>

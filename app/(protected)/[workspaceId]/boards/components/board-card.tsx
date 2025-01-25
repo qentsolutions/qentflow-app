@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { format } from "date-fns";
 import { Users } from "lucide-react";
 import Image from "next/image";
 
@@ -23,8 +22,6 @@ interface BoardCardProps {
 }
 
 export const BoardCard = ({ board, onClick }: BoardCardProps) => {
-  const createdAtDate = new Date(board.createdAt);
-  const formattedDate = isNaN(createdAtDate.getTime()) ? "Invalid date" : format(createdAtDate, "MMM d, yyyy");
 
   return (
     <Card

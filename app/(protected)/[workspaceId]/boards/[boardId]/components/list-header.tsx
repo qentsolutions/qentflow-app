@@ -2,7 +2,6 @@ import { toast } from "sonner";
 import { List } from "@prisma/client";
 import { useEventListener } from "usehooks-ts";
 import { useState, useRef, ElementRef } from "react";
-
 import { useAction } from "@/hooks/use-action";
 import { FormInput } from "@/components/form/form-input";
 import { ListOptions } from "./list-options";

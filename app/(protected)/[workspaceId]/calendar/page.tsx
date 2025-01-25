@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect } from "react";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
