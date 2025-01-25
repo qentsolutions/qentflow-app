@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import {
+  CalendarDays,
   LayoutDashboard,
   ListTodo,
   MessageCircle,
@@ -40,6 +41,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         name: "Home",
         url: "/home",
         icon: LayoutDashboard,
+      },
+      {
+        name: "Calendar",
+        url: `/${workspaceId}/calendar`,
+        icon: CalendarDays,
       },
       {
         name: "My Tasks",

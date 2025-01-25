@@ -189,77 +189,8 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
 
   return (
     <div className="flex flex-col lg:flex-row  dark:bg-gray-900 rounded-lg overflow-hidden mt-4 pb-12">
-      <div className="flex-grow">
-        <div className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-900 border-b">
-          <button onClick={() => navigateWeek('prev')} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <h2 className="text-lg font-semibold">
-            {format(weekStart, 'd MMMM', { locale: fr })} - {format(addDays(weekStart, 6), 'd MMMM yyyy', { locale: fr })}
-          </h2>
-          <button onClick={() => navigateWeek('next')} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-        <div ref={scrollContainerRef} className="overflow-auto max-h-[calc(100vh-12rem)]">
-          <div className="min-w-[800px]">
-            <div className="grid grid-cols-8 border-b">
-              <div className="sticky top-0 bg-white dark:bg-gray-800 z-10"></div>
-              {weekDays.map((day, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    "sticky top-0 bg-white dark:bg-gray-800 z-10 text-center p-2 border-l",
-                    isSameDay(day, new Date()) && "bg-blue-50 dark:bg-blue-900/20"
-                  )}
-                >
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {format(day, 'EEE', { locale: fr })}
-                  </div>
-                  <div className={cn(
-                    "text-lg",
-                    isSameDay(day, new Date()) && "text-blue-600 dark:text-blue-400 font-bold"
-                  )}>
-                    {format(day, 'd', { locale: fr })}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="grid grid-cols-8">
-              {hours.map((hour) => (
-                <React.Fragment key={hour}>
-                  <div className="text-right pr-2 py-4 text-sm text-gray-600 dark:text-gray-400 border-r">
-                    {hour}:00
-                  </div>
-                  {weekDays.map((day, dayIndex) => (
-                    <div
-                      key={`${hour}-${dayIndex}`}
-                      className={cn(
-                        "border-l border-t relative min-h-[4rem]",
-                        isSameDay(day, new Date()) && hour === new Date().getHours() && "bg-blue-50/50 dark:bg-blue-900/10"
-                      )}
-                    >
-                      {renderEvents(day, hour, events)}
 
-                      {isSameDay(day, new Date()) && hour === new Date().getHours() && (
-                        <div
-                          className="absolute top-0 left-0 w-full h-[2px] bg-blue-500 z-20"
-                          style={{
-                            top: `${(new Date().getMinutes() / 60) * 100}%`, // Position verticale en fonction de la minute actuelle
-                            position: 'absolute',
-                          }}
-                        />
-                      )}
-
-                    </div>
-                  ))}
-                </React.Fragment>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="w-full lg:w-80 p-4 bg-white dark:bg-gray-800">
+      <div className="w-full lg:w-80 p-4 bg-white dark:bg-gray-800 border-r">
         <div className="text-center mb-6">
           <Button
             onClick={() => setIsCreateEventOpen(true)}
@@ -347,6 +278,76 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
         isOpen={!!selectedEvent}
         onClose={() => setSelectedEvent(null)}
       />
+      <div className="flex-grow">
+        <div className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-900 border-b">
+          <button onClick={() => navigateWeek('prev')} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <h2 className="text-lg font-semibold">
+            {format(weekStart, 'd MMMM', { locale: fr })} - {format(addDays(weekStart, 6), 'd MMMM yyyy', { locale: fr })}
+          </h2>
+          <button onClick={() => navigateWeek('next')} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+        <div ref={scrollContainerRef} className="overflow-auto max-h-[calc(100vh-12rem)]">
+          <div className="min-w-[800px]">
+            <div className="grid grid-cols-8 border-b">
+              <div className="sticky top-0 bg-white dark:bg-gray-800 z-10"></div>
+              {weekDays.map((day, index) => (
+                <div
+                  key={index}
+                  className={cn(
+                    "sticky top-0 bg-white dark:bg-gray-800 z-10 text-center p-2 border-l",
+                    isSameDay(day, new Date()) && "bg-blue-50 dark:bg-blue-900/20"
+                  )}
+                >
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    {format(day, 'EEE', { locale: fr })}
+                  </div>
+                  <div className={cn(
+                    "text-lg",
+                    isSameDay(day, new Date()) && "text-blue-600 dark:text-blue-400 font-bold"
+                  )}>
+                    {format(day, 'd', { locale: fr })}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-8">
+              {hours.map((hour) => (
+                <React.Fragment key={hour}>
+                  <div className="text-right pr-2 py-4 text-sm text-gray-600 dark:text-gray-400 border-r">
+                    {hour}:00
+                  </div>
+                  {weekDays.map((day, dayIndex) => (
+                    <div
+                      key={`${hour}-${dayIndex}`}
+                      className={cn(
+                        "border-l border-t relative min-h-[4rem]",
+                        isSameDay(day, new Date()) && hour === new Date().getHours() && "bg-blue-50/50 dark:bg-blue-900/10"
+                      )}
+                    >
+                      {renderEvents(day, hour, events)}
+
+                      {isSameDay(day, new Date()) && hour === new Date().getHours() && (
+                        <div
+                          className="absolute top-0 left-0 w-full h-[2px] bg-blue-500 z-20"
+                          style={{
+                            top: `${(new Date().getMinutes() / 60) * 100}%`, // Position verticale en fonction de la minute actuelle
+                            position: 'absolute',
+                          }}
+                        />
+                      )}
+
+                    </div>
+                  ))}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
