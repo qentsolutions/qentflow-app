@@ -20,6 +20,9 @@ import {
   SignalHigh,
   AlertTriangle,
   ArrowUpDown,
+  Filter,
+  Tag,
+  KanbanSquare,
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -70,9 +73,9 @@ export default function MyTasksPage() {
   const { setBreadcrumbs } = useBreadcrumbs()
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCard, setSelectedCard] = useState<any>(null)
-  const [selectedBoard, setSelectedBoard] = useState<string>("all")
   const [sortByDueDate, setSortByDueDate] = useState(false)
   const [selectedBoards, setSelectedBoards] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]) // Nouveaux tags sélectionnés
 
 
   useEffect(() => {
@@ -94,13 +97,21 @@ export default function MyTasksPage() {
     acc[boardTitle].push(card)
     return acc
   }, {})
+
   const filteredGroupedCards = groupedCards
     ? Object.entries(groupedCards).reduce((acc: any, [boardTitle, cards]: [string, any]) => {
-      const filteredCards = (cards as any[]).filter(
-        (card) =>
+      const filteredCards = (cards as any[]).filter((card) => {
+        const matchesSearch =
           card.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          card.description?.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
+          card.description?.toLowerCase().includes(searchTerm.toLowerCase())
+        const matchesBoards =
+          selectedBoards.length === 0 || selectedBoards.includes(card.list.board.title)
+        const matchesTags =
+          selectedTags.length === 0 ||
+          card.tags?.some((tag: any) => selectedTags.includes(tag.name))
+
+        return matchesSearch && matchesBoards && matchesTags
+      })
       if (filteredCards.length > 0) {
         acc[boardTitle] = filteredCards
       }
@@ -134,15 +145,28 @@ export default function MyTasksPage() {
     )
   }
 
-  const toggleBoardSelection = (board: string) => {
-    setSelectedBoards((prevSelected) =>
-      prevSelected.includes(board)
-        ? prevSelected.filter((b) => b !== board) // Supprimer si déjà sélectionné
-        : [...prevSelected, board] // Ajouter sinon
-    );
+  const allTags = Array.from(
+    new Set(
+      assignedCards
+        ?.flatMap((card: any) => card.tags?.map((tag: any) => tag.name)) // Récupère les noms des tags
+        .filter(Boolean) // Exclure les valeurs nulles
+    )
+  )
+
+  const toggleTagSelection = (tag: string) => {
+    setSelectedTags((prevSelected) =>
+      prevSelected.includes(tag)
+        ? prevSelected.filter((t) => t !== tag) // Supprimer si déjà sélectionné
+        : [...prevSelected, tag] // Ajouter sinon
+    )
+  }
+
+  const clearAllFilters = () => {
+    setSearchTerm("");
+    setSelectedBoards([]);
+    setSelectedTags([]);
+    setSortByDueDate(false);
   };
-
-
 
 
   return (
@@ -163,39 +187,88 @@ export default function MyTasksPage() {
             <div>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline">Filter</Button>
+                  <Button variant="outline">
+                    <Filter className="mr-2 h-4 w-4" />
+                    Filters
+                    {selectedBoards.length > 0 || selectedTags.length > 0 || sortByDueDate ? (
+                      <span className="ml-2 flex items-center justify-center rounded-full bg-primary text-white text-xs w-6 h-6">
+                        {selectedBoards.length + selectedTags.length + (sortByDueDate ? 1 : 0)}
+                      </span>
+                    ) : null}
+                  </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-80">
                   <div className="space-y-4">
-                    <div>
-                      <h4 className="font-medium mb-2">Boards</h4>
-                      {boardNames.map((board) => (
-                        <div key={board} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`board-${board}`}
-                            checked={selectedBoards.includes(board)}
-                            onCheckedChange={() => toggleBoardSelection(board)}
-                          />
-                          <Label htmlFor={`board-${board}`}>{board}</Label>
-                        </div>
-                      ))}
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium text-sm">Filters</h4>
+                      <Button variant="ghost" size="sm" onClick={clearAllFilters} className="h-auto p-0 text-muted-foreground">
+                        Clear all
+                      </Button>
                     </div>
-                    <div>
-                      <h4 className="font-medium mb-2">Tags</h4>
-                      {/* Ajoute des tags si nécessaire */}
+                    <Separator />
+                    <div className="space-y-2">
+                      <h5 className="font-medium text-sm flex items-center">
+                        <Calendar className="mr-2 h-4 w-4" /> Date
+                      </h5>
+                      <Button
+                        variant={sortByDueDate ? "secondary" : "outline"}
+                        size="sm"
+                        onClick={() => setSortByDueDate(!sortByDueDate)}
+                        className="w-full justify-start"
+                      >
+                        <ArrowUpDown className="mr-2 h-4 w-4" />
+                        {sortByDueDate ? "Clear Sort" : "Sort by Due Date"}
+                      </Button>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setSortByDueDate(!sortByDueDate)}
-                      className="ml-2 whitespace-nowrap flex-shrink-0"
-                    >
-                      <ArrowUpDown className="h-4 w-4 mr-1" />
-                      <span>{sortByDueDate ? "Clear Sort" : "Sort by Due Date"}</span>
-                    </Button>
+                    <Separator />
+                    <div className="space-y-2">
+                      <h5 className="font-medium text-sm flex items-center">
+                        <KanbanSquare className="mr-2 h-4 w-4" /> Boards
+                      </h5>
+                      <div className="grid grid-cols-2 gap-2">
+                        {Object.keys(groupedCards || {}).map((board) => (
+                          <div key={board} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`board-${board}`}
+                              checked={selectedBoards.includes(board)}
+                              onCheckedChange={() =>
+                                setSelectedBoards(
+                                  selectedBoards.includes(board)
+                                    ? selectedBoards.filter((b) => b !== board)
+                                    : [...selectedBoards, board],
+                                )
+                              }
+                            />
+                            <Label htmlFor={`board-${board}`} className="text-sm">
+                              {board}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <Separator />
+                    <div className="space-y-2">
+                      <h5 className="font-medium text-sm flex items-center">
+                        <Tag className="mr-2 h-4 w-4" /> Tags
+                      </h5>
+                      <div className="grid grid-cols-2 gap-2">
+                        {allTags.map((tag) => {
+                          const tagString = String(tag); // Convertir en chaîne si nécessaire
+                          return (
+                            <div key={tagString} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`tag-${tagString}`}
+                                checked={selectedTags.includes(tagString)}
+                                onCheckedChange={() => toggleTagSelection(tagString)}
+                              />
+                              <Label htmlFor={`tag-${tagString}`}>{tagString}</Label>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                 </PopoverContent>
-
               </Popover>
             </div>
           </div>
