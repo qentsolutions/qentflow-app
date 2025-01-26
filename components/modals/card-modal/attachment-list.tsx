@@ -8,6 +8,7 @@ import { Paperclip, ExternalLink, Download } from 'lucide-react';
 import { fetcher } from "@/lib/fetcher";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface AttachmentListProps {
   cardId: string;
@@ -155,6 +156,36 @@ export const AttachmentList = ({ cardId }: AttachmentListProps) => {
           {selectedAttachment && renderAttachmentPreview(selectedAttachment)}
         </DialogContent>
       </Dialog>
+    </div>
+  );
+};
+
+AttachmentList.Skeleton = function AttachmentsSkeleton() {
+  return (
+    <div className="flex justify-between items-center">
+      {/* Skeleton pour Documents */}
+      <div className="flex flex-col gap-y-2">
+        <div className="flex items-center gap-x-2">
+          <Skeleton className="h-4 w-4 bg-neutral-200" />
+          <Skeleton className="h-6 w-24 bg-neutral-200" />
+        </div>
+        <Skeleton className="h-4 w-48 bg-neutral-200" />
+      </div>
+
+      {/* Skeleton pour le bouton "+" */}
+      <Skeleton className="h-6 w-6 rounded-full bg-neutral-200" />
+
+      {/* Skeleton pour Attachments */}
+      <div className="flex flex-col gap-y-2">
+        <div className="flex items-center gap-x-2">
+          <Skeleton className="h-4 w-4 bg-neutral-200" />
+          <Skeleton className="h-6 w-28 bg-neutral-200" />
+        </div>
+        <Skeleton className="h-4 w-56 bg-neutral-200" />
+      </div>
+
+      {/* Skeleton pour le bouton "+" */}
+      <Skeleton className="h-6 w-6 rounded-full bg-neutral-200" />
     </div>
   );
 };

@@ -54,7 +54,7 @@ export const TimelineView = ({ data, boardId }: TimelineViewProps) => {
 
   return (
     <div>
-      <Card className="mt-4 bg-white border-none dark:bg-gray-800 shadow-none">
+      <Card className="mt-4 bg-white border-none dark:bg-gray-800 shadow-none p-4">
         <ScrollArea className="relative border rounded-lg bg-white dark:bg-gray-800">
           <div className="overflow-x-auto" ref={scrollContainerRef}>
             <div style={{ width: `${DAY_WIDTH}px`, minWidth: '100%' }}>

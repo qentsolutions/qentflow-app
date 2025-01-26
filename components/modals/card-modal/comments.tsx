@@ -13,6 +13,7 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useParams } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type CommentsProps = {
   items: Comment[];
@@ -328,6 +329,30 @@ export const Comments = ({ items, cardId }: CommentsProps) => {
           </ul>
         )}
 
+      </div>
+    </div>
+  );
+};
+
+
+Comments.Skeleton = function CommentsSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-start gap-x-3 w-full">
+        <Skeleton className="h-10 w-10 rounded-full bg-neutral-200" />
+        <div className="w-full space-y-3">
+          <Skeleton className="h-6 w-1/3 bg-neutral-200" />
+          <Skeleton className="h-4 w-full bg-neutral-200" />
+          <Skeleton className="h-4 w-2/3 bg-neutral-200" />
+        </div>
+      </div>
+      <div className="flex items-start gap-x-3 w-full">
+        <Skeleton className="h-10 w-10 rounded-full bg-neutral-200" />
+        <div className="w-full space-y-3">
+          <Skeleton className="h-6 w-1/3 bg-neutral-200" />
+          <Skeleton className="h-4 w-full bg-neutral-200" />
+          <Skeleton className="h-4 w-2/3 bg-neutral-200" />
+        </div>
       </div>
     </div>
   );

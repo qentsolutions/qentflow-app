@@ -13,6 +13,7 @@ import { fetcher } from "@/lib/fetcher";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TasksProps {
     cardId: string;
@@ -234,6 +235,37 @@ export const Tasks = ({ cardId }: TasksProps) => {
                 </div>
             )}
 
+        </div>
+    );
+};
+
+
+Tasks.Skeleton = function TasksSkeleton() {
+    return (
+        <div className="space-y-4">
+            <div className="flex items-center justify-between">
+                <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-x-2">
+                        <Skeleton className="h-4 w-6 bg-neutral-200" />
+                        <Skeleton className="h-6 w-24 bg-neutral-200" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Skeleton className="h-2 w-full bg-neutral-200" />
+                        <Skeleton className="h-4 w-8 bg-neutral-200" />
+                    </div>
+                </div>
+                <Skeleton className="h-8 w-8 rounded-full bg-neutral-200" />
+            </div>
+
+            <div className="space-y-2">
+                {Array.from({ length: 3 }).map((_, index) => (
+                    <div key={index} className="flex items-center gap-x-2">
+                        <Skeleton className="h-4 w-4 bg-neutral-200" />
+                        <Skeleton className="h-4 w-full bg-neutral-200" />
+                        <Skeleton className="h-6 w-8 bg-neutral-200" />
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };

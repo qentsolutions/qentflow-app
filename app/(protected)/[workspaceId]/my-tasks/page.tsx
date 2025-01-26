@@ -6,7 +6,21 @@ import { useBreadcrumbs } from "@/hooks/use-breadcrumb"
 import { fetcher } from "@/lib/fetcher"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Search, CheckCircle2, Circle, Calendar, Clock, AlertCircle, ExternalLink } from "lucide-react"
+import {
+  Search,
+  CheckCircle2,
+  Circle,
+  Calendar,
+  Clock,
+  AlertCircle,
+  ExternalLink,
+  RefreshCw,
+  SignalLow,
+  SignalMedium,
+  SignalHigh,
+  AlertTriangle,
+  ArrowUpDown,
+} from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -15,14 +29,39 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
+
+const getPriorityIcon = (priority: string | null) => {
+  switch (priority) {
+    case "LOW":
+      return <SignalLow className="h-4 w-4 text-green-500" />
+    case "MEDIUM":
+      return <SignalMedium className="h-4 w-4 text-orange-500" />
+    case "HIGH":
+      return <SignalHigh className="h-4 w-4 text-red-500" />
+    case "CRITICAL":
+      return <AlertTriangle className="h-4 w-4 text-red-600" />
+    default:
+      return null
+  }
+}
 
 type Card = {
   list: {
     board: {
-      title: string;
-    };
-  };
-};
+      title: string
+    }
+  }
+  tags?: any[]
+  tasks?: any[]
+  createdAt: string
+  updatedAt: string
+  dueDate?: string
+  priority?: string
+  title: string
+  description?: string
+  id: string
+}
 
 export default function MyTasksPage() {
   const { currentWorkspace } = useCurrentWorkspace()
@@ -30,6 +69,7 @@ export default function MyTasksPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCard, setSelectedCard] = useState<any>(null)
   const [selectedBoard, setSelectedBoard] = useState<string>("all")
+  const [sortByDueDate, setSortByDueDate] = useState(false)
   useEffect(() => {
     document.title = "My Tasks - QentFlow"
   }, [])
@@ -64,9 +104,16 @@ export default function MyTasksPage() {
     : {}
   const boardNames = Object.keys(groupedCards || {})
   const allCards = Object.values(filteredGroupedCards).flat()
-  const displayedCards = selectedBoard === "all"
-    ? allCards
-    : allCards.filter((card) => (card as Card).list.board.title === selectedBoard);
+  const displayedCards =
+    selectedBoard === "all" ? allCards : allCards.filter((card) => (card as Card).list.board.title === selectedBoard)
+
+  const sortedCards = sortByDueDate
+    ? [...displayedCards].sort((a: any, b: any) => {
+      if (!a.dueDate) return 1
+      if (!b.dueDate) return -1
+      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+    })
+    : displayedCards
 
   if (isLoading) {
     return (
@@ -79,35 +126,55 @@ export default function MyTasksPage() {
     )
   }
   return (
-    <div className="flex h-screen bg-gray-100">
-      <div className="w-1/3 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-200 space-y-4">
-          <h1 className="text-2xl font-bold">My Tasks</h1>
+    <div className="flex bg-gradient-to-br from-gray-50 to-gray-100 h-[calc(100vh-70px)]">
+      <div className="w-1/3 bg-white border-r border-gray-200 flex flex-col shadow-lg">
+        <div className="p-6 border-b border-gray-200 space-y-4">
+          <h1 className="text-3xl font-bold text-gray-800">My Tasks</h1>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
             <Input
-              className="pl-9 w-full"
+              className="pl-10 w-full bg-gray-50 border-gray-300 focus:border-primary focus:ring-primary"
               placeholder="Search tasks..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedBoard}>
-            <TabsList className="w-full h-auto flex flex-wrap gap-2 bg-muted/50 p-1">
-              <TabsTrigger value="all" className="flex-shrink-0">
-                All Boards
-              </TabsTrigger>
-              {boardNames.map((boardName) => (
-                <TabsTrigger key={boardName} value={boardName} className="flex-shrink-0">
-                  {boardName}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+          <div className="flex justify-between items-center">
+            <div className="w-full overflow-x-auto">
+              <Tabs defaultValue="all" className="w-full" onValueChange={setSelectedBoard}>
+                <TabsList className="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground w-auto">
+                  <TabsTrigger
+                    value="all"
+                    className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                  >
+                    All Boards
+                  </TabsTrigger>
+                  {boardNames.map((boardName) => (
+                    <TabsTrigger
+                      key={boardName}
+                      value={boardName}
+                      className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+                    >
+                      {boardName}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSortByDueDate(!sortByDueDate)}
+              className="ml-2 whitespace-nowrap flex-shrink-0"
+            >
+              <ArrowUpDown className="h-4 w-4 mr-1" />
+              <span>{sortByDueDate ? "Clear Sort" : "Sort by Due Date"}</span>
+            </Button>
+          </div>
         </div>
         <ScrollArea className="flex-grow">
           <AnimatePresence>
-            {displayedCards.map((card: any) => (
+            {sortedCards.map((card: any) => (
               <motion.div
                 key={card.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -116,65 +183,90 @@ export default function MyTasksPage() {
                 transition={{ duration: 0.2 }}
               >
                 <Card
-                  className={`m-2 cursor-pointer transition-all duration-200 hover:shadow-md ${selectedCard?.id === card.id ? "border-primary border" : ""
+                  className={`m-3 cursor-pointer transition-all duration-200 hover:shadow-md ${selectedCard?.id === card.id ? "border-primary border-2" : ""
                     }`}
                   onClick={() => setSelectedCard(card)}
                 >
                   <CardContent className="p-4">
-                    <Badge variant="outline" className="bg-white">
-                      {card.list.board.title}
-                    </Badge>
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="font-semibold truncate flex-1">{card.title}</p>
-                      <Link
-                        href={`/${currentWorkspace?.id}/boards/${card.list.board.id}`}
-                        className="ml-2 p-2 hover:bg-gray-100 rounded-full transition-colors"
-                        onClick={(e) => e.stopPropagation()}
+                    <div className="flex justify-between items-start mb-2">
+                      <Badge
+                        variant="outline"
+                        className="bg-gray-50 text-gray-600 mb-2"
+                        style={{
+                          borderLeft: `4px solid`,
+                          paddingLeft: "8px",
+                        }}
                       >
-                        <ExternalLink className="h-4 w-4 text-gray-500" />
-                      </Link>
-                    </div>
-                    <div className="flex items-center space-x-2 mb-2">
-
-                      <Badge variant="outline" className="bg-white">
+                        {card.list.board.title}
+                      </Badge>
+                      <Badge variant="outline" className="bg-gray-50 text-gray-600">
                         {card.list.title}
                       </Badge>
                     </div>
-                    <div className="flex items-center mt-2 space-x-2">
-                      {card.priority && (
-                        <Badge
-                          variant={
-                            card.priority === "HIGH"
-                              ? "destructive"
-                              : card.priority === "MEDIUM"
-                                ? "default"
-                                : "secondary"
-                          }
-                        >
-                          {card.priority}
-                        </Badge>
-                      )}
-                      {card.dueDate && (
-                        <Badge variant="outline" className="flex items-center">
-                          <Calendar className="h-3 w-3 mr-1" />
-                          {new Date(card.dueDate).toLocaleDateString()}
-                        </Badge>
-                      )}
+                    <div className="flex flex-wrap gap-1 my-2">
+                      {card.tags &&
+                        card.tags.length > 0 &&
+                        card.tags.map((tag: any) => (
+                          <Badge
+                            key={tag.id}
+                            className="text-xs"
+                            style={{
+                              backgroundColor: tag.color,
+                              color: "white",
+                            }}
+                          >
+                            {tag.name}
+                          </Badge>
+                        ))}
                     </div>
+                    <p className="font-semibold text-lg mb-2 text-gray-800">{card.title}</p>
+                    <p
+                      className="text-sm text-gray-500 mb-2 line-clamp-2"
+                      dangerouslySetInnerHTML={{ __html: card.description }}
+                    ></p>
+                    <div className="flex items-center justify-between mt-4">
+                      <div className="flex items-center w-full justify-between space-x-2">
+                        <div className="flex items-center">
+                          {card.priority && (
+                            <Badge
+                              variant={"outline"}
+                              className="flex items-center border-none"
+                            >
+                              {getPriorityIcon(card.priority)}
+                            </Badge>
+                          )}
+                          {card.dueDate && (
+                            <Badge variant="outline" className="flex items-center text-xs bg-gray-50">
+                              <Calendar className="h-3 w-3 mr-1" />
+                              {new Date(card.dueDate).toLocaleDateString()}
+                            </Badge>
+                          )}
+                        </div>
+                        <div>
+                          {card.tasks && card.tasks.length > 0 && (
+                            <Badge variant="outline" className="flex items-center text-xs bg-gray-50">
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              {card.tasks.filter((t: any) => t.completed).length}/{card.tasks.length}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
           </AnimatePresence>
-          {displayedCards.length === 0 && (
+          {sortedCards.length === 0 && (
             <div className="text-center py-10">
-              <AlertCircle className="h-10 w-10 mx-auto text-gray-400 mb-2" />
-              <p className="text-gray-500">No tasks found</p>
+              <AlertCircle className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+              <p className="text-gray-500 text-lg">No tasks found</p>
             </div>
           )}
         </ScrollArea>
       </div>
-      <div className="flex-grow bg-white p-6">
+      <div className="flex-grow bg-white p-8 overflow-y-auto">
         <AnimatePresence mode="wait">
           {selectedCard ? (
             <motion.div
@@ -183,91 +275,133 @@ export default function MyTasksPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.2 }}
-              className="space-y-6"
+              className="space-y-8"
             >
               <div className="flex items-center justify-between">
-                <p className="text-2xl font-bold">{selectedCard.title}</p>
+                <h2 className="text-3xl font-bold text-gray-800">{selectedCard.title}</h2>
                 <Link
                   href={`/${currentWorkspace?.id}/boards/${selectedCard.list.board.id}`}
                   className="flex items-center gap-2 px-4 py-2 text-sm text-primary hover:bg-primary/10 rounded-md transition-colors"
                 >
                   <ExternalLink className="h-4 w-4" />
-                  View in Board
+                  Open in Board
                 </Link>
               </div>
-              <Separator />
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-gray-500">Board</p>
-                  <Badge variant="outline" className="text-base font-normal">
+              <Separator className="bg-gray-200" />
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-gray-500">Board</p>
+                  <Badge
+                    variant="outline"
+                    className="text-base font-normal bg-gray-50 text-gray-700"
+                    style={{
+                      borderLeft: `4px solid`,
+                      paddingLeft: "8px",
+                    }}
+                  >
                     {selectedCard.list.board.title}
                   </Badge>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-gray-500">List</p>
-                  <Badge variant="outline" className="text-base font-normal">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-gray-500">List</p>
+                  <Badge variant="outline" className="text-base font-normal bg-gray-50 text-gray-700">
                     {selectedCard.list.title}
                   </Badge>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-gray-500">Priority</p>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-gray-500">Priority</p>
                   <Badge
-                    variant={
-                      selectedCard.priority === "HIGH"
-                        ? "destructive"
-                        : selectedCard.priority === "MEDIUM"
-                          ? "default"
-                          : "secondary"
-                    }
+                    variant={"outline"}
+                    className="text-base gap-x-1"
                   >
-                    {selectedCard.priority || "None"}
+                    {getPriorityIcon(selectedCard.priority)} {selectedCard.priority || "None"}
                   </Badge>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-gray-500">Due Date</p>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-gray-500">Due Date</p>
                   {selectedCard.dueDate ? (
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1 text-gray-400" />
+                    <div className="flex items-center text-gray-700">
+                      <Calendar className="h-5 w-5 mr-2 text-gray-400" />
                       {new Date(selectedCard.dueDate).toLocaleDateString()}
                     </div>
                   ) : (
-                    <p>No due date</p>
+                    <p className="text-gray-500">No due date</p>
                   )}
                 </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-gray-500">Created At</p>
+                  <div className="flex items-center text-gray-700">
+                    <Clock className="h-5 w-5 mr-2 text-gray-400" />
+                    {new Date(selectedCard.createdAt).toLocaleString()}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-gray-500">Updated At</p>
+                  <div className="flex items-center text-gray-700">
+                    <RefreshCw className="h-5 w-5 mr-2 text-gray-400" />
+                    {new Date(selectedCard.updatedAt).toLocaleString()}
+                  </div>
+                </div>
               </div>
-              <Separator />
+              <Separator className="bg-gray-200" />
+              {selectedCard.tags && selectedCard.tags.length > 0 && (
+                <>
+                  <div>
+                    <h3 className="text-xl font-semibold mb-4 text-gray-800">Tags</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedCard.tags.map((tag: any) => (
+                        <Badge
+                          key={tag.id}
+                          className="text-sm"
+                          style={{
+                            backgroundColor: tag.color,
+                            color: "white",
+                          }}
+                        >
+                          {tag.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <Separator className="bg-gray-200" />
+                </>
+              )}
               <div>
-                <p className="text-lg font-semibold mb-2">Description</p>
+                <h3 className="text-xl font-semibold mb-4 text-gray-800">Description</h3>
                 <div
-                  className="prose"
+                  className="prose max-w-none bg-gray-50 p-4 rounded-md"
                   dangerouslySetInnerHTML={{ __html: selectedCard.description }}
                 ></div>
               </div>
               {selectedCard.tasks && selectedCard.tasks.length > 0 && (
                 <>
-                  <Separator />
+                  <Separator className="bg-gray-200" />
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Tasks</h3>
-                    <div className="space-y-2">
+                    <h3 className="text-xl font-semibold mb-4 text-gray-800">Tasks</h3>
+                    <div className="space-y-3">
                       {selectedCard.tasks.map((task: any) => (
-                        <div key={task.id} className="flex items-center">
+                        <div key={task.id} className="flex items-center bg-gray-50 p-3 rounded-md">
                           {task.completed ? (
-                            <CheckCircle2 className="h-5 w-5 text-green-500 mr-2" />
+                            <CheckCircle2 className="h-6 w-6 text-green-500 mr-3" />
                           ) : (
-                            <Circle className="h-5 w-5 text-gray-300 mr-2" />
+                            <Circle className="h-6 w-6 text-gray-300 mr-3" />
                           )}
-                          <span className={task.completed ? "line-through text-gray-400" : ""}>{task.title}</span>
+                          <span
+                            className={`text-lg ${task.completed ? "line-through text-gray-400" : "text-gray-700"}`}
+                          >
+                            {task.title}
+                          </span>
                         </div>
                       ))}
                     </div>
-                    <div className="mt-4">
+                    <div className="mt-6">
                       <Progress
                         value={
                           (selectedCard.tasks.filter((t: any) => t.completed).length / selectedCard.tasks.length) * 100
                         }
                         className="h-2"
                       />
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="text-sm text-gray-500 mt-2">
                         {selectedCard.tasks.filter((t: any) => t.completed).length} of {selectedCard.tasks.length} tasks
                         completed
                       </p>
@@ -285,8 +419,8 @@ export default function MyTasksPage() {
               className="h-full flex items-center justify-center"
             >
               <div className="text-center">
-                <Clock className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-                <h2 className="text-2xl font-semibold text-gray-600">Select a task to view details</h2>
+                <Clock className="h-20 w-20 mx-auto text-gray-300 mb-6" />
+                <h2 className="text-3xl font-semibold text-gray-600">Select a task to view details</h2>
               </div>
             </motion.div>
           )}
@@ -295,3 +429,4 @@ export default function MyTasksPage() {
     </div>
   )
 }
+
