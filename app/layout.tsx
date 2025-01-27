@@ -9,8 +9,6 @@ import { CardModalProvider } from '@/providers/card-modal-provider'
 import { QueryProvider } from '@/providers/query-provider'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { ThemeProvider } from '@/providers/theme-provider'
-import { SocketProvider } from './(protected)/[workspaceId]/conversations/components/providers/socket-provider'
-import { ModalProvider } from './(protected)/[workspaceId]/conversations/components/providers/modal-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -38,8 +36,6 @@ export default async function RootLayout({
         >
           <SessionProvider session={session}>
             <WorkspaceProvider>
-              <SocketProvider>
-                <ModalProvider />
                 <QueryProvider>
                   <TooltipProvider>
                     <Toaster />
@@ -47,7 +43,6 @@ export default async function RootLayout({
                     {children}
                   </TooltipProvider>
                 </QueryProvider>
-              </SocketProvider>
             </WorkspaceProvider>
           </SessionProvider>
         </ThemeProvider>
