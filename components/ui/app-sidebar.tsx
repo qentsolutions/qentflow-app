@@ -53,11 +53,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: ListTodo,
         count: taskCount,
       },
-      {
-        name: "Conversations",
-        url: `/${workspaceId}/conversations`,
-        icon: MessageCircle,
-      },
     ],
     navMain: [
       {

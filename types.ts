@@ -1,15 +1,4 @@
-import {
-  Card,
-  List,
-  Tag,
-  Document,
-  WorkspaceMember,
-  User,
-  Server,
-} from "@prisma/client";
-import { NextApiResponse } from "next";
-import { Server as NetServer, Socket } from "net";
-import { Server as SocketIOServer } from "socket.io";
+import { Card, List, Tag, Document } from "@prisma/client";
 
 export type ListWithCards = List & {
   cards: Card[];
@@ -32,18 +21,6 @@ export type Comment = {
   };
 };
 
-export type ServerWithMembersWithProfiles = Server & {
-  workspaceMembers: (WorkspaceMember & { user: User })[];
-};
-
-export type NextApiResponseServerIo = NextApiResponse & {
-  socket: Socket & {
-    server: NetServer & {
-      io: SocketIOServer;
-    };
-  };
-};
-
 export interface Point {
   x: number;
   y: number;
@@ -51,12 +28,12 @@ export interface Point {
 
 export interface WhiteboardElement {
   id: string;
-  type: 'rectangle' | 'circle' | 'arrow' | 'text';
+  type: "rectangle" | "circle" | "arrow" | "text";
   startPoint: Point;
   endPoint?: Point;
   color: string;
   strokeWidth: number;
-  strokeStyle: 'solid' | 'dashed' | 'dotted';
+  strokeStyle: "solid" | "dashed" | "dotted";
   backgroundColor?: string;
   text?: string;
   width?: number;
@@ -76,10 +53,10 @@ export interface WhiteboardState {
   elements: WhiteboardElement[];
   selectedElement: WhiteboardElement | null;
   isDrawing: boolean;
-  currentTool: 'select' | 'rectangle' | 'circle' | 'arrow' | 'text';
+  currentTool: "select" | "rectangle" | "circle" | "arrow" | "text";
   currentColor: string;
   currentStrokeWidth: number;
-  currentStrokeStyle: 'solid' | 'dashed' | 'dotted';
+  currentStrokeStyle: "solid" | "dashed" | "dotted";
   currentBackgroundColor: string;
   showConnectors: boolean;
   nearestConnector: { elementId: string; point: Point } | null;
@@ -87,6 +64,6 @@ export interface WhiteboardState {
 
 export interface StyleOptions {
   strokeWidth: number;
-  strokeStyle: 'solid' | 'dashed' | 'dotted';
+  strokeStyle: "solid" | "dashed" | "dotted";
   backgroundColor: string;
 }
