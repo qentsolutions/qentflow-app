@@ -27,6 +27,7 @@ export const TimelineView = ({ data, boardId }: TimelineViewProps) => {
     eachDayOfInterval({ start: startOfMonth(month), end: endOfMonth(month) })
   );
 
+  
   const calculatePosition = (date: Date) => {
     const dayIndex = differenceInDays(date, allDays[0]);
     return dayIndex * DAY_WIDTH;
