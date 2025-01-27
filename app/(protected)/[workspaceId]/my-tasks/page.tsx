@@ -191,7 +191,7 @@ export default function MyTasksPage() {
                     <Filter className="mr-2 h-4 w-4" />
                     Filters
                     {selectedBoards.length > 0 || selectedTags.length > 0 || sortByDueDate ? (
-                      <span className="ml-2 flex items-center justify-center rounded-full bg-primary text-white text-xs w-6 h-6">
+                      <span className="ml-2 flex items-center justify-center rounded-full bg-blue-500 text-white text-xs w-6 h-6">
                         {selectedBoards.length + selectedTags.length + (sortByDueDate ? 1 : 0)}
                       </span>
                     ) : null}
