@@ -71,6 +71,7 @@ export interface WhiteboardElement {
   connectedTo?: string[];
 }
 
+
 export interface WhiteboardState {
   elements: WhiteboardElement[];
   selectedElement: WhiteboardElement | null;
