@@ -136,15 +136,15 @@ export default function MyTasksPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6 space-y-4">
-        <Skeleton className="h-12 w-full" />
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-[200px] w-full" />
-        ))}
-      </div>
-    )
-  }
+      <div className="flex h-screen ">
+        {/* Left Panel */}
+        <div className="w-1/3 h-full bg-gray-100 m-4 rounded"></div>
 
+        {/* Right Panel */}
+        <div className="flex-1 h-full bg-gray-100 m-4 rounded"></div>
+      </div>
+    );
+  }
   const allTags = Array.from(
     new Set(
       assignedCards
