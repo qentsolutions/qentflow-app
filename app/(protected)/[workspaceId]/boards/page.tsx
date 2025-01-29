@@ -12,7 +12,7 @@ const BoardPage = () => {
 
   return (
     <div className="w-full bg-gray-50 h-[calc(100vh-70px)]">
-      <div className="px-2 md:px-4 w-full">
+      <div className="p-2 w-full">
         <BoardList />
       </div>
     </div>

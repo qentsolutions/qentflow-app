@@ -96,8 +96,8 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
   }
 
   return (
-    <div className="w-full p-4 bg-gray-50 h-[calc(100vh-70px)]">
-      <Card className="shadow-none rounded-md h-full">
+    <div className="w-full p-2 bg-gray-50 h-[calc(100vh-70px)]">
+      <Card className="shadow-none rounded-none h-full">
         <main className="relative w-full mx-auto h-full">
           <div className="flex flex-col h-full w-full">
             <div className="flex items-center justify-between px-6 pt-6">
