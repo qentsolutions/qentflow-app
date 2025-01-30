@@ -95,7 +95,7 @@ export default function DocsPage() {
   };
 
   return (
-    <div className="p-2 h-screen bg-gray-50">
+    <div className="p-2 h-[calc(100vh-70px)] bg-gray-50">
       <Card className="shadow-sm rounded-none w-full">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <div className="flex flex-col space-y-4">

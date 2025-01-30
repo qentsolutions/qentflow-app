@@ -7,6 +7,7 @@ import { currentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { TimelineView } from "./components/timeline-view";
 import { Card } from "@/components/ui/card";
+import { BoardOverview } from "./components/overview/overview";
 
 interface BoardIdPageProps {
   params: {
@@ -106,11 +107,15 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
             <div className="flex w-full items-center gap-4 mb-6 mt-4">
               <Tabs defaultValue="board" className="w-full ">
                 <TabsList className="px-6">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
                   <TabsTrigger value="board">Board</TabsTrigger>
                   <TabsTrigger value="timeline">Timeline</TabsTrigger>
                   <TabsTrigger value="settings">Settings</TabsTrigger>
                 </TabsList>
                 <div className="mt-4"></div>
+                <TabsContent value="overview">
+                  <BoardOverview board={board} />
+                </TabsContent>
                 <TabsContent value="board">
                   <BoardContent users={board.User} boardId={board.id} lists={board.lists} />
                 </TabsContent>

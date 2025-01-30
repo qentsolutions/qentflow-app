@@ -24,7 +24,7 @@ export function NavMain({
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>Collaboration</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
           // Vérifie si l'URL actuelle commence par l'URL de l'item
