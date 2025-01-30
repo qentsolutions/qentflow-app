@@ -195,7 +195,7 @@ export const boardTemplates = [
     id: "hr-onboarding",
     title: "HR Onboarding",
     description: "Track employee onboarding tasks",
-    icon: "👩‍💼",
+    icon: "⌨️",
     lists: [
       { title: "Pre-boarding", cards: [] },
       { title: "First Day", cards: [] },

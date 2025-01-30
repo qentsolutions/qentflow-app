@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Layout, Loader2 } from "lucide-react"
+import Image from "next/image"
 
 interface CreateBoardModalProps {
   isOpen: boolean
@@ -67,6 +68,7 @@ export const CreateBoardModal = ({ isOpen, onClose, workspaceId, templateId }: C
                 <Layout className="w-6 h-6 text-primary" />
                 Create Board
               </DialogTitle>
+
             </DialogHeader>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -88,11 +90,20 @@ export const CreateBoardModal = ({ isOpen, onClose, workspaceId, templateId }: C
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                 </div>
-                <div className="bg-gray-50 p-4 rounded-md">
+                <div className="bg-gray-50 border p-4 rounded-md">
                   <p className="text-sm text-gray-600">
                     Template: <span className="font-medium">{template?.title}</span>
                   </p>
                 </div>
+                <Image
+                  src="/board-img.png"
+                  alt="board image"
+                  width={1200} // La largeur de l'image en pixels
+                  height={200} // La hauteur de l'image en pixels
+                  layout="responsive" // Cela permet à l'image de prendre la largeur complète de son conteneur
+                  objectFit="cover" // Facultatif, mais permet de remplir l'espace sans déformation
+                  className="border rounded-xl shadow-md"
+                />
                 <div className="flex justify-end gap-x-2">
                   <Button type="button" variant="outline" onClick={onClose} disabled={isLoading} className="px-4 py-2">
                     Cancel
