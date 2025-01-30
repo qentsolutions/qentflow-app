@@ -219,6 +219,7 @@ export const Tasks = ({ cardId }: TasksProps) => {
             {isAddingTask && (
                 <div className="flex items-center gap-2">
                     <Input
+                        autoFocus
                         placeholder="Enter task title..."
                         value={newTaskTitle}
                         onChange={(e) => setNewTaskTitle(e.target.value)}

@@ -3,6 +3,7 @@
 import * as React from "react";
 import {
   CalendarDays,
+  FileText,
   LayoutDashboard,
   ListTodo,
   MessageCircle,
@@ -50,7 +51,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {
         name: "My Tasks",
         url: `/${workspaceId}/my-tasks`,
-        icon: ListTodo,
+        icon: ListTodo, 
         count: taskCount,
       },
     ],
@@ -59,6 +60,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         name: "Boards",
         url: `/${workspaceId}/boards`,
         icon: SquareKanban,
+        isActive: false,
+      },
+      {
+        name: "Documents",
+        url: `/${workspaceId}/documents`,
+        icon: FileText,
         isActive: false,
       },
     ],

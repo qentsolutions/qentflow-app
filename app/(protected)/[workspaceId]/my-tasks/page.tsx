@@ -385,8 +385,11 @@ export default function MyTasksPage() {
                   href={`/${currentWorkspace?.id}/boards/${selectedCard.list.board.id}`}
                   className="flex items-center gap-2 px-4 py-2 text-sm text-primary hover:bg-primary/10 rounded-md transition-colors"
                 >
-                  <ExternalLink className="h-4 w-4" />
-                  Open in Board
+                  <Button variant="default" size="sm">
+                    <ExternalLink className="h-4 w-4" />
+                    Open Board
+                  </Button>
+
                 </Link>
               </div>
               <Separator className="bg-gray-200" />

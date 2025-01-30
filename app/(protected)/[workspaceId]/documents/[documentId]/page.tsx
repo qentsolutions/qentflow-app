@@ -9,9 +9,6 @@ import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
 import { DocumentHeader } from "./document-header";
 import { Editor } from "./editor";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Link2, Check, RotateCw } from "lucide-react";
-import { LinkCardsDialog } from "./links-cards-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DocumentPage() {
@@ -65,21 +62,7 @@ export default function DocumentPage() {
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between">
                         <DocumentHeader document={document} />
-                        <div className="flex items-center gap-4">
-                            {isSaving ? (
-                                <div className="text-sm text-muted-foreground flex items-center"><RotateCw className="h-4 w-4 mr-2" />Auto saving...</div>
-                            ) : (
-                              <p className="text-gray-400 flex items-center"><Check className="h-4 w-4 mr-2" />Saved</p>
-                            )}
-                
-                            <Button
-                                variant="outline"
-                                onClick={() => setIsLinkCardsOpen(true)}
-                            >
-                                <Link2 className="h-4 w-4 mr-2" />
-                                Link Cards
-                            </Button>
-                        </div>
+                       
 
                     </div>
                 </div>
@@ -94,11 +77,6 @@ export default function DocumentPage() {
                     </Card>
                 </div>
             </div>
-            <LinkCardsDialog
-                isOpen={isLinkCardsOpen}
-                onClose={() => setIsLinkCardsOpen(false)}
-                documentId={documentId}
-            />
         </div>
     );
 }
