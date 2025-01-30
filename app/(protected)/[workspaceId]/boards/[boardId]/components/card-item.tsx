@@ -244,7 +244,7 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                 value={
                   (data.tasks.filter(task => task.completed).length / data.tasks.length) * 100
                 }
-                className="h-1 w-[calc(100%-6px)] mx-auto"
+                className="h-1 w-[calc(100%-4px)] mx-auto"
               />
             </div>
           )}

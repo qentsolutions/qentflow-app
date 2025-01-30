@@ -57,7 +57,7 @@ export default function DocumentPage() {
     }
 
     return (
-        <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="flex flex-col dark:bg-gray-900">
             <div className="border-b bg-white dark:bg-gray-800 shadow-sm">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between">

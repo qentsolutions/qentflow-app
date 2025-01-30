@@ -7,7 +7,7 @@ import { currentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { TimelineView } from "./components/timeline-view";
 import { Card } from "@/components/ui/card";
-import { BoardOverview } from "./components/overview/overview";
+import { Separator } from "@/components/ui/separator";
 
 interface BoardIdPageProps {
   params: {
@@ -69,6 +69,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
               order: "asc",
             },
           },
+
         },
         orderBy: {
           order: "asc",
@@ -97,7 +98,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
   }
 
   return (
-    <div className="w-full p-2 bg-gray-50 h-[calc(100vh-70px)]">
+    <div className="w-full p-2  h-[calc(100vh-70px)]">
       <Card className="shadow-none rounded-none h-full">
         <main className="relative w-full mx-auto h-full">
           <div className="flex flex-col h-full w-full">
@@ -105,16 +106,16 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
               <BoardNavbar board={board} />
             </div>
             <div className="flex w-full items-center gap-4 mb-6 mt-4">
-              <Tabs defaultValue="board" className="w-full ">
+              <Tabs defaultValue="board" className="w-full cursor-pointer">
                 <TabsList className="px-6">
                   <TabsTrigger value="overview">Overview</TabsTrigger>
                   <TabsTrigger value="board">Board</TabsTrigger>
                   <TabsTrigger value="timeline">Timeline</TabsTrigger>
                   <TabsTrigger value="settings">Settings</TabsTrigger>
                 </TabsList>
-                <div className="mt-4"></div>
+                <Separator />
                 <TabsContent value="overview">
-                  <BoardOverview board={board} />
+
                 </TabsContent>
                 <TabsContent value="board">
                   <BoardContent users={board.User} boardId={board.id} lists={board.lists} />

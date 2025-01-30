@@ -156,7 +156,7 @@ export const KanbanView = ({ data, boardId, users }: ListContainerProps) => {
           <ol
             {...provided.droppableProps}
             ref={provided.innerRef}
-            className="flex gap-x-3 h-full pb-8 p-4 md:max-w-6xl px-4"
+            className="flex gap-x-3 h-full pb-8 p-2 md:max-w-6xl px-4"
           >
             {orderedData.map((list, index) => (
               <ListItem key={list.id} index={index} data={list} users={users} />

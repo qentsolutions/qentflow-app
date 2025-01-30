@@ -10,7 +10,7 @@ interface WorkspaceLayoutProps {
 const WorkspaceLayout = ({ children }: WorkspaceLayoutProps) => {
   return (
     <QueryProvider>
-      <div className="h-full w-full bg-gray-50">
+      <div className="h-full w-full">
         {children}
       </div>
     </QueryProvider>

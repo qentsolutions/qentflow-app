@@ -185,7 +185,6 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                       </ScrollArea>
                     </div>
                   </div>
-
                   <Separator orientation="vertical" className="h-auto bg-border/60" />
 
                   {/* Priority Section */}
