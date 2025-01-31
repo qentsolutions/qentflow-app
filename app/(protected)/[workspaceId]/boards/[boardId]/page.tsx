@@ -9,6 +9,7 @@ import { TimelineView } from "./components/timeline-view";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { OverviewView } from "./components/overview/overview-view";
+import { CalendarView } from "./components/calendar-view";
 
 interface BoardIdPageProps {
   params: {
@@ -112,6 +113,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                   <TabsTrigger value="overview">Overview</TabsTrigger>
                   <TabsTrigger value="board">Board</TabsTrigger>
                   <TabsTrigger value="timeline">Timeline</TabsTrigger>
+                  <TabsTrigger value="calendar">Calendar</TabsTrigger>
                   <TabsTrigger value="settings">Settings</TabsTrigger>
                 </TabsList>
                 <Separator />
@@ -123,6 +125,9 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                 </TabsContent>
                 <TabsContent value="timeline">
                   <TimelineView boardId={board.id} data={board.lists} />
+                </TabsContent>
+                <TabsContent value="calendar">
+                  <CalendarView boardId={board.id} data={board.lists} />
                 </TabsContent>
                 <TabsContent value="settings">
                   <Settings
