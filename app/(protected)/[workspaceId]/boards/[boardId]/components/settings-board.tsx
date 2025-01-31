@@ -27,12 +27,6 @@ const Settings = ({ boardId, boardTitle, users, createdById }: BoardSettingsProp
       component: <GeneralSettings boardId={boardId} boardTitle={boardTitle} createdById={createdById} />,
     },
     {
-      id: "image",
-      label: "Image",
-      icon: Image,
-      component: <UploadBoardImage boardId={boardId} workspaceId={currentWorkspace?.id || ""} />,
-    },
-    {
       id: "members",
       label: "Members",
       icon: Users,

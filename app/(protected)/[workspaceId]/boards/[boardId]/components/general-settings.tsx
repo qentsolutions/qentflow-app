@@ -19,6 +19,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import UploadBoardImage from "./board-image";
 
 interface GeneralSettingsProps {
   boardId: string;
@@ -75,7 +76,9 @@ export const GeneralSettings = ({ boardId, boardTitle, createdById }: GeneralSet
 
   return (
     <div className="p-6">
-      <form onSubmit={onSubmit} className="space-y-4">
+      <p className="text-sm font-medium text-gray-700 mb-2">Board Image Background</p>
+      <UploadBoardImage boardId={boardId} workspaceId={currentWorkspace?.id || ""} />
+      <form onSubmit={onSubmit} className="space-y-4 mt-4">
         <div>
           <label className="text-sm font-medium text-gray-700">Board Name</label>
           <Input

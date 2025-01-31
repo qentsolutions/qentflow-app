@@ -10,6 +10,7 @@ import { createTag } from "@/actions/tasks/create-tag";
 import { deleteTag } from "@/actions/tasks/delete-tag";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface TagManagerProps {
   boardId: string;
@@ -91,31 +92,34 @@ export const TagManager = ({ boardId }: TagManagerProps) => {
       </form>
 
       {/* Liste des tags existants */}
-      <div className="space-y-4">
-        {tags?.map((tag: any) => (
-          <div
-            key={tag.id}
-            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
-          >
-            <div className="flex items-center space-x-3">
-              <Badge
-                style={{ backgroundColor: tag.color }}
-                className="text-white px-3 py-1 rounded"
-              >
-                {tag.name}
-              </Badge>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-red-500 hover:text-red-700"
-              onClick={() => handleDeleteTag(tag.id)}
+      <ScrollArea className="h-[500px]">
+        <div className="space-y-4">
+          {tags?.map((tag: any) => (
+            <div
+              key={tag.id}
+              className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
             >
-              Delete
-            </Button>
-          </div>
-        ))}
-      </div>
+              <div className="flex items-center space-x-3">
+                <Badge
+                  style={{ backgroundColor: tag.color }}
+                  className="text-white px-3 py-1 rounded"
+                >
+                  {tag.name}
+                </Badge>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-red-500 hover:text-red-700"
+                onClick={() => handleDeleteTag(tag.id)}
+              >
+                Delete
+              </Button>
+            </div>
+          ))}
+        </div>
+      </ScrollArea>
+
     </div>
   );
 };

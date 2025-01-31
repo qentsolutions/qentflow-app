@@ -122,7 +122,7 @@ export const AttachmentList = ({ cardId }: AttachmentListProps) => {
       )}
 
       <Dialog open={!!selectedAttachment} onOpenChange={() => setSelectedAttachment(null)}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-6xl">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <span>{selectedAttachment?.name}</span>
@@ -141,14 +141,6 @@ export const AttachmentList = ({ cardId }: AttachmentListProps) => {
                 >
                   <Download className="h-4 w-4 mr-2" />
                   Download
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => window.open(selectedAttachment.url, "_blank")}
-                >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Open in new tab
                 </Button>
               </div>
             </DialogTitle>
