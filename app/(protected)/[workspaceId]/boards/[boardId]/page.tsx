@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { TimelineView } from "./components/timeline-view";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { OverviewView } from "./components/overview/overview-view";
 
 interface BoardIdPageProps {
   params: {
@@ -115,7 +116,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                 </TabsList>
                 <Separator />
                 <TabsContent value="overview">
-
+                  <OverviewView lists={board.lists} users={board?.User} />
                 </TabsContent>
                 <TabsContent value="board">
                   <BoardContent users={board.User} boardId={board.id} lists={board.lists} />
