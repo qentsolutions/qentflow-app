@@ -14,6 +14,9 @@ import {
     isSameMonth,
     isSameDay,
     parseISO,
+    getDay,
+    addDays,
+    subDays,
 } from "date-fns"
 import { enUS } from "date-fns/locale"
 import { motion } from "framer-motion"
@@ -32,18 +35,22 @@ export const CalendarView = ({ data, boardId }: CalendarViewProps) => {
     const monthEnd = endOfMonth(currentDate)
     const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd })
 
-    const startDay = monthStart.getDay()
-    const endDay = 6 - monthEnd.getDay()
+    // Calculer le premier jour du mois (0 = dimanche, 1 = lundi, etc.)
+    const firstDayOfMonth = getDay(monthStart)
+    
+    // Ajuster pour commencer par lundi (1) au lieu de dimanche (0)
+    const startDay = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1
+    
+    // Calculer les jours du mois précédent
+    const prevMonthDays = Array.from({ length: startDay }, (_, i) => 
+        subDays(monthStart, startDay - i)
+    )
 
-    const prevMonthDays = eachDayOfInterval({
-        start: subMonths(monthStart, 1),
-        end: subMonths(monthStart, 1),
-    }).slice(-startDay)
-
-    const nextMonthDays = eachDayOfInterval({
-        start: addMonths(monthEnd, 1),
-        end: addMonths(monthEnd, 1),
-    }).slice(0, endDay)
+    // Calculer les jours du mois suivant
+    const remainingDays = (7 - ((monthDays.length + startDay) % 7)) % 7
+    const nextMonthDays = Array.from({ length: remainingDays }, (_, i) => 
+        addDays(monthEnd, i + 1)
+    )
 
     const allDays = [...prevMonthDays, ...monthDays, ...nextMonthDays]
 
@@ -91,17 +98,17 @@ export const CalendarView = ({ data, boardId }: CalendarViewProps) => {
                             <div
                                 key={day.toString()}
                                 className={`
-                  h-24 p-1 border border-gray-200 dark:border-gray-700 
-                  ${!isSameMonth(day, currentDate) ? "bg-gray-100 dark:bg-gray-800" : "bg-white dark:bg-gray-900"}
-                  ${isSameDay(day, new Date()) ? "ring-2 ring-blue-500" : ""}
-                `}
+                                    h-24 p-1 border border-gray-200 dark:border-gray-700 
+                                    ${!isSameMonth(day, currentDate) ? "bg-gray-100 dark:bg-gray-800" : "bg-white dark:bg-gray-900"}
+                                    ${isSameDay(day, new Date()) ? "ring-2 ring-blue-500" : ""}
+                                `}
                             >
                                 <div className="text-right">
                                     <span
                                         className={`
-                    text-sm ${!isSameMonth(day, currentDate) ? "text-gray-400 dark:text-gray-600" : "text-gray-700 dark:text-gray-300"}
-                    ${isSameDay(day, new Date()) ? "font-bold text-blue-500" : ""}
-                  `}
+                                            text-sm ${!isSameMonth(day, currentDate) ? "text-gray-400 dark:text-gray-600" : "text-gray-700 dark:text-gray-300"}
+                                            ${isSameDay(day, new Date()) ? "font-bold text-blue-500" : ""}
+                                        `}
                                     >
                                         {format(day, "d")}
                                     </span>
@@ -138,4 +145,3 @@ export const CalendarView = ({ data, boardId }: CalendarViewProps) => {
         </Card>
     )
 }
-

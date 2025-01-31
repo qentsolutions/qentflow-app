@@ -112,8 +112,8 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                 <TabsList className="px-6">
                   <TabsTrigger value="overview">Overview</TabsTrigger>
                   <TabsTrigger value="board">Board</TabsTrigger>
-                  <TabsTrigger value="timeline">Timeline</TabsTrigger>
                   <TabsTrigger value="calendar">Calendar</TabsTrigger>
+                  <TabsTrigger value="timeline">Timeline</TabsTrigger>
                   <TabsTrigger value="settings">Settings</TabsTrigger>
                 </TabsList>
                 <Separator />
@@ -123,11 +123,11 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                 <TabsContent value="board">
                   <BoardContent users={board.User} boardId={board.id} lists={board.lists} />
                 </TabsContent>
-                <TabsContent value="timeline">
-                  <TimelineView boardId={board.id} data={board.lists} />
-                </TabsContent>
                 <TabsContent value="calendar">
                   <CalendarView boardId={board.id} data={board.lists} />
+                </TabsContent>
+                <TabsContent value="timeline">
+                  <TimelineView boardId={board.id} data={board.lists} />
                 </TabsContent>
                 <TabsContent value="settings">
                   <Settings
