@@ -6,8 +6,6 @@ import { useState, useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { fetcher } from "@/lib/fetcher"
 import {
-  CheckIcon,
-  Plus,
   RefreshCcw,
   Search,
   SignalHigh,
@@ -15,22 +13,27 @@ import {
   SignalLow,
   SignalMedium,
   AlertTriangle,
+  ArrowUpDown,
+  ArrowDown,
+  ArrowUp,
   User,
-  ArrowUpIcon,
-  ArrowDownIcon,
+  Plus,
+  CheckIcon,
 } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { useBoardFilters } from "@/hooks/use-board-filters"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import CreateTagForm from "./create-tag-form"
 import { ListView } from "./list-view"
 import { useRouter } from "next/navigation"
+import { Separator } from "@/components/ui/separator"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { AlertDialogHeader } from "@/components/ui/alert-dialog"
+import CreateTagForm from "./create-tag-form"
 
 interface BoardContentProps {
   boardId: string
@@ -44,26 +47,6 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
   const [userSearchTerm, setUserSearchTerm] = useState("")
   const [isCreateTagOpen, setIsCreateTagOpen] = useState(false)
   const router = useRouter()
-  const [sortBy, setSortBy] = useState<string | null>(null)
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
-
-  const handleSort = (field: string) => {
-    if (sortBy === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
-    } else {
-      setSortBy(field)
-      setSortDirection("asc")
-    }
-  }
-
-  const getSortIcon = (field: string) => {
-    if (sortBy !== field) return null
-    return sortDirection === "asc" ? (
-      <ArrowUpIcon className="h-4 w-4 ml-2" />
-    ) : (
-      <ArrowDownIcon className="h-4 w-4 ml-2" />
-    )
-  }
 
   const {
     searchTerm,
@@ -75,6 +58,10 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     selectedPriority,
     setSelectedPriority,
     getFilteredLists,
+    sortBy,
+    setSortBy,
+    sortDirection,
+    setSortDirection,
   } = useBoardFilters({ lists })
 
   const { data: availableTags } = useQuery({
@@ -130,10 +117,32 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     }
   }
 
+  const handleSort = (newSortBy: string) => {
+    if (sortBy === newSortBy) {
+      if (sortDirection === "desc") {
+        setSortBy(null)
+        setSortDirection("asc")
+      } else {
+        setSortDirection("desc")
+      }
+    } else {
+      setSortBy(newSortBy)
+      setSortDirection("asc")
+    }
+  }
+
+  const sortOptions = [
+    { label: "Title", value: "title" },
+    { label: "Status", value: "status" },
+    { label: "Priority", value: "priority" },
+    { label: "Assigned", value: "assigned" },
+    { label: "Start Date", value: "startDate" },
+  ]
+
   return (
     <>
       <div className="flex items-center justify-between gap-4 mb-4 px-6">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -276,34 +285,36 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" size="sm" className="h-9 px-3 gap-1">
-                <ArrowUpIcon className="h-4 w-4" />
+                <ArrowUpDown className="h-4 w-4" />
                 Sort
                 {sortBy && (
                   <Badge variant="secondary" className="ml-1 px-1 py-0 text-xs">
-                    1
+                    {sortBy}
                   </Badge>
                 )}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-2" align="start">
-              <div className="space-y-1">
-                {[
-                  { label: "Title", value: "title" },
-                  { label: "Status", value: "status" },
-                  { label: "Priority", value: "priority" },
-                  { label: "Assigned", value: "assigned" },
-                  { label: "Start Date", value: "startDate" },
-                ].map((option) => (
-                  <Button
-                    key={option.value}
-                    variant="ghost"
-                    className="w-full justify-between"
-                    onClick={() => handleSort(option.value)}
-                  >
-                    {option.label}
-                    {getSortIcon(option.value)}
-                  </Button>
-                ))}
+            <PopoverContent className="w-[200px] p-0" align="start">
+              <div className="p-2">
+                <h4 className="font-medium mb-2">Sort by</h4>
+                <Separator className="mb-2" />
+                <div className="space-y-1">
+                  {sortOptions.map((option) => (
+                    <Button
+                      key={option.value}
+                      variant="ghost"
+                      className={cn(
+                        "w-full justify-between font-normal",
+                        sortBy === option.value && "bg-accent text-accent-foreground",
+                      )}
+                      onClick={() => handleSort(option.value)}
+                    >
+                      {option.label}
+                      {sortBy === option.value &&
+                        (sortDirection === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />)}
+                    </Button>
+                  ))}
+                </div>
               </div>
             </PopoverContent>
           </Popover>
