@@ -229,7 +229,7 @@ export const Tasks = ({ cardId }: TasksProps) => {
                             }
                         }}
                     />
-                    <Button onClick={handleAddTask}>Add</Button>
+                    <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleAddTask}>Add</Button>
                     <Button variant="ghost" onClick={() => setIsAddingTask(false)}>
                         Cancel
                     </Button>

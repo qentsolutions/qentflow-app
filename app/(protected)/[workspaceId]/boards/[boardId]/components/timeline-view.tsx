@@ -45,7 +45,7 @@ export const TimelineView = ({ data, boardId }: TimelineViewProps) => {
 
   return (
     <div className="space-y-4 py-2 max-w-[calc(100vw-20vw)] mx-auto">
-      <Card className="bg-white dark:bg-gray-800 shadow-md overflow-hidden">
+      <Card className="bg-white dark:bg-gray-800 shadow-none overflow-hidden">
         <div className=" relative">
           {/* Colonne fixe pour les titres des listes */}
           <div className="absolute left-0 top-0 bottom-0 w-[200px] bg-white dark:bg-gray-800 z-20 border-r dark:border-gray-700">

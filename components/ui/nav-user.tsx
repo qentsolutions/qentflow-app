@@ -125,7 +125,7 @@ export function NavUser({ user }: { user: any }) {
             <SidebarMenuItem>
                 <SidebarMenuButton
                     onClick={() => setShowInvitations(true)}
-                    className="w-full justify-start hover:bg-gray-100"
+                    className="w-full justify-start py-4 hover:bg-gray-100"
                 >
                     <Inbox className="mr-1 h-4 w-4" />
                     Invitations
@@ -224,7 +224,7 @@ export function NavUser({ user }: { user: any }) {
             <SidebarMenuItem>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <SidebarMenuButton className="flex items-center justify-between gap-3 my-1 py-5 rounded-lg hover:bg-gray-100">
+                        <SidebarMenuButton className="flex items-center justify-between gap-3 mb-2 py-4 rounded-lg hover:bg-gray-100">
                             <div className="flex items-center gap-x-2">
                                 <Bell className="mr-1 h-4 w-4" />
                                 <span className="font-medium">Notifications</span>
@@ -240,7 +240,7 @@ export function NavUser({ user }: { user: any }) {
                         <Tabs defaultValue={currentWorkspace?.id || "all"} className="px-2 pb-2 w-96">
                             <ScrollArea>
                                 <div className="flex items-center">
-                                    <p className="px-2 py-4 font-medium">Notifications</p>
+                                    <p className="px-2 py-2 font-medium">Notifications</p>
                                 </div>
                                 <TabsList>
                                     <TabsTrigger value="all">All</TabsTrigger>

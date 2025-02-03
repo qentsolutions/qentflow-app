@@ -16,6 +16,8 @@ import {
   SignalMedium,
   AlertTriangle,
   User,
+  ArrowUpIcon,
+  ArrowDownIcon,
 } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Input } from "@/components/ui/input"
@@ -42,6 +44,26 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
   const [userSearchTerm, setUserSearchTerm] = useState("")
   const [isCreateTagOpen, setIsCreateTagOpen] = useState(false)
   const router = useRouter()
+  const [sortBy, setSortBy] = useState<string | null>(null)
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
+
+  const handleSort = (field: string) => {
+    if (sortBy === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+    } else {
+      setSortBy(field)
+      setSortDirection("asc")
+    }
+  }
+
+  const getSortIcon = (field: string) => {
+    if (sortBy !== field) return null
+    return sortDirection === "asc" ? (
+      <ArrowUpIcon className="h-4 w-4 ml-2" />
+    ) : (
+      <ArrowDownIcon className="h-4 w-4 ml-2" />
+    )
+  }
 
   const {
     searchTerm,
@@ -248,6 +270,40 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                     </div>
                   </ScrollArea>
                 </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9 px-3 gap-1">
+                <ArrowUpIcon className="h-4 w-4" />
+                Sort
+                {sortBy && (
+                  <Badge variant="secondary" className="ml-1 px-1 py-0 text-xs">
+                    1
+                  </Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[200px] p-2" align="start">
+              <div className="space-y-1">
+                {[
+                  { label: "Title", value: "title" },
+                  { label: "Status", value: "status" },
+                  { label: "Priority", value: "priority" },
+                  { label: "Assigned", value: "assigned" },
+                  { label: "Start Date", value: "startDate" },
+                ].map((option) => (
+                  <Button
+                    key={option.value}
+                    variant="ghost"
+                    className="w-full justify-between"
+                    onClick={() => handleSort(option.value)}
+                  >
+                    {option.label}
+                    {getSortIcon(option.value)}
+                  </Button>
+                ))}
               </div>
             </PopoverContent>
           </Popover>

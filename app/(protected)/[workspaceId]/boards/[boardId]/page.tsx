@@ -10,14 +10,14 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { OverviewView } from "./components/overview/overview-view";
 import { CalendarView } from "./components/calendar-view";
-
+import { Calendar, Clock, LayoutDashboard, ListTodo, SettingsIcon } from "lucide-react";
+import { AddCardButton } from "./components/add-card-button";
 interface BoardIdPageProps {
   params: {
     boardId: string;
     workspaceId: string;
   };
 }
-
 export async function generateMetadata({ params }: { params: { boardId: string; workspaceId: string } }) {
   const board = await db.board.findUnique({
     where: {
@@ -25,16 +25,12 @@ export async function generateMetadata({ params }: { params: { boardId: string; 
       workspaceId: params.workspaceId,
     },
   });
-
   if (!board) {
     return { title: "Board Not Found | MyApp" };
   }
-
   return { title: `${board.title} - QentFlow` };
 }
-
 const BoardIdPage = async ({ params }: BoardIdPageProps) => {
-
   const user = await currentUser();
   const isMember = await db.workspaceMember.findFirst({
     where: {
@@ -42,12 +38,9 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
       userId: user?.id,
     },
   });
-
   if (!isMember) {
     redirect(`/${params.workspaceId}/boards`);
   }
-
-
   const board = await db.board.findUnique({
     where: {
       id: params.boardId,
@@ -71,7 +64,6 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
               order: "asc",
             },
           },
-
         },
         orderBy: {
           order: "asc",
@@ -87,20 +79,15 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
       },
     },
   });
-
   if (!board) {
     return <div>Board not found</div>;
   }
-
-
   const isBoardMember = board.User.some((boardUser) => boardUser.id === user?.id);
-
   if (!isBoardMember) {
     redirect(`/${params.workspaceId}/boards`);
   }
-
   return (
-    <div className="w-full p-2  h-[calc(100vh-70px)]">
+    <div className="w-full p-2 h-[calc(100vh-70px)]">
       <Card className="shadow-none rounded-none h-full">
         <main className="relative w-full mx-auto h-full">
           <div className="flex flex-col h-full w-full">
@@ -108,14 +95,36 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
               <BoardNavbar board={board} />
             </div>
             <div className="flex w-full items-center gap-4 mb-6 mt-4">
-              <Tabs defaultValue="board" className="w-full cursor-pointer">
-                <TabsList className="px-6">
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="board">Board</TabsTrigger>
-                  <TabsTrigger value="calendar">Calendar</TabsTrigger>
-                  <TabsTrigger value="timeline">Timeline</TabsTrigger>
-                  <TabsTrigger value="settings">Settings</TabsTrigger>
-                </TabsList>
+              <Tabs defaultValue="board" className="w-full">
+                <div className="flex items-center justify-between pl-6 pr-4">
+                  <TabsList className="cursor-pointer">
+                    <TabsTrigger value="overview">
+                      <LayoutDashboard className="w-4 h-4 mr-2" />
+                      Overview
+                    </TabsTrigger>
+                    <TabsTrigger value="board">
+                      <ListTodo className="w-4 h-4 mr-2" />
+                      Board
+                    </TabsTrigger>
+                    <TabsTrigger value="calendar">
+                      <Calendar className="w-4 h-4 mr-2" />
+                      Calendar
+                    </TabsTrigger>
+                    <TabsTrigger value="timeline">
+                      <Clock className="w-4 h-4 mr-2" />
+                      Timeline
+                    </TabsTrigger>
+                    <TabsTrigger value="settings">
+                      <SettingsIcon className="w-4 h-4 mr-2" />
+                      Settings
+                    </TabsTrigger>
+                  </TabsList>
+                    <AddCardButton
+                      boardId={params.boardId}
+                      workspaceId={params.workspaceId}
+                      lists={board.lists}
+                    />
+                </div>
                 <Separator />
                 <TabsContent value="overview">
                   <OverviewView lists={board.lists} users={board?.User} />
@@ -145,6 +154,4 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
     </div>
   );
 };
-
 export default BoardIdPage;
-

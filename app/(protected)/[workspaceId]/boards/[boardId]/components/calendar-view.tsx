@@ -63,7 +63,7 @@ export const CalendarView = ({ data, boardId }: CalendarViewProps) => {
     const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1))
 
     return (
-        <Card className="p-4 m-4 bg-white dark:bg-gray-800 shadow-md">
+        <Card className="p-1 m-4 bg-white dark:bg-gray-800 shadow-none border-none">
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
                     {format(currentDate, "MMMM yyyy", { locale: enUS })}
@@ -84,7 +84,7 @@ export const CalendarView = ({ data, boardId }: CalendarViewProps) => {
                     </div>
                 ))}
             </div>
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-7 gap-1 overflow-y-auto max-h-[65vh] p-1">
                 {weeks.map((week, weekIndex) =>
                     week.map((day, dayIndex) => {
                         const dayCards = data.flatMap((list) =>
@@ -98,7 +98,7 @@ export const CalendarView = ({ data, boardId }: CalendarViewProps) => {
                             <div
                                 key={day.toString()}
                                 className={`
-                                    h-24 p-1 border border-gray-200 dark:border-gray-700 
+                                    h-28 p-1 border border-gray-200 dark:border-gray-700 
                                     ${!isSameMonth(day, currentDate) ? "bg-gray-100 dark:bg-gray-800" : "bg-white dark:bg-gray-900"}
                                     ${isSameDay(day, new Date()) ? "ring-2 ring-blue-500" : ""}
                                 `}
