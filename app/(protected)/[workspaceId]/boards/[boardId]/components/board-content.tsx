@@ -296,7 +296,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
             </PopoverTrigger>
             <PopoverContent className="w-[200px] p-0" align="start">
               <div className="p-2">
-                <h4 className="font-medium mb-2">Sort by</h4>
+                <p className="font-medium mb-2 text-sm ml-1">Sort by</p>
                 <Separator className="mb-2" />
                 <div className="space-y-1">
                   {sortOptions.map((option) => (

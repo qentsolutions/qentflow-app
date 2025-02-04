@@ -68,7 +68,7 @@ export const AddCardButton = ({ boardId, workspaceId, lists }: AddCardButtonProp
             <Button
                 onClick={() => setOpen(true)}
                 size="sm"
-                className="bg-blue-600 hover:bg-blue-700 gap-2 mb-1"
+                className="bg-blue-600 hover:bg-blue-700 gap-1 mb-1"
             >
                 <Plus className="h-4 w-4" />
                 Add card
@@ -78,25 +78,25 @@ export const AddCardButton = ({ boardId, workspaceId, lists }: AddCardButtonProp
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
                         <DialogTitle className="text-xl font-semibold">
-                            Ajouter une nouvelle carte
+                            Add a new Card
                         </DialogTitle>
                     </DialogHeader>
                     <div className="space-y-6 py-4">
                         <div className="space-y-2">
                             <label htmlFor="title" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                Titre
+                                Title
                             </label>
                             <Input
                                 id="title"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                placeholder="Entrez le titre de la carte"
+                                placeholder="Enter the card title"
                                 className="w-full"
                             />
                         </div>
                         <div className="space-y-2">
                             <label htmlFor="list" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                Liste
+                                List
                             </label>
                             <Select value={selectedListId} onValueChange={setSelectedListId}>
                                 <SelectTrigger id="list" className="w-full">
@@ -114,10 +114,10 @@ export const AddCardButton = ({ boardId, workspaceId, lists }: AddCardButtonProp
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setOpen(false)}>
-                            Annuler
+                            Cancel
                         </Button>
                         <Button onClick={onSubmit} className="bg-primary hover:bg-primary/90">
-                            Créer
+                            Create
                         </Button>
                     </DialogFooter>
                 </DialogContent>

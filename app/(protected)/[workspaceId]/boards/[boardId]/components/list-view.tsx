@@ -158,14 +158,14 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
                         onOpenChange={() => toggleList(list.id)}
                         className="rounded-lg shadow-sm border border-gray-200 overflow-hidden"
                     >
-                        <CollapsibleTrigger className="bg-gray-50 border-b w-full px-6 py-4 flex items-center justify-between hover:bg-gray-100 transition-colors">
+                        <CollapsibleTrigger className="bg-gray-50 dark:bg-gray-800 border-b w-full px-6 py-4 flex items-center justify-between hover:bg-gray-100 transition-colors">
                             <div className="flex items-center gap-x-3">
                                 {openLists.includes(list.id) ? (
                                     <ChevronUp className="h-5 w-5 text-gray-500" />
                                 ) : (
                                     <ChevronDown className="h-5 w-5 text-gray-500" />
                                 )}
-                                <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-x-2">
+                                <h2 className="text-background text-lg font-semibold text-gray-800 flex items-center gap-x-2">
                                     {list.title}
                                     <span className="flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-600 text-xs font-bold rounded-full">
                                         {list.cards.length}

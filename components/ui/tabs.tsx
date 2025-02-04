@@ -24,22 +24,31 @@ TabsList.displayName = TabsPrimitive.List.displayName
 
 const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
->(({ className, ...props }, ref) => (
-  <TabsPrimitive.Trigger
-    ref={ref}
-    className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap px-2.5 py-3.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-      // Bordure par défaut transparente
-      "border-b-2 border-transparent",
-      // Styles pour l'état actif
-      "data-[state=active]:border-blue-500 data-[state=active]:text-blue-500",
-      className
-    )}
-    {...props}
-  />
-))
-TabsTrigger.displayName = TabsPrimitive.Trigger.displayName
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> & { py?: "3.5" | "2" | "1" }
+>(({ className, py = "3.5", ...props }, ref) => {
+  const pyClasses: Record<string, string> = {
+    "3.5": "py-3.5",
+    "2": "py-2",
+    "1": "py-1",
+  };
+
+  return (
+    <TabsPrimitive.Trigger
+      ref={ref}
+      className={cn(
+        "inline-flex items-center justify-center whitespace-nowrap px-2.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+        "border-b-2 border-transparent",
+        "data-[state=active]:border-blue-500 data-[state=active]:text-blue-500",
+        pyClasses[py] || "py-3.5", // Utilisation de la classe correspondante
+        className
+      )}
+      {...props}
+    />
+  );
+});
+
+TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
+
 
 const TabsContent = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Content>,

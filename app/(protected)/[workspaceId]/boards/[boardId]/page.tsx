@@ -12,6 +12,7 @@ import { OverviewView } from "./components/overview/overview-view";
 import { CalendarView } from "./components/calendar-view";
 import { Calendar, Clock, LayoutDashboard, ListTodo, SettingsIcon } from "lucide-react";
 import { AddCardButton } from "./components/add-card-button";
+import { Automations } from "./components/automations";
 interface BoardIdPageProps {
   params: {
     boardId: string;
@@ -119,11 +120,19 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                       Settings
                     </TabsTrigger>
                   </TabsList>
+                  <div className="space-x-2 flex items-center">
+                    <Automations
+                      boardId={params.boardId}
+                      workspaceId={params.workspaceId}
+                      lists={board.lists}
+                    />
                     <AddCardButton
                       boardId={params.boardId}
                       workspaceId={params.workspaceId}
                       lists={board.lists}
                     />
+                  </div>
+
                 </div>
                 <Separator />
                 <TabsContent value="overview">

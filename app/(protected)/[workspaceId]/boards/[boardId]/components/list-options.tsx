@@ -72,8 +72,8 @@ export const ListOptions = ({ data, onAddCard }: ListOptionsProps) => {
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="px-0 w-40" side="bottom" align="start">
-        <div className="text-sm font-medium text-center text-neutral-600 pb-4">
+      <PopoverContent className="px-0 w-40 py-2" side="bottom" align="start">
+        <div className="text-sm font-medium text-center text-neutral-600 pb-2">
           List actions
         </div>
         <Separator />
