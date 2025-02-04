@@ -141,7 +141,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
 
   return (
     <>
-      <div className="flex items-center justify-between gap-4 mb-4 px-6">
+      <div className="flex items-center justify-between gap-4 mb-2 px-6">
         <div className="flex items-center gap-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

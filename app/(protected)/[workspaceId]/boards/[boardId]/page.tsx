@@ -91,10 +91,10 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
       <Card className="shadow-none rounded-none h-full">
         <main className="relative w-full mx-auto h-full">
           <div className="flex flex-col h-full w-full">
-            <div className="flex items-center justify-between px-6 pt-6">
+            <div className="flex items-center justify-between px-6 pt-4">
               <BoardNavbar board={board} />
             </div>
-            <div className="flex w-full items-center gap-4 mb-6 mt-4">
+            <div className="flex w-full items-center gap-4 mb-6 mt-2">
               <Tabs defaultValue="board" className="w-full">
                 <div className="flex items-center justify-between pl-6 pr-4">
                   <TabsList className="cursor-pointer">
