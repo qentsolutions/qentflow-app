@@ -1,12 +1,10 @@
 "use client";
-import { Image, Settings2, Tag, Users } from "lucide-react";
+import {  Settings2, Tag, Users } from "lucide-react";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { GeneralSettings } from "./general-settings";
 import { TagManager } from "./tag-manager";
 import { BoardMembers } from "./board-member";
-import UploadBoardImage from "./board-image";
-import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 
 interface BoardSettingsProps {
   boardId: string;
@@ -17,7 +15,6 @@ interface BoardSettingsProps {
 
 const Settings = ({ boardId, boardTitle, users, createdById }: BoardSettingsProps) => {
   const [activeTab, setActiveTab] = useState("general");
-  const { currentWorkspace } = useCurrentWorkspace();
 
   const tabs = [
     {

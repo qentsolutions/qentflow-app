@@ -1,18 +1,18 @@
 import { db } from "@/lib/db";
 import { BoardNavbar } from "./components/board-navbar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Settings from "./components/settings-board";
+import Settings from "./components/settings/settings-board";
 import { BoardContent } from "./components/board-content";
 import { currentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { TimelineView } from "./components/timeline-view";
+import { TimelineView } from "./components/timeline/timeline-view";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { OverviewView } from "./components/overview/overview-view";
-import { CalendarView } from "./components/calendar-view";
+import { CalendarView } from "./components/calendar/calendar-view";
 import { Calendar, Clock, LayoutDashboard, ListTodo, SettingsIcon } from "lucide-react";
 import { AddCardButton } from "./components/add-card-button";
-import { Automations } from "./components/automations";
+import { Automations } from "./components/automations/automations";
 interface BoardIdPageProps {
   params: {
     boardId: string;

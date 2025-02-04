@@ -193,7 +193,6 @@ export const BoardList: React.FC = () => {
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">
             <div className="flex items-center mb-4 gap-x-2">
-
               <span className="text-2xl font-semibold flex items-center gap-x-2 "><KanbanSquare size={20} />
                 Boards
                 <span
@@ -202,7 +201,6 @@ export const BoardList: React.FC = () => {
                   {openBoards?.length || 0}
                 </span>
               </span>
-
             </div>
           </CardTitle>
           <div className="mt-4 text-center">
@@ -274,7 +272,6 @@ export const BoardList: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-
           {recentBoards.length > 0 && (
             <div className="mb-6">
               <p className="text-lg font-semibold mb-4 flex items-center gap-x-2">
