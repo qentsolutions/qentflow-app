@@ -1,5 +1,3 @@
-"use client";
-
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
@@ -7,7 +5,7 @@ import { useAction } from "@/hooks/use-action";
 import { updatePriority } from "@/actions/tasks/update-priority";
 import { CardWithList } from "@/types";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
-import { AlertTriangle, ArrowDown, ArrowRight, ArrowUp, OctagonAlert, Radio, SignalHigh, SignalLow, SignalMedium } from 'lucide-react';
+import { AlertTriangle, ArrowDown, ArrowRight, ArrowUp, OctagonAlert, Radio, SignalHigh, SignalLow, SignalMedium, Minus } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -47,13 +45,14 @@ export const Priority = ({ data }: PriorityProps) => {
 
     execute({
       id: data.id,
-      priority: newPriority as "low" | "medium" | "high" | "critical",
+      priority: newPriority === "none" ? null : (newPriority as "low" | "medium" | "high" | "critical"),
       boardId,
       workspaceId,
     });
   };
 
   const priorityOptions = [
+    { value: "none", label: "None", icon: Minus, color: "text-gray-500" },
     { value: "critical", label: "Critical", icon: AlertTriangle, color: "text-red-500" },
     { value: "high", label: "High", icon: SignalHigh, color: "text-red-500" },
     { value: "medium", label: "Medium", icon: SignalMedium, color: "text-yellow-500" },
@@ -69,7 +68,7 @@ export const Priority = ({ data }: PriorityProps) => {
         </div>
       </CardHeader>
       <CardContent>
-        <Select defaultValue={data.priority?.toLowerCase()} onValueChange={onPriorityChange}>
+        <Select defaultValue={data.priority?.toLowerCase() || "none"} onValueChange={onPriorityChange}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select priority" />
           </SelectTrigger>
@@ -101,4 +100,3 @@ Priority.Skeleton = function PrioritySkeleton() {
     </Card>
   );
 };
-

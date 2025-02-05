@@ -25,7 +25,9 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         },
       },
       data: {
-        priority: priority.toUpperCase() as "LOW" | "MEDIUM" | "HIGH" | "CRITICAL",
+        priority: priority
+          ? (priority.toUpperCase() as "LOW" | "MEDIUM" | "HIGH" | "CRITICAL")
+          : null,
       },
     });
     await createAuditLog({
