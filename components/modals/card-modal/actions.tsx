@@ -240,13 +240,15 @@ export const Actions = ({
                     <span>{assignedUser.name}</span>
                   </div>
                 ) : (
-                  "Assign user"
-                )}
+                  <div className="flex items-center gap-x-2 ml-1">
+                    <UserPlus className="h-4 w-4" />
+                    <span>Assign User</span>
+                  </div>)}
               </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="none">
-                <div className="flex items-center gap-x-2">
+                <div className="flex items-center gap-x-2 ml-1">
                   <UserX className="h-4 w-4" />
                   <span>Unassign</span>
                 </div>

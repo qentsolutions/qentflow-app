@@ -150,7 +150,7 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                           ) : (
                             <Avatar className="h-8 w-8">
                               <AvatarFallback className="text-gray-500 text-sm">
-                                <UserPlus size={12} />
+                                <UserPlus size={16} />
                               </AvatarFallback>
                             </Avatar>
                           )}

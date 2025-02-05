@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
+import { sendWorkspaceInvitationEmail } from "@/lib/mail";
 
 interface InviteMemberParams {
   workspaceId: string;
@@ -74,6 +75,8 @@ export async function inviteMember({ workspaceId, email }: InviteMemberParams) {
         },
       });
     }
+
+    await sendWorkspaceInvitationEmail(email, user?.name ?? "User", workspace.name);
 
     return { message: "Invitation sent successfully" };
   } catch (error: any) {

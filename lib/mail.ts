@@ -184,3 +184,25 @@ export const sendVerificationEmail = async (email: string, token: string) => {
     <a class="button" href="${confirmLink}">Confirm Email</a>`;
   await sendBeautifulEmail(email, "Confirm Your Email Address", content);
 };
+
+export const sendWorkspaceInvitationEmail = async (
+  email: string,
+  inviterName: string,
+  workspaceName: string
+) => {
+  const subject = `You're invited to join ${workspaceName} on QentFlow`;
+  const content = `
+    <h2>You've been invited to join a workspace!</h2>
+    <p>Hello,</p>
+    <p>${inviterName} has invited you to join the "${workspaceName}" workspace on QentFlow.</p>
+    <p>QentFlow is a powerful platform for managing your projects and workflows efficiently. By joining this workspace, you'll be able to collaborate with your team seamlessly.</p>
+    <p>Click the button below to accept the invitation and get started:</p>
+    <a class="button" href="https://app.qentflow.com/auth/login">Join Workspace</a>
+    <p>If you're new to QentFlow, don't worry! Once you accept the invitation, you'll be guided through the setup process.</p>
+    <p>This invitation will expire in 7 days. If you have any questions or need assistance, please don't hesitate to reach out to our support team.</p>
+    <p>We're excited to have you on board!</p>
+    <p>Best regards,<br>The QentFlow Team</p>
+  `;
+
+  await sendBeautifulEmail(email, subject, content);
+};
