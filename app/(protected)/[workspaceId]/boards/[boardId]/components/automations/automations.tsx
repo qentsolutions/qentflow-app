@@ -47,7 +47,7 @@ export const Automations = ({ boardId, workspaceId, lists }: AutomationsProps) =
           <div className="rounded-full bg-gray-100 p-8 mb-4">
             <LightningBoltIcon className="w-8 h-8 text-gray-400" />
           </div>
-          <h3 className="text-xl font-semibold mb-2">Let's create your first automation!</h3>
+          <h3 className="text-xl font-semibold mb-2">Let&apos;s create your first automation!</h3>
           <p className="text-gray-500 max-w-md mb-6">
             Use automations to streamline your workflows, automate tasks, and integrate other applications to boost your
             productivity.{" "}

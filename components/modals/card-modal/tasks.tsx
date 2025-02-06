@@ -215,7 +215,6 @@ export const Tasks = ({ cardId }: TasksProps) => {
                 </Droppable>
             </DragDropContext>
 
-
             {isAddingTask && (
                 <div className="flex items-center gap-2">
                     <Input

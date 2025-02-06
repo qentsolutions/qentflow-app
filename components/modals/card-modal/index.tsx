@@ -27,9 +27,9 @@ import { useState } from "react";
 import { DocumentSelector } from "./document-selector";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Priority } from "./priority";
 import { Tasks } from "./tasks";
+import { TagsComponent } from "./tags";
 
 export const CardModal = () => {
   const id = useCardModal((state) => state.id);
@@ -271,12 +271,15 @@ export const CardModal = () => {
             </div>
           </div>
           {!cardData ? (
-            <Actions.Skeleton />
+            <Description.Skeleton />
           ) : (
             <div>
+              <div className="mb-2 flex items-center justify-end w-full">
+                <Actions card={cardData} />
+              </div>
               <Details card={cardData} />
               <Priority data={cardData} />
-              <Actions data={cardData} availableTags={availableTags ?? []} />
+              <TagsComponent data={cardData} availableTags={availableTags ?? []} />
             </div>
           )}
         </div>
