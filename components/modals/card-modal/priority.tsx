@@ -54,7 +54,7 @@ export const Priority = ({ data }: PriorityProps) => {
   const priorityOptions = [
     { value: "none", label: "None", icon: Minus, color: "text-gray-500" },
     { value: "critical", label: "Critical", icon: AlertTriangle, color: "text-red-500" },
-    { value: "high", label: "High", icon: SignalHigh, color: "text-red-500" },
+    { value: "high", label: "High", icon: SignalHigh, color: "text-orange-500" },
     { value: "medium", label: "Medium", icon: SignalMedium, color: "text-yellow-500" },
     { value: "low", label: "Low", icon: SignalLow, color: "text-green-500" },
   ];

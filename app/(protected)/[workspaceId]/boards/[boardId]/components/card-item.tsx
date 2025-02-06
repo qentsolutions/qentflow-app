@@ -85,7 +85,7 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
       return <SignalMedium className="text-yellow-500" size={24} />;
     }
     if (priority === "HIGH") {
-      return <SignalHigh className="text-red-500" size={24} />;
+      return <SignalHigh className="text-orange-500" size={24} />;
     }
     if (priority === "CRITICAL") {
       return <AlertTriangle className="text-red-500" size={16} />;

@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { useState } from "react";
 
 interface AssignedTasksListProps {
   lists: any[];
@@ -8,7 +7,9 @@ interface AssignedTasksListProps {
 }
 
 export const AssignedTasksList = ({ lists, selectedUserId }: AssignedTasksListProps) => {
-  const allTasks = lists.flatMap(list => 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const allTasks = lists.flatMap(list =>
     list.cards
       .filter((card: { assignedUserId: string; }) => !selectedUserId || card.assignedUserId === selectedUserId)
       .map((card: any) => ({
@@ -17,17 +18,26 @@ export const AssignedTasksList = ({ lists, selectedUserId }: AssignedTasksListPr
       }))
   );
 
+  const filteredTasks = allTasks.filter((task) =>
+    task.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <Card className="p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Assigned Tasks ({allTasks.length})</h2>
-        <Button variant="outline" size="sm">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Task
-        </Button>
+    <Card className=" pb-4 h-[63vh] overflow-y-auto relative">
+      <div className="sticky top-0  px-4 pt-4 pb-1 z-10 bg-white border-b">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Assigned Tasks ({filteredTasks.length})</h2>
+          <input
+            type="text"
+            placeholder="Search by title..."
+            className="p-2 border rounded-md"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </div>
       <div className="space-y-2">
-        {allTasks.slice(0, 5).map((task: any) => (
+        {filteredTasks.map((task: any) => (
           <div
             key={task.id}
             className="p-3 hover:bg-accent rounded-lg transition-colors"
@@ -43,11 +53,6 @@ export const AssignedTasksList = ({ lists, selectedUserId }: AssignedTasksListPr
             </div>
           </div>
         ))}
-        {allTasks.length > 5 && (
-          <Button variant="ghost" className="w-full mt-2">
-            Show All
-          </Button>
-        )}
       </div>
     </Card>
   );

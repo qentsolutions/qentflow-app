@@ -41,11 +41,11 @@ const getPriorityIcon = (priority: string | null) => {
     case "LOW":
       return <SignalLow className="h-4 w-4 text-green-500" />
     case "MEDIUM":
-      return <SignalMedium className="h-4 w-4 text-orange-500" />
+      return <SignalMedium className="h-4 w-4 text-yellow-500" />
     case "HIGH":
-      return <SignalHigh className="h-4 w-4 text-red-500" />
+      return <SignalHigh className="h-4 w-4 text-orange-500" />
     case "CRITICAL":
-      return <AlertTriangle className="h-4 w-4 text-red-600" />
+      return <AlertTriangle className="h-4 w-4 text-red-500" />
     default:
       return null
   }
