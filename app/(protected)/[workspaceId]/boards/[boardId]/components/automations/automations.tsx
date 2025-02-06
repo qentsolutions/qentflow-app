@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import UsageStats from "./usage"
 
 interface List {
     id: string
@@ -84,23 +85,23 @@ export const Automations = ({ boardId, workspaceId, lists }: AutomationsProps) =
             </Button>
 
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="sm:max-w-[725px] h-[80vh] overflow-y-auto px-4 py-1">
+                <DialogContent className="sm:max-w-[1250px] h-[90vh] overflow-y-auto px-4 py-1 mt-2">
                     <Tabs defaultValue="manage" className="w-full">
-                        <span className="flex items-center pt-2 gap-x-1 font-semibold text-lg"><Workflow size={14} /> Automations</span>
-                        <TabsList className="border-b w-full justify-start h-auto p-0 bg-transparent">
+                        <span className="flex items-center pt-2 gap-x-1 font-semibold text-xl"><Workflow size={14} /> Automations</span>
+                        <TabsList className="border-b w-full justify-start h-auto p-0 bg-transparent mt-4">
                             <TabsTrigger
                                 py="2"
                                 value="browse"
                                 className="data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 border-b-2 border-transparent rounded-none"
                             >
-                                Browse
+                                Models
                             </TabsTrigger>
                             <TabsTrigger
                                 py="2"
                                 value="manage"
                                 className="data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 border-b-2 border-transparent rounded-none"
                             >
-                                Manage
+                                Recipes
                             </TabsTrigger>
                             <TabsTrigger
                                 py="2"
@@ -108,6 +109,13 @@ export const Automations = ({ boardId, workspaceId, lists }: AutomationsProps) =
                                 className="data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 border-b-2 border-transparent rounded-none"
                             >
                                 Activity
+                            </TabsTrigger>
+                            <TabsTrigger
+                                py="2"
+                                value="usage"
+                                className="data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 border-b-2 border-transparent rounded-none"
+                            >
+                                Usage
                             </TabsTrigger>
                         </TabsList>
 
@@ -211,10 +219,15 @@ export const Automations = ({ boardId, workspaceId, lists }: AutomationsProps) =
                             </div>
                             {renderEmptyState("automation")}
                         </TabsContent>
-
                         <TabsContent value="activity" className="pt-6">
                             {renderEmptyState("activity")}
                         </TabsContent>
+
+                        <TabsContent value="usage" className="pt-6">
+                            <UsageStats />
+                        </TabsContent>
+
+
                     </Tabs>
                 </DialogContent>
             </Dialog>
