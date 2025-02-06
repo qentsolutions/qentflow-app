@@ -30,85 +30,83 @@ export default function UsageStats() {
   const percentageChange = ((usedActions - previousActions) / previousActions) * 100
 
   return (
-    <div className="p-6 space-y-6 max-w-[1200px] mx-auto">
+    <div className="p-2 space-y-8 max-w-[1200px] mx-auto">
       <Card>
         <CardHeader className="pb-4">
-          <CardTitle className="text-sm font-medium">Actions Usage</CardTitle>
+          <CardTitle className="text-lg font-semibold">Actions Usage</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <Metric>
+              <Metric className="text-2xl">
                 {usedActions.toLocaleString()} / {totalActions.toLocaleString()}
               </Metric>
-              <Text className="text-xs text-muted-foreground mt-1">
+              <Text className="text-sm text-gray-500 mt-2">
                 {totalActions.toLocaleString()} actions per month with Fortek pro
               </Text>
             </div>
-            <BadgeDelta deltaType={percentageChange > 0 ? "increase" : "decrease"}>
+            <BadgeDelta deltaType={percentageChange > 0 ? "increase" : "decrease"} className="text-lg text-white">
               {percentageChange.toFixed(1)}%
             </BadgeDelta>
           </div>
-          <Progress value={percentage} className="h-2" />
+          <Progress value={percentage} className="h-3" />
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Automations</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <CardTitle className="text-base font-medium">Active Automations</CardTitle>
+            <Activity className="h-5 w-5 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <Metric>111</Metric>
+            <Metric className="text-xl">111</Metric>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Creators</CardTitle>
-            <Users2 className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <CardTitle className="text-base font-medium">Creators</CardTitle>
+            <Users2 className="h-5 w-5 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <Metric>2</Metric>
+            <Metric className="text-xl">2</Metric>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tables</CardTitle>
-            <Database className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <CardTitle className="text-base font-medium">Tables</CardTitle>
+            <Database className="h-5 w-5 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <Metric>18</Metric>
+            <Metric className="text-xl">18</Metric>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Workflows</CardTitle>
-            <GitBranch className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <CardTitle className="text-base font-medium">Active Workflows</CardTitle>
+            <GitBranch className="h-5 w-5 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <Metric>0</Metric>
+            <Metric className="text-xl">0</Metric>
           </CardContent>
         </Card>
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="text-sm font-medium">Daily Actions Usage</CardTitle>
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg font-semibold">Daily Actions Usage</CardTitle>
         </CardHeader>
         <CardContent>
           <BarChart
-            className="h-[200px] mt-4"
+            className="h-[300px] mt-6"
             data={chartdata}
             index="date"
             categories={["usage"]}
-            colors={["indigo"]}
-            valueFormatter={(number: number) => Intl.NumberFormat("us").format(number).toString()}
-            yAxisWidth={48}
+            valueFormatter={(number) => Intl.NumberFormat("us").format(number).toString()}
+            yAxisWidth={56}
           />
         </CardContent>
       </Card>
     </div>
   )
 }
-
