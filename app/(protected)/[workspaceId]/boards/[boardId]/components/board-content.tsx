@@ -34,6 +34,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { AlertDialogHeader } from "@/components/ui/alert-dialog"
 import CreateTagForm from "./create-tag-form"
+import { TableView } from "./table-view"
 
 interface BoardContentProps {
   boardId: string
@@ -83,12 +84,19 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
 
   const renderView = () => {
     const filteredLists = getFilteredLists()
-    return selectedView === "kanban" ? (
-      <KanbanView boardId={boardId} data={filteredLists} users={users} />
-    ) : (
-      <ListView boardId={boardId} data={filteredLists} users={users} />
-    )
+
+    if (selectedView === "kanban") {
+      return <KanbanView boardId={boardId} data={filteredLists} users={users} />
+    }
+    if (selectedView === "list") {
+      return <ListView boardId={boardId} data={filteredLists} users={users} />
+    }
+    if (selectedView == "table") {
+      return <TableView boardId={boardId} data={filteredLists} />
+    }
+    return <KanbanView boardId={boardId} data={filteredLists} users={users} />
   }
+
 
   const RefreshPage = () => {
     router.refresh()
