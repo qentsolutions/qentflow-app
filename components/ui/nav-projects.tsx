@@ -18,9 +18,8 @@ export function NavProjects({
   }[];
 }) {
   const pathname = usePathname(); // Récupérer le chemin actuel
-
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+    <SidebarGroup>
       <SidebarMenu>
         {projects.map((item, index) => {
           // Vérifier si le chemin actuel commence par l'URL
@@ -36,11 +35,14 @@ export function NavProjects({
                 <a href={item.url} className="flex items-center justify-between gap-2 w-full">
                   <div className="flex items-center gap-2">
                     <item.icon size={16} />
-                    <span>{item.name}</span>
+                    <span className="group-data-[collapsible=icon]:hidden">{item.name}</span>
                   </div>
-                  {item.name === "My Tasks" && item.count !== undefined && (
-                    <span className="ml-2 text-gray-500 mr-2">{item.count > 0 ? (<>{item.count}</>):(<></>)}</span>
-                  )}
+                  <span className="group-data-[collapsible=icon]:hidden">
+                    {item.name === "My Tasks" && item.count !== undefined && (
+                      <span className="ml-2 text-gray-500 mr-2">{item.count > 0 ? (<>{item.count}</>) : (<></>)}</span>
+                    )}
+                  </span>
+
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>

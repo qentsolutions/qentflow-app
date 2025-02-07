@@ -30,6 +30,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Priority } from "./priority";
 import { Tasks } from "./tasks";
 import { TagsComponent } from "./tags";
+import DateComponent from "./date";
 
 export const CardModal = () => {
   const id = useCardModal((state) => state.id);
@@ -278,8 +279,9 @@ export const CardModal = () => {
                 <Actions card={cardData} />
               </div>
               <Details card={cardData} />
-              <Priority data={cardData} />
               <TagsComponent data={cardData} availableTags={availableTags ?? []} />
+              <Priority data={cardData} />
+              <DateComponent card={cardData} />
             </div>
           )}
         </div>

@@ -294,7 +294,7 @@ export function NavUser({ user }: { user: any }) {
                 </DropdownMenu>
             </SidebarMenuItem>
 
-            <Separator />
+            <Separator className="mb-2" />
             <SidebarMenuItem>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>

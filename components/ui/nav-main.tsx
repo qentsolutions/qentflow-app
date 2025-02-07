@@ -1,6 +1,7 @@
 "use client";
 
 import { type LucideIcon } from "lucide-react";
+import { Separator } from "@/components/ui/separator"; // Assurez-vous d'importer le composant Separator
 
 import {
   SidebarGroup,
@@ -23,8 +24,13 @@ export function NavMain({
   const pathname = usePathname(); // Récupérer l'URL actuelle
 
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Collaboration</SidebarGroupLabel>
+    <SidebarGroup>
+      <div className="group-data-[collapsible=icon]:hidden">
+        <SidebarGroupLabel>Collaboration</SidebarGroupLabel>
+      </div>
+      <div className="group-data-[collapsible=icon]:block hidden mb-2">
+        <Separator />
+      </div>
       <SidebarMenu>
         {items.map((item) => {
           // Vérifie si l'URL actuelle commence par l'URL de l'item
@@ -33,9 +39,8 @@ export function NavMain({
           return (
             <SidebarMenuItem
               key={item.name}
-              className={`rounded-sm hover:font-semibold ${
-                isActive ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"
-              }`} // Appliquer le style actif
+              className={`rounded-sm hover:font-semibold ${isActive ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"
+                }`} // Appliquer le style actif
             >
               <SidebarMenuButton asChild>
                 <a href={item.url} className="flex items-center gap-2">
