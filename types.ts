@@ -114,4 +114,3 @@ export interface Board {
   automationRules: AutomationRule[];
 }
 
-
