@@ -48,7 +48,6 @@ export interface WhiteboardElement {
   connectedTo?: string[];
 }
 
-
 export interface WhiteboardState {
   elements: WhiteboardElement[];
   selectedElement: WhiteboardElement | null;
@@ -67,3 +66,52 @@ export interface StyleOptions {
   strokeStyle: "solid" | "dashed" | "dotted";
   backgroundColor: string;
 }
+
+export enum TriggerType {
+  CARD_MOVED = "CARD_MOVED",
+  CARD_CREATED = "CARD_CREATED",
+  TASK_COMPLETED = "TASK_COMPLETED",
+  COMMENT_ADDED = "COMMENT_ADDED",
+  DUE_DATE_APPROACHING = "DUE_DATE_APPROACHING",
+  ATTACHMENT_ADDED = "ATTACHMENT_ADDED",
+}
+
+export enum ActionType {
+  UPDATE_CARD_STATUS = "UPDATE_CARD_STATUS",
+  ASSIGN_CARD = "ASSIGN_CARD",
+  SEND_NOTIFICATION = "SEND_NOTIFICATION",
+  GENERATE_TASKS = "GENERATE_TASKS",
+  APPLY_TAG = "APPLY_TAG",
+  CREATE_CALENDAR_EVENT = "CREATE_CALENDAR_EVENT",
+  SAVE_ATTACHMENT = "SAVE_ATTACHMENT",
+}
+
+export interface Trigger {
+  type: TriggerType;
+  configuration?: Record<string, any>;
+}
+
+export interface Action {
+  type: ActionType;
+  configuration?: Record<string, any>;
+}
+
+export interface AutomationRule {
+  id: string;
+  name: string;
+  description?: string;
+  triggers: Trigger[];
+  actions: Action[];
+}
+
+export interface Board {
+  id: string;
+  name: string;
+  lists: {
+    id: string;
+    title: string;
+  }[];
+  automationRules: AutomationRule[];
+}
+
+
