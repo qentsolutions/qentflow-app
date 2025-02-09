@@ -8,6 +8,8 @@ import { Plus, Trash2, GripVertical } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Textarea } from "@/components/ui/textarea";
 import { Board } from "@prisma/client";
+import { useQuery } from "@tanstack/react-query";
+import { fetcher } from "@/lib/fetcher";
 
 const ACTION_TYPES = [
   { value: "UPDATE_CARD_STATUS", label: "Update card status" },
@@ -38,6 +40,12 @@ export const AutomationActionBuilder = ({
 }: AutomationActionBuilderProps) => {
   const lists = board.lists;
   const users = board.User;
+
+  // Fetch tags for the board
+  const { data: tags } = useQuery({
+    queryKey: ["available-tags", board.id],
+    queryFn: () => fetcher(`/api/boards/tags?boardId=${board.id}`),
+  });
 
   const addAction = () => {
     onActionsChange([
@@ -164,7 +172,7 @@ export const AutomationActionBuilder = ({
               <SelectValue placeholder="Select tag to add" />
             </SelectTrigger>
             <SelectContent>
-              {board?.Tag?.map((tag: any) => (
+              {tags?.map((tag: any) => (
                 <SelectItem key={tag.id} value={tag.id}>
                   {tag.name}
                 </SelectItem>
@@ -209,16 +217,6 @@ export const AutomationActionBuilder = ({
                 ))}
               </SelectContent>
             </Select>
-            <Input
-              value={action.config.subject || ""}
-              onChange={(e) => updateActionConfig(index, "subject", e.target.value)}
-              placeholder="Email subject"
-            />
-            <Textarea
-              value={action.config.content || ""}
-              onChange={(e) => updateActionConfig(index, "content", e.target.value)}
-              placeholder="Email content"
-            />
           </div>
         );
 

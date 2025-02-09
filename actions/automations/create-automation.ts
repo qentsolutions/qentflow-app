@@ -53,6 +53,14 @@ const handler = async (data: z.infer<typeof CreateAutomationSchema>) => {
 
     const { name, description, workspaceId, boardId, triggerType, triggerConditions, actions } = data;
 
+    // Créer d'abord le trigger
+    const trigger = await db.automationTrigger.create({
+      data: {
+        type: triggerType,
+        conditions: triggerConditions || {},
+      },
+    });
+
     // Créer l'automatisation avec son trigger et ses actions
     const automation = await db.automation.create({
       data: {
@@ -61,12 +69,7 @@ const handler = async (data: z.infer<typeof CreateAutomationSchema>) => {
         workspaceId,
         boardId,
         createdById: user.id,
-        trigger: {
-          create: {
-            type: triggerType,
-            conditions: triggerConditions || {},
-          },
-        },
+        triggerId: trigger.id,
         actions: {
           create: actions.map((action) => ({
             type: action.type,
@@ -84,7 +87,8 @@ const handler = async (data: z.infer<typeof CreateAutomationSchema>) => {
     revalidatePath(`/${workspaceId}/boards/${boardId}`);
     return { data: automation };
   } catch (error) {
-    return { error:`"Failed to create automation. ${error}` };
+    console.error("Error creating automation:", error);
+    return { error: "Failed to create automation." };
   }
 };
 

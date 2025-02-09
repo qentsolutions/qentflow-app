@@ -17,7 +17,7 @@ export const TemplateList = ({ onSelectTemplate }: TemplateListProps) => {
                 <div key={category.id} className="mb-6">
                     <h3 className="text-lg font-semibold mb-3">{category.label}</h3>
                     <div className="grid gap-4">
-                        {AUTOMATION_TEMPLATES[category.id].map((template) => (
+                        {(AUTOMATION_TEMPLATES[category.id as keyof typeof AUTOMATION_TEMPLATES]).map((template) => (
                             <Button
                                 key={template.id}
                                 variant="outline"
