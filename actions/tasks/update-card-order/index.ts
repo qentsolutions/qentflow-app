@@ -8,6 +8,7 @@ import { InputType, ReturnType } from "./types";
 import { currentUser } from "@/lib/auth";
 import { createAuditLog } from "@/lib/create-audit-log";
 import { ACTION, ENTITY_TYPE } from "@prisma/client";
+import { automationEngine } from "@/lib/automation-engine";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   const user = currentUser();
@@ -39,22 +40,22 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
     updatedCards = await db.$transaction(transaction);
 
-    // Ajouter un audit log pour chaque carte mise à jour
+    // Pour chaque carte qui a changé de liste
     for (const card of updatedCards) {
-      // Récupérer la liste actuelle de la carte
-      const list = await db.list.findUnique({
-        where: { id: card.listId },
-        select: { title: true },
-      });
-
-      // Créer un audit log pour la mise à jour de l'ordre de la carte
-      await createAuditLog({
-        entityTitle: `${list?.title || "Unknown List"}`,
-        entityId: card.id,
-        entityType: ENTITY_TYPE.CARD,
-        action: ACTION.UPDATE,
-        workspaceId,
-      });
+      const originalCard = items.find((item) => item.id === card.id);
+      if (originalCard && originalCard.listId !== card.listId) {
+        // Déclencher l'automatisation CARD_MOVED
+        await automationEngine.processAutomations(
+          "CARD_MOVED",
+          {
+            cardId: card.id,
+            sourceListId: originalCard.listId,
+            destinationListId: card.listId,
+          },
+          workspaceId,
+          boardId
+        );
+      }
     }
   } catch (error) {
     return {

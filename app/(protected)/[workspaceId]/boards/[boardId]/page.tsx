@@ -121,6 +121,9 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                     </TabsTrigger>
                   </TabsList>
                   <div className="space-x-2 flex items-center">
+                    <Automations
+                      board={board}
+                    />
                     <AddCardButton
                       boardId={params.boardId}
                       workspaceId={params.workspaceId}

@@ -179,10 +179,28 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
 
 // Envoi d'un e-mail de vérification
 export const sendVerificationEmail = async (email: string, token: string) => {
-  const confirmLink = `${domain}/auth/verify?token=${token}`;
-  const content = `<p>Thank you for signing up! Please confirm your email address by clicking the button below:</p>
-    <a class="button" href="${confirmLink}">Confirm Email</a>`;
-  await sendBeautifulEmail(email, "Confirm Your Email Address", content);
+  const confirmLink = `${domain}/auth/new-verification?token=${token}`;
+  const content = `
+    <div style="font-family: Arial, sans-serif;">
+      <h2>Verify your email address</h2>
+      <p>Thank you for signing up! Please confirm your email address by clicking the button below:</p>
+      <a href="${confirmLink}" style="
+        display: inline-block;
+        background-color: #007bff;
+        color: white;
+        padding: 12px 24px;
+        text-decoration: none;
+        border-radius: 4px;
+        margin: 16px 0;
+      ">Confirm Email</a>
+      <p>If the button doesn't work, you can also click this link:</p>
+      <p><a href="${confirmLink}">${confirmLink}</a></p>
+      <p>This link will expire in 24 hours.</p>
+      <p>If you didn't sign up for an account, you can safely ignore this email.</p>
+    </div>
+  `;
+
+  await sendBeautifulEmail(email, "Verify your email address", content);
 };
 
 export const sendWorkspaceInvitationEmail = async (

@@ -1,232 +1,212 @@
 "use client";
 
-import { Plus, Workflow } from "lucide-react";
+import { Plus, Workflow, ChevronDown, CloudLightningIcon as LightningBoltIcon } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import UsageStats from "./usage";
-import { LightningBoltIcon } from "@radix-ui/react-icons";
-
-interface List {
-  id: string;
-  title: string;
-}
+import { useAutomation } from "@/hooks/use-automation";
+import { CreateAutomationDialog } from "./create-automation-dialog";
+import { Board } from "@prisma/client";
 
 interface AutomationsProps {
-  boardId: string;
-  workspaceId: string;
-  lists: List[];
+  board: Board & {
+    lists: any[];
+    User: any[];
+  };
 }
 
-export const Automations = ({ boardId, workspaceId, lists }: AutomationsProps) => {
-  const [open, setOpen] = useState(false);
-  const [automationName, setAutomationName] = useState("");
-  const [selectedTrigger, setSelectedTrigger] = useState("");
-  const [selectedAction, setSelectedAction] = useState("");
-  const [description, setDescription] = useState("");
+// Catégories d'automatisation
+const AUTOMATION_CATEGORIES = [
+  { id: "all", label: "All" },
+  { id: "cards", label: "Cards" },
+  { id: "tasks", label: "Tasks" },
+  { id: "notifications", label: "Notifications" },
+  { id: "calendar", label: "Calendar" },
+  { id: "users", label: "Users" },
+];
 
-  const handleCreate = () => {
-    if (!automationName || !selectedTrigger || !selectedAction) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
+// Templates d'automatisation par catégorie
+const AUTOMATION_TEMPLATES = {
+  cards: [
+    {
+      id: "auto-assign",
+      name: "Auto Assign Cards",
+      description: "Automatically assign cards to team members based on list",
+      category: "cards",
+    },
+    {
+      id: "due-date-reminder",
+      name: "Due Date Reminder",
+      description: "Send notifications when cards are approaching due date",
+      category: "cards",
+    },
+  ],
+  tasks: [
+    {
+      id: "task-complete-notification",
+      name: "Task Complete Notification",
+      description: "Send notification when all tasks in a card are completed",
+      category: "tasks",
+    },
+  ],
+  notifications: [
+    {
+      id: "mention-notification",
+      name: "Mention Notifications",
+      description: "Send notifications when users are mentioned in comments",
+      category: "notifications",
+    },
+  ],
+  calendar: [
+    {
+      id: "auto-schedule",
+      name: "Auto Schedule Events",
+      description: "Create calendar events from card due dates",
+      category: "calendar",
+    },
+  ],
+  users: [
+    {
+      id: "workload-balance",
+      name: "Workload Balance",
+      description: "Automatically balance work across team members",
+      category: "users",
+    },
+  ],
+};
 
-    // Handle automation creation here
-    toast.success("Automation created successfully");
-    setOpen(false);
-  };
+export const Automations = ({ board }: AutomationsProps) => {
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const { automations, isLoading } = useAutomation({ workspaceId: board.workspaceId, boardId: board.id });
 
-  const renderEmptyState = (type: "automation" | "activity") => (
+  const filteredTemplates = selectedCategory === "all"
+    ? Object.values(AUTOMATION_TEMPLATES).flat()
+    : AUTOMATION_TEMPLATES[selectedCategory as keyof typeof AUTOMATION_TEMPLATES] || [];
+
+  const renderEmptyState = () => (
     <div className="flex flex-col items-center justify-center py-20 text-center">
-      {type === "automation" ? (
-        <>
-          <div className="rounded-full bg-gray-100 p-8 mb-4">
-            <LightningBoltIcon className="w-8 h-8 text-gray-400" />
-          </div>
-          <h3 className="text-xl font-semibold mb-2">Let&apos;s create your first automation!</h3>
-          <p className="text-gray-500 max-w-md mb-6">
-            Use automations to streamline your workflows, automate tasks, and integrate other applications to boost your
-            productivity.{" "}
-            <a href="#" className="text-primary underline">
-              Learn more
-            </a>
-          </p>
-        </>
-      ) : (
-        <>
-          <div className="mb-4">
-            <img
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Capture%20d%E2%80%99e%CC%81cran%202025-02-04%20a%CC%80%2020.52.36-2zcnmKpNeO4TM0U5JqpRQdnj9MqZru.png"
-              alt="No activity"
-              className="w-32 h-32 opacity-50"
-            />
-          </div>
-          <h3 className="text-xl font-semibold mb-2">No activity yet</h3>
-          <p className="text-gray-500 max-w-md mb-6">
-            Once you start using automations, your activity log will appear here. Get started and experience it for
-            yourself!
-          </p>
-        </>
-      )}
-      <Button onClick={() => setOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white">
-        Add Automation
+      <div className="rounded-full bg-gray-100 p-8 mb-4">
+        <LightningBoltIcon className="w-8 h-8 text-gray-400" />
+      </div>
+      <h3 className="text-xl font-semibold mb-2">Let's create your first automation!</h3>
+      <p className="text-gray-500 max-w-md mb-6">
+        Use automations to streamline your workflows, automate tasks, and boost your productivity.
+        <a href="#" className="text-primary underline ml-1">Learn more</a>
+      </p>
+      <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+        <Plus className="h-4 w-4 mr-2" />
+        Create Automation
       </Button>
     </div>
   );
 
   return (
     <>
-      <Button onClick={() => setOpen(true)} size="sm" variant="outline" className="gap-2 mb-1 shadow-none">
+      <Button onClick={() => setIsCreateDialogOpen(true)} size="sm" variant="outline" className="gap-2 mb-1 shadow-none">
         <Workflow className="h-4 w-4" />
         Automations
       </Button>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-[1250px] h-[90vh] overflow-y-auto px-4 py-4">
-          <Tabs defaultValue="manage" className="w-full">
-            <span className="flex items-center pt-2 gap-x-1 font-semibold text-xl">
-              <Workflow size={14} /> Automations
-            </span>
-            <TabsList className="border-b w-full justify-start h-auto p-0 bg-transparent mt-4">
-              <TabsTrigger
-                value="browse"
-                className="data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 border-b-2 border-transparent rounded-none"
-              >
-                Models
-              </TabsTrigger>
-              <TabsTrigger
-                value="manage"
-                className="data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 border-b-2 border-transparent rounded-none"
-              >
-                Recipes
-              </TabsTrigger>
-              <TabsTrigger
-                value="activity"
-                className="data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 border-b-2 border-transparent rounded-none"
-              >
-                Activity
-              </TabsTrigger>
-              <TabsTrigger
-                value="usage"
-                className="data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 border-b-2 border-transparent rounded-none"
-              >
-                Usage
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="browse" className="pt-6">
-              <div className="grid grid-cols-[1fr,auto,1fr] gap-4 items-start">
-                {/* Trigger Section */}
-                <div className="bg-card rounded-lg p-6 border shadow-sm">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="bg-pink-100 rounded-full p-2">
-                      <div className="w-4 h-4 bg-purple-500 rounded-full" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">When</h3>
-                      <p className="text-sm text-muted-foreground">Execute this action</p>
-                    </div>
-                  </div>
-
-                  <Select value={selectedTrigger} onValueChange={setSelectedTrigger}>
-                    <SelectTrigger className="w-full mb-4">
-                      <SelectValue placeholder="Tasks or subtasks" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="task-created">A task/subtask is created</SelectItem>
-                      <SelectItem value="task-completed">A task/subtask is completed</SelectItem>
-                      <SelectItem value="task-assigned">A task/subtask is assigned</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  <Button variant="outline" size="sm" className="w-full">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add condition
-                  </Button>
-                </div>
-
-                {/* Arrow */}
-                <div className="flex items-center justify-center pt-20">
-                  <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
-                    <svg
-                      className="w-4 h-4 text-muted-foreground"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </div>
-                </div>
-
-                {/* Action Section */}
-                <div className="bg-card rounded-lg p-6 border shadow-sm">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="bg-pink-100 rounded-full p-2">
-                      <div className="w-4 h-4 bg-pink-500 rounded-full" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Then</h3>
-                      <p className="text-sm text-muted-foreground">Execute this action</p>
-                    </div>
-                  </div>
-
-                  <Select value={selectedAction} onValueChange={setSelectedAction}>
-                    <SelectTrigger className="w-full mb-4">
-                      <SelectValue placeholder="Set a custom field" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="custom-field">Set a custom field</SelectItem>
-                      <SelectItem value="send-notification">Send a notification</SelectItem>
-                      <SelectItem value="change-status">Change status</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  <Button variant="outline" size="sm" className="w-full">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add action
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-6">
-                <Textarea
-                  placeholder="Enter description..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="min-h-[100px]"
-                />
-              </div>
-              <DialogFooter className="mt-6">
-                <Button onClick={handleCreate} className="bg-blue-600 hover:bg-blue-700 text-white">
-                  Create
-                </Button>
-              </DialogFooter>
-            </TabsContent>
-            <TabsContent value="manage" className="pt-6">
-              <div className="flex items-center gap-4 mb-4">
-                <Button variant="outline" className="rounded-full">
-                  Active <span className="ml-2 bg-blue-600 text-white px-2 py-0.5 rounded-full text-xs">0</span>
-                </Button>
-                <Button variant="outline" className="rounded-full">
-                  Inactive{" "}
-                  <span className="ml-2 bg-muted text-muted-foreground px-2 py-0.5 rounded-full text-xs">0</span>
+          <div className="flex h-full">
+            {/* Sidebar */}
+            <div className="w-64 border-r pr-4">
+              <div className="mb-6">
+                <Button 
+                  onClick={() => setIsCreateDialogOpen(true)}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Rule
                 </Button>
               </div>
-              {renderEmptyState("automation")}
-            </TabsContent>
-            <TabsContent value="activity" className="pt-6">
-              {renderEmptyState("activity")}
-            </TabsContent>
-            <TabsContent value="usage">
-              <UsageStats />
-            </TabsContent>
-          </Tabs>
+
+              <h3 className="font-medium mb-2">Categories</h3>
+              <div className="space-y-1">
+                {AUTOMATION_CATEGORIES.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.id)}
+                    className={`w-full text-left px-3 py-2 rounded-md transition-colors ${
+                      selectedCategory === category.id
+                        ? "bg-blue-50 text-blue-600"
+                        : "hover:bg-gray-100"
+                    }`}
+                  >
+                    {category.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="flex-1 pl-6">
+              <Tabs defaultValue="models">
+                <TabsList>
+                  <TabsTrigger value="models">Models</TabsTrigger>
+                  <TabsTrigger value="recipes">Recipes</TabsTrigger>
+                  <TabsTrigger value="activity">Activity</TabsTrigger>
+                  <TabsTrigger value="usage">Usage</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="models" className="mt-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    {filteredTemplates.map((template) => (
+                      <div
+                        key={template.id}
+                        className="p-4 border rounded-lg hover:border-blue-500 cursor-pointer transition-all duration-200"
+                      >
+                        <h4 className="font-medium">{template.name}</h4>
+                        <p className="text-sm text-gray-500">{template.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="recipes">
+                  {automations?.length === 0 ? renderEmptyState() : (
+                    <div className="space-y-4">
+                      {automations?.map((automation: any) => (
+                        <div
+                          key={automation.id}
+                          className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                        >
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-medium">{automation.name}</h4>
+                            <Button variant="outline" size="sm">Edit</Button>
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">{automation.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="activity">
+                  {renderEmptyState()}
+                </TabsContent>
+
+                <TabsContent value="usage">
+                  <UsageStats />
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
+
+      <CreateAutomationDialog
+        isOpen={isCreateDialogOpen}
+        onClose={() => setIsCreateDialogOpen(false)}
+        board={board}
+      />
     </>
   );
 };

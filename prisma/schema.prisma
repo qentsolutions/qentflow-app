@@ -25,6 +25,32 @@ enum ENTITY_TYPE {
   CARD
 }
 
+enum AutomationTriggerType {
+  CARD_CREATED
+  CARD_MOVED
+  CARD_UPDATED
+  TASK_COMPLETED
+  COMMENT_ADDED
+  ATTACHMENT_ADDED
+  DUE_DATE_APPROACHING
+  ALL_TASKS_COMPLETED
+  USER_MENTIONED
+  CARD_ASSIGNED
+}
+
+enum AutomationActionType {
+  UPDATE_CARD_STATUS
+  ASSIGN_USER
+  SEND_NOTIFICATION
+  CREATE_TASKS
+  ADD_TAG
+  CREATE_CALENDAR_EVENT
+  CREATE_AUDIT_LOG
+  MOVE_CARD
+  UPDATE_CARD_PRIORITY
+  SEND_EMAIL
+}
+
 model User {
   id                    String                 @id @default(cuid())
   name                  String?
@@ -47,6 +73,7 @@ model User {
   createdDocuments      Document[]
   Notification          Notification[]
   sentInvitations       Invitation[]
+  automations           Automation[]
 }
 
 model Workspace {
@@ -63,6 +90,7 @@ model Workspace {
   documents      Document[]
   Notification   Notification[]
   invitations    Invitation[]
+  automations    Automation[]
 }
 
 model Invitation {
@@ -80,12 +108,6 @@ model Invitation {
   @@index([workspaceId])
   @@index([inviterId])
 }
-
-
-
-
-
-
 
 model Document {
   id          String    @id @default(cuid())
@@ -154,8 +176,6 @@ model WorkspaceMember {
   @@unique([workspaceId, userId])
 }
 
-
-
 model StripeCustomer {
   id               String @id @default(uuid())
   userId           String @unique
@@ -173,7 +193,8 @@ model Board {
   createdById String
   image       String?
 
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  automations Automation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -385,3 +406,45 @@ model Notification {
   @@index([workspaceId]) // Index pour le workspace
 }
 
+model Automation {
+  id          String             @id @default(cuid())
+  name        String
+  description String?
+  active      Boolean            @default(true)
+  workspaceId String
+  workspace   Workspace          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  boardId     String?
+  board       Board?             @relation(fields: [boardId], references: [id])
+  createdById String
+  createdBy   User               @relation(fields: [createdById], references: [id])
+  trigger     AutomationTrigger  @relation(fields: [triggerId], references: [id])
+  triggerId   String             @unique
+  actions     AutomationAction[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@index([workspaceId])
+  @@index([boardId])
+}
+
+model AutomationTrigger {
+  id         String                @id @default(cuid())
+  type       AutomationTriggerType
+  conditions Json?
+  automation Automation?
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+}
+
+model AutomationAction {
+  id           String               @id @default(cuid())
+  type         AutomationActionType
+  config       Json
+  order        Int
+  automationId String
+  automation   Automation           @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  @@index([automationId])
+}

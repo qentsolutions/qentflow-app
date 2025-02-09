@@ -8,6 +8,7 @@ import { InputType, ReturnType } from "./types";
 import { createAuditLog } from "@/lib/create-audit-log";
 import { ACTION, ENTITY_TYPE } from "@prisma/client";
 import { currentUser } from "@/lib/auth";
+import { automationEngine } from "@/lib/automation-engine";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   const user = currentUser();
@@ -43,6 +44,21 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       action: ACTION.UPDATE,
       workspaceId,
     });
+
+    await automationEngine.processAutomations(
+      "CARD_UPDATED",
+      {
+        cardId: card.id,
+        title: card.title,
+        description: card.description,
+        startDate: card.startDate,
+        dueDate: card.dueDate,
+        listId: card.listId,
+      },
+      workspaceId,
+      boardId
+    );
+
   } catch (error) {
     return {
       error: "Failed to update.",
