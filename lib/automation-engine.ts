@@ -15,77 +15,30 @@ export class AutomationEngine {
     return AutomationEngine.instance;
   }
 
-  private getEmailTemplate(triggerType: string, context: any, board: any) {
-    const templates: { [key: string]: { subject: string; content: string } } = {
-      CARD_CREATED: {
-        subject: `New Card Created in Board "${board.title}"`,
-        content: `
-          <div style="font-family: Arial, sans-serif; padding: 20px;">
-            <h2 style="color: #2563eb;">New Card Created</h2>
-            <p>A new card has been created in your board.</p>
-            <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 15px 0;">
-              <p><strong>Card Title:</strong> ${context.title}</p>
-              <p><strong>Board:</strong> ${board.title}</p>
-              <p><strong>List:</strong> ${context.listTitle}</p>
-              <p><strong>Created By:</strong> ${context.createdBy?.name || 'Unknown'}</p>
-            </div>
-            <p style="color: #6b7280; font-size: 14px;">
-              You are receiving this email because you are subscribed to board notifications.
-            </p>
-          </div>
-        `,
-      },
-      CARD_MOVED: {
-        subject: `Card Moved in Board "${board.title}"`,
-        content: `
-          <div style="font-family: Arial, sans-serif; padding: 20px;">
-            <h2 style="color: #2563eb;">Card Moved</h2>
-            <p>A card has been moved to a different list.</p>
-            <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 15px 0;">
-              <p><strong>Card Title:</strong> ${context.title}</p>
-              <p><strong>From List:</strong> ${context.sourceListTitle}</p>
-              <p><strong>To List:</strong> ${context.destinationListTitle}</p>
-            </div>
-          </div>
-        `,
-      },
-      CARD_UPDATED: {
-        subject: `Card Updated in Board "${board.title}"`,
-        content: `
-          <div style="font-family: Arial, sans-serif; padding: 20px;">
-            <h2 style="color: #2563eb;">Card Updated</h2>
-            <p>A card has been updated in your board.</p>
-            <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 15px 0;">
-              <p><strong>Card Title:</strong> ${context.title}</p>
-              <p><strong>Updated Fields:</strong> ${Object.keys(context.updates || {}).join(", ")}</p>
-            </div>
-          </div>
-        `,
-      },
-      TASK_COMPLETED: {
-        subject: `Task Completed in Board "${board.title}"`,
-        content: `
-          <div style="font-family: Arial, sans-serif; padding: 20px;">
-            <h2 style="color: #2563eb;">Task Completed</h2>
-            <p>A task has been marked as complete.</p>
-            <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 15px 0;">
-              <p><strong>Card:</strong> ${context.title}</p>
-              <p><strong>Task:</strong> ${context.taskTitle}</p>
-            </div>
-          </div>
-        `,
-      },
-    };
-
-    return templates[triggerType] || {
-      subject: `Notification from Board "${board.title}"`,
-      content: `
-        <div style="font-family: Arial, sans-serif; padding: 20px;">
-          <h2 style="color: #2563eb;">Board Notification</h2>
-          <p>An action has occurred in your board.</p>
-        </div>
-      `,
-    };
+  private async logAutomationActivity(
+    automationId: string,
+    workspaceId: string,
+    boardId: string | undefined,
+    type: string,
+    description: string,
+    status: "success" | "error" = "success",
+    error?: string
+  ) {
+    try {
+      await db.automationActivity.create({
+        data: {
+          automationId,
+          workspaceId,
+          boardId,
+          type,
+          description,
+          status,
+          error,
+        },
+      });
+    } catch (error) {
+      console.error("Failed to log automation activity:", error);
+    }
   }
 
   async processAutomations(
@@ -95,8 +48,6 @@ export class AutomationEngine {
     boardId?: string
   ) {
     try {
-      
-      // Récupérer les automatisations actives pour ce trigger
       const automations = await db.automation.findMany({
         where: {
           workspaceId,
@@ -116,7 +67,6 @@ export class AutomationEngine {
         },
       });
 
-      // Récupérer les informations du board pour les templates d'email
       const board = await db.board.findUnique({
         where: { id: boardId },
         include: {
@@ -130,12 +80,60 @@ export class AutomationEngine {
       }
 
       for (const automation of automations) {
-        if (this.evaluateConditions(automation.trigger.conditions, context)) {
-          await this.executeActions(automation.actions, {
-            ...context,
+        try {
+          // Log the start of automation execution
+          await this.logAutomationActivity(
+            automation.id,
+            workspaceId,
+            boardId,
             triggerType,
-            board
-          }, workspaceId, board);
+            `Starting automation "${automation.name}"`,
+            "success"
+          );
+
+          if (this.evaluateConditions(automation.trigger.conditions, context)) {
+            try {
+              await this.executeActions(automation.actions, {
+                ...context,
+                triggerType,
+                board
+              }, workspaceId, board);
+
+              // Log successful execution
+              await this.logAutomationActivity(
+                automation.id,
+                workspaceId,
+                boardId,
+                triggerType,
+                `Successfully executed automation "${automation.name}"`,
+                "success"
+              );
+            } catch (error) {
+              // Log action execution failure
+              await this.logAutomationActivity(
+                automation.id,
+                workspaceId,
+                boardId,
+                triggerType,
+                `Failed to execute automation "${automation.name}"`,
+                "error",
+                error instanceof Error ? error.message : "Unknown error"
+              );
+              throw error;
+            }
+          } else {
+            // Log when conditions are not met
+            await this.logAutomationActivity(
+              automation.id,
+              workspaceId,
+              boardId,
+              triggerType,
+              `Conditions not met for automation "${automation.name}"`,
+              "success"
+            );
+          }
+        } catch (error) {
+          console.error(`Error processing automation ${automation.id}:`, error);
         }
       }
     } catch (error) {
@@ -188,72 +186,144 @@ export class AutomationEngine {
         await this.executeAction(action, context, workspaceId, board);
       } catch (error) {
         console.error(`Error executing action ${action.type}:`, error);
+        throw error;
       }
     }
+  }
+
+  private getEmailTemplate(triggerType: string, context: any, board: any) {
+    const templates: { [key: string]: { subject: string; content: string } } = {
+      CARD_CREATED: {
+        subject: `New Card Created in Board "${board.title}"`,
+        content: `
+          <div style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2 style="color: #2563eb;">New Card Created</h2>
+            <p>A new card has been created in your board.</p>
+            <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 15px 0;">
+              <p><strong>Card Title:</strong> ${context.title}</p>
+              <p><strong>Board:</strong> ${board.title}</p>
+              <p><strong>List:</strong> ${context.listTitle}</p>
+              <p><strong>Created By:</strong> ${context.createdBy?.name || 'Unknown'}</p>
+            </div>
+            <p style="color: #6b7280; font-size: 14px;">
+              You are receiving this email because you are subscribed to board notifications.
+            </p>
+          </div>
+        `,
+      },
+      CARD_MOVED: {
+        subject: `Card Moved in Board "${board.title}"`,
+        content: `
+          <div style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2 style="color: #2563eb;">Card Moved</h2>
+            <p>A card has been moved to a different list.</p>
+            <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 15px 0;">
+              <p><strong>Card Title:</strong> ${context.title}</p>
+              <p><strong>From List:</strong> ${context.sourceListTitle}</p>
+              <p><strong>To List:</strong> ${context.destinationListTitle}</p>
+            </div>
+          </div>
+        `,
+      },
+      // Add more email templates as needed
+    };
+
+    return templates[triggerType] || {
+      subject: `Notification from Board "${board.title}"`,
+      content: `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+          <h2 style="color: #2563eb;">Board Notification</h2>
+          <p>An action has occurred in your board.</p>
+        </div>
+      `,
+    };
   }
 
   private async executeAction(action: any, context: any, workspaceId: string, board: any) {
     const { cardId } = context;
 
-    switch (action.type) {
-      case "UPDATE_CARD_PRIORITY":
-        await db.card.update({
-          where: { id: cardId },
-          data: { 
-            priority: action.config.priority 
-          },
-        });
-        break;
+    try {
+      switch (action.type) {
+        case "UPDATE_CARD_PRIORITY":
+          await db.card.update({
+            where: { id: cardId },
+            data: { 
+              priority: action.config.priority 
+            },
+          });
+          break;
 
-      case "UPDATE_CARD_STATUS":
-        await this.updateCardStatus(action.config, context);
-        break;
+        case "UPDATE_CARD_STATUS":
+          await this.updateCardStatus(action.config, context);
+          break;
 
-      case "ASSIGN_USER":
-        await this.assignUser(action.config, context);
-        break;
+        case "ASSIGN_USER":
+          await this.assignUser(action.config, context);
+          break;
 
-      case "SEND_NOTIFICATION":
-        await this.sendNotification(action.config, context, workspaceId);
-        break;
+        case "SEND_NOTIFICATION":
+          await this.sendNotification(action.config, context, workspaceId);
+          break;
 
-      case "CREATE_TASKS":
-        await this.createTasks(action.config, context);
-        break;
+        case "CREATE_TASKS":
+          await this.createTasks(action.config, context);
+          break;
 
-      case "ADD_TAG":
-        await this.addTag(action.config, context);
-        break;
+        case "ADD_TAG":
+          await this.addTag(action.config, context);
+          break;
 
-      case "CREATE_CALENDAR_EVENT":
-        await this.createCalendarEvent(action.config, context, workspaceId);
-        break;
+        case "CREATE_CALENDAR_EVENT":
+          await this.createCalendarEvent(action.config, context, workspaceId);
+          break;
 
-      case "CREATE_AUDIT_LOG":
-        await this.createAuditLogEntry(action.config, context, workspaceId);
-        break;
+        case "CREATE_AUDIT_LOG":
+          await this.createAuditLogEntry(action.config, context, workspaceId);
+          break;
 
-      case "SEND_EMAIL":
-        const user = await db.user.findUnique({
-          where: { id: action.config.userId },
-        });
+        case "SEND_EMAIL":
+          const user = await db.user.findUnique({
+            where: { id: action.config.userId },
+          });
 
-        if (!user?.email) {
-          console.error("No email found for user:", action.config.userId);
-          return;
-        }
+          if (!user?.email) {
+            throw new Error("No email found for user");
+          }
 
-        const template = this.getEmailTemplate(context.triggerType, context, board);
-        
-        await sendBeautifulEmail(
-          user.email,
-          template.subject,
-          template.content
-        );
-        break;
+          const template = this.getEmailTemplate(context.triggerType, context, board);
+          
+          await sendBeautifulEmail(
+            user.email,
+            template.subject,
+            template.content
+          );
+          break;
 
-      default:
-        console.warn(`Unknown action type: ${action.type}`);
+        default:
+          throw new Error(`Unknown action type: ${action.type}`);
+      }
+
+      // Log successful action execution
+      await this.logAutomationActivity(
+        context.automationId,
+        workspaceId,
+        board.id,
+        action.type,
+        `Successfully executed action "${action.type}"`,
+        "success"
+      );
+    } catch (error) {
+      // Log failed action execution
+      await this.logAutomationActivity(
+        context.automationId,
+        workspaceId,
+        board.id,
+        action.type,
+        `Failed to execute action "${action.type}"`,
+        "error",
+        error instanceof Error ? error.message : "Unknown error"
+      );
+      throw error;
     }
   }
 

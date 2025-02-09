@@ -77,20 +77,21 @@ model User {
 }
 
 model Workspace {
-  id             String            @id @default(cuid())
-  name           String
-  logo           String?
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-  createdById    String
-  createdBy      User              @relation("CreatedBy", fields: [createdById], references: [id])
-  members        WorkspaceMember[]
-  boards         Board[]
-  calendarEvents CalendarEvent[]
-  documents      Document[]
-  Notification   Notification[]
-  invitations    Invitation[]
-  automations    Automation[]
+  id                 String               @id @default(cuid())
+  name               String
+  logo               String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  createdById        String
+  createdBy          User                 @relation("CreatedBy", fields: [createdById], references: [id])
+  members            WorkspaceMember[]
+  boards             Board[]
+  calendarEvents     CalendarEvent[]
+  documents          Document[]
+  Notification       Notification[]
+  invitations        Invitation[]
+  automations        Automation[]
+  automationActivity AutomationActivity[]
 }
 
 model Invitation {
@@ -199,8 +200,9 @@ model Board {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  User User[]
-  Tag  Tag[]
+  User                 User[]
+  Tag                  Tag[]
+  automationActivities AutomationActivity[]
 }
 
 model List {
@@ -407,21 +409,22 @@ model Notification {
 }
 
 model Automation {
-  id          String             @id @default(cuid())
+  id          String               @id @default(cuid())
   name        String
   description String?
-  active      Boolean            @default(true)
+  active      Boolean              @default(true)
   workspaceId String
-  workspace   Workspace          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspace   Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   boardId     String?
-  board       Board?             @relation(fields: [boardId], references: [id])
+  board       Board?               @relation(fields: [boardId], references: [id])
   createdById String
-  createdBy   User               @relation(fields: [createdById], references: [id])
-  trigger     AutomationTrigger  @relation(fields: [triggerId], references: [id])
-  triggerId   String             @unique
+  createdBy   User                 @relation(fields: [createdById], references: [id])
+  trigger     AutomationTrigger    @relation(fields: [triggerId], references: [id])
+  triggerId   String               @unique
   actions     AutomationAction[]
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
+  activities  AutomationActivity[]
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
 
   @@index([workspaceId])
   @@index([boardId])
@@ -447,4 +450,23 @@ model AutomationAction {
   updatedAt    DateTime             @updatedAt
 
   @@index([automationId])
+}
+
+model AutomationActivity {
+  id           String     @id @default(cuid())
+  automationId String
+  automation   Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  workspaceId  String
+  workspace    Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  boardId      String?
+  board        Board?     @relation(fields: [boardId], references: [id])
+  type         String
+  description  String
+  status       String     @default("success") // success or error
+  error        String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([automationId])
+  @@index([workspaceId])
 }

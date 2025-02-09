@@ -13,6 +13,8 @@ import { CreateAutomationForm } from "./create-automation-form"
 import { Switch } from "@/components/ui/switch"
 import { toast } from "sonner"
 import { useQueryClient } from "@tanstack/react-query"
+import { AutomationUsage } from "./automation-usage"
+import { AutomationActivity } from "./automation-activity"
 
 interface Board {
   id: string
@@ -134,7 +136,6 @@ export const Automations = ({ board }: AutomationsProps) => {
           Learn more
         </a>
       </p>
-   
     </motion.div>
   )
 
@@ -305,11 +306,11 @@ export const Automations = ({ board }: AutomationsProps) => {
                 </TabsContent>
 
                 <TabsContent value="activity" className="h-full">
-                  {renderEmptyState()}
+                  <AutomationActivity boardId={board.id} workspaceId={board.workspaceId} />
                 </TabsContent>
 
                 <TabsContent value="usage" className="h-full">
-                  <div className="p-6 text-center text-gray-500">Usage statistics will appear here</div>
+                  <AutomationUsage boardId={board.id} workspaceId={board.workspaceId} />
                 </TabsContent>
               </div>
             </Tabs>
