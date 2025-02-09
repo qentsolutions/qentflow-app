@@ -10,6 +10,9 @@ import { useAutomation } from "@/hooks/use-automation"
 import { motion, AnimatePresence } from "framer-motion"
 import { AUTOMATION_CATEGORIES, AUTOMATION_TEMPLATES } from "@/constants/automation-templates"
 import { CreateAutomationForm } from "./create-automation-form"
+import { Switch } from "@/components/ui/switch"
+import { toast } from "sonner"
+import { useQueryClient } from "@tanstack/react-query"
 
 interface Board {
   id: string
@@ -32,7 +35,10 @@ export const Automations = ({ board }: AutomationsProps) => {
   const [selectedTab, setSelectedTab] = useState("automations")
   const [isCreating, setIsCreating] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
-  const { automations, isLoading } = useAutomation({
+  const [filterStatus, setFilterStatus] = useState<"all" | "active" | "inactive">("all")
+  const queryClient = useQueryClient()
+  
+  const { automations, isLoading, updateAutomation, deleteAutomation } = useAutomation({
     workspaceId: board.workspaceId,
     boardId: board.id,
   })
@@ -48,6 +54,69 @@ export const Automations = ({ board }: AutomationsProps) => {
       template.description.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
+  const filteredAutomations = automations?.filter((automation: any) => {
+    if (filterStatus === "active") return automation.active
+    if (filterStatus === "inactive") return !automation.active
+    return true
+  })
+
+  const handleToggleAutomation = async (automationId: string, currentStatus: boolean) => {
+    try {
+      await updateAutomation({
+        id: automationId,
+        data: { active: !currentStatus }
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["automations", board.workspaceId, board.id],
+      })
+      toast.success(`Automation ${currentStatus ? 'disabled' : 'enabled'} successfully`)
+    } catch (error) {
+      toast.error("Failed to update automation status")
+    }
+  }
+
+  const handleDeleteAutomation = async (automationId: string) => {
+    try {
+      await deleteAutomation(automationId)
+      toast.success("Automation deleted successfully")
+    } catch (error) {
+      toast.error("Failed to delete automation")
+    }
+  }
+
+  const getTriggerDescription = (trigger: any) => {
+    const triggerTypes: { [key: string]: string } = {
+      CARD_CREATED: "a card is created",
+      CARD_MOVED: "a card is moved",
+      CARD_UPDATED: "a card is updated",
+      TASK_COMPLETED: "a task is completed",
+      COMMENT_ADDED: "a comment is added",
+      ATTACHMENT_ADDED: "an attachment is added",
+      DUE_DATE_APPROACHING: "a due date is approaching",
+      ALL_TASKS_COMPLETED: "all tasks are completed",
+      USER_MENTIONED: "a user is mentioned",
+      CARD_ASSIGNED: "a card is assigned",
+    }
+    return triggerTypes[trigger.type] || trigger.type
+  }
+
+  const getActionDescription = (actions: any[]) => {
+    if (!actions.length) return ""
+    const actionTypes: { [key: string]: string } = {
+      UPDATE_CARD_STATUS: "update card status",
+      ASSIGN_USER: "assign user",
+      SEND_NOTIFICATION: "send notification",
+      CREATE_TASKS: "create tasks",
+      ADD_TAG: "add tag",
+      CREATE_CALENDAR_EVENT: "create calendar event",
+      CREATE_AUDIT_LOG: "create audit log",
+      MOVE_CARD: "move card",
+      UPDATE_CARD_PRIORITY: "update card priority",
+      SEND_EMAIL: "send email",
+    }
+    return actionTypes[actions[0].type] || actions[0].type
+  }
+
   const renderEmptyState = () => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -58,17 +127,14 @@ export const Automations = ({ board }: AutomationsProps) => {
       <div className="rounded-full bg-blue-50 p-8 mb-4">
         <LightningBoltIcon className="w-12 h-12 text-blue-500" />
       </div>
-      <h3 className="text-2xl font-semibold mb-2">Let's create your first automation!</h3>
+      <h3 className="text-2xl font-semibold mb-2">Let&apos;s create your first automation!</h3>
       <p className="text-gray-500 max-w-md mb-6">
         Use automations to streamline your workflows, automate tasks, and boost your productivity.
         <a href="#" className="text-blue-500 hover:text-blue-600 underline ml-1">
           Learn more
         </a>
       </p>
-      <Button onClick={() => setIsCreating(true)} className="bg-blue-500 hover:bg-blue-600 text-white">
-        <Plus className="h-4 w-4 mr-2" />
-        Add automation
-      </Button>
+   
     </motion.div>
   )
 
@@ -82,7 +148,7 @@ export const Automations = ({ board }: AutomationsProps) => {
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[1250px] h-[90vh] overflow-hidden">
-        <div className=" h-full flex flex-col">
+        <div className="h-full flex flex-col">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
               <Workflow className="h-6 w-6 text-blue-500" />
@@ -90,7 +156,7 @@ export const Automations = ({ board }: AutomationsProps) => {
             </div>
           </div>
           {isCreating ? (
-            <div className="w-full flex px-12  justify-center h-[72vh] overflow-y-auto">
+            <div className="w-full flex px-12 justify-center h-[72vh] overflow-y-auto">
               <CreateAutomationForm board={board} onClose={() => setIsCreating(false)} />
             </div>
           ) : (
@@ -104,11 +170,10 @@ export const Automations = ({ board }: AutomationsProps) => {
                 </TabsList>
                 <div>
                   <Button onClick={() => setIsCreating(true)} className="bg-blue-500 hover:bg-blue-600 text-white text-xs">
-                    <PlusCircle /> New Automation
+                    <PlusCircle className="h-4 w-4 mr-2" /> New Automation
                   </Button>
                 </div>
               </div>
-
 
               <div className="flex-grow overflow-auto mt-4">
                 <TabsContent value="templates" className="h-[70vh] overflow-y-auto">
@@ -125,23 +190,21 @@ export const Automations = ({ board }: AutomationsProps) => {
                               className="pl-10 w-64"
                             />
                           </div>
-
                         </div>
                         {AUTOMATION_CATEGORIES.map((category) => (
                           <button
                             key={category.id}
                             onClick={() => setSelectedCategory(category.id)}
-                            className={`px-4 py-2 rounded-full text-sm transition-all whitespace-nowrap ${selectedCategory === category.id
-                              ? "bg-blue-50 text-blue-600 font-medium"
-                              : "text-gray-600 hover:bg-gray-50"
-                              }`}
+                            className={`px-4 py-2 rounded-full text-sm transition-all whitespace-nowrap ${
+                              selectedCategory === category.id
+                                ? "bg-blue-50 text-blue-600 font-medium"
+                                : "text-gray-600 hover:bg-gray-50"
+                            }`}
                           >
                             {category.label}
                           </button>
                         ))}
-
                       </div>
-
                     </div>
 
                     <motion.div
@@ -180,19 +243,61 @@ export const Automations = ({ board }: AutomationsProps) => {
                       exit={{ opacity: 0 }}
                       className="space-y-4"
                     >
-                      {automations?.map((automation: any) => (
+                      <div className="flex justify-between items-center mb-6">
+                        <div className="flex gap-2">
+                          <Button
+                            variant={filterStatus === "all" ? "default" : "outline"}
+                            onClick={() => setFilterStatus("all")}
+                            size="sm"
+                            className="bg-blue-600"
+                          >
+                            All
+                          </Button>
+                          <Button
+                            variant={filterStatus === "active" ? "default" : "outline"}
+                            onClick={() => setFilterStatus("active")}
+                            size="sm"
+                          >
+                            Active
+                          </Button>
+                          <Button
+                            variant={filterStatus === "inactive" ? "default" : "outline"}
+                            onClick={() => setFilterStatus("inactive")}
+                            size="sm"
+                          >
+                            Inactive
+                          </Button>
+                        </div>
+                      </div>
+
+                      {filteredAutomations?.map((automation: any) => (
                         <motion.div
                           key={automation.id}
-                          whileHover={{ scale: 1.01 }}
-                          className="p-6 bg-white border rounded-xl hover:border-blue-200 hover:shadow-md transition-all"
+                          whileHover={{ scale: 1 }}
+                          className="p-6 bg-white border rounded-xl m-4 hover:border-blue-200 hover:shadow-md transition-all"
                         >
                           <div className="flex items-center justify-between">
-                            <h4 className="font-medium text-lg">{automation.name}</h4>
-                            <Button variant="outline" size="sm">
-                              Edit
-                            </Button>
+                            <div className="flex-1">
+                              <h4 className="font-medium text-lg">{automation.name}</h4>
+                              <p className="text-gray-500 mt-1">
+                                When {getTriggerDescription(automation.trigger)}, then {getActionDescription(automation.actions)}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-4">
+                              <Switch
+                                checked={automation.active}
+                                onCheckedChange={() => handleToggleAutomation(automation.id, automation.active)}
+                              />
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                onClick={() => handleDeleteAutomation(automation.id)}
+                              >
+                                Delete
+                              </Button>
+                            </div>
                           </div>
-                          <p className="text-gray-500 mt-2">{automation.description}</p>
                         </motion.div>
                       ))}
                     </motion.div>
@@ -207,9 +312,6 @@ export const Automations = ({ board }: AutomationsProps) => {
                   <div className="p-6 text-center text-gray-500">Usage statistics will appear here</div>
                 </TabsContent>
               </div>
-
-
-
             </Tabs>
           )}
         </div>
@@ -219,4 +321,3 @@ export const Automations = ({ board }: AutomationsProps) => {
 }
 
 export default Automations
-
