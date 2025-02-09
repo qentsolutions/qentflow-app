@@ -76,17 +76,10 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
           name: true,
           email: true,
           image: true,
-        },
-      },
-      automationRules: {
-        include: {
-          triggers: true,
-          actions: true,
-        },
+        }
       },
     },
   });
-
   if (!board) {
     return <div>Board not found</div>;
   }
@@ -94,24 +87,6 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
   if (!isBoardMember) {
     redirect(`/${params.workspaceId}/boards`);
   }
-
-
-  const formattedBoard = {
-    ...board,
-    automationRules: board.automationRules.map(rule => ({
-      ...rule,
-      triggers: rule.triggers.map(trigger => ({
-        ...trigger,
-        configuration: JSON.stringify(trigger.configuration), // Conversion en string
-      })),
-      actions: rule.actions.map(action => ({
-        ...action,
-        configuration: JSON.stringify(action.configuration), // Conversion en string
-      })),
-    })),
-  };
-
-
   return (
     <div className="w-full p-2 h-[calc(100vh-70px)]">
       <Card className="shadow-none rounded-none h-full">
@@ -147,7 +122,9 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                   </TabsList>
                   <div className="space-x-2 flex items-center">
                     <Automations
-                      board={formattedBoard}
+                      boardId={params.boardId}
+                      workspaceId={params.workspaceId}
+                      lists={board.lists}
                     />
                     <AddCardButton
                       boardId={params.boardId}
