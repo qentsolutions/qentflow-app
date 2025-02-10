@@ -58,6 +58,8 @@ export async function DELETE(
   }
 }
 
+// app/api/automations/[workspaceId]/[automationId]/route.ts
+
 export async function PATCH(
   req: Request,
   { params }: { params: { workspaceId: string; automationId: string } }
@@ -69,14 +71,7 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    const {
-      name,
-      description,
-      active,
-      triggerType,
-      triggerConditions,
-      actions,
-    } = body;
+    const { active } = body;
 
     const automation = await db.automation.update({
       where: {
@@ -84,27 +79,7 @@ export async function PATCH(
         workspaceId: params.workspaceId,
       },
       data: {
-        name,
-        description,
         active,
-        trigger: {
-          update: {
-            type: triggerType,
-            conditions: triggerConditions,
-          },
-        },
-        actions: {
-          deleteMany: {},
-          create: actions.map((action: any) => ({
-            type: action.type,
-            config: action.config,
-            order: action.order,
-          })),
-        },
-      },
-      include: {
-        trigger: true,
-        actions: true,
       },
     });
 

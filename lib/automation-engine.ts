@@ -81,25 +81,20 @@ export class AutomationEngine {
 
       for (const automation of automations) {
         try {
-          // Log the start of automation execution
-          await this.logAutomationActivity(
-            automation.id,
-            workspaceId,
-            boardId,
-            triggerType,
-            `Starting automation "${automation.name}"`,
-            "success"
-          );
-
           if (this.evaluateConditions(automation.trigger.conditions, context)) {
             try {
-              await this.executeActions(automation.actions, {
-                ...context,
-                triggerType,
+              await this.executeActions(
+                automation.actions,
+                {
+                  ...context,
+                  triggerType,
+                  board,
+                },
+                workspaceId,
                 board
-              }, workspaceId, board);
+              );
 
-              // Log successful execution
+              // Log only successful execution
               await this.logAutomationActivity(
                 automation.id,
                 workspaceId,
@@ -109,7 +104,7 @@ export class AutomationEngine {
                 "success"
               );
             } catch (error) {
-              // Log action execution failure
+              // Log only failures
               await this.logAutomationActivity(
                 automation.id,
                 workspaceId,
@@ -161,7 +156,7 @@ export class AutomationEngine {
 
   private evaluateCondition(key: string, value: any, context: any): boolean {
     const contextValue = context[key];
-    
+
     if (typeof value === "object") {
       if (value.operator === "equals") {
         return contextValue === value.value;
@@ -180,7 +175,12 @@ export class AutomationEngine {
     return contextValue === value;
   }
 
-  private async executeActions(actions: any[], context: any, workspaceId: string, board: any) {
+  private async executeActions(
+    actions: any[],
+    context: any,
+    workspaceId: string,
+    board: any
+  ) {
     for (const action of actions) {
       try {
         await this.executeAction(action, context, workspaceId, board);
@@ -203,7 +203,9 @@ export class AutomationEngine {
               <p><strong>Card Title:</strong> ${context.title}</p>
               <p><strong>Board:</strong> ${board.title}</p>
               <p><strong>List:</strong> ${context.listTitle}</p>
-              <p><strong>Created By:</strong> ${context.createdBy?.name || 'Unknown'}</p>
+              <p><strong>Created By:</strong> ${
+                context.createdBy?.name || "Unknown"
+              }</p>
             </div>
             <p style="color: #6b7280; font-size: 14px;">
               You are receiving this email because you are subscribed to board notifications.
@@ -228,18 +230,25 @@ export class AutomationEngine {
       // Add more email templates as needed
     };
 
-    return templates[triggerType] || {
-      subject: `Notification from Board "${board.title}"`,
-      content: `
+    return (
+      templates[triggerType] || {
+        subject: `Notification from Board "${board.title}"`,
+        content: `
         <div style="font-family: Arial, sans-serif; padding: 20px;">
           <h2 style="color: #2563eb;">Board Notification</h2>
           <p>An action has occurred in your board.</p>
         </div>
       `,
-    };
+      }
+    );
   }
 
-  private async executeAction(action: any, context: any, workspaceId: string, board: any) {
+  private async executeAction(
+    action: any,
+    context: any,
+    workspaceId: string,
+    board: any
+  ) {
     const { cardId } = context;
 
     try {
@@ -247,8 +256,8 @@ export class AutomationEngine {
         case "UPDATE_CARD_PRIORITY":
           await db.card.update({
             where: { id: cardId },
-            data: { 
-              priority: action.config.priority 
+            data: {
+              priority: action.config.priority,
             },
           });
           break;
@@ -290,8 +299,12 @@ export class AutomationEngine {
             throw new Error("No email found for user");
           }
 
-          const template = this.getEmailTemplate(context.triggerType, context, board);
-          
+          const template = this.getEmailTemplate(
+            context.triggerType,
+            context,
+            board
+          );
+
           await sendBeautifulEmail(
             user.email,
             template.subject,
@@ -347,7 +360,11 @@ export class AutomationEngine {
     });
   }
 
-  private async sendNotification(config: any, context: any, workspaceId: string) {
+  private async sendNotification(
+    config: any,
+    context: any,
+    workspaceId: string
+  ) {
     const { userId } = config;
     const { message } = config;
 
@@ -389,7 +406,11 @@ export class AutomationEngine {
     });
   }
 
-  private async createCalendarEvent(config: any, context: any, workspaceId: string) {
+  private async createCalendarEvent(
+    config: any,
+    context: any,
+    workspaceId: string
+  ) {
     const { title, startDate, endDate, userId } = config;
 
     await db.calendarEvent.create({
@@ -404,7 +425,11 @@ export class AutomationEngine {
     });
   }
 
-  private async createAuditLogEntry(config: any, context: any, workspaceId: string) {
+  private async createAuditLogEntry(
+    config: any,
+    context: any,
+    workspaceId: string
+  ) {
     const { action, entityType, entityTitle } = config;
 
     await createAuditLog({

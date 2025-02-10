@@ -12,9 +12,11 @@ import { AUTOMATION_CATEGORIES, AUTOMATION_TEMPLATES } from "@/constants/automat
 import { CreateAutomationForm } from "./create-automation-form"
 import { Switch } from "@/components/ui/switch"
 import { toast } from "sonner"
-import { useQueryClient } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { AutomationUsage } from "./automation-usage"
 import { AutomationActivity } from "./automation-activity"
+import { useParams } from "next/navigation"
+import { fetcher } from "@/lib/fetcher"
 
 interface Board {
   id: string
@@ -39,11 +41,26 @@ export const Automations = ({ board }: AutomationsProps) => {
   const [searchQuery, setSearchQuery] = useState("")
   const [filterStatus, setFilterStatus] = useState<"all" | "active" | "inactive">("all")
   const queryClient = useQueryClient()
-  
+  const params = useParams();
+
   const { automations, isLoading, updateAutomation, deleteAutomation } = useAutomation({
     workspaceId: board.workspaceId,
     boardId: board.id,
   })
+
+  const { data: availableTags } = useQuery({
+    queryKey: ["available-tags", board.id],
+    queryFn: () => fetcher(`/api/boards/tags?boardId=${board.id}`),
+  });
+
+  const { data: usersInBoard } = useQuery({
+    queryKey: ["usersInBoard", board.id],
+    queryFn: () => fetcher(`/api/boards/assigned-user?boardId=${board.id}`),
+  });
+
+  // Get lists from the board prop
+  const lists = board.lists;
+  const users = board.User;
 
   const filteredTemplates =
     selectedCategory === "all"
@@ -86,38 +103,65 @@ export const Automations = ({ board }: AutomationsProps) => {
     }
   }
 
-  const getTriggerDescription = (trigger: any) => {
-    const triggerTypes: { [key: string]: string } = {
-      CARD_CREATED: "a card is created",
-      CARD_MOVED: "a card is moved",
-      CARD_UPDATED: "a card is updated",
-      TASK_COMPLETED: "a task is completed",
-      COMMENT_ADDED: "a comment is added",
-      ATTACHMENT_ADDED: "an attachment is added",
-      DUE_DATE_APPROACHING: "a due date is approaching",
-      ALL_TASKS_COMPLETED: "all tasks are completed",
-      USER_MENTIONED: "a user is mentioned",
-      CARD_ASSIGNED: "a card is assigned",
-    }
-    return triggerTypes[trigger.type] || trigger.type
-  }
-
   const getActionDescription = (actions: any[]) => {
-    if (!actions.length) return ""
-    const actionTypes: { [key: string]: string } = {
-      UPDATE_CARD_STATUS: "update card status",
-      ASSIGN_USER: "assign user",
-      SEND_NOTIFICATION: "send notification",
-      CREATE_TASKS: "create tasks",
-      ADD_TAG: "add tag",
-      CREATE_CALENDAR_EVENT: "create calendar event",
-      CREATE_AUDIT_LOG: "create audit log",
-      MOVE_CARD: "move card",
-      UPDATE_CARD_PRIORITY: "update card priority",
-      SEND_EMAIL: "send email",
+    if (!actions.length) return "";
+
+    const action = actions[0];
+    switch (action.type) {
+      case "UPDATE_CARD_STATUS":
+        const listName = lists.find(l => l.id === action.config.listId)?.title;
+        return `move card to "${listName}"`;
+      case "ASSIGN_USER":
+        const userName = users.find(u => u.id === action.config.userId)?.name;
+        return `assign to ${userName}`;
+      case "SEND_NOTIFICATION":
+        return `send notification "${action.config.message}"`;
+      case "CREATE_TASKS":
+        return `create ${action.config.tasks.length} tasks`;
+      case "ADD_TAG":
+        const tag = availableTags?.find((t: { id: any }) => t.id === action.config.tagId);
+        return `add tag "${tag?.name}"`;
+      case "CREATE_CALENDAR_EVENT":
+        return `create calendar event "${action.config.title}"`;
+      case "UPDATE_CARD_PRIORITY":
+        return `set priority to "${action.config.priority.toLowerCase()}"`;
+      case "SEND_EMAIL":
+        const emailUser = users.find(u => u.id === action.config.userId)?.name;
+        return `send email to ${emailUser}`;
+      default:
+        return action.type.toLowerCase().replace(/_/g, ' ');
     }
-    return actionTypes[actions[0].type] || actions[0].type
-  }
+  };
+
+  const getTriggerDescription = (trigger: any) => {
+    let desc = "";
+    switch (trigger.type) {
+      case "CARD_CREATED":
+        desc = "a card is created";
+        break;
+      case "CARD_MOVED":
+        const sourceList = lists.find(l => l.id === trigger.conditions?.sourceListId)?.title;
+        const destList = lists.find(l => l.id === trigger.conditions?.destinationListId)?.title;
+        desc = sourceList && destList
+          ? `a card is moved from "${sourceList}" to "${destList}"`
+          : "a card is moved";
+        break;
+      case "CARD_UPDATED":
+        desc = "a card is updated";
+        break;
+      case "TASK_COMPLETED":
+        desc = "a task is completed";
+        break;
+      case "DUE_DATE_APPROACHING":
+        const days = trigger.conditions?.daysBeforeDue || 1;
+        desc = `due date is ${days} day${days > 1 ? 's' : ''} away`;
+        break;
+      default:
+        desc = trigger.type.toLowerCase().replace(/_/g, ' ');
+    }
+    return desc;
+  };
+
 
   const renderEmptyState = () => (
     <motion.div
@@ -196,11 +240,10 @@ export const Automations = ({ board }: AutomationsProps) => {
                           <button
                             key={category.id}
                             onClick={() => setSelectedCategory(category.id)}
-                            className={`px-4 py-2 rounded-full text-sm transition-all whitespace-nowrap ${
-                              selectedCategory === category.id
-                                ? "bg-blue-50 text-blue-600 font-medium"
-                                : "text-gray-600 hover:bg-gray-50"
-                            }`}
+                            className={`px-4 py-2 rounded-full text-sm transition-all whitespace-nowrap ${selectedCategory === category.id
+                              ? "bg-blue-50 text-blue-600 font-medium"
+                              : "text-gray-600 hover:bg-gray-50"
+                              }`}
                           >
                             {category.label}
                           </button>
@@ -274,20 +317,34 @@ export const Automations = ({ board }: AutomationsProps) => {
                       {filteredAutomations?.map((automation: any) => (
                         <motion.div
                           key={automation.id}
-                          whileHover={{ scale: 1 }}
+                          whileHover={{ scale: 1.01 }}
                           className="p-6 bg-white border rounded-xl m-4 hover:border-blue-200 hover:shadow-md transition-all"
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
-                              <h4 className="font-medium text-lg">{automation.name}</h4>
-                              <p className="text-gray-500 mt-1">
-                                When {getTriggerDescription(automation.trigger)}, then {getActionDescription(automation.actions)}
+                              <h4 className="font-medium text-lg mb-2">{automation.name}</h4>
+                              <p className="text-sm text-gray-600 mb-4">
+                                <span className="text-blue-600 font-medium">When</span> {getTriggerDescription(automation.trigger)},
+                                <span className="text-green-600 font-medium"> then</span> {getActionDescription(automation.actions)}
                               </p>
                             </div>
                             <div className="flex items-center gap-4">
                               <Switch
                                 checked={automation.active}
-                                onCheckedChange={() => handleToggleAutomation(automation.id, automation.active)}
+                                onCheckedChange={async () => {
+                                  try {
+                                    await updateAutomation({
+                                      id: automation.id,
+                                      data: { active: !automation.active }
+                                    });
+                                    queryClient.invalidateQueries({
+                                      queryKey: ["automations", params.workspaceId, params.boardId],
+                                    });
+                                    toast.success(`Automation ${automation.active ? 'disabled' : 'enabled'}`);
+                                  } catch (error) {
+                                    toast.error("Failed to update automation status");
+                                  }
+                                }}
                               />
                               <Button
                                 variant="ghost"

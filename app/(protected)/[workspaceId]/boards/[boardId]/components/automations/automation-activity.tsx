@@ -36,10 +36,13 @@ export const AutomationActivity = ({ boardId, workspaceId }: AutomationActivityP
         );
     }
 
+    // Trier les activités par ordre croissant (les plus récentes en haut)
+    const sortedActivities = activities.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
     return (
         <ScrollArea className="h-[calc(100vh-250px)]">
             <div className="space-y-4 p-4">
-                {activities.map((activity: any) => (
+                {sortedActivities.map((activity: any) => (
                     <motion.div
                         key={activity.id}
                         initial={{ opacity: 0, y: 20 }}
@@ -62,11 +65,10 @@ export const AutomationActivity = ({ boardId, workspaceId }: AutomationActivityP
                                         </div>
                                     </div>
                                 </div>
-                                <span className={`px-2 py-1 rounded-full text-xs ${
-                                    activity.status === "success" 
-                                        ? "bg-green-100 text-green-800" 
-                                        : "bg-red-100 text-red-800"
-                                }`}>
+                                <span className={`px-2 py-1 rounded-full text-xs ${activity.status === "success"
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-red-100 text-red-800"
+                                    }`}>
                                     {activity.status}
                                 </span>
                             </div>
