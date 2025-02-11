@@ -81,18 +81,20 @@ export const Automations = ({ board }: AutomationsProps) => {
 
   const handleToggleAutomation = async (automationId: string, currentStatus: boolean) => {
     try {
+      console.log('Toggling automation:', automationId, 'Current status:', currentStatus);
       await updateAutomation({
         id: automationId,
         data: { active: !currentStatus }
-      })
+      });
       queryClient.invalidateQueries({
-        queryKey: ["automations", board.workspaceId, board.id],
-      })
-      toast.success(`Automation ${currentStatus ? 'disabled' : 'enabled'} successfully`)
+        queryKey: ["automations", params.workspaceId, params.boardId],
+      });
+      toast.success(`Automation ${currentStatus ? 'disabled' : 'enabled'} successfully`);
     } catch (error) {
-      toast.error("Failed to update automation status")
+      console.error('Failed to update automation status:', error);
+      toast.error("Failed to update automation status");
     }
-  }
+  };
 
   const handleDeleteAutomation = async (automationId: string) => {
     try {
@@ -161,7 +163,6 @@ export const Automations = ({ board }: AutomationsProps) => {
     }
     return desc;
   };
-
 
   const renderEmptyState = () => (
     <motion.div
@@ -331,20 +332,7 @@ export const Automations = ({ board }: AutomationsProps) => {
                             <div className="flex items-center gap-4">
                               <Switch
                                 checked={automation.active}
-                                onCheckedChange={async () => {
-                                  try {
-                                    await updateAutomation({
-                                      id: automation.id,
-                                      data: { active: !automation.active }
-                                    });
-                                    queryClient.invalidateQueries({
-                                      queryKey: ["automations", params.workspaceId, params.boardId],
-                                    });
-                                    toast.success(`Automation ${automation.active ? 'disabled' : 'enabled'}`);
-                                  } catch (error) {
-                                    toast.error("Failed to update automation status");
-                                  }
-                                }}
+                                onCheckedChange={() => handleToggleAutomation(automation.id, automation.active)}
                               />
                               <Button
                                 variant="ghost"
@@ -378,4 +366,4 @@ export const Automations = ({ board }: AutomationsProps) => {
   )
 }
 
-export default Automations
+export default Automations;

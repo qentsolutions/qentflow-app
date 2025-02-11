@@ -27,9 +27,8 @@ export const useAutomation = ({
   boardId,
 }: UseAutomationOptions) => {
   const queryClient = useQueryClient();
-  const { currentWorkspace } = useCurrentWorkspace();
 
-  // Récupérer les automatisations
+  // Fetch automations
   const { data: automations, isLoading } = useQuery({
     queryKey: ["automations", workspaceId, boardId],
     queryFn: async () => {
@@ -43,7 +42,7 @@ export const useAutomation = ({
     enabled: !!workspaceId,
   });
 
-  // Créer une automatisation
+  // Create automation
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await fetch(`/api/automations/${workspaceId}`, {
@@ -65,7 +64,7 @@ export const useAutomation = ({
     },
   });
 
-  // Mettre à jour une automatisation
+  // Update automation
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
       const response = await fetch(`/api/automations/${workspaceId}/${id}`, {
@@ -80,10 +79,14 @@ export const useAutomation = ({
       queryClient.invalidateQueries({
         queryKey: ["automations", workspaceId, boardId],
       });
+      toast.success("Automation updated successfully");
+    },
+    onError: () => {
+      toast.error("Failed to update automation");
     },
   });
 
-  // Supprimer une automatisation
+  // Delete automation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const response = await fetch(`/api/automations/${workspaceId}/${id}`, {
