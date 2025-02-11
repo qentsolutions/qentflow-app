@@ -79,7 +79,6 @@ export const useAutomation = ({
       queryClient.invalidateQueries({
         queryKey: ["automations", workspaceId, boardId],
       });
-      toast.success("Automation updated successfully");
     },
     onError: () => {
       toast.error("Failed to update automation");
@@ -99,7 +98,6 @@ export const useAutomation = ({
       queryClient.invalidateQueries({
         queryKey: ["automations", workspaceId, boardId],
       });
-      toast.success("Automation deleted successfully");
     },
     onError: () => {
       toast.error("Failed to delete automation");

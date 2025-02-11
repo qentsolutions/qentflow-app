@@ -1,59 +1,55 @@
-"use client"
-
-import { Plus, Workflow, CloudLightningIcon as LightningBoltIcon, Search, PlusCircle, ZapIcon, Trash, Users } from "lucide-react"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { useAutomation } from "@/hooks/use-automation"
-import { motion, AnimatePresence } from "framer-motion"
-import { AUTOMATION_CATEGORIES, AUTOMATION_TEMPLATES } from "@/constants/automation-templates"
-import { CreateAutomationForm } from "./create-automation-form"
-import { Switch } from "@/components/ui/switch"
-import { toast } from "sonner"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { AutomationUsage } from "./automation-usage"
-import { AutomationActivity } from "./automation-activity"
-import { useParams } from "next/navigation"
-import { fetcher } from "@/lib/fetcher"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { ScrollArea } from "@/components/ui/scroll-area"
+"use client";
+import { CloudLightningIcon as LightningBoltIcon, Search, PlusCircle, ZapIcon, Trash, Users, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useAutomation } from "@/hooks/use-automation";
+import { motion, AnimatePresence } from "framer-motion";
+import { CreateAutomationForm } from "./create-automation-form";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { AutomationUsage } from "./automation-usage";
+import { AutomationActivity } from "./automation-activity";
+import { useParams } from "next/navigation";
+import { fetcher } from "@/lib/fetcher";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { AutomationTemplates } from "./automation-templates";
 
 interface Board {
-  id: string
-  workspaceId: string
-  title: string
-  createdById: string
-  image: string | null
-  createdAt: Date
-  updatedAt: Date
-  lists: any[]
-  User: any[]
+  id: string;
+  workspaceId: string;
+  title: string;
+  createdById: string;
+  image: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  lists: any[];
+  User: any[];
 }
 
 interface AutomationsProps {
-  board: Board
+  board: Board;
 }
 
 export const Automations = ({ board }: AutomationsProps) => {
-  const [selectedCategory, setSelectedCategory] = useState("all")
-  const [selectedTab, setSelectedTab] = useState("automations")
-  const [isCreating, setIsCreating] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [filterStatus, setFilterStatus] = useState<"all" | "active" | "inactive">("all")
-  const queryClient = useQueryClient()
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedTab, setSelectedTab] = useState("automations");
+  const [isCreating, setIsCreating] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState<"all" | "active" | "inactive">("all");
+  const queryClient = useQueryClient();
   const params = useParams();
   const [filterCreator, setFilterCreator] = useState<string | null>(null);
-
-
-
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
 
   const { automations, isLoading, updateAutomation, deleteAutomation } = useAutomation({
     workspaceId: board.workspaceId,
     boardId: board.id,
-  })
+  });
 
   const { data: availableTags } = useQuery({
     queryKey: ["available-tags", board.id],
@@ -69,17 +65,6 @@ export const Automations = ({ board }: AutomationsProps) => {
   const lists = board.lists;
   const users = board.User;
 
-  const filteredTemplates =
-    selectedCategory === "all"
-      ? Object.values(AUTOMATION_TEMPLATES).flat()
-      : AUTOMATION_TEMPLATES[selectedCategory as keyof typeof AUTOMATION_TEMPLATES] || []
-
-  const searchedTemplates = filteredTemplates.filter(
-    (template) =>
-      template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      template.description.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
-
   const filteredAutomations = automations?.filter((automation: any) => {
     if (filterStatus === "active") return automation.active;
     if (filterStatus === "inactive") return !automation.active;
@@ -89,7 +74,6 @@ export const Automations = ({ board }: AutomationsProps) => {
 
   const handleToggleAutomation = async (automationId: string, currentStatus: boolean) => {
     try {
-      console.log('Toggling automation:', automationId, 'Current status:', currentStatus);
       await updateAutomation({
         id: automationId,
         data: { active: !currentStatus }
@@ -106,12 +90,11 @@ export const Automations = ({ board }: AutomationsProps) => {
 
   const handleDeleteAutomation = async (automationId: string) => {
     try {
-      await deleteAutomation(automationId)
-      toast.success("Automation deleted successfully")
+      await deleteAutomation(automationId);
     } catch (error) {
-      toast.error("Failed to delete automation")
+      toast.error("Failed to delete automation");
     }
-  }
+  };
 
   const getActionDescription = (actions: any[]) => {
     if (!actions.length) return "";
@@ -190,7 +173,20 @@ export const Automations = ({ board }: AutomationsProps) => {
         </a>
       </p>
     </motion.div>
-  )
+  );
+
+  const handleTemplateSelect = (template: any) => {
+    setSelectedTemplate(template);
+    setIsCreating(true);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-250px)]">
+        <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <Dialog>
@@ -211,10 +207,17 @@ export const Automations = ({ board }: AutomationsProps) => {
           </div>
           {isCreating ? (
             <div className="w-full flex px-12 justify-center h-[72vh] overflow-y-auto">
-              <CreateAutomationForm board={board} onClose={() => setIsCreating(false)} />
+              <CreateAutomationForm
+                board={board}
+                onClose={() => {
+                  setIsCreating(false);
+                  setSelectedTemplate(null);
+                }}
+                template={selectedTemplate}
+              />
             </div>
           ) : (
-            <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex-grow flex flex-col">
+            <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex-grow flex flex-col h-[75vh]">
               <div className="flex justify-between items-center">
                 <TabsList className="p-1">
                   <TabsTrigger value="templates">Templates</TabsTrigger>
@@ -231,59 +234,11 @@ export const Automations = ({ board }: AutomationsProps) => {
 
               <div className="flex-grow mt-4">
                 <TabsContent value="templates" className="h-[70vh] overflow-y-auto">
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex gap-4 overflow-x-auto pb-2">
-                        <div className="flex items-center gap-2">
-                          <div className="relative">
-                            <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                            <Input
-                              placeholder="Search automations..."
-                              value={searchQuery}
-                              onChange={(e) => setSearchQuery(e.target.value)}
-                              className="pl-10 w-64"
-                            />
-                          </div>
-                        </div>
-                        {AUTOMATION_CATEGORIES.map((category) => (
-                          <button
-                            key={category.id}
-                            onClick={() => setSelectedCategory(category.id)}
-                            className={`px-4 py-2 rounded-full text-sm transition-all whitespace-nowrap ${selectedCategory === category.id
-                              ? "bg-blue-50 text-blue-600 font-medium"
-                              : "text-gray-600 hover:bg-gray-50"
-                              }`}
-                          >
-                            {category.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-                    >
-                      <AnimatePresence>
-                        {searchedTemplates.map((template) => (
-                          <motion.div
-                            key={template.id}
-                            layout
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            whileHover={{ scale: 1.02 }}
-                            className="px py-4 bg-white border rounded-xl hover:border-blue-200 hover:shadow-md transition-all duration-200 cursor-pointer"
-                          >
-                            <h4 className="font-medium text-lg mb-2">{template.name}</h4>
-                            <p className="text-gray-500 text-sm">{template.description}</p>
-                          </motion.div>
-                        ))}
-                      </AnimatePresence>
-                    </motion.div>
-                  </div>
+                  <AutomationTemplates
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                    handleTemplateSelect={handleTemplateSelect}
+                  />
                 </TabsContent>
 
                 <TabsContent value="automations">
@@ -295,10 +250,10 @@ export const Automations = ({ board }: AutomationsProps) => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="space-y-4"
+                        className="space-y-6 px-6"
                       >
-                        <div className="flex justify-between items-center mb-6 ml-4">
-                          <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                          <div className="flex flex-wrap gap-2">
                             <Button
                               variant={filterStatus === "all" ? "default" : "outline"}
                               onClick={() => setFilterStatus("all")}
@@ -320,50 +275,48 @@ export const Automations = ({ board }: AutomationsProps) => {
                             >
                               Inactive
                             </Button>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button size={"sm"} variant={"outline"} className="ml-6">
-                                  Filter by <Users size={8} />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent className="w-48">
-                                {usersInBoard?.map((user: any) => (
-                                  <DropdownMenuItem
-                                    key={user.id}
-                                    onClick={() => setFilterCreator(user.id)}
-                                  >
-                                    {user.name}
-                                  </DropdownMenuItem>
-                                ))}
-                              </DropdownMenuContent>
-                            </DropdownMenu>
                           </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button size="sm" variant="outline" className="w-full sm:w-auto">
+                                Filter by <Users className="ml-2 h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56">
+                              {usersInBoard?.map((user: any) => (
+                                <DropdownMenuItem
+                                  key={user.id}
+                                  onClick={() => setFilterCreator(user.id)}
+                                >
+                                  <Avatar className="h-6 w-6 mr-2">
+                                    {user.image ? (
+                                      <AvatarImage src={user.image} alt={user.name} />
+                                    ) : (
+                                      <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                                    )}
+                                  </Avatar>
+                                  {user.name}
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
-
 
                         {filteredAutomations?.map((automation: any) => (
                           <motion.div
                             key={automation.id}
-                            className="p-6 bg-white border rounded-xl m-4 hover:border-blue-400 hover:shadow-sm transition-all"
+                            className="p-6 bg-white border rounded-xl hover:border-blue-400 hover:shadow-md transition-all"
                           >
-                            <div className="flex items-center justify-between">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                               <div className="flex-1">
-                                <p className="font-medium text-lg mb-2">{automation.name}</p>
-                                <p className="text-sm text-gray-600 mb-4">
-                                  <p className="text-xl">When
-                                    <span className="ml-1 text-blue-700">
-                                      {getTriggerDescription(automation.trigger)}
-                                    </span>
-                                    ,
-                                    then
-                                    <span className="ml-1 text-blue-700">
-                                      {getActionDescription(automation.actions)}
-                                    </span>
-                                  </p>
+                                <h3 className="font-semibold text-lg mb-2">{automation.name}</h3>
+                                <p className="text-lg text-gray-600 mb-4">
+                                  When <span className="font-medium text-blue-600">{getTriggerDescription(automation.trigger)}</span>,
+                                  then <span className="font-medium text-pink-500">{getActionDescription(automation.actions)}</span>
                                 </p>
-                                <p className="text-sm text-gray-600">{automation.description}</p>
+                                <p className="text-sm text-gray-500">{automation.description}</p>
                               </div>
-                              <div className="flex flex-col items-end justify-end gap-4">
+                              <div className="flex flex-col items-end gap-4">
                                 <div className="flex items-center gap-x-2">
                                   <Button
                                     variant="ghost"
@@ -371,28 +324,24 @@ export const Automations = ({ board }: AutomationsProps) => {
                                     className="text-red-500 hover:text-red-700 hover:bg-red-50"
                                     onClick={() => handleDeleteAutomation(automation.id)}
                                   >
-                                    <Trash size={14} />
+                                    <Trash className="h-4 w-4" />
                                   </Button>
                                   <Switch
                                     checked={automation.active}
                                     onCheckedChange={() => handleToggleAutomation(automation.id, automation.active)}
                                   />
                                 </div>
-
-                                <div className="flex items-center gap-x-1 text-xs">
-                                  <span className="text-gray-500">Created by :</span>
-                                  <Avatar className="h-6 w-6 flex items-center justify-center">
-                                    {automation.createdBy.image?.image ? (
-                                      <AvatarImage src={automation.createdBy?.image} alt={automation.createdBy.name || "User"} className="w-full h-full object-cover" />
+                                <div className="flex items-center gap-x-2 text-xs text-gray-500">
+                                  <span>Created by</span>
+                                  <Avatar className="h-6 w-6">
+                                    {automation.createdBy.image ? (
+                                      <AvatarImage src={automation.createdBy.image} alt={automation.createdBy.name || "User"} />
                                     ) : (
-                                      <AvatarFallback className="text-xs font-medium text-gray-500 bg-gray-200 rounded-full">
-                                        {automation.createdBy.name?.charAt(0).toUpperCase() || "U"}
-                                      </AvatarFallback>
+                                      <AvatarFallback>{automation.createdBy.name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
                                     )}
                                   </Avatar>
-                                  {automation.createdBy.name}
+                                  <span>{automation.createdBy.name}</span>
                                 </div>
-
                               </div>
                             </div>
                           </motion.div>
@@ -415,7 +364,7 @@ export const Automations = ({ board }: AutomationsProps) => {
         </div>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
 export default Automations;
