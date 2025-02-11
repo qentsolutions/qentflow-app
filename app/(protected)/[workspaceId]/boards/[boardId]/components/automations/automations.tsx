@@ -119,7 +119,7 @@ export const Automations = ({ board }: AutomationsProps) => {
       case "SEND_NOTIFICATION":
         return `send notification "${action.config.message}"`;
       case "CREATE_TASKS":
-        return `create ${action.config.tasks.length} tasks`;
+        return `create ${action?.config?.tasks.length} tasks`;
       case "ADD_TAG":
         const tag = availableTags?.find((t: { id: any }) => t.id === action.config.tagId);
         return `add tag "${tag?.name}"`;
