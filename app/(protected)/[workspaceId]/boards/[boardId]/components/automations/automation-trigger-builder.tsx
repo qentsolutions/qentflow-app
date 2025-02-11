@@ -21,6 +21,7 @@ import {
     UserPlus,
     FilePlus2,
     CheckSquare2Icon,
+    Goal,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
@@ -37,6 +38,7 @@ const TRIGGER_CATEGORIES = [
     {
         label: "Task Actions",
         triggers: [
+            { value: "TASK_ADDED", label: "When a task is added", icon: Goal },
             { value: "TASK_COMPLETED", label: "When a task is completed", icon: CheckSquare },
             { value: "ALL_TASKS_COMPLETED", label: "When all tasks are completed", icon: CheckSquare2Icon },
         ],

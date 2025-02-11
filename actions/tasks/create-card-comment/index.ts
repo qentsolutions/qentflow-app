@@ -4,11 +4,11 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { createAuditLog } from "@/lib/create-audit-log";
 import { createSafeAction } from "@/lib/create-safe-action";
-
 import { CreateComment } from "./schema";
 import { InputType, ReturnType } from "./types";
 import { currentUser } from "@/lib/auth";
 import { ACTION, ENTITY_TYPE } from "@prisma/client";
+import { automationEngine } from "@/lib/automation-engine";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   const user = currentUser();
@@ -48,6 +48,40 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       action: ACTION.CREATE,
       workspaceId,
     });
+
+    // Trigger automation for comment added
+    await automationEngine.processAutomations(
+      "COMMENT_ADDED",
+      {
+        cardId: card.id,
+        commentId: comment.id,
+        userId: userId,
+        text: text,
+      },
+      workspaceId,
+      boardId
+    );
+
+    // Check for mentions in the comment
+    const mentionRegex = /@(\w+)/g;
+    const mentions = text.match(mentionRegex);
+    
+    if (mentions) {
+      // Trigger automation for each mention
+      for (const mention of mentions) {
+        await automationEngine.processAutomations(
+          "USER_MENTIONED",
+          {
+            cardId: card.id,
+            commentId: comment.id,
+            mentionedUser: mention.substring(1),
+            mentionedBy: userId,
+          },
+          workspaceId,
+          boardId
+        );
+      }
+    }
 
     // Revalide la page pour mettre à jour l'interface utilisateur
     revalidatePath(`/${workspaceId}/boards/${boardId}`);

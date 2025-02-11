@@ -35,6 +35,9 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         startDate: values.startDate ? new Date(values.startDate) : undefined,
         dueDate: values.dueDate ? new Date(values.dueDate) : undefined,
       },
+      include: {
+        list: true,
+      },
     });
 
     await createAuditLog({
@@ -45,6 +48,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       workspaceId,
     });
 
+    // Trigger automation for card update
     await automationEngine.processAutomations(
       "CARD_UPDATED",
       {
@@ -54,6 +58,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         startDate: card.startDate,
         dueDate: card.dueDate,
         listId: card.listId,
+        assignedUserId: card.assignedUserId,
       },
       workspaceId,
       boardId

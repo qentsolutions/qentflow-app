@@ -35,6 +35,9 @@ const handler = async (data: InputType): Promise<ReturnType> => {
           order: card.order,
           listId: card.listId,
         },
+        include: {
+          list: true,
+        },
       })
     );
 
@@ -51,6 +54,8 @@ const handler = async (data: InputType): Promise<ReturnType> => {
             cardId: card.id,
             sourceListId: originalCard.listId,
             destinationListId: card.listId,
+            title: card.title,
+            listTitle: card.list.title,
           },
           workspaceId,
           boardId

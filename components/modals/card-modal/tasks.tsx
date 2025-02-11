@@ -14,6 +14,8 @@ import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Skeleton } from "@/components/ui/skeleton";
+import { createTask } from "@/actions/tasks/create-task";
+import { toggleTask } from "@/actions/tasks/toggle-task";
 
 interface TasksProps {
     cardId: string;
@@ -39,18 +41,18 @@ export const Tasks = ({ cardId }: TasksProps) => {
         if (!newTaskTitle.trim()) return;
 
         try {
-            const response = await fetch(`/api/cards/${cardId}/tasks`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    title: newTaskTitle,
-                    order: tasks.length,
-                    workspaceId: currentWorkspace?.id,
-                    boardId: params.boardId,
-                }),
-            });
+            const response = await createTask(
+                newTaskTitle,
+                cardId,
+                tasks.length,
+                currentWorkspace?.id as string,
+                params.boardId as string
+            );
 
-            if (!response.ok) throw new Error();
+            if (response.error) {
+                toast.error(response.error);
+                return;
+            }
 
             queryClient.invalidateQueries({
                 queryKey: ["card-tasks", cardId],
@@ -64,19 +66,21 @@ export const Tasks = ({ cardId }: TasksProps) => {
         }
     };
 
+    // Modifier la fonction handleToggleTask
     const handleToggleTask = async (taskId: string, completed: boolean) => {
         try {
-            const response = await fetch(`/api/cards/${cardId}/tasks/${taskId}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    completed,
-                    workspaceId: currentWorkspace?.id,
-                    boardId: params.boardId,
-                }),
-            });
+            const response = await toggleTask(
+                taskId,
+                completed,
+                cardId,
+                currentWorkspace?.id as string,
+                params.boardId as string
+            );
 
-            if (!response.ok) throw new Error();
+            if (response.error) {
+                toast.error(response.error);
+                return;
+            }
 
             queryClient.invalidateQueries({
                 queryKey: ["card-tasks", cardId],

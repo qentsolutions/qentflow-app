@@ -18,6 +18,7 @@ const CreateAutomationSchema = z.object({
     "TASK_COMPLETED",
     "COMMENT_ADDED",
     "ATTACHMENT_ADDED",
+    "TASK_ADDED",
     "DUE_DATE_APPROACHING",
     "ALL_TASKS_COMPLETED",
     "USER_MENTIONED",

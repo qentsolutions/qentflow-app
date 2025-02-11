@@ -5,69 +5,56 @@ import { z } from "zod";
 import { createNotification } from "../notifications/create-notification";
 import { createAuditLog } from "@/lib/create-audit-log";
 import { ACTION, ENTITY_TYPE } from "@prisma/client";
+import { automationEngine } from "@/lib/automation-engine";
 
 const assignUserSchema = z.object({
   cardId: z.string(),
   userId: z.string().nullable().optional(),
 });
 
-export async function assignUserToCard(cardId: string, userId: string) {
+export async function assignUserToCard(cardId: string, userId: string | null) {
   try {
-    // Validate input
-    assignUserSchema.parse({ cardId, userId });
-
-    // Check if card exists
+    // Get the card with its list and board information
     const card = await db.card.findUnique({
       where: { id: cardId },
       include: {
         list: {
           include: {
-            board: {
-              include: {
-                User: true,
-              },
-            },
+            board: true,
           },
         },
       },
     });
 
     if (!card) {
-      return { success: false, error: "Card not found" };
+      throw new Error("Card not found");
     }
 
-    // Si userId est "null", on désassigne l'utilisateur
-    const updateData =
-      userId === "null" ? { assignedUserId: null } : { assignedUserId: userId };
-
-    // Update card with assigned user or remove assignment
+    // Update the card with the new assignee
     const updatedCard = await db.card.update({
       where: { id: cardId },
-      data: updateData,
+      data: {
+        assignedUserId: userId === "null" ? null : userId,
+      },
     });
 
-    const workspaceId = card.list.board.workspaceId;
-    await createNotification(
-      userId,
-      workspaceId,
-      `You have been assigned a new card: ${card.title}`
-    );
+    // Trigger automation for card assignment
+    if (userId && userId !== "null") {
+      await automationEngine.processAutomations(
+        "CARD_ASSIGNED",
+        {
+          cardId: card.id,
+          assignedUserId: userId,
+          title: card.title,
+        },
+        card.list.board.workspaceId,
+        card.list.boardId
+      );
+    }
 
-    const user = await db.user.findUnique({
-      where: { id: userId },
-    });
-
-    await createAuditLog({
-      entityTitle: `assignment to ${user?.name}`,
-      entityId: card.id,
-      entityType: ENTITY_TYPE.CARD,
-      action: ACTION.UPDATE,
-      workspaceId,
-    });
-
-    return { success: true, data: updatedCard };
+    return updatedCard;
   } catch (error) {
-    console.error("Error assigning user to card:", error);
-    return { success: false, error: "Failed to assign user" };
+    console.error("Error in assignUserToCard:", error);
+    throw error;
   }
 }

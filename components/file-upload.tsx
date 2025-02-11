@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useAction } from "@/hooks/use-action";
 import { createAttachment } from "@/actions/attachments/create-attachment";
 import { useQueryClient } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
 
 interface FileUploadProps {
   cardId: string;
@@ -16,7 +17,7 @@ interface FileUploadProps {
 export const FileUpload = ({ cardId, workspaceId, onUploadComplete }: FileUploadProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const queryClient = useQueryClient();
-
+  const params = useParams();
 
   const { execute } = useAction(createAttachment, {
     onSuccess: () => {
@@ -62,6 +63,7 @@ export const FileUpload = ({ cardId, workspaceId, onUploadComplete }: FileUpload
         file: fileData,
         cardId,
         workspaceId,
+        boardId: params.boardId as string
       });
     } catch (error) {
       console.error("Upload error:", error);
