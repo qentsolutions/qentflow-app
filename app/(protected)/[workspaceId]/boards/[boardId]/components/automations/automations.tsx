@@ -1,6 +1,6 @@
 "use client"
 
-import { Plus, Workflow, CloudLightningIcon as LightningBoltIcon, Search, PlusCircle } from "lucide-react"
+import { Plus, Workflow, CloudLightningIcon as LightningBoltIcon, Search, PlusCircle, ZapIcon, Trash, Users } from "lucide-react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
@@ -17,6 +17,9 @@ import { AutomationUsage } from "./automation-usage"
 import { AutomationActivity } from "./automation-activity"
 import { useParams } from "next/navigation"
 import { fetcher } from "@/lib/fetcher"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 interface Board {
   id: string
@@ -42,6 +45,10 @@ export const Automations = ({ board }: AutomationsProps) => {
   const [filterStatus, setFilterStatus] = useState<"all" | "active" | "inactive">("all")
   const queryClient = useQueryClient()
   const params = useParams();
+  const [filterCreator, setFilterCreator] = useState<string | null>(null);
+
+
+
 
   const { automations, isLoading, updateAutomation, deleteAutomation } = useAutomation({
     workspaceId: board.workspaceId,
@@ -74,10 +81,11 @@ export const Automations = ({ board }: AutomationsProps) => {
   )
 
   const filteredAutomations = automations?.filter((automation: any) => {
-    if (filterStatus === "active") return automation.active
-    if (filterStatus === "inactive") return !automation.active
-    return true
-  })
+    if (filterStatus === "active") return automation.active;
+    if (filterStatus === "inactive") return !automation.active;
+    if (filterCreator) return automation.createdById === filterCreator;
+    return true;
+  });
 
   const handleToggleAutomation = async (automationId: string, currentStatus: boolean) => {
     try {
@@ -188,16 +196,16 @@ export const Automations = ({ board }: AutomationsProps) => {
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2">
-          <Workflow className="h-4 w-4" />
+          <ZapIcon className="h-4 w-4" />
           Automations
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[1250px] h-[90vh] overflow-hidden">
+      <DialogContent className="sm:max-w-[1250px] overflow-hidden">
         <div className="h-full flex flex-col">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
-              <Workflow className="h-6 w-6 text-blue-500" />
+              <ZapIcon className="h-6 w-6 text-blue-500" />
               <p className="text-2xl font-semibold">Automations</p>
             </div>
           </div>
@@ -216,12 +224,12 @@ export const Automations = ({ board }: AutomationsProps) => {
                 </TabsList>
                 <div>
                   <Button onClick={() => setIsCreating(true)} className="bg-blue-500 hover:bg-blue-600 text-white text-xs">
-                    <PlusCircle className="h-4 w-4 mr-2" /> New Automation
+                    <PlusCircle className="h-4 w-4" /> New Automation
                   </Button>
                 </div>
               </div>
 
-              <div className="flex-grow overflow-auto mt-4">
+              <div className="flex-grow mt-4">
                 <TabsContent value="templates" className="h-[70vh] overflow-y-auto">
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
@@ -267,10 +275,10 @@ export const Automations = ({ board }: AutomationsProps) => {
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
                             whileHover={{ scale: 1.02 }}
-                            className="p-6 bg-white border rounded-xl hover:border-blue-200 hover:shadow-md transition-all duration-200 cursor-pointer"
+                            className="px py-4 bg-white border rounded-xl hover:border-blue-200 hover:shadow-md transition-all duration-200 cursor-pointer"
                           >
                             <h4 className="font-medium text-lg mb-2">{template.name}</h4>
-                            <p className="text-gray-500">{template.description}</p>
+                            <p className="text-gray-500 text-sm">{template.description}</p>
                           </motion.div>
                         ))}
                       </AnimatePresence>
@@ -278,76 +286,120 @@ export const Automations = ({ board }: AutomationsProps) => {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="automations" className="h-full">
-                  {automations?.length === 0 ? (
-                    renderEmptyState()
-                  ) : (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="space-y-4"
-                    >
-                      <div className="flex justify-between items-center mb-6">
-                        <div className="flex gap-2">
-                          <Button
-                            variant={filterStatus === "all" ? "default" : "outline"}
-                            onClick={() => setFilterStatus("all")}
-                            size="sm"
-                            className="bg-blue-600"
-                          >
-                            All
-                          </Button>
-                          <Button
-                            variant={filterStatus === "active" ? "default" : "outline"}
-                            onClick={() => setFilterStatus("active")}
-                            size="sm"
-                          >
-                            Active
-                          </Button>
-                          <Button
-                            variant={filterStatus === "inactive" ? "default" : "outline"}
-                            onClick={() => setFilterStatus("inactive")}
-                            size="sm"
-                          >
-                            Inactive
-                          </Button>
-                        </div>
-                      </div>
-
-                      {filteredAutomations?.map((automation: any) => (
-                        <motion.div
-                          key={automation.id}
-                          whileHover={{ scale: 1.01 }}
-                          className="p-6 bg-white border rounded-xl m-4 hover:border-blue-200 hover:shadow-md transition-all"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <h4 className="font-medium text-lg mb-2">{automation.name}</h4>
-                              <p className="text-sm text-gray-600 mb-4">
-                                <span className="text-blue-600 font-medium">When</span> {getTriggerDescription(automation.trigger)},
-                                <span className="text-green-600 font-medium"> then</span> {getActionDescription(automation.actions)}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-4">
-                              <Switch
-                                checked={automation.active}
-                                onCheckedChange={() => handleToggleAutomation(automation.id, automation.active)}
-                              />
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                                onClick={() => handleDeleteAutomation(automation.id)}
-                              >
-                                Delete
-                              </Button>
-                            </div>
+                <TabsContent value="automations">
+                  <ScrollArea className="h-[calc(100vh-250px)]">
+                    {automations?.length === 0 ? (
+                      renderEmptyState()
+                    ) : (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="space-y-4"
+                      >
+                        <div className="flex justify-between items-center mb-6 ml-4">
+                          <div className="flex gap-2">
+                            <Button
+                              variant={filterStatus === "all" ? "default" : "outline"}
+                              onClick={() => setFilterStatus("all")}
+                              size="sm"
+                            >
+                              All
+                            </Button>
+                            <Button
+                              variant={filterStatus === "active" ? "default" : "outline"}
+                              onClick={() => setFilterStatus("active")}
+                              size="sm"
+                            >
+                              Active
+                            </Button>
+                            <Button
+                              variant={filterStatus === "inactive" ? "default" : "outline"}
+                              onClick={() => setFilterStatus("inactive")}
+                              size="sm"
+                            >
+                              Inactive
+                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button size={"sm"} variant={"outline"} className="ml-6">
+                                  Filter by <Users size={8} />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent className="w-48">
+                                {usersInBoard?.map((user: any) => (
+                                  <DropdownMenuItem
+                                    key={user.id}
+                                    onClick={() => setFilterCreator(user.id)}
+                                  >
+                                    {user.name}
+                                  </DropdownMenuItem>
+                                ))}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
-                        </motion.div>
-                      ))}
-                    </motion.div>
-                  )}
+                        </div>
+
+
+                        {filteredAutomations?.map((automation: any) => (
+                          <motion.div
+                            key={automation.id}
+                            className="p-6 bg-white border rounded-xl m-4 hover:border-blue-400 hover:shadow-sm transition-all"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <p className="font-medium text-lg mb-2">{automation.name}</p>
+                                <p className="text-sm text-gray-600 mb-4">
+                                  <p className="text-xl">When
+                                    <span className="ml-1 text-blue-700">
+                                      {getTriggerDescription(automation.trigger)}
+                                    </span>
+                                    ,
+                                    then
+                                    <span className="ml-1 text-blue-700">
+                                      {getActionDescription(automation.actions)}
+                                    </span>
+                                  </p>
+                                </p>
+                                <p className="text-sm text-gray-600">{automation.description}</p>
+                              </div>
+                              <div className="flex flex-col items-end justify-end gap-4">
+                                <div className="flex items-center gap-x-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                    onClick={() => handleDeleteAutomation(automation.id)}
+                                  >
+                                    <Trash size={14} />
+                                  </Button>
+                                  <Switch
+                                    checked={automation.active}
+                                    onCheckedChange={() => handleToggleAutomation(automation.id, automation.active)}
+                                  />
+                                </div>
+
+                                <div className="flex items-center gap-x-1 text-xs">
+                                  <span className="text-gray-500">Created by :</span>
+                                  <Avatar className="h-6 w-6 flex items-center justify-center">
+                                    {automation.createdBy.image?.image ? (
+                                      <AvatarImage src={automation.createdBy?.image} alt={automation.createdBy.name || "User"} className="w-full h-full object-cover" />
+                                    ) : (
+                                      <AvatarFallback className="text-xs font-medium text-gray-500 bg-gray-200 rounded-full">
+                                        {automation.createdBy.name?.charAt(0).toUpperCase() || "U"}
+                                      </AvatarFallback>
+                                    )}
+                                  </Avatar>
+                                  {automation.createdBy.name}
+                                </div>
+
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </ScrollArea>
                 </TabsContent>
 
                 <TabsContent value="activity" className="h-full">

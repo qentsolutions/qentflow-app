@@ -68,7 +68,7 @@ export const AddCardButton = ({ boardId, workspaceId, lists }: AddCardButtonProp
             <Button
                 onClick={() => setOpen(true)}
                 size="sm"
-                className="bg-blue-600 hover:bg-blue-700 gap-1 mb-1"
+                className="bg-blue-600 hover:bg-blue-700 gap-1"
             >
                 <Plus className="h-4 w-4" />
                 Add card

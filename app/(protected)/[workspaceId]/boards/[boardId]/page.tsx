@@ -120,7 +120,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                       Settings
                     </TabsTrigger>
                   </TabsList>
-                  <div className="space-x-2 flex items-center">
+                  <div className="space-x-2 flex items-center mb-1">
                     <Automations
                       board={board}
                     />

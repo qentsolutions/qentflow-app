@@ -24,6 +24,12 @@ export async function GET(
             order: "asc",
           },
         },
+        createdBy: {
+          select: {
+            name: true,
+            image: true,
+          },
+        },
       },
     });
 

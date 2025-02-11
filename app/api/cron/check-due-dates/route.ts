@@ -1,5 +1,5 @@
+import { checkDueDates } from "@/app/lib/check-due-dates";
 import { NextResponse } from "next/server";
-import { checkDueDates } from "@/lib/check-due-dates";
 
 export async function GET() {
   try {

@@ -4,6 +4,11 @@ import { db } from "@/lib/db";
 import { automationEngine } from "@/lib/automation-engine";
 import { addDays, isWithinInterval } from "date-fns";
 
+interface TriggerConditions {
+  daysBeforeDue?: number;
+  [key: string]: any;
+}
+
 export async function checkDueDates() {
   try {
     // Get all cards with due dates
@@ -42,7 +47,8 @@ export async function checkDueDates() {
       });
 
       for (const automation of automations) {
-        const daysBeforeDue = automation.trigger.conditions?.daysBeforeDue || 1;
+        const conditions = automation.trigger.conditions as TriggerConditions;
+        const daysBeforeDue = conditions?.daysBeforeDue || 1;
         const warningDate = addDays(card.dueDate, -daysBeforeDue);
 
         // Check if current date is within the warning period
