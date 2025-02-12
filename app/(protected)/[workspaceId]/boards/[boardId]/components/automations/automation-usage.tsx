@@ -15,7 +15,7 @@ interface AutomationUsageProps {
 export const AutomationUsage = ({ boardId, workspaceId }: AutomationUsageProps) => {
     const { data: usageData, isLoading } = useQuery({
         queryKey: ["automation-usage", boardId],
-        queryFn: () => fetcher(`/api/automations/${workspaceId}/${boardId}/usage`),
+        queryFn: () => fetcher(`/api/boards/${workspaceId}/${boardId}/usage`),
     });
 
     if (isLoading) {

@@ -6,8 +6,6 @@ import { createSafeAction } from "@/lib/create-safe-action";
 import { UpdateCardOrder } from "./schema";
 import { InputType, ReturnType } from "./types";
 import { currentUser } from "@/lib/auth";
-import { createAuditLog } from "@/lib/create-audit-log";
-import { ACTION, ENTITY_TYPE } from "@prisma/client";
 import { automationEngine } from "@/lib/automation-engine";
 
 const handler = async (data: InputType): Promise<ReturnType> => {

@@ -81,7 +81,44 @@ export class AutomationEngine {
 
       for (const automation of automations) {
         try {
-          if (this.evaluateConditions(automation.trigger.conditions, context)) {
+          if (triggerType === "CARD_MOVED") {
+            const conditions = automation.trigger.conditions as {
+              sourceListId?: string;
+              destinationListId?: string;
+            };
+
+            const sourceMatches =
+              !conditions.sourceListId ||
+              conditions.sourceListId === context.sourceListId;
+            const destMatches =
+              !conditions.destinationListId ||
+              conditions.destinationListId === context.destinationListId;
+
+            if (sourceMatches && destMatches) {
+              await this.executeActions(
+                automation.actions,
+                {
+                  ...context,
+                  triggerType,
+                  board,
+                },
+                workspaceId,
+                board
+              );
+
+              await this.logAutomationActivity(
+                automation.id,
+                workspaceId,
+                boardId,
+                triggerType,
+                `Successfully executed automation "${automation.name}"`,
+                "success"
+              );
+            }
+          } else if (
+           
+            this.evaluateConditions(automation.trigger.conditions, context)
+          ) {
             try {
               await this.executeActions(
                 automation.actions,
@@ -289,6 +326,49 @@ export class AutomationEngine {
         case "CREATE_AUDIT_LOG":
           await this.createAuditLogEntry(action.config, context, workspaceId);
           break;
+
+        case "MOVE_CARD":
+          const { boardId, listId } = action.config;
+
+          // Vérifier si le board de destination existe
+          const destinationBoard = await db.board.findUnique({
+            where: { id: boardId },
+            include: {
+              lists: true,
+            },
+          });
+
+          if (!destinationBoard) {
+            throw new Error("Destination board not found");
+          }
+
+          // Vérifier si la liste de destination existe
+          const destinationList = destinationBoard.lists.find(
+            (list) => list.id === listId
+          );
+          if (!destinationList) {
+            throw new Error("Destination list not found");
+          }
+
+          // Obtenir la dernière position dans la liste de destination
+          const lastCard = await db.card.findFirst({
+            where: { listId },
+            orderBy: { order: "desc" },
+          });
+
+          const newOrder = lastCard ? lastCard.order + 1 : 0;
+
+          // Mettre à jour la carte
+          const updatedCard = await db.card.update({
+            where: { id: cardId },
+            data: {
+              listId,
+              order: newOrder,
+            },
+            include: {
+              list: true,
+            },
+          });
 
         case "SEND_EMAIL":
           const user = await db.user.findUnique({

@@ -111,7 +111,6 @@ export async function POST(req: NextRequest) {
 
         if (subscription) {
           // Mettre en pause l'accès ou notifier l'utilisateur
-          console.log(`Payment failed for subscription ${subscription.id}`);
         }
 
         break;

@@ -17,7 +17,6 @@ export async function GET(
     const totalExecutions = await db.automationActivity.count({
       where: {
         boardId: params.boardId,
-        automationId: params.boardId,
         workspaceId: params.workspaceId,
       },
     });
@@ -26,7 +25,6 @@ export async function GET(
     const successfulExecutions = await db.automationActivity.count({
       where: {
         boardId: params.boardId,
-        automationId: params.boardId,
         workspaceId: params.workspaceId,
         status: "success",
       },

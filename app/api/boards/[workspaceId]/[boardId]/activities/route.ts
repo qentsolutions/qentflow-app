@@ -13,16 +13,15 @@ export async function GET(
     }
 
     const activities = await db.automationActivity.findMany({
-        where: {
-          boardId: params.boardId,
-        },
-        include: {
-          automation: true,
-          workspace: true,
-          board: true,
-        },
-      });
-  
+      where: {
+        boardId: params.boardId,
+      },
+      include: {
+        automation: true,
+        workspace: true,
+        board: true,
+      },
+    });
 
     return NextResponse.json(activities);
   } catch (error) {

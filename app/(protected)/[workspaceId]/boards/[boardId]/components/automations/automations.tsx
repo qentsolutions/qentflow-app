@@ -1,5 +1,5 @@
 "use client";
-import { CloudLightningIcon as LightningBoltIcon, Search, PlusCircle, ZapIcon, Trash, Users, Loader2 } from "lucide-react";
+import { CloudLightningIcon as LightningBoltIcon, Search, PlusCircle, ZapIcon, Trash, Users, Loader2, WorkflowIcon } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -71,6 +71,8 @@ export const Automations = ({ board }: AutomationsProps) => {
     if (filterCreator) return automation.createdById === filterCreator;
     return true;
   });
+
+  const activeAutomationsCount = automations?.filter((automation: any) => automation.active).length || 0;
 
   const handleToggleAutomation = async (automationId: string, currentStatus: boolean) => {
     try {
@@ -180,13 +182,6 @@ export const Automations = ({ board }: AutomationsProps) => {
     setIsCreating(true);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-[calc(100vh-250px)]">
-        <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <Dialog>
@@ -194,10 +189,13 @@ export const Automations = ({ board }: AutomationsProps) => {
         <Button variant="outline" size="sm" className="gap-2">
           <ZapIcon className="h-4 w-4" />
           Automations
+          <span className=" bg-blue-500 text-white rounded-full px-2 py-0.5 text-xs">
+            {activeAutomationsCount}
+          </span>
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[1250px] overflow-hidden">
+      <DialogContent className="max-w-[1250px] h-[90vh] overflow-hidden">
         <div className="h-full flex flex-col">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
@@ -217,8 +215,8 @@ export const Automations = ({ board }: AutomationsProps) => {
               />
             </div>
           ) : (
-            <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex-grow flex flex-col h-[75vh]">
-              <div className="flex justify-between items-center">
+            <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex-grow flex flex-col">
+              <div className="flex justify-between items-center border-b">
                 <TabsList className="p-1">
                   <TabsTrigger value="templates">Templates</TabsTrigger>
                   <TabsTrigger value="automations">Automations</TabsTrigger>
@@ -226,14 +224,14 @@ export const Automations = ({ board }: AutomationsProps) => {
                   <TabsTrigger value="usage">Usage</TabsTrigger>
                 </TabsList>
                 <div>
-                  <Button onClick={() => setIsCreating(true)} className="bg-blue-500 hover:bg-blue-600 text-white text-xs">
+                  <Button onClick={() => setIsCreating(true)} className="bg-blue-500 hover:bg-blue-600 text-white text-xs mr-4 mb-1">
                     <PlusCircle className="h-4 w-4" /> New Automation
                   </Button>
                 </div>
               </div>
 
-              <div className="flex-grow mt-4">
-                <TabsContent value="templates" className="h-[70vh] overflow-y-auto">
+              <div className="flex-grow mt-4 h-[80vh]">
+                <TabsContent value="templates">
                   <AutomationTemplates
                     searchTerm={searchTerm}
                     setSearchTerm={setSearchTerm}
@@ -242,9 +240,11 @@ export const Automations = ({ board }: AutomationsProps) => {
                 </TabsContent>
 
                 <TabsContent value="automations">
-                  <ScrollArea className="h-[calc(100vh-250px)]">
+                  <ScrollArea className="h-[80vh] pb-32">
                     {automations?.length === 0 ? (
-                      renderEmptyState()
+                      <div className="mt-20">
+                        {renderEmptyState()}
+                      </div>
                     ) : (
                       <motion.div
                         initial={{ opacity: 0 }}
@@ -309,7 +309,10 @@ export const Automations = ({ board }: AutomationsProps) => {
                           >
                             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                               <div className="flex-1">
-                                <h3 className="font-semibold text-lg mb-2">{automation.name}</h3>
+                                <div className="flex items-center gap-x-2 mb-2">
+                                  <WorkflowIcon size={20} />
+                                  <p className="font-semibold text-lg">{automation.name}</p>
+                                </div>
                                 <p className="text-lg text-gray-600 mb-4">
                                   When <span className="font-medium text-blue-600">{getTriggerDescription(automation.trigger)}</span>,
                                   then <span className="font-medium text-pink-500">{getActionDescription(automation.actions)}</span>
@@ -351,7 +354,7 @@ export const Automations = ({ board }: AutomationsProps) => {
                   </ScrollArea>
                 </TabsContent>
 
-                <TabsContent value="activity" className="h-full">
+                <TabsContent value="activity">
                   <AutomationActivity boardId={board.id} workspaceId={board.workspaceId} />
                 </TabsContent>
 

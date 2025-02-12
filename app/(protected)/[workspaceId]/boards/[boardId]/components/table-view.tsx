@@ -46,7 +46,6 @@ export const TableView = ({ boardId, data = [] }: TableViewProps) => {
 
     useEffect(() => {
         setLists(data);
-        console.log("Updated lists:", data);
     }, [data]);
 
     // Action pour mettre à jour une carte sur le serveur
