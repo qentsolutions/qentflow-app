@@ -1,8 +1,8 @@
 "use client"
 
 import { toast } from "sonner"
-import { Copy, MoreHorizontal, MoreVertical, Trash } from "lucide-react"
-import { useParams } from "next/navigation"
+import { Copy, MoreHorizontal, MoreVertical, Trash, Expand } from "lucide-react"
+import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -19,6 +19,7 @@ interface ActionsProps {
 
 export const Actions = ({ card }: ActionsProps) => {
   const params = useParams()
+  const router = useRouter()
   const cardModal = useCardModal()
   const { currentWorkspace } = useCurrentWorkspace()
   const boardId = params.boardId as string
@@ -69,53 +70,67 @@ export const Actions = ({ card }: ActionsProps) => {
     })
   }
 
+  const onExpand = () => {
+    cardModal.onClose()
+    router.push(`/${currentWorkspace?.id}/boards/${boardId}/cards/${card.id}`)
+  }
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
-          <MoreVertical className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={onCopy} disabled={isLoadingCopy}>
-          <Copy className="h-4 w-4 mr-2" />
-          Duplicate
-        </DropdownMenuItem>
-        <Dialog>
-          <DialogTrigger asChild>
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-              <Trash className="h-4 w-4 mr-2" />
-              Delete
-            </DropdownMenuItem>
-          </DialogTrigger>
-          <DialogContent>
-            <p className="text-base text-muted-foreground mb-4">
-              Are you sure you want to delete this card? This action is irreversible.
-            </p>
-            <div className="flex items-center">
-              <Button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onDelete()
-                }}
-                disabled={isLoadingDelete}
-                variant="destructive"
-                className="w-full justify-center mr-8"
-                size="default"
-              >
-                <Trash className="h-4 w-4 mr-1" />
+    <div className="flex items-center gap-2">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={onExpand}
+        className="text-muted-foreground hover:text-foreground"
+      >
+        <Expand className="h-4 w-4" />
+      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm">
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={onCopy} disabled={isLoadingCopy}>
+            <Copy className="h-4 w-4 mr-2" />
+            Duplicate
+          </DropdownMenuItem>
+          <Dialog>
+            <DialogTrigger asChild>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <Trash className="h-4 w-4 mr-2" />
                 Delete
-              </Button>
-              <DialogClose asChild>
-                <Button variant="outline" className="w-full justify-center cursor-pointer" size="default">
-                  Cancel
+              </DropdownMenuItem>
+            </DialogTrigger>
+            <DialogContent>
+              <p className="text-base text-muted-foreground mb-4">
+                Are you sure you want to delete this card? This action is irreversible.
+              </p>
+              <div className="flex items-center">
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onDelete()
+                  }}
+                  disabled={isLoadingDelete}
+                  variant="destructive"
+                  className="w-full justify-center mr-8"
+                  size="default"
+                >
+                  <Trash className="h-4 w-4 mr-1" />
+                  Delete
                 </Button>
-              </DialogClose>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </DropdownMenuContent>
-    </DropdownMenu>
+                <DialogClose asChild>
+                  <Button variant="outline" className="w-full justify-center cursor-pointer" size="default">
+                    Cancel
+                  </Button>
+                </DialogClose>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   )
 }
-
