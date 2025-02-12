@@ -104,7 +104,7 @@ export const Description = ({ data, readonly = false }: DescriptionProps) => {
         {readonly ? (
           <EditorContent
             editor={readOnlyEditor}
-            className="prose max-w-none p-4 bg-gray-50 rounded-lg border cursor-pointer"
+            className="prose max-w-none p-1"
           />
         ) : (
           <>

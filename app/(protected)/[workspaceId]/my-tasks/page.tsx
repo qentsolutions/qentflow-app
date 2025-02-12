@@ -293,7 +293,7 @@ export default function MyTasksPage() {
                   onClick={() => setSelectedCard(card)}
                 >
                   <CardContent className="p-4">
-                    <div className="flex justify-between items-start mb-2">
+                    <div className="flex justify-end items-start mb-2">
                       <Badge
                         variant="outline"
                         className="bg-gray-50 text-gray-600 mb-2"
@@ -303,9 +303,6 @@ export default function MyTasksPage() {
                         }}
                       >
                         {card.list.board.title}
-                      </Badge>
-                      <Badge variant="outline" className="bg-gray-50 text-gray-600">
-                        {card.list.title}
                       </Badge>
                     </div>
                     <div className="flex flex-wrap gap-1 my-2">
@@ -370,8 +367,8 @@ export default function MyTasksPage() {
           )}
         </ScrollArea>
       </div>
-      {selectedCard && (
-        <div className="flex-1 bg-background">
+      {selectedCard ? (
+        <div className="bg-background w-full">
           <CardPage
             params={{
               cardId: selectedCard.id,
@@ -381,6 +378,19 @@ export default function MyTasksPage() {
             readonly={true}
           />
         </div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="h-full w-full flex items-center justify-center"
+        >
+          <div className="text-center">
+            <Clock className="h-20 w-20 mx-auto text-gray-300 mb-6" />
+            <h2 className="text-3xl font-semibold text-gray-600">Select a task to view details</h2>
+          </div>
+        </motion.div>
       )}
     </div>
   );

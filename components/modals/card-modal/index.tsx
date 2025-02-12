@@ -40,6 +40,8 @@ export const CardModal = () => {
   const { currentWorkspace } = useCurrentWorkspace();
   const [isDocumentSelectorOpen, setIsDocumentSelectorOpen] = useState(false);
   const [visibleDocuments, setVisibleDocuments] = useState(2); // Modification 1
+  const boardIdString = Array.isArray(boardId) ? boardId[0] : boardId;
+
 
   const { data: cardData } = useQuery<CardWithList>({
     queryKey: ["card", id],
@@ -276,7 +278,7 @@ export const CardModal = () => {
           ) : (
             <div>
               <div className="mb-2 flex items-center justify-end w-full">
-                <Actions card={cardData} />
+                <Actions card={cardData} boardId={boardIdString} />
               </div>
               <Details card={cardData} />
               <TagsComponent data={cardData} availableTags={availableTags ?? []} />

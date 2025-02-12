@@ -16,14 +16,14 @@ import type { CardWithList } from "@/types"
 interface ActionsProps {
   card: CardWithList
   readonly?: boolean;
+  boardId: string;
 }
 
-export const Actions = ({ card, readonly = false }: ActionsProps) => {
+export const Actions = ({ card, boardId, readonly = false }: ActionsProps) => {
   const params = useParams()
   const router = useRouter()
   const cardModal = useCardModal()
   const { currentWorkspace } = useCurrentWorkspace()
-  const boardId = params.boardId as string
 
   const { execute: executeCopyCard, isLoading: isLoadingCopy } = useAction(copyCard, {
     onSuccess: (data) => {

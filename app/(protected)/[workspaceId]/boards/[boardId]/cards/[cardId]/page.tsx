@@ -154,7 +154,7 @@ const CardPage = ({ params, readonly }: any) => {
                         ) : (
                             <div>
                                 <div className="mb-2 flex items-center justify-end w-full">
-                                    <Actions card={cardData} readonly={readonly} />
+                                    <Actions card={cardData} readonly={readonly} boardId={params.boardId} />
                                 </div>
                                 <Details card={cardData} />
                                 <TagsComponent data={cardData} availableTags={availableTags ?? []} readonly={readonly} />
