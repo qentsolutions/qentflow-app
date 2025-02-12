@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { ViewSwitcher, type ViewType } from "./view-switcher"
-import { KanbanView } from "./kanban-view"
-import { useState, useMemo } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { fetcher } from "@/lib/fetcher"
+import { ViewSwitcher, type ViewType } from "./view-switcher";
+import { KanbanView } from "./kanban-view";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { fetcher } from "@/lib/fetcher";
 import {
   RefreshCcw,
   Search,
@@ -19,35 +19,47 @@ import {
   User,
   Plus,
   CheckIcon,
-} from "lucide-react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { useBoardFilters } from "@/hooks/use-board-filters"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { ListView } from "./list-view"
-import { useRouter } from "next/navigation"
-import { Separator } from "@/components/ui/separator"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { AlertDialogHeader } from "@/components/ui/alert-dialog"
-import CreateTagForm from "./create-tag-form"
-import { TableView } from "./table-view"
+  Settings2,
+} from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { useBoardFilters } from "@/hooks/use-board-filters";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { ListView } from "./list-view";
+import { useRouter } from "next/navigation";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialogHeader } from "@/components/ui/alert-dialog";
+import CreateTagForm from "./create-tag-form";
+import { TableView } from "./table-view";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface BoardContentProps {
-  boardId: string
-  lists: any
-  users: any
+  boardId: string;
+  lists: any;
+  users: any;
 }
 
 export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
-  const [selectedView, setSelectedView] = useState<ViewType>("kanban")
-  const [tagSearchTerm, setTagSearchTerm] = useState("")
-  const [userSearchTerm, setUserSearchTerm] = useState("")
-  const [isCreateTagOpen, setIsCreateTagOpen] = useState(false)
-  const router = useRouter()
+  const [selectedView, setSelectedView] = useState<ViewType>("kanban");
+  const [tagSearchTerm, setTagSearchTerm] = useState("");
+  const [userSearchTerm, setUserSearchTerm] = useState("");
+  const [isCreateTagOpen, setIsCreateTagOpen] = useState(false);
+  const router = useRouter();
+
+  // Add state for visible fields
+  const [visibleFields, setVisibleFields] = useState({
+    title: true,
+    priority: true,
+    assignee: true,
+    dueDate: true,
+    tasks: true,
+    tags: true,
+  });
 
   const {
     searchTerm,
@@ -63,81 +75,80 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     setSortBy,
     sortDirection,
     setSortDirection,
-  } = useBoardFilters({ lists })
+  } = useBoardFilters({ lists });
 
   const { data: availableTags } = useQuery({
     queryKey: ["available-tags", boardId],
     queryFn: () => fetcher(`/api/boards/tags?boardId=${boardId}`),
-  })
+  });
 
-  const selectedUserData = useMemo(() => users.find((user: any) => user.id === selectedUser), [selectedUser, users])
+  const selectedUserData = useMemo(() => users.find((user: any) => user.id === selectedUser), [selectedUser, users]);
 
   const filteredTags = useMemo(
     () => availableTags?.filter((tag: any) => tag.name.toLowerCase().includes(tagSearchTerm.toLowerCase())),
-    [availableTags, tagSearchTerm],
-  )
+    [availableTags, tagSearchTerm]
+  );
 
   const filteredUsers = useMemo(
     () => users.filter((user: any) => user.name.toLowerCase().includes(userSearchTerm.toLowerCase())),
-    [users, userSearchTerm],
-  )
+    [users, userSearchTerm]
+  );
 
   const renderView = () => {
-    const filteredLists = getFilteredLists()
+    const filteredLists = getFilteredLists();
 
     if (selectedView === "kanban") {
-      return <KanbanView boardId={boardId} data={filteredLists} users={users} />
+      return <KanbanView boardId={boardId} data={filteredLists} users={users} />;
     }
     if (selectedView === "list") {
-      return <ListView boardId={boardId} data={filteredLists} users={users} />
+      return <ListView boardId={boardId} data={filteredLists} users={users} visibleFields={visibleFields} />;
     }
-    if (selectedView == "table") {
-      return <TableView boardId={boardId} data={filteredLists} />
+    if (selectedView === "table") {
+      return <TableView boardId={boardId} data={filteredLists} visibleFields={visibleFields} users={users} />;
     }
-    return <KanbanView boardId={boardId} data={filteredLists} users={users} />
-  }
-
+    return <KanbanView boardId={boardId} data={filteredLists} users={users} />;
+  };
 
   const RefreshPage = () => {
-    router.refresh()
-  }
+    router.refresh();
+  };
 
   const getActiveFiltersCount = () => {
-    let count = 0
-    if (selectedUser) count++
-    if (selectedPriority) count++
-    if (selectedTags.length > 0) count++
-    return count
-  }
+    let count = 0;
+    if (selectedUser) count++;
+    if (selectedPriority) count++;
+    if (selectedTags.length > 0) count++;
+    return count;
+  };
 
   const getPriorityIcon = (priority: string) => {
     switch (priority) {
       case "LOW":
-        return <SignalLow className="h-4 w-4 text-green-500" />
+        return <SignalLow className="h-4 w-4 text-green-500" />;
       case "MEDIUM":
-        return <SignalMedium className="h-4 w-4 text-yellow-500" />
+        return <SignalMedium className="h-4 w-4 text-yellow-500" />;
       case "HIGH":
-        return <SignalHigh className="h-4 w-4 text-orange-500" />
+        return <SignalHigh className="h-4 w-4 text-orange-500" />;
       case "CRITICAL":
-        return <AlertTriangle className="h-4 w-4 text-red-500" />
+        return <AlertTriangle className="h-4 w-4 text-red-500" />;
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   const handleSort = (newSortBy: string) => {
     if (sortBy === newSortBy) {
       if (sortDirection === "desc") {
-        setSortBy(null)
-        setSortDirection("asc")
+        setSortBy(null);
+        setSortDirection("asc");
       } else {
-        setSortDirection("desc")
+        setSortDirection("desc");
       }
     } else {
-      setSortBy(newSortBy)
-      setSortDirection("asc")
+      setSortBy(newSortBy);
+      setSortDirection("asc");
     }
-  }
+  };
 
   const sortOptions = [
     { label: "Title", value: "title" },
@@ -145,7 +156,14 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     { label: "Priority", value: "priority" },
     { label: "Assigned", value: "assigned" },
     { label: "Start Date", value: "startDate" },
-  ]
+  ];
+
+  const toggleField = (field: keyof typeof visibleFields) => {
+    setVisibleFields((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  };
 
   return (
     <>
@@ -189,7 +207,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                         onClick={() => setSelectedUser(selectedUser === "unassigned" ? null : "unassigned")}
                         className={cn(
                           "flex items-center gap-2 p-2 rounded-md cursor-pointer text-sm",
-                          selectedUser === "unassigned" ? "bg-secondary" : "hover:bg-secondary/50",
+                          selectedUser === "unassigned" ? "bg-secondary" : "hover:bg-secondary/50"
                         )}
                       >
                         <User className="h-4 w-4" />
@@ -201,7 +219,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                           onClick={() => setSelectedUser(selectedUser === user.id ? null : user.id)}
                           className={cn(
                             "flex items-center gap-2 p-2 rounded-md cursor-pointer text-sm",
-                            selectedUser === user.id ? "bg-secondary" : "hover:bg-secondary/50",
+                            selectedUser === user.id ? "bg-secondary" : "hover:bg-secondary/50"
                           )}
                         >
                           <Avatar className="h-5 w-5">
@@ -225,7 +243,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                         onClick={() => setSelectedPriority(selectedPriority === priority ? null : priority)}
                         className={cn(
                           "flex items-center gap-2 p-2 rounded-md cursor-pointer text-sm",
-                          selectedPriority === priority ? "bg-secondary" : "hover:bg-secondary/50",
+                          selectedPriority === priority ? "bg-secondary" : "hover:bg-secondary/50"
                         )}
                       >
                         {getPriorityIcon(priority)}
@@ -270,7 +288,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                             onClick={() => toggleTag(tag.id)}
                             className={cn(
                               "flex items-center justify-between p-2 rounded-md cursor-pointer text-sm",
-                              selectedTags.includes(tag.id) ? "bg-secondary" : "hover:bg-secondary/50",
+                              selectedTags.includes(tag.id) ? "bg-secondary" : "hover:bg-secondary/50"
                             )}
                           >
                             <div className="flex items-center gap-2">
@@ -313,7 +331,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                       variant="ghost"
                       className={cn(
                         "w-full justify-between font-normal",
-                        sortBy === option.value && "bg-accent text-accent-foreground",
+                        sortBy === option.value && "bg-accent text-accent-foreground"
                       )}
                       onClick={() => handleSort(option.value)}
                     >
@@ -326,6 +344,36 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
               </div>
             </PopoverContent>
           </Popover>
+          {/* Conditionally render the "Fields" button */}
+          {(selectedView === "list" || selectedView === "table") && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9 px-3 gap-1">
+                  <Settings2 className="h-4 w-4" />
+                  Fields
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[200px]" align="start">
+                <div className="p-2">
+                  <p className="font-medium mb-2">Visible Fields</p>
+                  <div className="space-y-2">
+                    {Object.entries(visibleFields).map(([field, isVisible]) => (
+                      <div key={field} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={field}
+                          checked={isVisible}
+                          onCheckedChange={() => toggleField(field as keyof typeof visibleFields)}
+                        />
+                        <label htmlFor={field} className="text-sm capitalize">
+                          {field.replace(/([A-Z])/g, " $1").trim()}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <ViewSwitcher selectedView={selectedView} onViewChange={setSelectedView} />
@@ -334,8 +382,9 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
           </Button>
         </div>
       </div>
-      <main className="w-full max-w-screen shadow-sm overflow-x-auto bg-background h-full px-2">{renderView()}</main>
+      <main className="w-full max-w-screen shadow-sm overflow-x-auto bg-background h-full px-2">
+        {renderView()}
+      </main>
     </>
-  )
-}
-
+  );
+};

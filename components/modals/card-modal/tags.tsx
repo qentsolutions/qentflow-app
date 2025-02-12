@@ -197,7 +197,7 @@ export const TagsComponent = ({
 
           <div className="space-y-2">
             <div className="flex items-center">
-              <p className="text-lg font-semibold my-2 flex items-center gap-x-2"><Tags size={16} /> Tags</p>
+              <p className="text-lg font-semibold mt-2 flex items-center gap-x-2"><Tags size={16} /> Tags</p>
               <Tooltip>
                 <TooltipTrigger>
                   <Info size={14} className="ml-2 cursor-pointer" />

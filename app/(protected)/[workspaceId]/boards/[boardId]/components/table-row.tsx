@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Clock, LayoutList } from "lucide-react";
+import { Clock, LayoutList, MoreHorizontal, Trash } from "lucide-react";
 import { format } from "date-fns";
 import {
   Select,
@@ -9,6 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 interface TableRowProps {
   item: any;
@@ -17,7 +19,9 @@ interface TableRowProps {
   onRowClick: (id: string) => void;
 }
 
+
 export const TableViewRow = ({ item, lists, onListChange, onRowClick }: TableRowProps) => {
+
   const getRandomColor = (id: string): string => {
     const colors = [
       "bg-red-500",
@@ -35,13 +39,17 @@ export const TableViewRow = ({ item, lists, onListChange, onRowClick }: TableRow
     return colors[index];
   };
 
+  function onDelete(id: any) {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <TableRow
       key={item.id}
       className="group hover:bg-gray-50 transition-colors"
     >
-      <TableCell 
-        className="font-medium cursor-pointer"
+      <TableCell
+        className="font-medium cursor-pointer py-2"
         onClick={() => onRowClick(item.id)}
       >
         <div className="flex items-center space-x-2">
@@ -67,7 +75,7 @@ export const TableViewRow = ({ item, lists, onListChange, onRowClick }: TableRow
           </SelectContent>
         </Select>
       </TableCell>
-      <TableCell 
+      <TableCell
         className="cursor-pointer"
         onClick={() => onRowClick(item.id)}
       >
@@ -82,7 +90,7 @@ export const TableViewRow = ({ item, lists, onListChange, onRowClick }: TableRow
           ))}
         </div>
       </TableCell>
-      <TableCell 
+      <TableCell
         className="text-muted-foreground cursor-pointer"
         onClick={() => onRowClick(item.id)}
       >
@@ -90,6 +98,29 @@ export const TableViewRow = ({ item, lists, onListChange, onRowClick }: TableRow
           <Clock className="h-3.5 w-3.5" />
           <span>{format(new Date(item.createdAt), "MMM d, yyyy")}</span>
         </div>
+      </TableCell>
+      <TableCell
+        className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm">
+              <MoreHorizontal size={16} />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              className="flex items-center justify-between"
+              onClick={() => {
+                onDelete(item.id)
+              }}
+            >
+              Delete
+              <Trash size={16} className=" text-red-500" />
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </TableCell>
     </TableRow>
   );

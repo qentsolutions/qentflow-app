@@ -12,6 +12,14 @@ import {
     MoreHorizontal,
     Trash,
     GripVertical,
+    Calendar,
+    MessageSquare,
+    Paperclip,
+    CheckSquare,
+    SignalLow,
+    SignalMedium,
+    SignalHigh,
+    AlertTriangle,
 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
@@ -27,8 +35,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { assignUserToCard } from "@/actions/boards/assign-user-to-card"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { deleteCard } from "@/actions/tasks/delete-card"
-import { list } from "postcss"
 import { useParams } from "next/navigation"
+import { format } from "date-fns"
+import { Progress } from "@/components/ui/progress"
+import { useQuery } from "@tanstack/react-query"
+import { fetcher } from "@/lib/fetcher"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface ListViewProps {
     boardId: string
@@ -43,24 +55,39 @@ interface ListViewProps {
             listId: string
             createdAt: Date
             updatedAt: Date
+            priority: string
             assignedUserId?: string | null
             tags?: {
                 id: string
                 name: string
-                color: string;
+                color: string
             }[]
+            tasks?: {
+                id: string
+                completed: boolean
+            }[]
+            startDate?: Date | null
+            dueDate?: Date | null
         }[]
     }[]
     users: any
+    visibleFields: {
+        title: boolean
+        priority: boolean
+        assignee: boolean
+        tags: boolean
+        dueDate: boolean
+        tasks: boolean
+    }
 }
 
-export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
+export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewProps) => {
     const cardModal = useCardModal()
     const [openLists, setOpenLists] = useState<string[]>(data.map((list) => list.id))
     const [lists, setLists] = useState(data)
     const { currentWorkspace } = useCurrentWorkspace()
     const [openAssign, setOpenAssign] = useState<string | null>(null)
-    const params = useParams();
+    const params = useParams()
 
     useEffect(() => {
         setLists(data)
@@ -130,22 +157,45 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
 
     const { execute: executeDeleteCard } = useAction(deleteCard, {
         onSuccess: (data) => {
-            toast.success(`Card "${data.title}" deleted`);
+            toast.success(`Card "${data.title}" deleted`)
         },
         onError: (error) => {
-            toast.error(error);
+            toast.error(error)
         },
-    });
+    })
 
     const onDelete = (cardId: string) => {
-        const workspaceId = currentWorkspace?.id;
+        const workspaceId = currentWorkspace?.id
 
         if (!workspaceId) {
-            toast.error("Workspace ID is required.");
-            return;
+            toast.error("Workspace ID is required.")
+            return
         }
 
-        executeDeleteCard({ id: cardId, boardId: Array.isArray(params?.boardId) ? params.boardId[0] : params?.boardId || "", workspaceId });
+        executeDeleteCard({
+            id: cardId,
+            boardId: Array.isArray(params?.boardId) ? params.boardId[0] : params?.boardId || "",
+            workspaceId,
+        })
+    }
+
+    const PriorityIcon = (priority: string | null) => {
+        if (!priority) {
+            return null; // Si priority est null, ne rien afficher
+        }
+        if (priority === "LOW") {
+            return <SignalLow className="text-green-500" size={25} />;
+        }
+        if (priority === "MEDIUM") {
+            return <SignalMedium className="text-yellow-500" size={24} />;
+        }
+        if (priority === "HIGH") {
+            return <SignalHigh className="text-orange-500" size={24} />;
+        }
+        if (priority === "CRITICAL") {
+            return <AlertTriangle className="text-red-500" size={16} />;
+        }
+        return null; // Si aucune correspondance, ne rien afficher
     };
 
     return (
@@ -172,7 +222,6 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
                                     </span>
                                 </h2>
                             </div>
-                            
                         </CollapsibleTrigger>
                         <CollapsibleContent>
                             <Droppable droppableId={list.id}>
@@ -181,137 +230,229 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
                                         <table className="w-full">
                                             <thead>
                                                 <tr className="border-b border-gray-200">
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        <div className="flex items-center gap-x-2">
-                                                            <TargetIcon size={14} />
-                                                            Task Name
-                                                        </div>
-                                                    </th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        <div className="flex items-center gap-x-2">
-                                                            <Tags size={14} />
-                                                            Tags
-                                                        </div>
-                                                    </th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        <div className="flex items-center gap-x-2">
-                                                            <UserRound size={14} />
-                                                            Assigned
-                                                        </div>
-                                                    </th>
+                                                    {visibleFields.title && (
+                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            <div className="flex items-center gap-x-2">
+                                                                <TargetIcon size={14} />
+                                                                Task Name
+                                                            </div>
+                                                        </th>
+                                                    )}
+                                                    {visibleFields.priority && (
+                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            <div className="flex items-center gap-x-2">
+                                                                Priority
+                                                            </div>
+                                                        </th>
+                                                    )}
+                                                    {visibleFields.assignee && (
+                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            <div className="flex items-center gap-x-2">
+                                                                <UserRound size={14} />
+                                                                Assigned
+                                                            </div>
+                                                        </th>
+                                                    )}
+                                                    {visibleFields.dueDate && (
+                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            <div className="flex items-center gap-x-2">
+                                                                <Calendar size={14} />
+                                                                Due Date
+                                                            </div>
+                                                        </th>
+                                                    )}
+                                                    {visibleFields.tasks && (
+                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            <div className="flex items-center gap-x-2">
+                                                                <CheckSquare size={14} />
+                                                                Tasks
+                                                            </div>
+                                                        </th>
+                                                    )}
+                                                    {visibleFields.tags && (
+                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            <div className="flex items-center gap-x-2">
+                                                                <Tags size={14} />
+                                                                Tags
+                                                            </div>
+                                                        </th>
+                                                    )}
+                                                   
+                                                 
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {list.cards.map((card, index) => (
-                                                    <Draggable key={card.id} draggableId={card.id} index={index}>
-                                                        {(provided) => (
-                                                            <tr
-                                                                ref={provided.innerRef}
-                                                                {...provided.draggableProps}
-                                                                {...provided.dragHandleProps}
-                                                                className="group bg-background hover:bg-gray-50 transition-colors cursor-pointer"
-                                                                onClick={() => cardModal.onOpen(card.id)}
-                                                            >
-                                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                                    <div className="flex items-center gap-x-3">
-                                                                        <GripVertical size={16} className="text-gray-400" />
-                                                                        <span className="text-sm font-medium text-gray-900">{card.title}</span>
-                                                                    </div>
-                                                                </td>
-                                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                                    {card.tags?.map((tag) => (
-                                                                        <Badge
-                                                                            key={tag.id}
-                                                                            variant={"outline"}
-                                                                            style={{ backgroundColor: tag.color, color: 'white' }}
-                                                                            className="mr-2"
-                                                                        >
-                                                                            {tag.name}
-                                                                        </Badge>
-                                                                    ))}
-                                                                </td>
+                                                {list.cards.map((card, index) => {
+                                                    return (
+                                                        <Draggable key={card.id} draggableId={card.id} index={index}>
+                                                            {(provided) => (
+                                                                <tr
+                                                                    ref={provided.innerRef}
+                                                                    {...provided.draggableProps}
+                                                                    {...provided.dragHandleProps}
+                                                                    className="group bg-background hover:bg-gray-50 transition-colors cursor-pointer"
+                                                                    onClick={() => cardModal.onOpen(card.id)}
+                                                                >
+                                                                    {visibleFields.title && (
+                                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                                            <div className="flex items-center gap-x-3">
+                                                                                <GripVertical size={16} className="text-gray-400" />
+                                                                                <span className="text-sm font-medium text-gray-900">{card.title}</span>
+                                                                            </div>
+                                                                        </td>
+                                                                    )}
 
-                                                                <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
-                                                                    <Popover
-                                                                        open={openAssign === card.id}
-                                                                        onOpenChange={(open) => setOpenAssign(open ? card.id : null)}
-                                                                    >
-                                                                        <PopoverTrigger asChild>
-                                                                            <Button variant="outline" size="sm" className="w-[200px] justify-start">
-                                                                                {card.assignedUserId ? (
-                                                                                    <div className="flex items-center gap-2">
-                                                                                        <Avatar className="h-6 w-6">
-                                                                                            <AvatarImage
-                                                                                                src={
-                                                                                                    users.find(
-                                                                                                        (u: { id: string | null | undefined }) =>
-                                                                                                            u.id === card.assignedUserId,
-                                                                                                    )?.image || ""
-                                                                                                }
-                                                                                            />
-                                                                                            <AvatarFallback>
-                                                                                                {users.find(
-                                                                                                    (u: { id: string | null | undefined }) =>
-                                                                                                        u.id === card.assignedUserId,
-                                                                                                )?.name?.[0] || <UserRound size={12} />}
-                                                                                            </AvatarFallback>
-                                                                                        </Avatar>
-                                                                                        <span className="text-sm">
-                                                                                            {
-                                                                                                users.find(
-                                                                                                    (u: { id: string | null | undefined }) =>
-                                                                                                        u.id === card.assignedUserId,
-                                                                                                )?.name
-                                                                                            }
+
+                                                                    {visibleFields.priority && (
+                                                                        <td>
+                                                                            <div className="mr-1 flex items-center justify-center">
+                                                                                <Tooltip>
+                                                                                    <TooltipTrigger>
+                                                                                        {PriorityIcon(card?.priority)}
+                                                                                    </TooltipTrigger>
+                                                                                    <TooltipContent className="flex items-center justify-center">
+                                                                                        {card.priority}
+                                                                                    </TooltipContent>
+                                                                                </Tooltip>
+                                                                            </div>
+                                                                        </td>
+                                                                    )}
+                                                                    {visibleFields.assignee && (
+                                                                        <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                                                                            <Popover
+                                                                                open={openAssign === card.id}
+                                                                                onOpenChange={(open) => setOpenAssign(open ? card.id : null)}
+                                                                            >
+                                                                                <PopoverTrigger asChild>
+                                                                                    <Button variant="outline" size="sm" className="w-[200px] justify-start">
+                                                                                        {card.assignedUserId ? (
+                                                                                            <div className="flex items-center gap-2">
+                                                                                                <Avatar className="h-6 w-6">
+                                                                                                    <AvatarImage
+                                                                                                        src={
+                                                                                                            users.find(
+                                                                                                                (u: { id: string | null | undefined }) =>
+                                                                                                                    u.id === card.assignedUserId,
+                                                                                                            )?.image || ""
+                                                                                                        }
+                                                                                                    />
+                                                                                                    <AvatarFallback>
+                                                                                                        {users.find(
+                                                                                                            (u: { id: string | null | undefined }) =>
+                                                                                                                u.id === card.assignedUserId,
+                                                                                                        )?.name?.[0] || <UserRound size={12} />}
+                                                                                                    </AvatarFallback>
+                                                                                                </Avatar>
+                                                                                                <span className="text-sm">
+                                                                                                    {
+                                                                                                        users.find(
+                                                                                                            (u: { id: string | null | undefined }) =>
+                                                                                                                u.id === card.assignedUserId,
+                                                                                                        )?.name
+                                                                                                    }
+                                                                                                </span>
+                                                                                            </div>
+                                                                                        ) : (
+                                                                                            <span className="text-sm text-gray-500">Assign user...</span>
+                                                                                        )}
+                                                                                    </Button>
+                                                                                </PopoverTrigger>
+                                                                                <PopoverContent className="w-[200px] p-0">
+                                                                                    <div className="py-2">
+                                                                                        {users.map((user: any) => (
+                                                                                            <button
+                                                                                                key={user.id}
+                                                                                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"
+                                                                                                onClick={() => handleAssignUser(card.id, user.id)}
+                                                                                            >
+                                                                                                <Avatar className="h-6 w-6">
+                                                                                                    <AvatarImage src={user.image || ""} />
+                                                                                                    <AvatarFallback>{user.name[0]}</AvatarFallback>
+                                                                                                </Avatar>
+                                                                                                {user.name}
+                                                                                            </button>
+                                                                                        ))}
+                                                                                    </div>
+                                                                                </PopoverContent>
+                                                                            </Popover>
+                                                                        </td>
+                                                                    )}
+                                                                    {visibleFields.dueDate && (
+                                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                                            {card.dueDate && (
+                                                                                <div className="flex items-center text-sm text-gray-600">
+                                                                                    <Calendar className="h-4 w-4 mr-2" />
+                                                                                    {format(new Date(card.dueDate), "MMM d, yyyy")}
+                                                                                </div>
+                                                                            )}
+                                                                        </td>
+                                                                    )}
+                                                                    {visibleFields.tasks && (
+                                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                                            {card.tasks && card.tasks.length > 0 && (
+                                                                                <div className="flex flex-col gap-1">
+                                                                                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                                                        <span>
+                                                                                            {card.tasks.filter((t: any) => t.completed).length}/{card.tasks.length}
                                                                                         </span>
                                                                                     </div>
-                                                                                ) : (
-                                                                                    <span className="text-sm text-gray-500">Assign user...</span>
-                                                                                )}
-                                                                            </Button>
-                                                                        </PopoverTrigger>
-                                                                        <PopoverContent className="w-[200px] p-0">
-                                                                            <div className="py-2">
-                                                                                {users.map((user: any) => (
-                                                                                    <button
-                                                                                        key={user.id}
-                                                                                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"
-                                                                                        onClick={() => handleAssignUser(card.id, user.id)}
+                                                                                    <Progress
+                                                                                        value={
+                                                                                            (card.tasks.filter((task: any) => task.completed).length /
+                                                                                                card.tasks.length) *
+                                                                                            100
+                                                                                        }
+                                                                                        className="h-1.5"
+                                                                                    />
+                                                                                </div>
+                                                                            )}
+                                                                        </td>
+                                                                    )}
+                                                                    {visibleFields.tags && (
+                                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                                            <div className="flex gap-1.5 flex-wrap">
+                                                                                {card.tags?.map((tag: any) => (
+                                                                                    <Badge
+                                                                                        key={tag.id}
+                                                                                        className={`text-white`}
+                                                                                        style={{ backgroundColor: tag?.color || "#ff0000" }}
                                                                                     >
-                                                                                        <Avatar className="h-6 w-6">
-                                                                                            <AvatarImage src={user.image || ""} />
-                                                                                            <AvatarFallback>{user.name[0]}</AvatarFallback>
-                                                                                        </Avatar>
-                                                                                        {user.name}
-                                                                                    </button>
+                                                                                        {tag.name}
+                                                                                    </Badge>
                                                                                 ))}
                                                                             </div>
-                                                                        </PopoverContent>
-                                                                    </Popover>
-                                                                </td>
-                                                                <td
-                                                                    className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
-                                                                    onClick={(e) => e.stopPropagation()}
-                                                                >
-                                                                    <DropdownMenu>
-                                                                        <DropdownMenuTrigger asChild>
-                                                                            <Button variant="ghost" size="sm">
-                                                                                <MoreHorizontal size={16} />
-                                                                            </Button>
-                                                                        </DropdownMenuTrigger>
-                                                                        <DropdownMenuContent align="end">
-                                                                            <DropdownMenuItem className="flex items-center justify-between" onClick={() => { onDelete(card.id) }}>
-                                                                                Delete
-                                                                                <Trash size={16} className=" text-red-500" />
-                                                                            </DropdownMenuItem>
-                                                                        </DropdownMenuContent>
-                                                                    </DropdownMenu>
-                                                                </td>
-                                                            </tr>
-                                                        )}
-                                                    </Draggable>
-                                                ))}
+                                                                        </td>
+                                                                    )}
+                                                                   
+                                                                    <td
+                                                                        className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                    >
+                                                                        <DropdownMenu>
+                                                                            <DropdownMenuTrigger asChild>
+                                                                                <Button variant="ghost" size="sm">
+                                                                                    <MoreHorizontal size={16} />
+                                                                                </Button>
+                                                                            </DropdownMenuTrigger>
+                                                                            <DropdownMenuContent align="end">
+                                                                                <DropdownMenuItem
+                                                                                    className="flex items-center justify-between"
+                                                                                    onClick={() => {
+                                                                                        onDelete(card.id)
+                                                                                    }}
+                                                                                >
+                                                                                    Delete
+                                                                                    <Trash size={16} className=" text-red-500" />
+                                                                                </DropdownMenuItem>
+                                                                            </DropdownMenuContent>
+                                                                        </DropdownMenu>
+                                                                    </td>
+                                                                </tr>
+                                                            )}
+                                                        </Draggable>
+                                                    )
+                                                })}
                                                 {provided.placeholder}
                                             </tbody>
                                         </table>
@@ -326,4 +467,3 @@ export const ListView = ({ boardId, users, data = [] }: ListViewProps) => {
         </DragDropContext>
     )
 }
-
