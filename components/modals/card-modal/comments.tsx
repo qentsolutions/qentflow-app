@@ -24,9 +24,10 @@ import { createNotification } from "@/actions/notifications/create-notification"
 interface CommentsProps {
   items: Comment[];
   cardId: string;
+  readonly?: boolean;
 }
 
-export const Comments = ({ items, cardId }: CommentsProps) => {
+export const Comments = ({ items, cardId, readonly = false }: CommentsProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
   const [comments, setComments] = useState<Comment[]>(items);
@@ -43,7 +44,7 @@ export const Comments = ({ items, cardId }: CommentsProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Fetch board users
-  const { data: boardUsers } = useQuery({
+  const { data: boardUsers, isLoading: isLoadingBoardUsers, isError: isErrorBoardUsers } = useQuery({
     queryKey: ["usersInBoard", params.boardId],
     queryFn: () => fetcher(`/api/boards/assigned-user?boardId=${params.boardId}`),
   });
@@ -171,9 +172,11 @@ export const Comments = ({ items, cardId }: CommentsProps) => {
     }, 0);
   };
 
-  const filteredUsers = boardUsers?.filter((boardUser: any) =>
-    boardUser.name.toLowerCase().includes(mentionQuery.toLowerCase())
-  );
+  const filteredUsers = Array.isArray(boardUsers)
+    ? boardUsers.filter((boardUser: any) =>
+      boardUser.name.toLowerCase().includes(mentionQuery.toLowerCase())
+    )
+    : [];
 
   if (!user) {
     toast.error("User not found or not authenticated.");
@@ -305,78 +308,88 @@ export const Comments = ({ items, cardId }: CommentsProps) => {
     });
   };
 
+  if (isLoadingBoardUsers) {
+    return <Skeleton className="h-6 w-full" />;
+  }
+
+  if (isErrorBoardUsers) {
+    return <p>Failed to load board users.</p>;
+  }
+
   return (
     <div className="space-y-6">
-      <div className="mt-4">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target as HTMLFormElement);
-            handleSubmit(formData);
-          }}
-        >
-          <div onClick={() => setIsEditing(true)} role="button" className="relative">
-            {!isEditing ? (
-              <div className="pb-12 border mt-2 pt-2 pl-2 rounded-lg bg-gray-50 dark:text-gray-200 dark:bg-gray-700">
-                <p className="text-gray-500 text-sm">{newComment ? "" : "Write a comment..."}</p>
-              </div>
-            ) : (
-              <div className="relative">
-                <FormTextarea
-                  ref={textareaRef}
-                  id="new-comment"
-                  value={newComment}
-                  onChange={handleTextChange}
-                  placeholder="Write a comment..."
-                  className="pb-20 mt-2 pt-2 pl-2 rounded-lg bg-gray-50 dark:text-gray-200 dark:bg-gray-700"
-                  errors={fieldErrors}
-                />
-                {showMentions && filteredUsers && filteredUsers.length > 0 && (
-                  <Card
-                    className="absolute z-50 w-64 max-h-48 overflow-y-auto"
-                    style={{
-                      top: mentionPosition.top,
-                      left: mentionPosition.left,
-                    }}
-                  >
-                    {filteredUsers.map((user: any) => (
-                      <div
-                        key={user.id}
-                        className="p-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
-                        onClick={() => handleMentionSelect(user)}
-                      >
-                        <Avatar className="h-6 w-6">
-                          <AvatarImage src={user.image} />
-                          <AvatarFallback>{user.name[0]}</AvatarFallback>
-                        </Avatar>
-                        <span>{user.name}</span>
-                      </div>
-                    ))}
-                  </Card>
-                )}
+      {!readonly &&
+        <div className="mt-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target as HTMLFormElement);
+              handleSubmit(formData);
+            }}
+          >
+            <div onClick={() => setIsEditing(true)} role="button" className="relative">
+              {!isEditing ? (
+                <div className="pb-12 border mt-2 pt-2 pl-2 rounded-lg bg-gray-50 dark:text-gray-200 dark:bg-gray-700">
+                  <p className="text-gray-500 text-sm">{newComment ? "" : "Write a comment..."}</p>
+                </div>
+              ) : (
+                <div className="relative">
+                  <FormTextarea
+                    ref={textareaRef}
+                    id="new-comment"
+                    value={newComment}
+                    onChange={handleTextChange}
+                    placeholder="Write a comment..."
+                    className="pb-20 mt-2 pt-2 pl-2 rounded-lg bg-gray-50 dark:text-gray-200 dark:bg-gray-700"
+                    errors={fieldErrors}
+                  />
+                  {showMentions && filteredUsers && filteredUsers.length > 0 && (
+                    <Card
+                      className="absolute z-50 w-64 max-h-48 overflow-y-auto"
+                      style={{
+                        top: mentionPosition.top,
+                        left: mentionPosition.left,
+                      }}
+                    >
+                      {filteredUsers.map((user: any) => (
+                        <div
+                          key={user.id}
+                          className="p-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
+                          onClick={() => handleMentionSelect(user)}
+                        >
+                          <Avatar className="h-6 w-6">
+                            <AvatarImage src={user.image} />
+                            <AvatarFallback>{user.name[0]}</AvatarFallback>
+                          </Avatar>
+                          <span>{user.name}</span>
+                        </div>
+                      ))}
+                    </Card>
+                  )}
+                </div>
+              )}
+            </div>
+            {isEditing && (
+              <div className="flex space-x-2 mt-2">
+                <Button type="submit" disabled={isSubmitting} size="sm" className="bg-blue-500 hover:bg-blue-700">
+                  {isSubmitting ? "Adding..." : "Add Comment"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setNewComment("");
+                    setIsEditing(false);
+                  }}
+                >
+                  Cancel
+                </Button>
               </div>
             )}
-          </div>
-          {isEditing && (
-            <div className="flex space-x-2 mt-2">
-              <Button type="submit" disabled={isSubmitting} size="sm" className="bg-blue-500 hover:bg-blue-700">
-                {isSubmitting ? "Adding..." : "Add Comment"}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setNewComment("");
-                  setIsEditing(false);
-                }}
-              >
-                Cancel
-              </Button>
-            </div>
-          )}
-        </form>
-      </div>
+          </form>
+        </div>
+      }
 
       <div className="flex justify-end items-center space-x-2">
         <Label htmlFor="sort-comments" className="text-sm">
@@ -448,29 +461,33 @@ export const Comments = ({ items, cardId }: CommentsProps) => {
                         {highlightMentions(comment.text)}
                       </p>
                     )}
-                    {editingCommentId !== comment.id && (
-                      <div className="flex items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        {user?.id === comment.user.id && (
-                          <>
-                            <button
-                              onClick={() => {
-                                setEditingText(comment.text);
-                                setEditingCommentId(comment.id);
-                              }}
-                              className="text-neutral-600 hover:text-neutral-800 mr-8"
-                            >
-                              <p className="text-xs">Edit</p>
-                            </button>
-                            <button
-                              onClick={() => handleDelete(comment.id)}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              <p className="text-xs">Delete</p>
-                            </button>
-                          </>
-                        )}
+                    {!readonly && (
+                      <div>{editingCommentId !== comment.id && (
+                        <div className="flex items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          {user?.id === comment.user.id && (
+                            <>
+                              <button
+                                onClick={() => {
+                                  setEditingText(comment.text);
+                                  setEditingCommentId(comment.id);
+                                }}
+                                className="text-neutral-600 hover:text-neutral-800 mr-8"
+                              >
+                                <p className="text-xs">Edit</p>
+                              </button>
+                              <button
+                                onClick={() => handleDelete(comment.id)}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                <p className="text-xs">Delete</p>
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      )}
                       </div>
                     )}
+
                   </div>
                 </div>
               </li>

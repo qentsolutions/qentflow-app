@@ -1,3 +1,5 @@
+"use client";
+
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
@@ -12,9 +14,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 interface PriorityProps {
   data: CardWithList;
+  readonly?: boolean;
 }
 
-export const Priority = ({ data }: PriorityProps) => {
+export const Priority = ({
+  data,
+  readonly = false,
+}: PriorityProps) => {
   const params = useParams();
   const queryClient = useQueryClient();
   const { currentWorkspace } = useCurrentWorkspace();
@@ -59,6 +65,8 @@ export const Priority = ({ data }: PriorityProps) => {
     { value: "critical", label: "Critical", icon: AlertTriangle, color: "text-red-500" }
   ];
 
+  const currentPriority = priorityOptions.find(option => option.value === data.priority?.toLowerCase()) || priorityOptions[0];
+
   return (
     <Card className="mt-4 shadow-none">
       <CardHeader className="pt-4 pb-2">
@@ -68,21 +76,29 @@ export const Priority = ({ data }: PriorityProps) => {
         </div>
       </CardHeader>
       <CardContent>
-        <Select defaultValue={data.priority?.toLowerCase() || "none"} onValueChange={onPriorityChange}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select priority" />
-          </SelectTrigger>
-          <SelectContent>
-            {priorityOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                <div className="flex items-center gap-2">
-                  <option.icon className={`h-6 w-6 ${option.color}`} />
-                  {option.label}
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {readonly ? (
+          <div className="flex items-center gap-2">
+            {/* Affichage de l'icône et du label dans le mode readonly */}
+            <currentPriority.icon className={`h-6 w-6 ${currentPriority.color}`} />
+            {currentPriority.label || "None"}
+          </div>
+        ) : (
+          <Select defaultValue={data.priority?.toLowerCase() || "none"} onValueChange={onPriorityChange}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select priority" />
+            </SelectTrigger>
+            <SelectContent>
+              {priorityOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  <div className="flex items-center gap-2">
+                    <option.icon className={`h-6 w-6 ${option.color}`} />
+                    {option.label}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </CardContent>
     </Card>
   );

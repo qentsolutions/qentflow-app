@@ -18,16 +18,20 @@ import { TagsComponent } from "@/components/modals/card-modal/tags";
 import DateComponent from "@/components/modals/card-modal/date";
 import { ActivityIcon, FileText, MessageSquareText, Logs } from "lucide-react";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
+import { Actions } from "@/components/modals/card-modal/actions";
 
+{/* 
 interface CardPageProps {
     params: {
         cardId: string;
         workspaceId: string;
         boardId: string;
     };
+    readonly: boolean;
 }
+*/}
 
-const CardPage = ({ params }: CardPageProps) => {
+const CardPage = ({ params, readonly }: any) => {
     const { currentWorkspace } = useCurrentWorkspace();
     const [isDocumentSelectorOpen, setIsDocumentSelectorOpen] = useState(false);
     const { setBreadcrumbs } = useBreadcrumbs();
@@ -80,7 +84,7 @@ const CardPage = ({ params }: CardPageProps) => {
                     {!cardData ? (
                         <Header.Skeleton />
                     ) : (
-                        <Header data={cardData} />
+                        <Header data={cardData} readonly={readonly} />
                     )}
                     <div className="grid grid-cols-1 md:grid-cols-4 md:gap-4">
                         <div className="col-span-3">
@@ -88,7 +92,7 @@ const CardPage = ({ params }: CardPageProps) => {
                                 {!cardData ? (
                                     <Description.Skeleton />
                                 ) : (
-                                    <Description data={cardData} />
+                                    <Description data={cardData} readonly={readonly} />
                                 )}
                                 {!cardData ? (
                                     <Tasks.Skeleton />
@@ -131,7 +135,7 @@ const CardPage = ({ params }: CardPageProps) => {
                                                 </TabsTrigger>
                                             </TabsList>
                                             <TabsContent value="comments">
-                                                <Comments items={commentsData} cardId={cardData?.id ?? ''} />
+                                                <Comments items={commentsData} cardId={cardData?.id ?? ''} readonly={readonly} />
                                             </TabsContent>
                                             <TabsContent value="logs">
                                                 {!auditLogsData ? (
@@ -149,10 +153,13 @@ const CardPage = ({ params }: CardPageProps) => {
                             <Description.Skeleton />
                         ) : (
                             <div>
+                                <div className="mb-2 flex items-center justify-end w-full">
+                                    <Actions card={cardData} readonly={readonly} />
+                                </div>
                                 <Details card={cardData} />
-                                <TagsComponent data={cardData} availableTags={availableTags ?? []} />
-                                <Priority data={cardData} />
-                                <DateComponent card={cardData} />
+                                <TagsComponent data={cardData} availableTags={availableTags ?? []} readonly={readonly} />
+                                <Priority data={cardData} readonly={readonly} />
+                                <DateComponent card={cardData} readonly={readonly} />
                             </div>
                         )}
                     </div>

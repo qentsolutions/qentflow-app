@@ -12,9 +12,10 @@ import { Card, CardContent } from "@/components/ui/card";
 
 interface DateManagerProps {
     card: CardWithList;
+    readonly?: boolean;
 }
 
-const DateComponent: React.FC<DateManagerProps> = ({ card }) => {
+const DateComponent: React.FC<DateManagerProps> = ({ card, readonly = false }) => {
     const params = useParams();
     const { currentWorkspace } = useCurrentWorkspace();
     const queryClient = useQueryClient();
@@ -64,6 +65,7 @@ const DateComponent: React.FC<DateManagerProps> = ({ card }) => {
                             <input
                                 type="date"
                                 className="flex h-10 mt-1 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled={readonly}
                                 value={card.startDate ? new Date(card.startDate).toISOString().split("T")[0] : ""}
                                 onChange={(e) => {
                                     const date = e.target.value ? new Date(e.target.value) : null;
@@ -81,6 +83,7 @@ const DateComponent: React.FC<DateManagerProps> = ({ card }) => {
                                 type="date"
                                 className="flex mt-1 h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                 value={card.dueDate ? new Date(card.dueDate).toISOString().split("T")[0] : ""}
+                                disabled={readonly}
                                 onChange={(e) => {
                                     const date = e.target.value ? new Date(e.target.value) : null;
                                     updateDates(card.startDate ? new Date(card.startDate) : null, date);

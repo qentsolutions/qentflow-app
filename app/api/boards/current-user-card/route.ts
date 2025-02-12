@@ -33,13 +33,14 @@ export async function GET(req: Request) {
             board: {
               select: {
                 title: true,
+                workspaceId: true,
               },
             },
           },
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
 

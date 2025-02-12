@@ -13,10 +13,12 @@ import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 
 interface HeaderProps {
   data: CardWithList;
+  readonly?: boolean;
 }
 
 export const Header = ({
   data,
+  readonly = false
 }: HeaderProps) => {
   const queryClient = useQueryClient();
   const params = useParams();
@@ -81,24 +83,33 @@ export const Header = ({
   return (
     <div className="flex items-start gap-x-3 mb-6 w-full">
       <div className="w-full">
-        <form action={onSubmit}>
-          {isEditing ? (
-            <FormInput
-              ref={inputRef}
-              onBlur={onBlur} // Add onBlur to handle losing focus
-              id="title"
-              defaultValue={title}
-              className="font-semibold !text-2xl px-1 text-neutral-700 dark:text-white bg-transparent border-transparent relative -left-1.5 w-[95%] focus-visible:bg-white dark:focus-visible:bg-gray-700 focus-visible:border-input mb-0.5"
-            />
-          ) : (
-            <p
-              onClick={handleEditClick}
-              className="font-semibold text-2xl px-1 text-neutral-700 dark:text-white cursor-pointer"
-            >
-              {title}
-            </p>
-          )}
-        </form>
+        {readonly ? (
+          <p
+            className="font-semibold text-2xl px-1 text-neutral-700 dark:text-white cursor-pointer"
+          >
+            {title}
+          </p>
+        ) : (
+          <form action={onSubmit}>
+            {isEditing ? (
+              <FormInput
+                ref={inputRef}
+                onBlur={onBlur} // Add onBlur to handle losing focus
+                id="title"
+                defaultValue={title}
+                className="font-semibold !text-2xl px-1 text-neutral-700 dark:text-white bg-transparent border-transparent relative -left-1.5 w-[95%] focus-visible:bg-white dark:focus-visible:bg-gray-700 focus-visible:border-input mb-0.5"
+              />
+            ) : (
+              <p
+                onClick={handleEditClick}
+                className="font-semibold text-2xl px-1 text-neutral-700 dark:text-white cursor-pointer"
+              >
+                {title}
+              </p>
+            )}
+          </form>
+        )}
+
       </div>
     </div>
   );

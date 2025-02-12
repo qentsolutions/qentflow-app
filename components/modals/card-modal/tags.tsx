@@ -1,3 +1,5 @@
+"use client";
+
 import { toast } from "sonner";
 import { Copy, Trash, Check, Plus, X, PlusCircle, Info, Pencil, UserPlus, ChevronDown, UserRound, Tags, Pen } from 'lucide-react';
 import { useParams } from "next/navigation";
@@ -28,11 +30,13 @@ import { cn } from "@/lib/utils";
 interface MainComponentProps {
   data: CardWithList;
   availableTags: { id: string; name: string; color: string }[];
+  readonly?: boolean;
 }
 
 export const TagsComponent = ({
   data,
   availableTags,
+  readonly = false,
 }: MainComponentProps) => {
   const params = useParams();
   const cardModal = useCardModal();
@@ -44,7 +48,7 @@ export const TagsComponent = ({
   const [linkedTags, setLinkedTags] = useState<string[]>(data.tags.map(tag => tag.name));
   const boardId = params.boardId as string;
 
-  const { data: usersInBoard } = useQuery({
+  const { data: usersInBoard, isLoading: isLoadingUsers, isError: isErrorUsers } = useQuery({
     queryKey: ["usersInBoard", boardId],
     queryFn: () => fetcher(`/api/boards/assigned-user?boardId=${boardId}`),
   });
@@ -148,70 +152,86 @@ export const TagsComponent = ({
     }
   };
 
+  if (isLoadingUsers) {
+    return <Skeleton className="h-6 w-full" />;
+  }
+
+  if (isErrorUsers) {
+    return <p>Failed to load board users.</p>;
+  }
+
   return (
     <Card className="mt-4 shadow-none">
       <CardContent className="h-full pb-8">
         <div className="space-y-2 mt-4">
-          <p className="text-lg font-semibold flex items-center gap-x-2 "><UserRound size={16} /> Assigned</p>
-          <Select
-            value={assignedUser?.id || "none"}
-            onValueChange={(value) => handleAssignUser(value === "none" ? null : value)}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue>
-                {assignedUser ? (
-                  <div className="flex items-center gap-x-2">
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage src={assignedUser.image || ""} />
-                      <AvatarFallback>{assignedUser.name?.charAt(0) || <UserIcon className="h-4 w-4" />}</AvatarFallback>
-                    </Avatar>
-                    <span>{assignedUser.name}</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-x-2 ml-1">
-                    <UserPlus className="h-4 w-4" />
-                    <span>Assign User</span>
-                  </div>)}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">
-                <div className="flex items-center gap-x-2 ml-1">
-                  <UserX className="h-4 w-4" />
-                  <span>Unassign</span>
-                </div>
-              </SelectItem>
-              {usersInBoard?.map((user: User) => (
-                <SelectItem key={user.id!} value={user.id!}>
-                  <div className="flex items-center gap-x-2">
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage src={user.image || ""} />
-                      <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <span>{user.name}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
+          {readonly ? (
+            <></>
+          ) : (
+            <div>
+              <p className="text-lg font-semibold flex items-center gap-x-2 "><UserRound size={16} /> Assigned</p>
+              <Select
+                value={assignedUser?.id || "none"}
+                onValueChange={(value) => handleAssignUser(value === "none" ? null : value)}
+                disabled={readonly}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue>
+                    {assignedUser ? (
+                      <div className="flex items-center gap-x-2">
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage src={assignedUser.image || ""} />
+                          <AvatarFallback>{assignedUser.name?.charAt(0) || <UserIcon className="h-4 w-4" />}</AvatarFallback>
+                        </Avatar>
+                        <span>{assignedUser.name}</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-x-2 ml-1">
+                        <UserPlus className="h-4 w-4" />
+                        <span>Assign User</span>
+                      </div>)}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">
+                    <div className="flex items-center gap-x-2 ml-1">
+                      <UserX className="h-4 w-4" />
+                      <span>Unassign</span>
+                    </div>
+                  </SelectItem>
+                  {Array.isArray(usersInBoard) && usersInBoard.map((user: User) => (
+                    <SelectItem key={user.id!} value={user.id!}>
+                      <div className="flex items-center gap-x-2">
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage src={user.image || ""} />
+                          <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <span>{user.name}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="space-y-2">
             <div className="flex items-center">
               <p className="text-lg font-semibold mt-2 flex items-center gap-x-2"><Tags size={16} /> Tags</p>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Info size={14} className="ml-2 cursor-pointer" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-sm text-muted-foreground">
-                    Add tags to categorize your cards.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
+              {!readonly && (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Info size={14} className="ml-2 cursor-pointer" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-sm text-muted-foreground">
+                      Add tags to categorize your cards.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
             </div>
             <div
-              className={`relative border rounded-md p-2 mx-1 bg-gray-50 dark:bg-gray-700 cursor-pointer group ${isEditMode ? "ring-2 ring-blue-500" : ""}`}
-              onClick={() => setIsEditMode((prev) => !prev)}
+              className={`relative rounded-md ${readonly ? 'bg-background' : 'bg-gray-50 border p-2 mx-1'}  dark:bg-gray-700 cursor-pointer group ${isEditMode ? "ring-2 ring-blue-500" : ""}`}
+              onClick={() => !readonly && setIsEditMode((prev) => !prev)}
             >
               <div className="flex flex-wrap gap-2">
                 {linkedTags.length === 0 ? (
@@ -228,35 +248,39 @@ export const TagsComponent = ({
                         style={{ backgroundColor: tag.color }}
                       >
                         {tag.name}
-                        <button
-                          className="absolute -right-2 -top-2 h-4 w-4 bg-white rounded-full flex items-center justify-center shadow-lg border opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onRemoveTag(tag.id);
-                          }}
-                        >
-                          <X size={10} className="text-black" />
-                        </button>
+                        {!readonly && (
+                          <button
+                            className="absolute -right-2 -top-2 h-4 w-4 bg-white rounded-full flex items-center justify-center shadow-lg border opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onRemoveTag(tag.id);
+                            }}
+                          >
+                            <X size={10} className="text-black" />
+                          </button>
+                        )}
                       </Badge>
                     );
                   })
                 )}
               </div>
 
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
-                  className="flex items-center justify-center text-gray-400 hover:text-gray-600"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsEditMode((prev) => !prev);
-                  }}
-                >
-                  {isEditMode ? <Check size={14} /> : <Pencil size={14} />}
-                </button>
-              </div>
+              {!readonly && (
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    className="flex items-center justify-center text-gray-400 hover:text-gray-600"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsEditMode((prev) => !prev);
+                    }}
+                  >
+                    {isEditMode ? <Check size={14} /> : <Pencil size={14} />}
+                  </button>
+                </div>
+              )}
             </div>
 
-            {isEditMode && (
+            {isEditMode && !readonly && (
               <Select
                 value={selectedTag || ""}
                 onValueChange={(value) => {

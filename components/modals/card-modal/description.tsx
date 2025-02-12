@@ -20,9 +20,10 @@ import FontSize from "tiptap-extension-font-size";
 
 interface DescriptionProps {
   data: CardWithList;
+  readonly?: boolean;
 }
 
-export const Description = ({ data }: DescriptionProps) => {
+export const Description = ({ data, readonly = false }: DescriptionProps) => {
   const params = useParams();
   const queryClient = useQueryClient();
   const { currentWorkspace } = useCurrentWorkspace();
@@ -100,32 +101,41 @@ export const Description = ({ data }: DescriptionProps) => {
         <span className="flex items-center font-bold text-lg mb-4">
           <TextAlignLeftIcon className="mr-2" /> Description
         </span>
-        {isEditing ? (
-          <form onSubmit={onSubmit} ref={formRef} className="space-y-2">
-            <RichTextEditor content={description} onChange={setDescription} />
-            <div className="flex items-center gap-x-2">
-              <Button
-                type="submit"
-                className="bg-blue-500 text-white hover:bg-blue-700 hover:text-white"
-              >
-                Save
-              </Button>
-              <Button
-                type="button"
-                onClick={disableEditing}
-                size="sm"
-                variant="ghost"
-              >
-                Cancel
-              </Button>
-            </div>
-          </form>
-        ) : (
+        {readonly ? (
           <EditorContent
-            onClick={enableEditing}
             editor={readOnlyEditor}
             className="prose max-w-none p-4 bg-gray-50 rounded-lg border cursor-pointer"
           />
+        ) : (
+          <>
+            {isEditing ? (
+              <form onSubmit={onSubmit} ref={formRef} className="space-y-2">
+                <RichTextEditor content={description} onChange={setDescription} />
+                <div className="flex items-center gap-x-2">
+                  <Button
+                    type="submit"
+                    className="bg-blue-500 text-white hover:bg-blue-700 hover:text-white"
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={disableEditing}
+                    size="sm"
+                    variant="ghost"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            ) : (
+              <EditorContent
+                onClick={enableEditing}
+                editor={readOnlyEditor}
+                className="prose max-w-none p-4 bg-gray-50 rounded-lg border cursor-pointer"
+              />
+            )}
+          </>
         )}
       </div>
     </div>
