@@ -20,6 +20,7 @@ import {
     SignalMedium,
     SignalHigh,
     AlertTriangle,
+    Signal,
 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
@@ -234,13 +235,14 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                             <div className="flex items-center gap-x-2">
                                                                 <TargetIcon size={14} />
-                                                                Task Name
+                                                                Title
                                                             </div>
                                                         </th>
                                                     )}
                                                     {visibleFields.priority && (
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                             <div className="flex items-center gap-x-2">
+                                                                <Signal size={14} />
                                                                 Priority
                                                             </div>
                                                         </th>
@@ -277,8 +279,8 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                             </div>
                                                         </th>
                                                     )}
-                                                   
-                                                 
+
+
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                                                 </tr>
                                             </thead>
@@ -424,7 +426,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                                             </div>
                                                                         </td>
                                                                     )}
-                                                                   
+
                                                                     <td
                                                                         className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
                                                                         onClick={(e) => e.stopPropagation()}

@@ -141,12 +141,15 @@ export const AutomationTemplates = ({
                                     <button
                                         onClick={() => scrollToCategory(category.id)}
                                         className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all flex justify-between items-center ${activeCategory === category.id
-                                                ? "bg-blue-100 text-blue-600 font-medium"
-                                                : "text-gray-600 hover:bg-gray-200"
+                                            ? "bg-blue-100 text-blue-800 font-medium"
+                                            : "text-gray-600 hover:text-blue-800"
                                             }`}
                                     >
                                         <span>{category.label}</span>
-                                        <span className="bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full text-xs">
+                                        <span className={` px-2 py-0.5 rounded-full text-xs ${activeCategory === category.id
+                                            ? "bg-white text-blue-800 font-medium"
+                                            : "text-gray-600 bg-blue-100"
+                                            }`}>
                                             {getTemplateCount(category.id)}
                                         </span>
                                     </button>
@@ -204,7 +207,7 @@ export const AutomationTemplates = ({
                     ))}
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

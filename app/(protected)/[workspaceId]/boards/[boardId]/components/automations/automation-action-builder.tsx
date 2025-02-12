@@ -11,14 +11,15 @@ import { Board } from "@prisma/client";
 import { fetcher } from "@/lib/fetcher";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 const ACTION_CATEGORIES = [
     {
         label: "Card Actions",
         actions: [
             { value: "UPDATE_CARD_STATUS", label: "Update card status", icon: Edit },
-            { value: "MOVE_CARD", label: "Move card to another board", icon: ArrowRight },
-            { value: "UPDATE_CARD_PRIORITY", label: "Update card priority", icon: Edit }
+            { value: "UPDATE_CARD_PRIORITY", label: "Update card priority", icon: Edit },
+            { value: "MOVE_CARD", label: "Move card to another board", icon: ArrowRight, disabled: true },
         ]
     },
     {
@@ -463,10 +464,11 @@ export const AutomationActionBuilder = ({
                                                                         {category.label}
                                                                     </div>
                                                                     {category.actions.map((type) => (
-                                                                        <SelectItem key={type.value} value={type.value}>
+                                                                        <SelectItem key={type.value} value={type.value} disabled={type.disabled}>
                                                                             <div className="flex items-center gap-2 ml-2">
                                                                                 <type.icon className="h-4 w-4" />
                                                                                 {type.label}
+                                                                                {type.disabled ? (<Badge variant={"outline"}>Disabled</Badge>) : (<></>)}
                                                                             </div>
                                                                         </SelectItem>
                                                                     ))}
@@ -514,7 +516,7 @@ const DynamicBoardLists = ({ boardId, onListSelect }: { boardId: string; onListS
         enabled: !!boardId,
     });
 
-  
+
     if (isLoading) {
         return <SelectItem value="loading">Loading lists...</SelectItem>;
     }

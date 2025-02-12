@@ -92,8 +92,8 @@ export const CreateAutomationForm = ({ onClose, board, template }: CreateAutomat
         <Card className="h-full">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg font-medium">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
-                <Sparkles className="h-4 w-4 text-primary" />
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100">
+                <Sparkles className="h-4 w-4 text-blue-600" />
               </div>
               When this happens...
             </CardTitle>
@@ -109,17 +109,17 @@ export const CreateAutomationForm = ({ onClose, board, template }: CreateAutomat
           </CardContent>
         </Card>
 
-        <div className="hidden lg:flex flex-col items-center justify-center mt-20">
-          <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center">
-            <ArrowRight className="h-8 w-8 text-background" />
+        <div className="flex items-center justify-center pt-20">
+          <div className="w-12 h-12 rounded-lg border shadow-sm bg-white flex items-center justify-center">
+            <ArrowRight className="h-6 w-6 text-muted-foreground" />
           </div>
         </div>
 
         <Card className="h-full">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg font-medium">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
-                <Zap className="h-4 w-4 text-primary" />
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100">
+                <Zap className="h-4 w-4 text-blue-600" />
               </div>
               Do this...
             </CardTitle>

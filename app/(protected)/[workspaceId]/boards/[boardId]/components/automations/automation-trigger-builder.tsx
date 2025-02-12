@@ -24,14 +24,15 @@ import {
     Goal,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 const TRIGGER_CATEGORIES = [
     {
         label: "Card Actions",
         triggers: [
             { value: "CARD_CREATED", label: "When a card is created", icon: FilePlus2 },
-            { value: "CARD_MOVED", label: "When a card is moved between lists", icon: ArrowRight },
-            { value: "CARD_UPDATED", label: "When a card is updated", icon: Edit },
+            { value: "CARD_MOVED", label: "When a card is moved between lists", icon: ArrowRight, disabled: true },
+            { value: "CARD_UPDATED", label: "When the card's description is updated", icon: Edit },
             { value: "CARD_ASSIGNED", label: "When a card is assigned", icon: UserPlus },
         ],
     },
@@ -187,10 +188,11 @@ export const AutomationTriggerBuilder = ({
                         <div key={category.label} className="mb-2">
                             <div className="text-sm font-medium m-1 text-gray-600 uppercase">{category.label}</div>
                             {category.triggers.map((type) => (
-                                <SelectItem key={type.value} value={type.value}>
+                                <SelectItem key={type.value} value={type.value} disabled={type.disabled}>
                                     <div className="flex items-center gap-2 ml-2">
                                         <type.icon className="h-4 w-4" />
                                         {type.label}
+                                        {type.disabled ? (<Badge variant={"outline"}>Disabled</Badge>) : (<></>)}
                                     </div>
                                 </SelectItem>
                             ))}

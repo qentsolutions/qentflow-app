@@ -2,7 +2,7 @@
 
 import { ViewSwitcher, type ViewType } from "./view-switcher";
 import { KanbanView } from "./kanban-view";
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
 import {
@@ -45,7 +45,9 @@ interface BoardContentProps {
 }
 
 export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
-  const [selectedView, setSelectedView] = useState<ViewType>("kanban");
+  // Récupérer la vue sauvegardée depuis le localStorage ou utiliser "kanban" par défaut
+  const initialView = typeof window !== "undefined" ? localStorage.getItem("selectedView") || "kanban" : "kanban";
+  const [selectedView, setSelectedView] = useState<ViewType>(initialView as ViewType);
   const [tagSearchTerm, setTagSearchTerm] = useState("");
   const [userSearchTerm, setUserSearchTerm] = useState("");
   const [isCreateTagOpen, setIsCreateTagOpen] = useState(false);
@@ -164,6 +166,13 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
       [field]: !prev[field],
     }));
   };
+
+  // Sauvegarder la vue sélectionnée dans le localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("selectedView", selectedView);
+    }
+  }, [selectedView]);
 
   return (
     <>
@@ -310,7 +319,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
           </Popover>
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-9 px-3 gap-1">
+              <Button variant="outline" size="sm" className="h-9 px-3 gap-1 p-4">
                 <ArrowUpDown className="h-4 w-4" />
                 Sort
                 {sortBy && (
@@ -321,9 +330,12 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[200px] p-0" align="start">
-              <div className="p-2">
-                <p className="font-medium mb-2 text-sm ml-1">Sort by</p>
-                <Separator className="mb-2" />
+              <div className="p-4">
+                <div className="flex items-center justify-between">
+                  <p className="font-medium text-sm ml-1">Sort by</p>
+                  <ArrowUpDown className="h-4 w-4" />
+                </div>
+                <Separator className="my-2" />
                 <div className="space-y-1">
                   {sortOptions.map((option) => (
                     <Button
@@ -354,8 +366,12 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-[200px]" align="start">
-                <div className="p-2">
-                  <p className="font-medium mb-2">Visible Fields</p>
+                <div>
+                  <div className="flex items-center justify-between">
+                    <p className="font-medium text-sm ml-1">Visible Fields</p>
+                    <Settings2 className="h-4 w-4" />
+                  </div>
+                  <Separator className="my-2" />
                   <div className="space-y-2">
                     {Object.entries(visibleFields).map(([field, isVisible]) => (
                       <div key={field} className="flex items-center space-x-2">

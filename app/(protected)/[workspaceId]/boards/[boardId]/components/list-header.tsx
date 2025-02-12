@@ -84,7 +84,7 @@ export const ListHeader = ({ data, onAddCard }: ListHeaderProps) => {
 
   return (
     <div className="pt-2 pb-1 px-2 text-sm font-semibold flex justify-between items-center">
-      <div className="flex-1 flex items-center gap-x-2">
+      <div className="flex-1 flex ittems-center gap-x-2">
         {isEditing ? (
           <form ref={formRef} action={handleSubmit} className="flex-1 px-[2px]">
             <input hidden id="id" name="id" value={data.id} />
