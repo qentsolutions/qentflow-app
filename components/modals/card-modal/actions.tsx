@@ -78,14 +78,16 @@ export const Actions = ({ card, boardId, readonly = false }: ActionsProps) => {
 
   return (
     <div className="flex items-center gap-2">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={onExpand}
-        className="text-muted-foreground hover:text-foreground"
-      >
-        <Expand className="h-4 w-4" />
-      </Button>
+      {!readonly && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onExpand}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <Expand className="h-4 w-4" />
+        </Button>
+      )}
       {!readonly && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

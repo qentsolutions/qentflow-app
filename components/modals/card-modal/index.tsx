@@ -117,7 +117,7 @@ export const CardModal = () => {
                       cardId={cardData?.id || ""}
                       workspaceId={currentWorkspace?.id!}
                     />
-                    <div className="space-y-3 mt-2">
+                    <div className="space-y-3">
                       {!cardData ? (
                         <Description.Skeleton />
                       ) : (
@@ -172,6 +172,7 @@ export const CardModal = () => {
                       <span className="font-bold text-lg flex items-center">
                         <Paperclip size={12} className="mr-2" /> Attachments
                       </span>
+                      
                       <Dialog>
                         <DialogTrigger>
                           <Button className="border-none shadow-none" variant={"outline"}>

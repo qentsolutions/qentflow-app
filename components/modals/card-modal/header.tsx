@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 import { ElementRef, useRef, useState } from "react";
-import { Layout, Text } from "lucide-react";
-import { useParams } from "next/navigation";
+import { Edit, Eye, Layout, Text } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { CardWithList } from "@/types";
@@ -10,6 +10,7 @@ import { updateCard } from "@/actions/tasks/update-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormInput } from "@/components/form/form-input";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
+import { Button } from "@/components/ui/button";
 
 interface HeaderProps {
   data: CardWithList;
@@ -23,6 +24,7 @@ export const Header = ({
   const queryClient = useQueryClient();
   const params = useParams();
   const { currentWorkspace } = useCurrentWorkspace();
+  const router = useRouter();
 
   const { execute } = useAction(updateCard, {
     onSuccess: (data) => {
@@ -80,15 +82,39 @@ export const Header = ({
     setIsEditing(true); // Switch to edit mode on click
   };
 
+  const onExpand = () => {
+    router.push(`/${currentWorkspace?.id}/boards/${params.boardId}/cards/${data.id}`)
+  }
+
   return (
     <div className="flex items-start gap-x-3 mb-6 w-full">
       <div className="w-full">
         {readonly ? (
-          <p
-            className="font-semibold text-2xl px-1 text-neutral-700 dark:text-white cursor-pointer"
-          >
-            {title}
-          </p>
+          <div className="flex items-center justify-between">
+            <p
+              className="font-semibold text-2xl px-1 text-neutral-700 dark:text-white cursor-pointer"
+            >
+              {title}
+            </p>
+            <div className="flex items-center gap-x-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs bg-blue-100 text-blue-700 hover:text-foreground hover:bg-blue-100 hover:text-blue-700"
+              >
+                read-only <Eye className="h-4 w-4" />
+              </Button>
+              <div className="w-[1px] h-5 bg-gray-500" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onExpand}
+                className="text-muted-foreground hover:text-blue-700"
+              >
+                Edit <Edit className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         ) : (
           <form action={onSubmit}>
             {isEditing ? (

@@ -16,9 +16,15 @@ import { Priority } from "@/components/modals/card-modal/priority";
 import { Tasks } from "@/components/modals/card-modal/tasks";
 import { TagsComponent } from "@/components/modals/card-modal/tags";
 import DateComponent from "@/components/modals/card-modal/date";
-import { ActivityIcon, FileText, MessageSquareText, Logs } from "lucide-react";
+import { ActivityIcon, FileText, MessageSquareText, Logs, ExternalLink, Paperclip, Plus, Trash2 } from "lucide-react";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
 import { Actions } from "@/components/modals/card-modal/actions";
+import { Card } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { FileUpload } from "@/components/file-upload";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 {/* 
 interface CardPageProps {
@@ -35,6 +41,7 @@ const CardPage = ({ params, readonly }: any) => {
     const { currentWorkspace } = useCurrentWorkspace();
     const [isDocumentSelectorOpen, setIsDocumentSelectorOpen] = useState(false);
     const { setBreadcrumbs } = useBreadcrumbs();
+    const [visibleDocuments, setVisibleDocuments] = useState(2); // Modification 1
 
     const { data: cardData } = useQuery({
         queryKey: ["card", params.cardId],
@@ -61,6 +68,12 @@ const CardPage = ({ params, readonly }: any) => {
         queryFn: () => fetcher(`/api/boards/tags?boardId=${params.boardId}`),
     });
 
+    const { data: attachments, refetch: refetchAttachments } = useQuery({
+        queryKey: ["card-attachments", params.cardId],
+        queryFn: () => fetcher(`/api/cards/${params.cardId}/attachments`),
+    });
+
+
     useEffect(() => {
         if (boardData && cardData) {
             setBreadcrumbs([
@@ -73,9 +86,15 @@ const CardPage = ({ params, readonly }: any) => {
 
     if (!params.boardId) return null;
 
+    const handleDocumentClick = (documentId: string) => {
+        window.open(`/${currentWorkspace?.id}/documents/${documentId}`, '_blank');
+    };
+
     if (!cardData || !boardData) {
         return <div></div>;
     }
+
+
 
     return (
         <div className="flex h-full bg-gray-50">
@@ -94,59 +113,356 @@ const CardPage = ({ params, readonly }: any) => {
                                 ) : (
                                     <Description data={cardData} readonly={readonly} />
                                 )}
-                                {!cardData ? (
-                                    <Tasks.Skeleton />
-                                ) : (
-                                    <Tasks cardId={cardData.id} />
-                                )}
-                                {!cardData ? (
-                                    <AttachmentList.Skeleton />
-                                ) : (
-                                    <div className="flex items-start space-x-8">
-                                        <div className="w-1/2">
-                                            <div className="flex items-center justify-between">
-                                                <span className="font-bold text-lg flex items-center">
-                                                    <FileText size={12} className="mr-2" /> Documents
-                                                </span>
+                                {readonly ? (
+                                    <div>
+                                        {!cardData ? (
+                                            <AttachmentList.Skeleton />
+                                        ) : (
+                                            <div className="flex items-start space-x-8">
+                                                <div className="w-1/2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="font-bold text-lg flex items-center">
+                                                            <FileText size={12} className="mr-2" /> Documents
+                                                        </span>
+                                                    </div>
+                                                    <DocumentSelector
+                                                        isOpen={isDocumentSelectorOpen}
+                                                        onClose={() => setIsDocumentSelectorOpen(false)}
+                                                        cardId={cardData?.id || ""}
+                                                        workspaceId={currentWorkspace?.id!}
+                                                    />
+                                                    <div className="space-y-3 mt-2">
+                                                        {!cardData ? (
+                                                            <Description.Skeleton />
+                                                        ) : (
+                                                            <div className="space-y-2">
+                                                                {cardData?.documents && cardData.documents.length > 0 ? (
+                                                                    <>
+                                                                        {cardData.documents.slice(0, visibleDocuments).map((doc: any) => (
+                                                                            <Card
+                                                                                key={doc.id}
+                                                                                className="p-3 hover:bg-gray-100 shadow-none dark:hover:bg-gray-800 cursor-pointer transition"
+                                                                                onClick={() => handleDocumentClick(doc.id)}
+                                                                            >
+                                                                                <div className="flex items-center justify-between gap-2">
+                                                                                    <div className="flex items-center gap-x-2">
+                                                                                        <FileText className="h-4 w-4 text-blue-500" />
+                                                                                        <Tooltip>
+                                                                                            <TooltipTrigger>
+                                                                                                <div className="truncate max-w-[250px]">
+                                                                                                    <p className="font-medium text-sm">{doc.title}</p>
+                                                                                                </div>
+                                                                                            </TooltipTrigger>
+                                                                                            <TooltipContent>
+                                                                                                <p className="font-medium text-sm">{doc.title}</p>
+                                                                                            </TooltipContent>
+                                                                                        </Tooltip>
+                                                                                    </div>
+                                                                                    <ExternalLink className="h-4 w-4 text-blue-500" />
+                                                                                </div>
+                                                                            </Card>
+                                                                        ))}
+                                                                        {cardData.documents.length > 2 && ( // Modification 2
+                                                                            <Button
+                                                                                variant="ghost"
+                                                                                size="sm"
+                                                                                onClick={() => setVisibleDocuments(prev => prev === 2 ? cardData.documents.length : 2)}
+                                                                                className="w-full mt-2 text-blue-500 hover:text-blue-600"
+                                                                            >
+                                                                                {visibleDocuments === 2 ? `See more (${cardData.documents.length - 2})` : 'See less'}
+                                                                            </Button>
+                                                                        )}
+                                                                    </>
+                                                                ) : (
+                                                                    <div className="text-gray-700 text-xs py-1">No documents linked.</div>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="w-1/2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="font-bold text-lg flex items-center">
+                                                            <Paperclip size={12} className="mr-2" /> Attachments
+                                                        </span>
+                                                        {!readonly && (
+                                                            <Dialog>
+                                                                <DialogTrigger>
+                                                                    <Button className="border-none shadow-none" variant={"outline"}>
+                                                                        <Plus />
+                                                                    </Button>
+                                                                </DialogTrigger>
+                                                                <DialogContent>
+                                                                    <DialogTitle>Add Attachment to Card</DialogTitle>
+                                                                    <FileUpload
+                                                                        cardId={cardData?.id || ""}
+                                                                        workspaceId={currentWorkspace?.id!}
+                                                                        onUploadComplete={() => {
+                                                                            refetchAttachments();
+                                                                        }}
+                                                                    />
+                                                                    <p className="text-lg font-semibold">All Attachments</p>
+                                                                    <ScrollArea className="h-56">
+                                                                        <div className="space-y-2">
+                                                                            {attachments && attachments.length > 0 ? (
+                                                                                attachments.map((attachment: any) => (
+                                                                                    <Card key={attachment.id} className="p-3 flex items-center justify-between">
+                                                                                        <div className="flex items-center space-x-3">
+                                                                                            {(attachment.type)}
+                                                                                            <div>
+                                                                                                <Tooltip>
+                                                                                                    <TooltipTrigger>
+                                                                                                        <a
+                                                                                                            href={attachment.url}
+                                                                                                            target="_blank"
+                                                                                                            rel="noopener noreferrer"
+                                                                                                            className="text-blue-500 hover:underline font-medium"
+                                                                                                        >
+                                                                                                            {attachment.name.length > 20 ? `${attachment.name.substring(0, 40)}...` : attachment.name}
+                                                                                                        </a>
+                                                                                                    </TooltipTrigger>
+                                                                                                    <TooltipContent>
+                                                                                                        <p>{attachment.name}</p>
+                                                                                                    </TooltipContent>
+                                                                                                </Tooltip>
+
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <Button
+                                                                                            variant="ghost"
+                                                                                            size="icon"
+                                                                                            onClick={() => { }}
+                                                                                        >
+                                                                                            <Trash2 size={16} className="text-red-500" />
+                                                                                        </Button>
+                                                                                    </Card>
+                                                                                ))
+                                                                            ) : (
+                                                                                <div className="text-gray-700 text-xs">No attachments found.</div>
+                                                                            )}
+                                                                        </div>
+                                                                    </ScrollArea>
+
+
+                                                                </DialogContent>
+                                                            </Dialog>
+                                                        )}
+
+                                                    </div>
+
+                                                    <div className="space-y-3 mt-2 mb-4">
+                                                        {!cardData ? (
+                                                            <Description.Skeleton />
+                                                        ) : (
+                                                            <AttachmentList cardId={cardData?.id || ""} readonly={readonly} />
+                                                        )}
+                                                    </div>
+                                                </div>
+
                                             </div>
-                                            <DocumentSelector
-                                                isOpen={isDocumentSelectorOpen}
-                                                onClose={() => setIsDocumentSelectorOpen(false)}
-                                                cardId={cardData?.id || ""}
-                                                workspaceId={currentWorkspace?.id!}
-                                            />
-                                        </div>
+                                        )}
+                                        {!cardData ? (
+                                            <Tasks.Skeleton />
+                                        ) : (
+                                            <Tasks cardId={cardData.id} />
+                                        )}
                                     </div>
-                                )}
-                                {!commentsData ? (
-                                    <Comments.Skeleton />
                                 ) : (
                                     <div>
-                                        <span className="font-bold text-lg flex items-center">
-                                            <ActivityIcon size={12} className="mr-2" /> Activity
-                                        </span>
-                                        <Tabs defaultValue="comments">
-                                            <TabsList>
-                                                <TabsTrigger value="comments">
-                                                    <MessageSquareText size={12} className="mr-1" /> Comments
-                                                </TabsTrigger>
-                                                <TabsTrigger value="logs">
-                                                    <Logs size={12} className="mr-1" /> Logs
-                                                </TabsTrigger>
-                                            </TabsList>
-                                            <TabsContent value="comments">
-                                                <Comments items={commentsData} cardId={cardData?.id ?? ''} readonly={readonly} />
-                                            </TabsContent>
-                                            <TabsContent value="logs">
-                                                {!auditLogsData ? (
-                                                    <Activity.Skeleton />
-                                                ) : (
-                                                    <Activity items={auditLogsData} />
-                                                )}
-                                            </TabsContent>
-                                        </Tabs>
+                                        {!cardData ? (
+                                            <Tasks.Skeleton />
+                                        ) : (
+                                            <Tasks cardId={cardData.id} />
+                                        )}
+                                        {!cardData ? (
+                                            <AttachmentList.Skeleton />
+                                        ) : (
+                                            <div className="flex items-start space-x-8 mt-8">
+                                                <div className="w-1/2 mt-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="font-bold text-lg flex items-center">
+                                                            <FileText size={12} className="mr-2" /> Documents
+                                                        </span>
+                                                        <Button
+                                                            className="border-none shadow-none"
+                                                            variant="outline"
+                                                            onClick={() => setIsDocumentSelectorOpen(true)}
+                                                        >
+                                                            <Plus />
+                                                        </Button>
+                                                    </div>
+                                                    <DocumentSelector
+                                                        isOpen={isDocumentSelectorOpen}
+                                                        onClose={() => setIsDocumentSelectorOpen(false)}
+                                                        cardId={cardData?.id || ""}
+                                                        workspaceId={currentWorkspace?.id!}
+                                                    />
+                                                    <div className="space-y-3 mt-2">
+                                                        {!cardData ? (
+                                                            <Description.Skeleton />
+                                                        ) : (
+                                                            <div className="space-y-2">
+                                                                {cardData?.documents && cardData.documents.length > 0 ? (
+                                                                    <>
+                                                                        {cardData.documents.slice(0, visibleDocuments).map((doc: any) => (
+                                                                            <Card
+                                                                                key={doc.id}
+                                                                                className="p-3 hover:bg-gray-100 shadow-none dark:hover:bg-gray-800 cursor-pointer transition"
+                                                                                onClick={() => handleDocumentClick(doc.id)}
+                                                                            >
+                                                                                <div className="flex items-center justify-between gap-2">
+                                                                                    <div className="flex items-center gap-x-2">
+                                                                                        <FileText className="h-4 w-4 text-blue-500" />
+                                                                                        <Tooltip>
+                                                                                            <TooltipTrigger>
+                                                                                                <div className="truncate max-w-[250px]">
+                                                                                                    <p className="font-medium text-sm">{doc.title}</p>
+                                                                                                </div>
+                                                                                            </TooltipTrigger>
+                                                                                            <TooltipContent>
+                                                                                                <p className="font-medium text-sm">{doc.title}</p>
+                                                                                            </TooltipContent>
+                                                                                        </Tooltip>
+                                                                                    </div>
+                                                                                    <ExternalLink className="h-4 w-4 text-blue-500" />
+                                                                                </div>
+                                                                            </Card>
+                                                                        ))}
+                                                                        {cardData.documents.length > 2 && ( // Modification 2
+                                                                            <Button
+                                                                                variant="ghost"
+                                                                                size="sm"
+                                                                                onClick={() => setVisibleDocuments(prev => prev === 2 ? cardData.documents.length : 2)}
+                                                                                className="w-full mt-2 text-blue-500 hover:text-blue-600"
+                                                                            >
+                                                                                {visibleDocuments === 2 ? `See more (${cardData.documents.length - 2})` : 'See less'}
+                                                                            </Button>
+                                                                        )}
+                                                                    </>
+                                                                ) : (
+                                                                    <div className="text-gray-700 text-xs py-1">No documents linked.</div>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="w-1/2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="font-bold text-lg flex items-center">
+                                                            <Paperclip size={12} className="mr-2" /> Attachments
+                                                        </span>
+                                                        {!readonly && (
+                                                            <Dialog>
+                                                                <DialogTrigger>
+                                                                    <Button className="border-none shadow-none" variant={"outline"}>
+                                                                        <Plus />
+                                                                    </Button>
+                                                                </DialogTrigger>
+                                                                <DialogContent>
+                                                                    <DialogTitle>Add Attachment to Card</DialogTitle>
+                                                                    <FileUpload
+                                                                        cardId={cardData?.id || ""}
+                                                                        workspaceId={currentWorkspace?.id!}
+                                                                        onUploadComplete={() => {
+                                                                            refetchAttachments();
+                                                                        }}
+                                                                    />
+                                                                    <p className="text-lg font-semibold">All Attachments</p>
+                                                                    <ScrollArea className="h-56">
+                                                                        <div className="space-y-2">
+                                                                            {attachments && attachments.length > 0 ? (
+                                                                                attachments.map((attachment: any) => (
+                                                                                    <Card key={attachment.id} className="p-3 flex items-center justify-between">
+                                                                                        <div className="flex items-center space-x-3">
+                                                                                            {(attachment.type)}
+                                                                                            <div>
+                                                                                                <Tooltip>
+                                                                                                    <TooltipTrigger>
+                                                                                                        <a
+                                                                                                            href={attachment.url}
+                                                                                                            target="_blank"
+                                                                                                            rel="noopener noreferrer"
+                                                                                                            className="text-blue-500 hover:underline font-medium"
+                                                                                                        >
+                                                                                                            {attachment.name.length > 20 ? `${attachment.name.substring(0, 40)}...` : attachment.name}
+                                                                                                        </a>
+                                                                                                    </TooltipTrigger>
+                                                                                                    <TooltipContent>
+                                                                                                        <p>{attachment.name}</p>
+                                                                                                    </TooltipContent>
+                                                                                                </Tooltip>
+
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <Button
+                                                                                            variant="ghost"
+                                                                                            size="icon"
+                                                                                            onClick={() => { }}
+                                                                                        >
+                                                                                            <Trash2 size={16} className="text-red-500" />
+                                                                                        </Button>
+                                                                                    </Card>
+                                                                                ))
+                                                                            ) : (
+                                                                                <div className="text-gray-700 text-xs">No attachments found.</div>
+                                                                            )}
+                                                                        </div>
+                                                                    </ScrollArea>
+
+
+                                                                </DialogContent>
+                                                            </Dialog>
+                                                        )}
+
+                                                    </div>
+
+                                                    <div className="space-y-3 mt-2 mb-4">
+                                                        {!cardData ? (
+                                                            <Description.Skeleton />
+                                                        ) : (
+                                                            <AttachmentList cardId={cardData?.id || ""} />
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
+
+                                {!readonly && (
+                                    <div>
+                                        {!commentsData ? (
+                                            <Comments.Skeleton />
+                                        ) : (
+                                            <div>
+                                                <span className="font-bold text-lg flex items-center">
+                                                    <ActivityIcon size={12} className="mr-2" /> Activity
+                                                </span>
+                                                <Tabs defaultValue="comments">
+                                                    <TabsList>
+                                                        <TabsTrigger value="comments">
+                                                            <MessageSquareText size={12} className="mr-1" /> Comments
+                                                        </TabsTrigger>
+                                                        <TabsTrigger value="logs">
+                                                            <Logs size={12} className="mr-1" /> Logs
+                                                        </TabsTrigger>
+                                                    </TabsList>
+                                                    <TabsContent value="comments">
+                                                        <Comments items={commentsData} cardId={cardData?.id ?? ''} readonly={readonly} />
+                                                    </TabsContent>
+                                                    <TabsContent value="logs">
+                                                        {!auditLogsData ? (
+                                                            <Activity.Skeleton />
+                                                        ) : (
+                                                            <Activity items={auditLogsData} />
+                                                        )}
+                                                    </TabsContent>
+                                                </Tabs>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                             </div>
                         </div>
                         {!cardData ? (
@@ -165,7 +481,7 @@ const CardPage = ({ params, readonly }: any) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

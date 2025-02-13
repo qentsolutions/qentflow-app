@@ -12,9 +12,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 interface AttachmentListProps {
   cardId: string;
+  readonly?: boolean;
 }
 
-export const AttachmentList = ({ cardId }: AttachmentListProps) => {
+export const AttachmentList = ({ cardId, readonly = false }: AttachmentListProps) => {
   const [showAll, setShowAll] = useState(false);
   const [selectedAttachment, setSelectedAttachment] = useState<any>(null);
   const { data: attachments } = useQuery({
@@ -76,7 +77,7 @@ export const AttachmentList = ({ cardId }: AttachmentListProps) => {
           <Paperclip className="h-4 w-4 text-blue-500" />
           <Tooltip>
             <TooltipTrigger>
-              <div className="w-full max-w-[270px] overflow-hidden">
+              <div className={`w-full ${readonly ? 'max-w-[200px]': 'max-w-[270px]'} overflow-hidden`}>
                 <p className="font-medium text-sm truncate">{attachment.name}</p>
               </div>
             </TooltipTrigger>
