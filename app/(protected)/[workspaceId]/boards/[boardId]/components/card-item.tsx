@@ -240,19 +240,12 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
           </div>
           {data.tasks && data.tasks.length > 0 && (
             <div>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Progress
-                    value={
-                      (data.tasks.filter(task => task.completed).length / data.tasks.length) * 100
-                    }
-                    className="h-1 w-[calc(100%-4px)] mx-auto"
-                  />
-                </TooltipTrigger>
-                <TooltipContent>
-                  {data.tasks.filter(task => task.completed).length}/{data.tasks.length} tasks
-                </TooltipContent>
-              </Tooltip>
+              <Progress
+                value={
+                  (data.tasks.filter(task => task.completed).length / data.tasks.length) * 100
+                }
+                className="h-1 w-[calc(100%-4px)] mx-auto"
+              />
             </div>
           )}
         </div>
