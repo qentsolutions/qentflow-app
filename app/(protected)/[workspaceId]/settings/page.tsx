@@ -77,8 +77,8 @@ const ManageWorkspacesPage = () => {
 
    
     return (
-        <div className="px-4 py-4">
-            <Card>
+        <div className="p-2">
+            <Card className="rounded-none shadow-none">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7">
                     <div className="space-y-1">
                         <CardTitle className="text-2xl font-bold">Manage Workspace</CardTitle>

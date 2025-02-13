@@ -151,7 +151,7 @@ export function NavUser({ user }: { user: any }) {
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -20 }}
-                                        className="text-center py-8"
+                                        className="text-center pt-2 pb-12"
                                     >
                                         <Users className="w-12 h-12 mx-auto text-muted-foreground opacity-50 mb-4" />
                                         <p className="text-lg font-medium text-muted-foreground">
