@@ -1,5 +1,5 @@
 "use client";
-import { CloudLightningIcon as LightningBoltIcon, Search, PlusCircle, ZapIcon, Trash, Users, Loader2, WorkflowIcon } from "lucide-react";
+import { CloudLightningIcon as LightningBoltIcon, PlusCircle, ZapIcon, Trash, Users, Loader2, WorkflowIcon } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";

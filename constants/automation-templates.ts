@@ -3,7 +3,8 @@ export const AUTOMATION_TEMPLATES = {
     {
       id: "auto-assign",
       name: "Auto Assign Cards",
-      description: "Automatically assign cards to team members when moved to specific lists",
+      description:
+        "Automatically assign cards to team members when moved to specific lists",
       trigger: {
         type: "CARD_MOVED",
         conditions: {
@@ -22,7 +23,8 @@ export const AUTOMATION_TEMPLATES = {
     {
       id: "due-date-notification",
       name: "Due Date Notification",
-      description: "Send notifications when cards are approaching their due date",
+      description:
+        "Send notifications when cards are approaching their due date",
       trigger: {
         type: "DUE_DATE_APPROACHING",
         conditions: {
@@ -47,7 +49,7 @@ export const AUTOMATION_TEMPLATES = {
       },
       actions: [
         {
-          type: "MOVE_CARD",
+          type: "UPDATE_CARD_STATUS",
           config: {
             listId: null,
           },
@@ -268,7 +270,8 @@ export const AUTOMATION_TEMPLATES = {
     {
       id: "create-event-on-due-date",
       name: "Create Calendar Event on Due Date",
-      description: "Automatically create a calendar event when a card's due date is approaching",
+      description:
+        "Automatically create a calendar event when a card's due date is approaching",
       trigger: {
         type: "DUE_DATE_APPROACHING",
         conditions: {
@@ -288,7 +291,8 @@ export const AUTOMATION_TEMPLATES = {
     {
       id: "create-event-on-task-completion",
       name: "Create Calendar Event on Task Completion",
-      description: "Automatically create a calendar event when all tasks are completed",
+      description:
+        "Automatically create a calendar event when all tasks are completed",
       trigger: {
         type: "ALL_TASKS_COMPLETED",
       },

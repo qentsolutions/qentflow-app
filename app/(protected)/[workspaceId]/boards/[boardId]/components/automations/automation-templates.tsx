@@ -1,6 +1,5 @@
 import { MessageSquare, Search } from 'lucide-react';
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion, AnimatePresence } from "framer-motion";
 import { AUTOMATION_CATEGORIES, AUTOMATION_TEMPLATES } from "@/constants/automation-templates";
 import { useRef, useState, useEffect } from 'react';

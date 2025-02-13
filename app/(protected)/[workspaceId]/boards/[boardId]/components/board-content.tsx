@@ -37,6 +37,7 @@ import { AlertDialogHeader } from "@/components/ui/alert-dialog";
 import CreateTagForm from "./create-tag-form";
 import { TableView } from "./table-view";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 
 interface BoardContentProps {
   boardId: string;
@@ -375,7 +376,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                   <div className="space-y-2">
                     {Object.entries(visibleFields).map(([field, isVisible]) => (
                       <div key={field} className="flex items-center space-x-2">
-                        <Checkbox
+                        <Switch
                           id={field}
                           checked={isVisible}
                           onCheckedChange={() => toggleField(field as keyof typeof visibleFields)}
