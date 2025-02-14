@@ -36,6 +36,7 @@ interface DocumentSidebarProps {
   editor: Editor | null;
 }
 
+
 const fontFamilies = [
   { name: "Sans", value: "Arial, sans-serif" },
   { name: "Serif", value: "Georgia, serif" },
