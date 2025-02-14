@@ -77,11 +77,32 @@ export const AttachmentList = ({ cardId, readonly = false }: AttachmentListProps
           <Paperclip className="h-4 w-4 text-blue-500" />
           <Tooltip>
             <TooltipTrigger>
-              <div className={`w-full ${readonly ? 'max-w-[200px]': 'max-w-[270px]'} overflow-hidden`}>
+              <div className={`w-full ${readonly ? 'max-w-[200px]' : 'max-w-[270px]'} overflow-hidden`}>
                 <p className="font-medium text-sm truncate">{attachment.name}</p>
               </div>
             </TooltipTrigger>
             <TooltipContent>
+              {isImage(attachment.url) && (
+                <div className="relative h-[200px] mb-2">
+                  <img
+                    src={attachment.url}
+                    alt={attachment.name}
+                    className="h-[200px] object-contain"
+                  />
+                </div>
+              )}
+              {isPDF(attachment.url) && (
+                <iframe
+                  src={`${attachment.url}#view=FitH`}
+                  className="w-full h-[200px] mb-2"
+                  title={attachment.name}
+                />
+              )}
+              {!isImage(attachment.url) && !isPDF(attachment.url) && (
+                <div className="flex items-center justify-center p-8 bg-gray-100 rounded-lg mb-2">
+                  <p>Preview not available for this file type</p>
+                </div>
+              )}
               <p className="font-medium text-sm">{attachment.name}</p>
             </TooltipContent>
           </Tooltip>
