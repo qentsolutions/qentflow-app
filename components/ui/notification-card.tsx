@@ -11,6 +11,8 @@ import { markNotificationAsRead } from '@/actions/notifications/read-notificatio
 import { markNotificationAsUnread } from '@/actions/notifications/unread-notification';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentWorkspace } from '@/hooks/use-current-workspace';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 
 interface NotificationCardProps {
   id: string;
@@ -23,7 +25,12 @@ interface NotificationCardProps {
   onMarkAsUnRead?: () => void;
   showWorkspace?: boolean;
   isInvitation?: boolean;
-
+  metadata?: {
+    type: 'card_created' | 'comment_added' | 'card_updated' | 'task_completed' | 'mention';
+    cardId?: string;
+    boardId?: string;
+    commentId?: string;
+  };
 }
 
 export function NotificationCard({
@@ -36,11 +43,14 @@ export function NotificationCard({
   onMarkAsRead,
   onMarkAsUnRead,
   showWorkspace = false,
+  isInvitation = false,
+  metadata,
 }: NotificationCardProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { currentWorkspace } = useCurrentWorkspace();
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const handleMarkAsRead = async () => {
     if (isRead || isLoading) return;
@@ -108,59 +118,103 @@ export function NotificationCard({
     }
   };
 
+  const handleClick = () => {
+    if (!metadata || !currentWorkspace) return;
+
+    const baseUrl = `/${currentWorkspace.id}/boards/${metadata.boardId}`;
+
+    switch (metadata.type) {
+      case 'card_created':
+      case 'card_updated':
+      case 'comment_added':
+      case 'mention':
+        if (metadata.cardId) {
+          router.push(`${baseUrl}/cards/${metadata.cardId}`);
+        }
+        break;
+      case 'task_completed':
+        if (metadata.cardId) {
+          router.push(`${baseUrl}/cards/${metadata.cardId}?tab=tasks`);
+        }
+        break;
+      default:
+        break;
+    }
+
+    // Mark as read when clicked
+    if (!isRead) {
+      handleMarkAsRead();
+    }
+  };
+
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
       className={`
-        group relative flex items-start gap-3 p-3 rounded-lg transition-colors cursor-pointer
-        ${isRead ? 'bg-gray-50' : 'bg-blue-50'}
+        group relative flex items-start gap-3 p-4 rounded-lg transition-all cursor-pointer
+        ${isRead ? 'bg-gray-50 hover:bg-gray-100' : 'bg-blue-50 hover:bg-blue-100'}
+        border border-transparent hover:border-blue-200
+        transform hover:-translate-y-1 hover:shadow-md
+        duration-200
       `}
+      onClick={handleClick}
     >
       <div className="mt-1">
-        <AlertCircle className={`w-5 h-5 ${isRead ? 'text-gray-400' : 'text-blue-500'}`} />
+        <div className={`rounded-full p-2 ${isRead ? 'bg-gray-200' : 'bg-blue-200'}`}>
+          <AlertCircle className={`w-4 h-4 ${isRead ? 'text-gray-600' : 'text-blue-600'}`} />
+        </div>
       </div>
-      <div className="flex-1 min-w-0 pr-12">
-        <p className="text-sm text-gray-900">{message}</p>
-        <p className="text-xs text-gray-500 mt-1">
-          {formatDistanceToNow(createdAt, {
-            addSuffix: true,
-            locale: enUS
-          })}
+      <div className="flex-1 min-w-0">
+        <p className={`text-sm ${isRead ? 'text-gray-600' : 'text-blue-800'} font-medium`}>
+          {message}
         </p>
-        {showWorkspace && (
-          <p className="text-xs text-gray-600 mt-1">
-            Workspace: {workspaceName}
+        <div className="flex items-center gap-2 mt-1">
+          <p className="text-xs text-gray-500">
+            {formatDistanceToNow(createdAt, {
+              addSuffix: true,
+              locale: enUS
+            })}
           </p>
-        )}
-     
+          {showWorkspace && (
+            <>
+              <span className="text-gray-300">•</span>
+              <p className="text-xs text-gray-600 font-medium">
+                {workspaceName}
+              </p>
+            </>
+          )}
+        </div>
       </div>
-      <div
-        className={`
-          absolute right-0 top-0 bottom-0 w-10 flex flex-col opacity-0 transition-opacity
-          group-hover:opacity-100
-        `}
-      >
+      <div className="absolute right-2 top-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         <Button
           variant="ghost"
           size="icon"
-          className={`h-1/2 w-full rounded-none rounded-tr-lg bg-blue-500 hover:bg-blue-500 ${isRead ? 'hover:bg-blue-400' : 'hover:bg-blue-500'}`}
-          onClick={isRead ? handleMarkAsUnRead : handleMarkAsRead}
+          className="h-8 w-8 bg-white hover:bg-gray-100 rounded-full"
+          onClick={(e) => {
+            e.stopPropagation();
+            isRead ? handleMarkAsUnRead() : handleMarkAsRead();
+          }}
         >
           {isRead ? (
-            <BellOff className={`h-4 w-4 ${isRead ? 'text-gray-400' : 'text-white'}`} />
+            <BellOff className="h-4 w-4 text-gray-500" />
           ) : (
-            <BellPlus className={`h-4 w-4 ${isRead ? 'text-gray-400' : 'text-white'}`} />
+            <BellPlus className="h-4 w-4 text-blue-500" />
           )}
         </Button>
         <Button
           variant="ghost"
           size="icon"
-          className="h-1/2 w-full rounded-none rounded-br-lg border-t border-gray-200 bg-red-400 hover:bg-red-400"
-          onClick={handleDelete}
-          disabled={isDeleting}
+          className="h-8 w-8 bg-white hover:bg-red-100 rounded-full"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDelete();
+          }}
         >
-          <X className="h-4 w-4 text-white" />
+          <X className="h-4 w-4 text-red-500" />
         </Button>
       </div>
-    </div>
+    </motion.div>
   );
 }
