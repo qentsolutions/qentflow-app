@@ -1,3 +1,5 @@
+import { useCurrentWorkspace } from "./hooks/use-current-workspace";
+
 /**
  * An array of routes that are accessible to the public
  * These routes do not require authentication
@@ -20,7 +22,7 @@ export const authRoutes = [
   "/auth/register",
   "/auth/error",
   "/auth/reset",
-  "/auth/new-password"
+  "/auth/new-password",
 ];
 
 /**
@@ -34,4 +36,6 @@ export const apiAuthPrefix = "/api/auth";
  * The default redirect path after logging in
  * @type {string}
  */
-export const DEFAULT_LOGIN_REDIRECT = "/home";
+
+const { currentWorkspace } = useCurrentWorkspace();
+export const DEFAULT_LOGIN_REDIRECT = `/${currentWorkspace?.id}home"`;
