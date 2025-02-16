@@ -35,7 +35,7 @@ export function NotificationList({ notifications: initialNotifications, onUpdate
         </div>
         <p className="text-sm text-gray-500 font-medium">No notifications yet</p>
         <p className="text-xs text-gray-400 mt-1">
-          We'll notify you when something important happens
+          We&apos;ll notify you when something important happens
         </p>
       </div>
     );

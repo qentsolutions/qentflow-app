@@ -40,7 +40,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     main: [
       {
         name: "Home",
-        url: "/home",
+        url: `/${workspaceId}/home`,
         icon: LayoutDashboard,
       },
       {
