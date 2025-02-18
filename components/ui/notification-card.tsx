@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertCircle, Bell, BellOff, BellPlus, Check, Trash2, X } from 'lucide-react';
+import { AlertCircle, Bell, BellOff, BellPlus, Check, ExternalLink, Share, Trash2, X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { useState } from 'react';
@@ -13,11 +13,13 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentWorkspace } from '@/hooks/use-current-workspace';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 interface NotificationCardProps {
   id: string;
   message: string;
   createdAt: Date;
+  link?: string | null;
   isRead: boolean;
   workspaceName: string;
   onDelete?: () => void;
@@ -37,6 +39,7 @@ export function NotificationCard({
   id,
   message,
   createdAt,
+  link,
   isRead = false,
   workspaceName,
   onDelete,
@@ -188,6 +191,18 @@ export function NotificationCard({
         </div>
       </div>
       <div className="absolute right-2 top-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        {link != null && (
+          <Link href={link || ""}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 bg-white hover:bg-gray-100 rounded-full"
+            >
+              <ExternalLink className="h-4 w-4 text-blue-500" />
+            </Button>
+          </Link>
+        )}
+
         <Button
           variant="ghost"
           size="icon"

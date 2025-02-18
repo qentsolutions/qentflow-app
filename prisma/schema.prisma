@@ -400,6 +400,7 @@ model Notification {
   workspaceId  String // ID du workspace associé à la notification
   workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   message      String // Message de la notification
+  link         String? 
   isInvitation Boolean   @default(false) // Indique si la notification est une invitation
   read         Boolean   @default(false) // Statut de lecture de la notification
   createdAt    DateTime  @default(now()) // Date de création de la notification

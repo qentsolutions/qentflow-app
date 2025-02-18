@@ -49,6 +49,7 @@ export function NotificationList({ notifications: initialNotifications, onUpdate
             key={notification.id}
             id={notification.id}
             message={notification.message}
+            link={notification.link}
             createdAt={new Date(notification.createdAt)}
             isRead={notification.read}
             workspaceName={notification.workspaceName}

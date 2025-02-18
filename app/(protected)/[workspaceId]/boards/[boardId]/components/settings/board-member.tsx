@@ -52,7 +52,8 @@ export const BoardMembers = ({ boardId, users, createdById, boardTitle }: BoardM
         await createNotification(
           user?.id,
           currentWorkspace?.id || "",
-          `${currentUser?.name} added you in the board : ${boardTitle} `
+          `${currentUser?.name} added you in the board : ${boardTitle}`,
+          `/${currentWorkspace?.id}/boards/${boardId}`
         )
         toast.success(`${user.name} added to board`);
       } catch (error) {

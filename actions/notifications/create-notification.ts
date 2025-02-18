@@ -3,7 +3,12 @@
 import { db } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
 
-export async function createNotification(userId: string, workspaceId: string, message: string) {
+export async function createNotification(
+  userId: string,
+  workspaceId: string,
+  message: string,
+  link: string | null = null
+) {
   const user = await currentUser();
   if (!user) {
     throw new Error("Unauthorized");
@@ -28,11 +33,12 @@ export async function createNotification(userId: string, workspaceId: string, me
   // Créer la notification
   const notification = await db.notification.create({
     data: {
-      userId: userId,      // Utilisateur destinataire
+      userId: userId, // Utilisateur destinataire
       workspaceId: workspaceId, // Workspace associé
-      message: message,     // Contenu du message
-      createdAt: new Date(),   // Date de création
-      read: false,            // Notification non lue par défaut
+      message: message, // Contenu du message
+      link: link,
+      createdAt: new Date(), // Date de création
+      read: false, // Notification non lue par défaut
     },
   });
 
