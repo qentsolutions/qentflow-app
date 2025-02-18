@@ -1,94 +1,93 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Users } from "lucide-react";
-import Image from "next/image";
-
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Card } from "@/components/ui/card"
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
+import { Users } from "lucide-react"
 interface BoardCardProps {
   board: {
-    id: string;
-    title: string;
+    id: string
+    title: string
     creator: {
-      id: string;
-      name: string;
-      imageUrl: string;
-    };
-    memberCount: number;
-    createdAt: string;
-    isMember: boolean;
-    image: string;
-  };
-  onClick: (e: React.MouseEvent) => void;
+      id: string
+      name: string
+      imageUrl: string
+    }
+    memberCount: number
+    createdAt: string
+    isMember: boolean
+    image: string
+  }
+  onClick: (e: React.MouseEvent) => void
 }
-
 export const BoardCard = ({ board, onClick }: BoardCardProps) => {
-
   return (
-    <Card
-      onClick={onClick}
-      className={`group cursor-pointer hover:shadow-lg transition-all duration-200 overflow-hidden ${!board.isMember ? "opacity-50 cursor-not-allowed" : ""
-        }`}
-    >
-      <div className="relative">
-        {/* Board preview background */}
-        <div className="h-24 bg-gradient-to-br from-blue-500/10 to-blue-500/10 flex justify-center items-center">
-          {/* Miniature board preview */}
-          {board.image ? (
-            <div className="relative w-full h-full">
-              <Image
-                src={board.image}
+    <TooltipProvider>
+      <Card
+        onClick={onClick}
+        className={`group relative overflow-hidden rounded-xl transition-all duration-300 hover:scale-[1.02] ${!board.isMember
+          ? "cursor-not-allowed opacity-50"
+          : "cursor-pointer hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
+          }`}
+      >
+        <div className="relative">
+          {/* Board preview background */}
+          <div className="relative h-32 w-full overflow-hidden">
+            {board.image ? (
+              <img
+                src={board.image || "/placeholder.svg"}
                 alt={board.title}
-                fill
-                className="object-cover"
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
-            </div>
-          ) : (
-            <p></p>
-          )}
-        </div>
-
-        {/* Board info */}
-        <div className="p-4">
-          <div className="flex items-center gap-x-2">
-            <h3 className="font-medium group-hover:text-blue-600 text-sm transition-colors">{board.title}</h3>
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200">
+                <span className="text-2xl font-medium text-neutral-600">
+                  {board.title.charAt(0)}
+                </span>
+              </div>
+            )}
+            {/* Overlay gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
           </div>
+          {/* Board info */}
+          <div className="space-y-2 p-4">
+            <div className="flex items-start justify-between">
+              <h3 className="line-clamp-2 font-medium tracking-tight text-neutral-900 transition-colors group-hover:text-neutral-700">
+                {board.title}
+              </h3>
 
-          <div className="mt-4 flex items-center justify-between">
-            {/* Affichage du créateur */}
-            <div className="flex items-center space-x-2">
+            </div>
+            <div className="flex items-center justify-between">
               <Tooltip>
-                <TooltipTrigger>
-                  <Avatar className="h-10 w-10 border-2 border-white">
-                    {/* Vérification si l'image du créateur existe */}
-                    {board.creator.imageUrl ? (
-                      <AvatarImage
-                        src={board.creator.imageUrl}
-                        alt={board.creator.name}
-                      />
-                    ) : (
-                      <AvatarFallback className="bg-gray-200">
-                        {board.creator.name?.charAt(0).toUpperCase()} {/* Affichage de l'initiale du nom */}
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center space-x-2">
+                    <Avatar className="h-8 w-8 ring-2 ring-white">
+                      {board.creator.imageUrl ? (
+                        <AvatarImage
+                          src={board.creator.imageUrl}
+                          alt={board.creator.name}
+                          className="object-cover"
+                        />
+                      ) : (
+                        <AvatarFallback className="bg-neutral-100 text-sm font-medium text-neutral-600">
+                          {board.creator.name?.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                  </div>
                 </TooltipTrigger>
-                <TooltipContent>
-                  <span className="text-sm">{board.creator.name}</span>
+                <TooltipContent side="bottom" className="bg-neutral-900 text-white">
+                  <p className="text-sm">{board.creator.name}</p>
                 </TooltipContent>
               </Tooltip>
-            </div>
-
-            <div className="flex items-center text-xs text-gray-500">
-              <Users className="h-3 w-3 mr-1" />
-              {board.memberCount > 1 ? (
-                <p>{board.memberCount} members</p>
-              ) : (
-                <p>{board.memberCount} member</p>
-              )}
+              <div className="ml-2 flex items-center space-x-1 rounded-full bg-neutral-100 px-2 py-1">
+                <Users className="h-3 w-3 text-neutral-600" />
+                <span className="text-xs font-medium text-neutral-600">
+                  {board.memberCount}
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </Card>
-  );
-};
+      </Card>
+    </TooltipProvider>
+  )
+}

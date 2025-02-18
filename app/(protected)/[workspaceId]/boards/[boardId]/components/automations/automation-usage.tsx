@@ -49,7 +49,7 @@ export const AutomationUsage = ({ boardId, workspaceId }: AutomationUsageProps) 
 
     return (
         <ScrollArea className="h-[calc(100vh-250px)]">
-            <div className="space-y-6 p-4">
+            <div className="space-y-6 px-4 pb-4">
                 {/* Stats Overview */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Card className="p-6 bg-white shadow-sm hover:shadow-md transition-shadow">

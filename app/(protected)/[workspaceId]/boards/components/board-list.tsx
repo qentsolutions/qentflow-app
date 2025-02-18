@@ -193,89 +193,89 @@ export const BoardList: React.FC = () => {
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">
             <div className="flex items-center mb-4 gap-x-2">
-              <span className="text-2xl font-semibold flex items-center gap-x-2 "><KanbanSquare size={20} />
+              <span className="text-2xl font-semibold flex items-center gap-x-2">
+                <KanbanSquare size={24} />
                 Boards
                 <span
-                  className={`text-2xl font-semibold text-blue-500 ${openBoards?.length > 99 ? "text-2xl" : "text-2xl"} ${openBoards?.length === 0 ? "text-gray-400" : "text-blue-600"}`}
+                  className={cn("text-2xl font-semibold", openBoards?.length > 0 ? "text-blue-600" : "text-gray-400")}
                 >
                   {openBoards?.length || 0}
                 </span>
               </span>
             </div>
           </CardTitle>
-          <div className="mt-4 text-center">
-            <Dialog open={isExploreDialogOpen} onOpenChange={setIsExploreDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline">Explore templates</Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-6xl">
-                <DialogHeader>
-                  <DialogTitle>Explore Board Templates</DialogTitle>
-                </DialogHeader>
-                <TemplateExplorer
-                  onSelectTemplate={(templateId) => {
-                    setSelectedTemplateId(templateId)
-                    setIsExploreDialogOpen(false)
-                    setIsCreateBoardModalOpen(true)
-                  }}
-                />
-              </DialogContent>
-            </Dialog>
-          </div>
+          <Dialog open={isExploreDialogOpen} onOpenChange={setIsExploreDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">Explore templates</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-6xl">
+              <DialogHeader>
+                <DialogTitle>Explore Board Templates</DialogTitle>
+              </DialogHeader>
+              <TemplateExplorer
+                onSelectTemplate={(templateId) => {
+                  setSelectedTemplateId(templateId)
+                  setIsExploreDialogOpen(false)
+                  setIsCreateBoardModalOpen(true)
+                }}
+              />
+            </DialogContent>
+          </Dialog>
         </CardHeader>
         <CardContent>
-          <div>
-            <Carousel
-              opts={{
-                align: "start",
-                loop: true,
-              }}
-              className="w-full"
-            >
-              <CarouselContent className="-ml-2 md:-ml-4">
-                {boardTemplates.slice(0, 8).map((template) => (
-                  <CarouselItem key={template.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/4 lg:basis-1/5">
-                    <div
-                      className={`
-                        aspect-[16/10] relative group
-                        ${template.id === "blank" ? "bg-white" : "bg-gradient-to-br from-blue-50 to-indigo-50"} 
-                        rounded-lg border-2 border-dashed border-gray-200 
-                        hover:border-blue-500 transition-all duration-200
-                        flex flex-col items-center justify-center cursor-pointer
-                        p-4 overflow-hidden
-                      `}
-                      onClick={() => {
-                        setSelectedTemplateId(template.id)
-                        setIsCreateBoardModalOpen(true)
-                      }}
-                    >
-                      <div className="text-2xl mb-2">{template.icon}</div>
-                      <p className="text-sm text-center font-medium text-gray-600 group-hover:text-gray-900">
-                        {template.title}
-                      </p>
-                      <p className="text-xs text-center text-gray-500 mt-1">{template.description}</p>
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="absolute top-1/2 -left-2 transform -translate-y-1/2 bg-white hover:bg-gray-300 rounded-full p-2 shadow-md" />
-              <CarouselNext className="absolute top-1/2 -right-2 transform -translate-y-1/2 bg-white hover:bg-gray-300 rounded-full p-2 shadow-md" />
-            </Carousel>
-          </div>
+          {/* Template Carousel */}
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full mb-6"
+          >
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {boardTemplates.slice(0, 8).map((template) => (
+                <CarouselItem key={template.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/4 lg:basis-1/5">
+                  <div
+                    className={cn(
+                      "aspect-[16/10] relative group rounded-lg border-2 border-dashed",
+                      "hover:border-blue-500 transition-all duration-200",
+                      "flex flex-col items-center justify-center cursor-pointer p-4 overflow-hidden",
+                      template.id === "blank" ? "bg-white" : "bg-gradient-to-br from-blue-50 to-indigo-50",
+                    )}
+                    onClick={() => {
+                      setSelectedTemplateId(template.id)
+                      setIsCreateBoardModalOpen(true)
+                    }}
+                  >
+                    <div className="text-2xl mb-2">{template.icon}</div>
+                    <p className="text-sm text-center font-medium text-gray-600 group-hover:text-gray-900">
+                      {template.title}
+                    </p>
+                    <p className="text-xs text-center text-gray-500 mt-1">{template.description}</p>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="absolute top-1/2 -left-2 transform -translate-y-1/2 bg-white hover:bg-gray-100 rounded-full p-2 shadow-md" />
+            <CarouselNext className="absolute top-1/2 -right-2 transform -translate-y-1/2 bg-white hover:bg-gray-100 rounded-full p-2 shadow-md" />
+          </Carousel>
 
+          {/* Search Input */}
           <div className="relative mb-6">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              className="pl-10 mt-4"
+              className="pl-10"
               placeholder="Search boards"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+
+          {/* Recent Boards */}
           {recentBoards.length > 0 && (
             <div className="mb-6">
               <p className="text-lg font-semibold mb-4 flex items-center gap-x-2">
-                <Clock size={18} />Recently Opened
+                <Clock size={18} />
+                Recently Opened
               </p>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {recentBoards.map((board) => (
@@ -284,11 +284,10 @@ export const BoardList: React.FC = () => {
               </div>
             </div>
           )}
-          {recentBoardIds.length > 0 && (
-            <Separator className="mb-6" />
-          )}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {recentBoardIds.length > 0 && <Separator className="mb-6" />}
 
+          {/* All Boards */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {isLoading || isFirstLoad ? (
               Array.from({ length: 4 }).map((_, idx) => (
                 <Skeleton key={idx} className="h-36 rounded-md bg-gray-200 dark:bg-gray-700" />
@@ -298,13 +297,21 @@ export const BoardList: React.FC = () => {
                 <BoardCard key={board.id} board={board} onClick={() => handleBoardClick(board)} />
               ))
             ) : (
-              <div className="text-center py-10 w-full bg-gray-50">
+              <div className="col-span-full text-center py-10 bg-gray-50 rounded-lg">
                 <KanbanSquare className="h-10 w-10 mx-auto text-gray-400 mb-2" />
-                <p className="text-muted-foreground text-xs">No boards found</p>
+                <p className="text-muted-foreground text-sm">No boards found</p>
               </div>
             )}
           </div>
         </CardContent>
+
+        {/* Create Board Modal */}
+        <CreateBoardModal
+          isOpen={isCreateBoardModalOpen}
+          onClose={() => setIsCreateBoardModalOpen(false)}
+          workspaceId={workspaceId || ""}
+          templateId={selectedTemplateId}
+        />
       </Card>
       <CreateBoardModal
         isOpen={isCreateBoardModalOpen}

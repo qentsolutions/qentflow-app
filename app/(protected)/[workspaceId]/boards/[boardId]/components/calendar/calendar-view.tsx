@@ -37,18 +37,18 @@ export const CalendarView = ({ data, boardId }: CalendarViewProps) => {
 
     // Calculer le premier jour du mois (0 = dimanche, 1 = lundi, etc.)
     const firstDayOfMonth = getDay(monthStart)
-    
+
     // Ajuster pour commencer par lundi (1) au lieu de dimanche (0)
     const startDay = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1
-    
+
     // Calculer les jours du mois précédent
-    const prevMonthDays = Array.from({ length: startDay }, (_, i) => 
+    const prevMonthDays = Array.from({ length: startDay }, (_, i) =>
         subDays(monthStart, startDay - i)
     )
 
     // Calculer les jours du mois suivant
     const remainingDays = (7 - ((monthDays.length + startDay) % 7)) % 7
-    const nextMonthDays = Array.from({ length: remainingDays }, (_, i) => 
+    const nextMonthDays = Array.from({ length: remainingDays }, (_, i) =>
         addDays(monthEnd, i + 1)
     )
 

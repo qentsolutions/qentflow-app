@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
+import { Input } from "@/components/ui/input";
 
 interface AssignedTasksListProps {
   lists: any[];
@@ -22,34 +23,49 @@ export const AssignedTasksList = ({ lists, selectedUserId }: AssignedTasksListPr
     task.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'CRITICAL': return 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400';
+      case 'HIGH': return 'bg-orange-100 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400';
+      case 'MEDIUM': return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950/30 dark:text-yellow-400';
+      case 'LOW': return 'bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-400';
+      default: return 'bg-gray-100 text-gray-700 dark:bg-gray-950/30 dark:text-gray-400';
+    }
+  };
+
   return (
-    <Card className=" pb-4 h-[63vh] overflow-y-auto relative">
-      <div className="sticky top-0  px-4 pt-4 pb-1 z-10 bg-white border-b">
-        <div className="flex items-center justify-between mb-4">
+    <Card className="overflow-hidden border border-border/50 backdrop-blur-sm">
+      <div className="sticky top-0 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/75 border-b border-border/50 px-6 py-4 z-10">
+        <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-semibold">Assigned Tasks ({filteredTasks.length})</h2>
-          <input
+          <Input
             type="text"
-            placeholder="Search by title..."
-            className="p-2 border rounded-md"
+            placeholder="Search tasks..."
+            className="max-w-xs"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
       </div>
-      <div className="space-y-2">
+      <div className="p-6 space-y-4 max-h-[600px] overflow-y-auto">
         {filteredTasks.map((task: any) => (
           <div
             key={task.id}
-            className="p-3 hover:bg-accent rounded-lg transition-colors"
+            className="p-4 rounded-lg border border-border/50 bg-card hover:shadow-md transition-all duration-200"
           >
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-medium">{task.title}</h3>
+            <div className="flex justify-between items-start gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${getPriorityColor(task.priority)}`}>
+                    {task.priority}
+                  </span>
+                  <h3 className="font-medium">{task.title}</h3>
+                </div>
                 <p className="text-sm text-muted-foreground">{task.projectName}</p>
               </div>
-              <span className="text-sm text-muted-foreground">
+              <div className="text-sm text-muted-foreground">
                 {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date'}
-              </span>
+              </div>
             </div>
           </div>
         ))}

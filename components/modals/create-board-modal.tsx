@@ -124,7 +124,7 @@ export const CreateBoardModal = ({ isOpen, onClose, workspaceId, templateId }: C
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                    className="px-4 py-2 bg-blue-600 text-primary-foreground hover:bg-primary/90 transition-colors"
                   >
                     {isLoading ? (
                       <>
