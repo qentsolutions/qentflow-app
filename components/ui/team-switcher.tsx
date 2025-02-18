@@ -15,13 +15,12 @@ export function TeamSwitcher() {
     const { currentWorkspace, workspaces, setCurrentWorkspace } = useCurrentWorkspace();
 
     const handleNewWorkspace = () => {
-        // Redirige l'utilisateur vers la page pour sélectionner ou créer un nouveau workspace
         router.push("/workspace/select");
     };
 
     const handleWorkspaceSelect = (workspace: any) => {
-        setCurrentWorkspace(workspace);  // Met à jour l'espace de travail actuel
-        router.push(`/${workspace.id}`);  // Redirige vers le workspace sélectionné
+        setCurrentWorkspace(workspace);  
+        router.push(`/${workspace.id}/home`);
     };
     return (
         <SidebarMenu>

@@ -216,7 +216,7 @@ export const Comments = ({ items, cardId, readonly = false }: CommentsProps) => 
             mention.id,
             params.workspaceId as string,
             `${user?.name} mentioned you in a comment`,
-            `/${currentWorkspace?.id}/boards/${boardId}/${cardId}`
+            `/${currentWorkspace?.id}/boards/${boardId}/cards/${cardId}`
           );
         } catch (error) {
           console.error('Failed to create mention notification:', error);
