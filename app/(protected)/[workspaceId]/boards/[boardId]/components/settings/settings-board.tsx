@@ -27,7 +27,7 @@ const Settings = ({ boardId, boardTitle, users, createdById }: BoardSettingsProp
       id: "members",
       label: "Members",
       icon: Users,
-      component: <BoardMembers boardId={boardId} users={users} createdById={createdById} />,
+      component: <BoardMembers boardId={boardId} users={users} createdById={createdById} boardTitle={boardTitle} />,
     },
     {
       id: "tags",

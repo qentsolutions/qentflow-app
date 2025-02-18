@@ -20,14 +20,16 @@ import { UserPlus, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { createNotification } from "@/actions/notifications/create-notification";
 
 interface BoardMembersProps {
   boardId: string;
   users: any[];
   createdById: string;
+  boardTitle: string;
 }
 
-export const BoardMembers = ({ boardId, users, createdById }: BoardMembersProps) => {
+export const BoardMembers = ({ boardId, users, createdById, boardTitle }: BoardMembersProps) => {
   const { currentWorkspace } = useCurrentWorkspace();
   const currentUser = useCurrentUser();
   const [isAdding, setIsAdding] = useState(false);
@@ -47,6 +49,11 @@ export const BoardMembers = ({ boardId, users, createdById }: BoardMembersProps)
       try {
         await addUserToBoard(user.id, boardId);
         setBoardUsers((prevUsers) => [...prevUsers, user]);
+        await createNotification(
+          user?.id,
+          currentWorkspace?.id || "",
+          `${currentUser?.name} added you in the board : ${boardTitle} `
+        )
         toast.success(`${user.name} added to board`);
       } catch (error) {
         console.error("Failed to update board users:", error);
