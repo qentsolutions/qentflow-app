@@ -20,6 +20,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
 import { Card } from "@/components/ui/card";
 import { createNotification } from "@/actions/notifications/create-notification";
+import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 
 interface CommentsProps {
   items: Comment[];
@@ -42,6 +43,7 @@ export const Comments = ({ items, cardId, readonly = false }: CommentsProps) => 
   const user = useCurrentUser();
   const params = useParams();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { currentWorkspace } = useCurrentWorkspace();
 
   // Fetch board users
   const { data: boardUsers, isLoading: isLoadingBoardUsers, isError: isErrorBoardUsers } = useQuery({
@@ -213,7 +215,8 @@ export const Comments = ({ items, cardId, readonly = false }: CommentsProps) => 
           await createNotification(
             mention.id,
             params.workspaceId as string,
-            `${user?.name} mentioned you in a comment`
+            `${user?.name} mentioned you in a comment`,
+            `/${currentWorkspace?.id}/boards/${boardId}/${cardId}`
           );
         } catch (error) {
           console.error('Failed to create mention notification:', error);
