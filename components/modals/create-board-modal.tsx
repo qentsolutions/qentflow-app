@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
@@ -11,7 +13,7 @@ import { boardTemplates } from "@/constants/board-templates"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { Layout, Loader2 } from "lucide-react"
+import { Layout, Loader2, X } from "lucide-react"
 import Image from "next/image"
 
 interface CreateBoardModalProps {
@@ -62,23 +64,25 @@ export const CreateBoardModal = ({ isOpen, onClose, workspaceId, templateId }: C
     <AnimatePresence>
       {isOpen && (
         <Dialog open={isOpen} onOpenChange={onClose}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-                <Layout className="w-6 h-6 text-primary" />
-                Create Board
+          <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden">
+            <DialogHeader className="p-6 pb-0">
+              <DialogTitle className="text-2xl font-bold flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Layout className="w-6 h-6 text-primary" />
+                  Create Board
+                </div>
               </DialogTitle>
-
             </DialogHeader>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.2 }}
+              className="p-6 pt-2"
             >
               <form onSubmit={onSubmit} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="title" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="title" className="text-md font-medium text-gray-700">
                     Board Title
                   </Label>
                   <Input
@@ -90,28 +94,37 @@ export const CreateBoardModal = ({ isOpen, onClose, workspaceId, templateId }: C
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                 </div>
-                <div className="bg-gray-50 border p-4 rounded-md">
-                  <p className="text-sm text-gray-600">
-                    Template: <span className="font-medium">{template?.title}</span>
-                  </p>
+              
+                <div className="relative overflow-hidden rounded-xl shadow-lg">
+                  <Image
+                    src="/board-img.png"
+                    alt="board image"
+                    width={1200}
+                    height={200}
+                    layout="responsive"
+                    objectFit="cover"
+                    className="transition-transform duration-300 hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <h3 className="text-xl font-semibold">{template?.title}</h3>
+                    <p className="text-md opacity-80">Create your new board</p>
+                  </div>
                 </div>
-                <Image
-                  src="/board-img.png"
-                  alt="board image"
-                  width={1200} // La largeur de l'image en pixels
-                  height={200} // La hauteur de l'image en pixels
-                  layout="responsive" // Cela permet à l'image de prendre la largeur complète de son conteneur
-                  objectFit="cover" // Facultatif, mais permet de remplir l'espace sans déformation
-                  className="border rounded-xl shadow-md"
-                />
                 <div className="flex justify-end gap-x-2">
-                  <Button type="button" variant="outline" onClick={onClose} disabled={isLoading} className="px-4 py-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onClose}
+                    disabled={isLoading}
+                    className="px-4 py-2 hover:bg-gray-100 transition-colors"
+                  >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90"
+                    className="px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                   >
                     {isLoading ? (
                       <>
