@@ -1,5 +1,4 @@
 "use client";
-
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
 import { Header } from "@/components/modals/card-modal/header";
@@ -26,22 +25,11 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/
 import { FileUpload } from "@/components/file-upload";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-{/* 
-interface CardPageProps {
-    params: {
-        cardId: string;
-        workspaceId: string;
-        boardId: string;
-    };
-    readonly: boolean;
-}
-*/}
-
 const CardPage = ({ params, readonly }: any) => {
     const { currentWorkspace } = useCurrentWorkspace();
     const [isDocumentSelectorOpen, setIsDocumentSelectorOpen] = useState(false);
     const { setBreadcrumbs } = useBreadcrumbs();
-    const [visibleDocuments, setVisibleDocuments] = useState(2); // Modification 1
+    const [visibleDocuments, setVisibleDocuments] = useState(2);
 
     const { data: cardData } = useQuery({
         queryKey: ["card", params.cardId],
@@ -73,7 +61,6 @@ const CardPage = ({ params, readonly }: any) => {
         queryFn: () => fetcher(`/api/cards/${params.cardId}/attachments`),
     });
 
-
     useEffect(() => {
         if (boardData && cardData) {
             setBreadcrumbs([
@@ -93,8 +80,6 @@ const CardPage = ({ params, readonly }: any) => {
     if (!cardData || !boardData) {
         return <div></div>;
     }
-
-
 
     return (
         <div className="flex h-full bg-gray-50">
@@ -162,7 +147,7 @@ const CardPage = ({ params, readonly }: any) => {
                                                                                 </div>
                                                                             </Card>
                                                                         ))}
-                                                                        {cardData.documents.length > 2 && ( // Modification 2
+                                                                        {cardData.documents.length > 2 && (
                                                                             <Button
                                                                                 variant="ghost"
                                                                                 size="sm"
@@ -242,7 +227,6 @@ const CardPage = ({ params, readonly }: any) => {
                                                                             )}
                                                                         </div>
                                                                     </ScrollArea>
-
 
                                                                 </DialogContent>
                                                             </Dialog>
@@ -328,7 +312,7 @@ const CardPage = ({ params, readonly }: any) => {
                                                                                 </div>
                                                                             </Card>
                                                                         ))}
-                                                                        {cardData.documents.length > 2 && ( // Modification 2
+                                                                        {cardData.documents.length > 2 && (
                                                                             <Button
                                                                                 variant="ghost"
                                                                                 size="sm"
@@ -409,7 +393,6 @@ const CardPage = ({ params, readonly }: any) => {
                                                                         </div>
                                                                     </ScrollArea>
 
-
                                                                 </DialogContent>
                                                             </Dialog>
                                                         )}
@@ -448,7 +431,11 @@ const CardPage = ({ params, readonly }: any) => {
                                                         </TabsTrigger>
                                                     </TabsList>
                                                     <TabsContent value="comments">
-                                                        <Comments items={commentsData} cardId={cardData?.id ?? ''} readonly={readonly} />
+                                                        {Array.isArray(commentsData) ? (
+                                                            <Comments items={commentsData} cardId={cardData?.id ?? ''} readonly={readonly} />
+                                                        ) : (
+                                                            <div>No comments available.</div>
+                                                        )}
                                                     </TabsContent>
                                                     <TabsContent value="logs">
                                                         {!auditLogsData ? (
@@ -481,7 +468,7 @@ const CardPage = ({ params, readonly }: any) => {
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 
