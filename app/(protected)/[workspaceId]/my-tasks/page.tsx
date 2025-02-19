@@ -314,10 +314,6 @@ export default function MyTasksPage() {
                         ))}
                     </div>
                     <p className="font-semibold text-lg mb-2 text-gray-800">{card.title}</p>
-                    <p
-                      className="text-sm text-gray-500 mb-2 line-clamp-2"
-                      dangerouslySetInnerHTML={{ __html: card.description }}
-                    ></p>
                     <div className="flex items-center justify-between mt-4">
                       <div className="flex items-center w-full justify-between space-x-2">
                         <div className="flex items-center">

@@ -3,8 +3,8 @@ import {  Settings2, Tag, Users } from "lucide-react";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { GeneralSettings } from "./general-settings";
-import { TagManager } from "./tag-manager";
 import { BoardMembers } from "./board-member";
+import { TagManager } from "./tag-manager";
 
 interface BoardSettingsProps {
   boardId: string;

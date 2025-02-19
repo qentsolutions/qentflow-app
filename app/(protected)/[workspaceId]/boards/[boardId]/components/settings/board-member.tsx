@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { useCallback, useState } from "react";
 import { addUserToBoard } from "@/actions/boards/add-users-to-board";
-import { UserPlus, X } from "lucide-react";
+import { Plus, UserPlus, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -133,7 +133,7 @@ export const BoardMembers = ({ boardId, users, createdById, boardTitle }: BoardM
                           variant="ghost"
                           className="opacity-0 group-hover:opacity-100"
                         >
-                          Add
+                          <Plus size={20} />
                         </Button>
                       </div>
                     ))
