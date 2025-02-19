@@ -21,6 +21,7 @@ import {
     SignalHigh,
     AlertTriangle,
     Signal,
+    Flag,
 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
@@ -185,16 +186,16 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
             return null; // Si priority est null, ne rien afficher
         }
         if (priority === "LOW") {
-            return <SignalLow className="text-green-500" size={25} />;
+            return <Flag className="text-green-500" size={14} />;
         }
         if (priority === "MEDIUM") {
-            return <SignalMedium className="text-yellow-500" size={24} />;
+            return <Flag className="text-yellow-500" size={14} />;
         }
         if (priority === "HIGH") {
-            return <SignalHigh className="text-orange-500" size={24} />;
+            return <Flag className="text-red-500" size={14} />;
         }
         if (priority === "CRITICAL") {
-            return <AlertTriangle className="text-red-500" size={16} />;
+            return <AlertTriangle className="text-red-500" size={14} />;
         }
         return null; // Si aucune correspondance, ne rien afficher
     };
@@ -242,7 +243,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                     {visibleFields.priority && (
                                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                             <div className="flex items-center gap-x-2">
-                                                                <Signal size={14} />
+                                                                <Flag size={14} />
                                                                 Priority
                                                             </div>
                                                         </th>
@@ -327,38 +328,59 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                                                 onOpenChange={(open) => setOpenAssign(open ? card.id : null)}
                                                                             >
                                                                                 <PopoverTrigger asChild>
-                                                                                    <Button variant="outline" size="sm" className="w-[200px] justify-start">
-                                                                                        {card.assignedUserId ? (
-                                                                                            <div className="flex items-center gap-2">
-                                                                                                <Avatar className="h-6 w-6">
-                                                                                                    <AvatarImage
-                                                                                                        src={
+                                                                                    {card.assignedUserId ? (
+                                                                                        <div className="flex items-center justify-center gap-2">
+                                                                                            <Tooltip>
+                                                                                                <TooltipTrigger>
+                                                                                                    <Avatar className="h-8 w-8 border">
+                                                                                                        <AvatarImage
+                                                                                                            src={
+                                                                                                                users.find(
+                                                                                                                    (u: { id: string | null | undefined }) =>
+                                                                                                                        u.id === card.assignedUserId,
+                                                                                                                )?.image || ""
+                                                                                                            }
+                                                                                                        />
+                                                                                                        <AvatarFallback>
+                                                                                                            {users.find(
+                                                                                                                (u: { id: string | null | undefined }) =>
+                                                                                                                    u.id === card.assignedUserId,
+                                                                                                            )?.name?.[0] || <UserRound size={12} />}
+                                                                                                        </AvatarFallback>
+                                                                                                    </Avatar>
+                                                                                                </TooltipTrigger>
+                                                                                                <TooltipContent>
+                                                                                                    <span className="text-sm">
+                                                                                                        {
                                                                                                             users.find(
                                                                                                                 (u: { id: string | null | undefined }) =>
                                                                                                                     u.id === card.assignedUserId,
-                                                                                                            )?.image || ""
+                                                                                                            )?.name
                                                                                                         }
-                                                                                                    />
-                                                                                                    <AvatarFallback>
-                                                                                                        {users.find(
-                                                                                                            (u: { id: string | null | undefined }) =>
-                                                                                                                u.id === card.assignedUserId,
-                                                                                                        )?.name?.[0] || <UserRound size={12} />}
-                                                                                                    </AvatarFallback>
-                                                                                                </Avatar>
-                                                                                                <span className="text-sm">
-                                                                                                    {
-                                                                                                        users.find(
-                                                                                                            (u: { id: string | null | undefined }) =>
-                                                                                                                u.id === card.assignedUserId,
-                                                                                                        )?.name
-                                                                                                    }
-                                                                                                </span>
-                                                                                            </div>
-                                                                                        ) : (
-                                                                                            <span className="text-sm text-gray-500">Assign user...</span>
-                                                                                        )}
-                                                                                    </Button>
+                                                                                                    </span>
+                                                                                                </TooltipContent>
+                                                                                            </Tooltip>
+                                                                                        </div>
+                                                                                    ) : (
+                                                                                        <div className="flex items-center justify-center">
+                                                                                            <Tooltip>
+                                                                                                <TooltipTrigger>
+                                                                                                    <Avatar className="h-8 w-8 border">
+                                                                                                        <AvatarFallback>
+                                                                                                            <UserRound size={16} />
+                                                                                                        </AvatarFallback>
+                                                                                                    </Avatar>
+                                                                                                </TooltipTrigger>
+                                                                                                <TooltipContent>
+                                                                                                    <p className="text-sm">
+                                                                                                        Assign user
+                                                                                                    </p>
+                                                                                                </TooltipContent>
+                                                                                            </Tooltip>
+
+                                                                                        </div>
+
+                                                                                    )}
                                                                                 </PopoverTrigger>
                                                                                 <PopoverContent className="w-[200px] p-0">
                                                                                     <div className="py-2">

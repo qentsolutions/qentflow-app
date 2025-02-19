@@ -7,7 +7,7 @@ import { useAction } from "@/hooks/use-action";
 import { updatePriority } from "@/actions/tasks/update-priority";
 import { CardWithList } from "@/types";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
-import { AlertTriangle, ArrowDown, ArrowRight, ArrowUp, OctagonAlert, Radio, SignalHigh, SignalLow, SignalMedium, Minus } from 'lucide-react';
+import { AlertTriangle, ArrowDown, ArrowRight, ArrowUp, OctagonAlert, Radio, SignalHigh, SignalLow, SignalMedium, Minus, Flag } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -59,9 +59,9 @@ export const Priority = ({
 
   const priorityOptions = [
     { value: "none", label: "None", icon: Minus, color: "text-gray-500" },
-    { value: "low", label: "Low", icon: SignalLow, color: "text-green-500" },
-    { value: "medium", label: "Medium", icon: SignalMedium, color: "text-yellow-500" },
-    { value: "high", label: "High", icon: SignalHigh, color: "text-orange-500" },
+    { value: "low", label: "Low", icon: Flag, color: "text-green-500" },
+    { value: "medium", label: "Medium", icon: Flag, color: "text-yellow-500" },
+    { value: "high", label: "High", icon: Flag, color: "text-red-500" },
     { value: "critical", label: "Critical", icon: AlertTriangle, color: "text-red-500" }
   ];
 
@@ -91,7 +91,7 @@ export const Priority = ({
               {priorityOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   <div className="flex items-center gap-2">
-                    <option.icon className={`h-6 w-6 ${option.color}`} />
+                    <option.icon className={`h-4 w-4 ${option.color}`} />
                     {option.label}
                   </div>
                 </SelectItem>

@@ -18,6 +18,7 @@ import {
   UserRound,
   MoreHorizontal,
   Trash,
+  Flag,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -85,16 +86,16 @@ export const TableView = ({ data, visibleFields, users }: TableViewProps) => {
       return null; // Si priority est null, ne rien afficher
     }
     if (priority === "LOW") {
-      return <SignalLow className="text-green-500" size={25} />;
+      return <Flag className="text-green-500" size={14} />;
     }
     if (priority === "MEDIUM") {
-      return <SignalMedium className="text-yellow-500" size={24} />;
+      return <Flag className="text-yellow-500" size={14} />;
     }
     if (priority === "HIGH") {
-      return <SignalHigh className="text-orange-500" size={24} />;
+      return <Flag className="text-red-500" size={14} />;
     }
     if (priority === "CRITICAL") {
-      return <AlertTriangle className="text-red-500" size={16} />;
+      return <AlertTriangle className="text-red-500" size={14} />;
     }
     return null; // Si aucune correspondance, ne rien afficher
   };

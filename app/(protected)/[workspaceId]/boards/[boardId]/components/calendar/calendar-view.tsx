@@ -84,7 +84,7 @@ export const CalendarView = ({ data, boardId }: CalendarViewProps) => {
                     </div>
                 ))}
             </div>
-            <div className="grid grid-cols-7 gap-1 overflow-y-auto max-h-[65vh] p-1">
+            <div className="grid grid-cols-7 gap-1 p-1">
                 {weeks.map((week, weekIndex) =>
                     week.map((day, dayIndex) => {
                         const dayCards = data.flatMap((list) =>
@@ -113,7 +113,7 @@ export const CalendarView = ({ data, boardId }: CalendarViewProps) => {
                                         {format(day, "d")}
                                     </span>
                                 </div>
-                                <div className="mt-1 space-y-1 overflow-y-auto max-h-[calc(100%-1.5rem)]">
+                                <div className="mt-1 space-y-1">
                                     {dayCards.map((card: any) => (
                                         <motion.div
                                             key={card.id}

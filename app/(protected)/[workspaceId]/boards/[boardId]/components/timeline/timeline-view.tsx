@@ -1,11 +1,11 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Card } from "@/components/ui/card"
 import { format, addMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, differenceInDays } from "date-fns"
-import { useCardModal } from "@/hooks/use-card-modal"
-import { motion } from "framer-motion"
 import { fr } from "date-fns/locale"
+import { motion } from "framer-motion"
+import { useCardModal } from "@/hooks/use-card-modal"
+import { Card } from "@/components/ui/card"
 
 interface TimelineViewProps {
   boardId: string
@@ -14,7 +14,9 @@ interface TimelineViewProps {
 
 const MONTHS_TO_SHOW = 12
 const DAY_WIDTH = 45
-const LIST_TITLE_WIDTH = 200 // Largeur de la colonne des titres de liste
+const LIST_TITLE_WIDTH = 200
+const CARD_HEIGHT = 40
+const CARD_GAP = 8
 
 export const TimelineView = ({ data, boardId }: TimelineViewProps) => {
   const cardModal = useCardModal()
@@ -41,32 +43,31 @@ export const TimelineView = ({ data, boardId }: TimelineViewProps) => {
       scrollContainerRef.current.scrollLeft =
         scrollPosition - scrollContainerRef.current.clientWidth / 2 + LIST_TITLE_WIDTH
     }
-  }, [calculatePosition, scrollContainerRef]) // Added dependencies to useEffect
+  }, [scrollContainerRef]) // Added dependencies to useEffect
 
   return (
     <div className="space-y-4 py-2 max-w-[calc(100vw-20vw)] mx-auto">
-      <Card className="bg-white dark:bg-gray-800 shadow-none overflow-hidden">
-        <div className=" relative">
-          {/* Colonne fixe pour les titres des listes */}
+      <Card className="bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden">
+        <div className="relative">
+          {/* Fixed column for list titles */}
           <div className="absolute left-0 top-0 bottom-0 w-[200px] bg-white dark:bg-gray-800 z-20 border-r dark:border-gray-700">
-            <div className="h-[88px]"></div> {/* Espace pour les en-têtes de mois et de jours */}
+            <div className="h-[88px] bg-gray-100 dark:bg-gray-900"></div>
             {data.map((list: any, listIndex: number) => (
               <div
                 key={list.id}
-                className={`h-[88px] flex items-center px-4 ${
-                  listIndex % 2 === 0 ? "bg-gray-50/50 dark:bg-gray-900/30" : ""
-                }`}
+                className={`h-[200px] flex items-center px-4 ${listIndex % 2 === 0 ? "bg-gray-50 dark:bg-gray-900/50" : ""
+                  }`}
               >
                 <span className="font-medium text-gray-700 dark:text-gray-300">{list.title}</span>
               </div>
             ))}
           </div>
 
-          {/* Contenu défilant */}
+          {/* Scrollable content */}
           <div className="overflow-x-auto ml-[200px]" ref={scrollContainerRef}>
             <div style={{ width: `${allDays.length * DAY_WIDTH}px`, minWidth: "calc(100% - 200px)" }}>
               {/* Month headers */}
-              <div className="flex sticky top-0 z-10 bg-white dark:bg-gray-800 shadow-sm">
+              <div className="flex sticky top-0 z-10 bg-gray-100 dark:bg-gray-900 shadow-sm">
                 {months.map((month) => {
                   const daysInMonth = eachDayOfInterval({
                     start: startOfMonth(month),
@@ -91,10 +92,9 @@ export const TimelineView = ({ data, boardId }: TimelineViewProps) => {
                     key={day.toISOString()}
                     className={`
                       flex-none text-center py-2 border-r dark:border-gray-700
-                      ${
-                        isSameDay(day, new Date())
-                          ? "bg-blue-50 dark:bg-blue-900/20 font-bold text-blue-600 dark:text-blue-400"
-                          : "text-gray-600 dark:text-gray-400"
+                      ${isSameDay(day, new Date())
+                        ? "bg-blue-50 dark:bg-blue-900/20 font-bold text-blue-600 dark:text-blue-400"
+                        : "text-gray-600 dark:text-gray-400"
                       }
                     `}
                     style={{ width: `${DAY_WIDTH}px` }}
@@ -111,14 +111,14 @@ export const TimelineView = ({ data, boardId }: TimelineViewProps) => {
                   <div
                     key={list.id}
                     className={`
-                      relative py-6 border-b dark:border-gray-700 h-[88px]
+                      relative py-4 border-b dark:border-gray-700 h-[200px]
                       ${listIndex % 2 === 0 ? "bg-gray-50/50 dark:bg-gray-900/30" : ""}
                     `}
                   >
-                    <div className="relative h-16 mx-4">
+                    <div className="relative h-full mx-4">
                       {list.cards
                         .filter((card: any) => card.startDate && card.dueDate)
-                        .map((card: any) => {
+                        .map((card: any, cardIndex: number) => {
                           const startDate = new Date(card.startDate)
                           const endDate = new Date(card.dueDate)
                           const left = calculatePosition(startDate)
@@ -127,11 +127,12 @@ export const TimelineView = ({ data, boardId }: TimelineViewProps) => {
                           return (
                             <motion.div
                               key={card.id}
-                              className="absolute h-12 rounded-md cursor-pointer transition-all hover:opacity-90 hover:shadow-lg"
+                              className="absolute rounded-lg cursor-pointer transition-all hover:opacity-90 hover:shadow-lg"
                               style={{
                                 left: `${left}px`,
                                 width: `${width}px`,
-                                top: "0",
+                                top: `${cardIndex * (CARD_HEIGHT + CARD_GAP)}px`,
+                                height: `${CARD_HEIGHT}px`,
                                 backgroundColor:
                                   card.priority === "HIGH"
                                     ? "#ef4444"
@@ -144,10 +145,9 @@ export const TimelineView = ({ data, boardId }: TimelineViewProps) => {
                               onClick={() => cardModal.onOpen(card.id)}
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
-                              transition={{ duration: 0.3 }}
+                              transition={{ duration: 0.3, delay: cardIndex * 0.05 }}
                             >
                               <div className="px-3 py-2 text-white text-sm truncate font-medium">{card.title}</div>
-                              <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/10" />
                             </motion.div>
                           )
                         })}

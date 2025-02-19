@@ -9,28 +9,20 @@ import { Input } from "@/components/ui/input";
 import {
   Search,
   CheckCircle2,
-  Circle,
   Calendar,
   Clock,
   AlertCircle,
-  ExternalLink,
-  RefreshCw,
-  SignalLow,
-  SignalMedium,
-  SignalHigh,
   AlertTriangle,
   ArrowUpDown,
   Filter,
   Tag,
   KanbanSquare,
+  Flag,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -40,11 +32,11 @@ import CardPage from "../boards/[boardId]/cards/[cardId]/page";
 const getPriorityIcon = (priority: string | null) => {
   switch (priority) {
     case "LOW":
-      return <SignalLow className="h-4 w-4 text-green-500" />;
+      return <Flag className="h-4 w-4 text-green-500" />;
     case "MEDIUM":
-      return <SignalMedium className="h-4 w-4 text-yellow-500" />;
+      return <Flag className="h-4 w-4 text-yellow-500" />;
     case "HIGH":
-      return <SignalHigh className="h-4 w-4 text-orange-500" />;
+      return <Flag className="h-4 w-4 text-red-500" />;
     case "CRITICAL":
       return <AlertTriangle className="h-4 w-4 text-red-500" />;
     default:

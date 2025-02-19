@@ -6,7 +6,7 @@ import { useCardModal } from "@/hooks/use-card-modal";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { UserPlus, User as UserIcon, UserX, MessageSquareText, ArrowDown, ArrowRight, ArrowUp, AlertTriangle, SignalLow, SignalMedium, SignalHigh, Paperclip } from "lucide-react";
+import { UserPlus, User as UserIcon, UserX, MessageSquareText, ArrowDown, ArrowRight, ArrowUp, AlertTriangle, SignalLow, SignalMedium, SignalHigh, Paperclip, Flag } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { assignUserToCard } from "@/actions/boards/assign-user-to-card";
@@ -79,16 +79,16 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
       return null; // Si priority est null, ne rien afficher
     }
     if (priority === "LOW") {
-      return <SignalLow className="text-green-500" size={25} />;
+      return <Flag className="text-green-500" size={14} />;
     }
     if (priority === "MEDIUM") {
-      return <SignalMedium className="text-yellow-500" size={24} />;
+      return <Flag className="text-yellow-500" size={14} />;
     }
     if (priority === "HIGH") {
-      return <SignalHigh className="text-orange-500" size={24} />;
+      return <Flag className="text-red-500" size={14} />;
     }
     if (priority === "CRITICAL") {
-      return <AlertTriangle className="text-red-500" size={16} />;
+      return <AlertTriangle className="text-red-500" size={14} />;
     }
     return null; // Si aucune correspondance, ne rien afficher
   };

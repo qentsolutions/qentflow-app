@@ -8,10 +8,7 @@ import { fetcher } from "@/lib/fetcher";
 import {
   RefreshCcw,
   Search,
-  SignalHigh,
   Filter,
-  SignalLow,
-  SignalMedium,
   AlertTriangle,
   ArrowUpDown,
   ArrowDown,
@@ -20,6 +17,7 @@ import {
   Plus,
   CheckIcon,
   Settings2,
+  Flag,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
@@ -127,11 +125,11 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
   const getPriorityIcon = (priority: string) => {
     switch (priority) {
       case "LOW":
-        return <SignalLow className="h-4 w-4 text-green-500" />;
+        return <Flag className="h-4 w-4 text-green-500" />;
       case "MEDIUM":
-        return <SignalMedium className="h-4 w-4 text-yellow-500" />;
+        return <Flag className="h-4 w-4 text-yellow-500" />;
       case "HIGH":
-        return <SignalHigh className="h-4 w-4 text-orange-500" />;
+        return <Flag className="h-4 w-4 text-red-500" />;
       case "CRITICAL":
         return <AlertTriangle className="h-4 w-4 text-red-500" />;
       default:
