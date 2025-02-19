@@ -26,6 +26,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { assignUserToCard } from "@/actions/boards/assign-user-to-card";
 import { UserIcon, UserX } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { createNotification } from "@/actions/notifications/create-notification";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 interface MainComponentProps {
   data: CardWithList;
@@ -43,7 +45,7 @@ export const TagsComponent = ({
   const { currentWorkspace } = useCurrentWorkspace();
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
-
+  const currentUser = useCurrentUser();
   const [assignedUser, setAssignedUser] = useState<User | null>(null);
   const [linkedTags, setLinkedTags] = useState<string[]>(data.tags.map(tag => tag.name));
   const boardId = params.boardId as string;
@@ -144,6 +146,12 @@ export const TagsComponent = ({
   const handleAssignUser = async (userId: string | null) => {
     try {
       await assignUserToCard(data.id, userId!);
+      await createNotification(
+        userId || "",
+        params?.workspaceId as string,
+        `${currentUser?.name} has assigned you to a card : ${data?.title} !`,
+        `/${params?.workspaceId}/boards/${params.boardId}/cards/${data?.id}`
+      );
       const newAssignedUser = userId ? usersInBoard.find((user: User) => user.id === userId) : null;
       setAssignedUser(newAssignedUser);
       toast.success(userId ? "User assigned to card" : "User unassigned from card");

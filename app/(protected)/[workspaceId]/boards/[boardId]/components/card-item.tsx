@@ -15,6 +15,9 @@ import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Progress } from "@/components/ui/progress";
+import { createNotification } from "@/actions/notifications/create-notification";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { useParams } from "next/navigation";
 
 interface CommentCountResponse {
   commentCount: number;
@@ -46,6 +49,8 @@ interface CardItemProps {
 export const CardItem = ({ data, index, users }: CardItemProps) => {
   const cardModal = useCardModal();
   const [assignedUserState, setAssignedUserState] = useState<User | null>(null);
+  const currentUser = useCurrentUser();
+  const params = useParams();
 
   useEffect(() => {
     const assignedUser = users.find(user => user.id === data.assignedUserId) || null;
@@ -60,7 +65,12 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
   const handleAssignUser = async (userId: string | null) => {
     try {
       await assignUserToCard(data.id, userId || "null");
-
+      await createNotification(
+        userId || "",
+        params?.workspaceId as string,
+        `${currentUser?.name} has assigned you to a card : ${data?.title} !`,
+        `/${params?.workspaceId}/boards/${params.boardId}/cards/${data?.id}`
+      );
       if (userId === null) {
         setAssignedUserState(null);
         toast.success("User unassigned from card");

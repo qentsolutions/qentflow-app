@@ -43,6 +43,8 @@ import { Progress } from "@/components/ui/progress"
 import { useQuery } from "@tanstack/react-query"
 import { fetcher } from "@/lib/fetcher"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { createNotification } from "@/actions/notifications/create-notification"
+import { useCurrentUser } from "@/hooks/use-current-user"
 
 interface ListViewProps {
     boardId: string
@@ -90,6 +92,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
     const { currentWorkspace } = useCurrentWorkspace()
     const [openAssign, setOpenAssign] = useState<string | null>(null)
     const params = useParams()
+    const currentUser = useCurrentUser();
 
     useEffect(() => {
         setLists(data)
@@ -147,6 +150,13 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
 
     const handleAssignUser = async (cardId: string, userId: string) => {
         await assignUserToCard(cardId, userId!)
+        const card = lists.flatMap(list => list.cards).find(card => card.id === cardId);
+        await createNotification(
+            userId || "",
+            params?.workspaceId as string,
+            `${currentUser?.name} has assigned you to a card : ${card?.title} !`,
+            `/${params?.workspaceId}/boards/${params.boardId}/cards/${cardId}`
+        );
         setLists((prevLists) =>
             prevLists.map((list) => ({
                 ...list,

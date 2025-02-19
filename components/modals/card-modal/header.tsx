@@ -123,12 +123,12 @@ export const Header = ({
                 onBlur={onBlur} // Add onBlur to handle losing focus
                 id="title"
                 defaultValue={title}
-                className="font-semibold !text-2xl px-1 text-neutral-700 dark:text-white bg-transparent border-transparent relative -left-1.5 w-[95%] focus-visible:bg-white dark:focus-visible:bg-gray-700 focus-visible:border-input mb-0.5"
+                className="font-semibold !text-2xl px-1 text-neutral-700 dark:text-white bg-transparent relative -left-1.5 w-[90%] focus-visible:bg-white dark:focus-visible:bg-gray-700 focus-visible:border-input mb-0.5"
               />
             ) : (
               <p
                 onClick={handleEditClick}
-                className="font-semibold text-2xl px-1 text-neutral-700 dark:text-white cursor-pointer"
+                className="font-semibold p-1 hover:bg-gray-50 text-2xl px-1 text-neutral-700 dark:text-white cursor-pointer"
               >
                 {title}
               </p>
