@@ -151,14 +151,14 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                       <PopoverTrigger onClick={(e) => e.stopPropagation()} asChild>
                         <button className="hover:opacity-75 transition">
                           {assignedUserState ? (
-                            <Avatar className="h-8 w-8">
+                            <Avatar className="h-6 w-6">
                               <AvatarImage src={assignedUserState.image || ""} />
                               <AvatarFallback className="text-gray-500 text-sm">
                                 {assignedUserState.name?.charAt(0) || <UserIcon className="h-2 w-2" />}
                               </AvatarFallback>
                             </Avatar>
                           ) : (
-                            <Avatar className="h-8 w-8">
+                            <Avatar className="h-6 w-6">
                               <AvatarFallback className="text-gray-500 text-sm">
                                 <UserPlus size={16} />
                               </AvatarFallback>

@@ -20,7 +20,7 @@ export const newVerification = async (token: string) => {
   const existingUser = await getUserByEmail(existingToken.email);
 
   if (!existingUser) {
-    return { error: "Email does not exist!" };
+    return { error: "Email or password is invalid!" };
   }
 
   await db.user.update({

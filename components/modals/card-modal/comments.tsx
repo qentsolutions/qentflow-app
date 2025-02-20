@@ -307,9 +307,15 @@ export const Comments = ({ items, cardId, readonly = false }: CommentsProps) => 
       if (part.startsWith('@')) {
         return <span key={index} className="text-blue-500">{part}</span>;
       }
-      return part;
+      // Split the part by new lines and render each line in a separate paragraph
+      return part.split('\n').map((line, lineIndex) => (
+        <p key={`${index}-${lineIndex}`} className="text-sm text-foreground">
+          {line}
+        </p>
+      ));
     });
   };
+
 
   if (isLoadingBoardUsers) {
     return <Skeleton className="h-6 w-full" />;

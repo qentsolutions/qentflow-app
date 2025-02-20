@@ -50,7 +50,7 @@ export default function CreateTagForm({ boardId }: CreateTagFormProps) {
   }
 
   return (
-    <Card>
+    <Card className="border-none p-0 shadow-none">
       <CardHeader>
         <CardTitle>Create New Tag</CardTitle>
       </CardHeader>

@@ -272,9 +272,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Create New Tag</DialogTitle>
-                        </DialogHeader>
+      
                         <CreateTagForm boardId={boardId} />
                       </DialogContent>
                     </Dialog>
