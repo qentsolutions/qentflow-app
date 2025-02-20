@@ -27,7 +27,7 @@ export const Tasks = ({ cardId }: TasksProps) => {
     const params = useParams();
     const { currentWorkspace } = useCurrentWorkspace();
     const queryClient = useQueryClient();
-
+    
     const { data: tasks = [], isLoading } = useQuery({
         queryKey: ["card-tasks", cardId],
         queryFn: () => fetcher(`/api/cards/${cardId}/tasks`),

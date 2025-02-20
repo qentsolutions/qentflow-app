@@ -25,7 +25,8 @@ interface CreateBoardModalProps {
 
 export const CreateBoardModal = ({ isOpen, onClose, workspaceId, templateId }: CreateBoardModalProps) => {
   const router = useRouter()
-  const [title, setTitle] = useState("")
+  const [title, setTitle] = useState("");
+  const [error, setError] = useState<string | null>(null); // New state for error message
 
   const template = boardTemplates.find((t) => t.id === templateId)
 
@@ -42,17 +43,21 @@ export const CreateBoardModal = ({ isOpen, onClose, workspaceId, templateId }: C
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!title.trim()) {
-      toast.error("Board title is required")
-      return
+
+    if (title.trim().length < 2) {
+      setError("Board title must be at least 2 characters long."); // Set error message
+      return;
     }
+
+    setError(null); 
 
     execute({
       title,
       workspaceId,
       templateId,
-    })
-  }
+    });
+  };
+
 
   useEffect(() => {
     if (!isOpen) {
@@ -93,8 +98,9 @@ export const CreateBoardModal = ({ isOpen, onClose, workspaceId, templateId }: C
                     disabled={isLoading}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
+                  {error && <p className="text-red-500 text-sm mt-1">{error}</p>} {/* Error message below input */}
                 </div>
-              
+
                 <div className="relative overflow-hidden rounded-xl shadow-lg">
                   <Image
                     src="/board-img.png"

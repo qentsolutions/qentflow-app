@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { useCardModal } from "@/hooks/use-card-modal";
 
 interface AssignedTasksListProps {
   lists: any[];
@@ -9,6 +10,7 @@ interface AssignedTasksListProps {
 
 export const AssignedTasksList = ({ lists, selectedUserId }: AssignedTasksListProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const cardModal = useCardModal();
 
   const allTasks = lists.flatMap(list =>
     list.cards
@@ -33,11 +35,15 @@ export const AssignedTasksList = ({ lists, selectedUserId }: AssignedTasksListPr
     }
   };
 
+  const OpenCard = (cardId: string) => {
+    cardModal.onOpen(cardId);
+  }
+
   return (
     <Card className="overflow-hidden border border-border/50 backdrop-blur-sm">
       <div className="sticky top-0 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/75 border-b border-border/50 px-6 py-4 z-10">
         <div className="flex items-center justify-between gap-4">
-          <h2 className="text-lg font-semibold">Assigned Tasks ({filteredTasks.length})</h2>
+          <h2 className="text-lg font-semibold">Tasks ({filteredTasks.length})</h2>
           <Input
             type="text"
             placeholder="Search tasks..."
@@ -51,7 +57,8 @@ export const AssignedTasksList = ({ lists, selectedUserId }: AssignedTasksListPr
         {filteredTasks.map((task: any) => (
           <div
             key={task.id}
-            className="p-4 rounded-lg border border-border/50 bg-card hover:shadow-md transition-all duration-200"
+            className="p-4 rounded-lg border border-border/50 bg-card hover:shadow-md transition-all duration-200 cursor-pointer"
+            onClick={() => OpenCard(task.id)} // Trigger OpenCard when a task is clicked
           >
             <div className="flex justify-between items-start gap-4">
               <div className="space-y-1">

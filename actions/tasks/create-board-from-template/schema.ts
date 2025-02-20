@@ -5,7 +5,7 @@ export const CreateBoardFromTemplate = z.object({
     required_error: "Title is required",
     invalid_type_error: "Title is required",
   })
-  .min(3, {
+  .min(2, {
     message: "Title is too short.",
   })
   .refine(title => /^[a-zA-Z0-9\s]+$/.test(title), {

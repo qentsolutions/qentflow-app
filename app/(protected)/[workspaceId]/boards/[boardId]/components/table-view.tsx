@@ -19,6 +19,7 @@ import {
   MoreHorizontal,
   Trash,
   Flag,
+  GripVertical,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -140,10 +141,17 @@ export const TableView = ({ data, visibleFields, users }: TableViewProps) => {
           </TableHeader>
           <TableBody>
             {allCards.map((card) => {
-          
+
               return (
                 <TableRow key={card.id} className="cursor-pointer hover:bg-gray-50" onClick={() => cardModal.onOpen(card.id)}>
-                  {visibleFields.title && <TableCell className="font-medium">{card.title}</TableCell>}
+                  <TableCell className="px-6 py-4">
+                    <div className="flex items-center gap-x-3">
+                      <GripVertical size={16} className="text-gray-400" />
+                      <span className="text-sm font-medium max-w-52 text-gray-900 line-clamp-2 overflow-hidden">
+                        {card.title}
+                      </span>
+                    </div>
+                  </TableCell>
                   {visibleFields.priority && (
                     <TableCell>
                       <div className="mr-1 flex items-center justify-center">
@@ -155,7 +163,7 @@ export const TableView = ({ data, visibleFields, users }: TableViewProps) => {
                     </TableCell>
                   )}
                   {visibleFields.assignee && (
-                    <TableCell>
+                    <TableCell className="text-center">
                       {card.assignedUserId && (
                         <Tooltip>
                           <TooltipTrigger>
@@ -218,7 +226,7 @@ export const TableView = ({ data, visibleFields, users }: TableViewProps) => {
                       </div>
                     </TableCell>
                   )}
-               
+
                   <TableCell className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" onClick={(e) => e.stopPropagation()}>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

@@ -308,15 +308,15 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                                     onClick={() => cardModal.onOpen(card.id)}
                                                                 >
                                                                     {visibleFields.title && (
-                                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                                        <td className="px-6 py-4">
                                                                             <div className="flex items-center gap-x-3">
                                                                                 <GripVertical size={16} className="text-gray-400" />
-                                                                                <span className="text-sm font-medium text-gray-900">{card.title}</span>
+                                                                                <span className="text-sm font-medium text-gray-900 line-clamp-2 overflow-hidden">
+                                                                                    {card.title}
+                                                                                </span>
                                                                             </div>
                                                                         </td>
                                                                     )}
-
-
                                                                     {visibleFields.priority && (
                                                                         <td>
                                                                             <div className="mr-1 flex items-center justify-center">

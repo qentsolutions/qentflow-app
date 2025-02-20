@@ -59,7 +59,7 @@ export const BoardCard = ({ board, onClick }: BoardCardProps) => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center space-x-2">
-                    <Avatar className="h-8 w-8 ring-2 ring-white">
+                    <Avatar className="h-6 w-6 ring-2 ring-white">
                       {board.creator.imageUrl ? (
                         <AvatarImage
                           src={board.creator.imageUrl}

@@ -86,9 +86,9 @@ const ManageWorkspacesPage = () => {
                             Configure and manage your workspace and team members
                         </CardDescription>
                     </div>
-                    <Avatar className="h-16 w-16">
+                    <Avatar className="h-12 w-12 bg-blue-500 rounded-lg">
                         <AvatarImage src={currentWorkspace?.logo || ""} alt={`${currentWorkspace?.name} logo`} />
-                        <AvatarFallback>{currentWorkspace?.name[0]}</AvatarFallback>
+                        <AvatarFallback className="bg-blue-500 text-white text-xl">{currentWorkspace?.name[0]}</AvatarFallback>
                     </Avatar>
                 </CardHeader>
                 <CardContent>
