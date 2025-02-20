@@ -1,6 +1,6 @@
 import AWS from "aws-sdk";
 
-// Vérification des variables d'environnement
+// AWS Configuration check
 if (
   !process.env.NEXT_AWS_REGION ||
   !process.env.NEXT_AWS_ACCESS_KEY_ID ||
@@ -10,7 +10,7 @@ if (
   throw new Error("Missing AWS SES configuration environment variables");
 }
 
-// Configuration de AWS SES
+// AWS SES Configuration
 const ses = new AWS.SES({
   region: process.env.NEXT_AWS_REGION,
   credentials: {
@@ -22,12 +22,10 @@ const ses = new AWS.SES({
 const domain = process.env.NEXT_PUBLIC_APP_URL;
 const fromEmail = process.env.NEXT_AWS_SES_FROM_EMAIL;
 
-// Fonction d'envoi d'email générique
 const sendEmail = async (to: string, subject: string, html: string) => {
   if (!fromEmail) {
     throw new Error("FROM_EMAIL is not configured in environment variables");
   }
-
   if (!to || !subject || !html) {
     throw new Error("Missing required email parameters");
   }
@@ -67,7 +65,7 @@ const sendEmail = async (to: string, subject: string, html: string) => {
   }
 };
 
-// Modèle HTML d'e-mail
+// Modern Email Template
 export const sendBeautifulEmail = async (
   email: string,
   subject: string,
@@ -77,66 +75,126 @@ export const sendBeautifulEmail = async (
     <!DOCTYPE html>
     <html>
     <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
       <style>
         body {
-          font-family: Arial, sans-serif;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
           margin: 0;
           padding: 0;
-          background-color: #007bff;
-          color: #333;
+          background-color: #F0F9FF;
+          color: #1F2937;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
         }
         .container {
           max-width: 600px;
-          margin: 30px auto;
-          background: #ffffff;
-          border-radius: 8px;
+          margin: 40px auto;
+          background: #FFFFFF;
+          border-radius: 16px;
           overflow: hidden;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
         .header {
-          background-color: #007bff;
-          color: white;
+          background-color: #FFFFFF;
           text-align: center;
-          padding: 20px;
-          font-size: 24px;
+          padding: 32px 24px;
+          border-bottom: 1px solid #E5E7EB;
+        }
+        .logo {
+          height: 40px;
+          margin-bottom: 16px;
         }
         .content {
-          padding: 20px;
-          line-height: 1.6;
+          padding: 32px 24px;
+          line-height: 1.7;
+          color: #374151;
+        }
+        .content h1 {
+          margin: 0 0 24px;
+          color: #111827;
+          font-size: 24px;
+          font-weight: 600;
+          line-height: 1.3;
         }
         .content p {
-          margin: 10px 0;
+          margin: 16px 0;
+          font-size: 16px;
         }
         .button {
           display: inline-block;
-          margin: 20px 0;
-          padding: 12px 20px;
-          font-size: 16px;
-          background-color: #007bff;
+          margin: 24px 0;
+          padding: 12px 24px;
+          background-color: #0EA5E9;
           color: white;
           text-decoration: none;
-          border-radius: 5px;
+          border-radius: 8px;
+          font-weight: 500;
+          text-align: center;
+          transition: background-color 0.2s ease;
+        }
+        .button:hover {
+          background-color: #0284C7;
         }
         .footer {
           text-align: center;
-          padding: 10px;
-          background-color: #007bff;
-          color: white;
-          font-size: 12px;
+          padding: 24px;
+          background-color: #F9FAFB;
+          color: #6B7280;
+          font-size: 14px;
+          border-top: 1px solid #E5E7EB;
+        }
+        .social-links {
+          margin-top: 16px;
+        }
+        .social-link {
+          display: inline-block;
+          margin: 0 8px;
+          color: #6B7280;
+          text-decoration: none;
+        }
+        .social-link:hover {
+          color: #374151;
+        }
+        .divider {
+          height: 1px;
+          background-color: #E5E7EB;
+          margin: 24px 0;
+        }
+        @media (max-width: 600px) {
+          .container {
+            margin: 20px;
+            width: auto;
+          }
+          .content {
+            padding: 24px 16px;
+          }
+          .button {
+            display: block;
+            text-align: center;
+          }
         }
       </style>
     </head>
     <body>
       <div class="container">
         <div class="header">
-          QentFlow
+          <img src="${domain}/logo.png" alt="QentFlow" class="logo">
         </div>
         <div class="content">
           ${content}
-          <p>If you have any questions, feel free to contact us at <a href="mailto:support@qentsolutions.com">support@qentsolutions.com</a>.</p>
         </div>
         <div class="footer">
-          &copy; ${new Date().getFullYear()} QentFlow. All rights reserved.
+          <p>&copy; ${new Date().getFullYear()} QentFlow. All rights reserved.</p>
+          <p>For any questions, contact us at <a href="mailto:support@qentsolutions.com" style="color: #0EA5E9; text-decoration: none;">support@qentsolutions.com</a></p>
+          <div class="social-links">
+            <a href="#" class="social-link">Twitter</a>
+            <span style="color: #D1D5DB">•</span>
+            <a href="#" class="social-link">LinkedIn</a>
+            <span style="color: #D1D5DB">•</span>
+            <a href="#" class="social-link">Facebook</a>
+          </div>
         </div>
       </div>
     </body>
@@ -146,7 +204,7 @@ export const sendBeautifulEmail = async (
   await sendEmail(email, subject, emailTemplate);
 };
 
-// Fonction pour vérifier une adresse email
+// Email verification
 export const verifyEmailAddress = async (emailAddress: string) => {
   try {
     await ses
@@ -154,72 +212,86 @@ export const verifyEmailAddress = async (emailAddress: string) => {
         EmailAddress: emailAddress,
       })
       .promise();
-    return `Verification email sent to ${emailAddress}. Please check your inbox.`;
+    return `A verification email has been sent to ${emailAddress}. Please check your inbox.`;
   } catch (error) {
     console.error("Error verifying email:", error);
-    throw new Error("Failed to initiate email verification");
+    throw new Error("Unable to initiate email verification");
   }
 };
 
-// Cas d'utilisation spécifiques
-
-// Envoi d'un e-mail avec un code 2FA
+// 2FA Email
 export const sendTwoFactorTokenEmail = async (email: string, token: string) => {
-  const content = `<p>Your 2FA code is: <strong>${token}</strong>. Enter this code to complete your login.</p>`;
-  await sendBeautifulEmail(email, "Your 2FA Code", content);
+  const content = `
+    <h1>Your Verification Code</h1>
+    <p>Here is your two-step verification code:</p>
+    <div style="
+      background-color: #F3F4F6;
+      border-radius: 8px;
+      padding: 24px;
+      text-align: center;
+      margin: 24px 0;
+      font-size: 32px;
+      letter-spacing: 4px;
+      font-weight: 600;
+      color: #111827;
+    ">${token}</div>
+    <p>This code will expire in 5 minutes. Do not share it with anyone.</p>
+  `;
+
+  await sendBeautifulEmail(email, "Your Verification Code", content);
 };
 
-// Envoi d'un e-mail de réinitialisation de mot de passe
+// Password Reset Email
 export const sendPasswordResetEmail = async (email: string, token: string) => {
   const resetLink = `${domain}/auth/reset-password?token=${token}`;
-  const content = `<p>We received a request to reset your password. Click the button below to proceed:</p>
-    <a class="button" href="${resetLink}">Reset Password</a>`;
+  const content = `
+    <h1>Reset Your Password</h1>
+    <p>We have received a request to reset your password. To proceed with the change, click the button below:</p>
+    <a class="button" href="${resetLink}">Reset My Password</a>
+    <p style="margin-top: 24px; font-size: 14px; color: #6B7280;">If you did not request this reset, you can safely ignore this email.</p>
+  `;
+
   await sendBeautifulEmail(email, "Reset Your Password", content);
 };
 
-// Envoi d'un e-mail de vérification
+// Email Verification
 export const sendVerificationEmail = async (email: string, token: string) => {
   const confirmLink = `${domain}/auth/new-verification?token=${token}`;
   const content = `
-    <div style="font-family: Arial, sans-serif;">
-      <h2>Verify your email address</h2>
-      <p>Thank you for signing up! Please confirm your email address by clicking the button below:</p>
-      <a href="${confirmLink}" style="
-        display: inline-block;
-        background-color: #007bff;
-        color: white;
-        padding: 12px 24px;
-        text-decoration: none;
-        border-radius: 4px;
-        margin: 16px 0;
-      ">Confirm Email</a>
-      <p>If the button doesn't work, you can also click this link:</p>
-      <p><a href="${confirmLink}">${confirmLink}</a></p>
-      <p>This link will expire in 24 hours.</p>
-      <p>If you didn't sign up for an account, you can safely ignore this email.</p>
-    </div>
+    <h1>Welcome to QentFlow!</h1>
+    <p>Thank you for signing up. To start using your account, please confirm your email address:</p>
+    <a class="button" href="${confirmLink}">Confirm My Email</a>
+    <p style="margin-top: 24px; color: #6B7280;">This link will expire in 24 hours.</p>
+    <div class="divider"></div>
+    <p style="font-size: 14px; color: #6B7280;">If you did not create an account, you can ignore this email.</p>
   `;
 
-  await sendBeautifulEmail(email, "Verify your email address", content);
+  await sendBeautifulEmail(email, "Confirm Your Email Address", content);
 };
 
+// Workspace Invitation
 export const sendWorkspaceInvitationEmail = async (
   email: string,
   inviterName: string,
   workspaceName: string
 ) => {
-  const subject = `You're invited to join ${workspaceName} on QentFlow`;
+  const subject = `${inviterName} invites you to join ${workspaceName} on QentFlow`;
   const content = `
-    <h2>You've been invited to join a workspace!</h2>
-    <p>Hello,</p>
-    <p>${inviterName} has invited you to join the "${workspaceName}" workspace on QentFlow.</p>
-    <p>QentFlow is a powerful platform for managing your projects and workflows efficiently. By joining this workspace, you'll be able to collaborate with your team seamlessly.</p>
-    <p>Click the button below to accept the invitation and get started:</p>
-    <a class="button" href="https://app.qentflow.com/auth/login">Join Workspace</a>
-    <p>If you're new to QentFlow, don't worry! Once you accept the invitation, you'll be guided through the setup process.</p>
-    <p>This invitation will expire in 7 days. If you have any questions or need assistance, please don't hesitate to reach out to our support team.</p>
-    <p>We're excited to have you on board!</p>
-    <p>Best regards,<br>The QentFlow Team</p>
+    <h1>You've Been Invited to a Workspace!</h1>
+    <p>${inviterName} invites you to join the "${workspaceName}" workspace on QentFlow.</p>
+    <p>QentFlow is a powerful platform that allows you to manage your projects and workflows efficiently. By joining this workspace, you can easily collaborate with your team.</p>
+    <a class="button" href="https://app.qentflow.com/auth/login">Join the Workspace</a>
+    <div style="
+      background-color: #F3F4F6;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 24px 0;
+    ">
+      <p style="margin: 0; font-size: 14px; color: #4B5563;">
+        ✨ <strong>New to QentFlow?</strong> No worries! We'll guide you through all the steps after accepting the invitation.
+      </p>
+    </div>
+    <p style="font-size: 14px; color: #6B7280;">This invitation will expire in 7 days.</p>
   `;
 
   await sendBeautifulEmail(email, subject, content);

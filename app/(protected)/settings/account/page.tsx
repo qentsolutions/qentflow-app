@@ -82,11 +82,11 @@ const AccountPage = () => {
     };
 
     return (
-        <div className="space-y-6 pb-12">
+        <div>
             {/* Profile Section */}
-            <Card className="mt-4 shadow-none">
+            <Card className="mb-2 shadow-none rounded-none">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-xl font-semibold tracking-tight">
                         <User2 className="h-5 w-5" /> Profile Information
                     </CardTitle>
                     <CardDescription>
@@ -138,9 +138,9 @@ const AccountPage = () => {
             </Card>
 
             {/* Account Information */}
-            <Card className="shadow-none">
+            <Card className="shadow-none mb-2 rounded-none">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-xl font-semibold tracking-tight">
                         <UserCog2 className="h-5 w-5" /> Account Information
                     </CardTitle>
                     <CardDescription>
@@ -164,9 +164,9 @@ const AccountPage = () => {
             </Card>
 
             {/* Security Section */}
-            <Card className="shadow-none">
+            <Card className="shadow-none rounded-none">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-xl font-semibold tracking-tight">
                         <Shield className="h-5 w-5" /> Security Settings
                     </CardTitle>
                     <CardDescription>
