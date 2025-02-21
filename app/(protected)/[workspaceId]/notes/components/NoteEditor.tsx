@@ -1,11 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+"use client";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Flag, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useDebounce } from "@/hooks/use-debounce";
 import { toast } from "sonner";
-
 interface Note {
     id: string;
     title: string;
@@ -18,54 +17,39 @@ interface Note {
     };
     priority?: string;
 }
-
 interface NoteEditorProps {
     note: Note;
     onSave: (note: { title: string; content?: string }) => Promise<any>;
     readonly?: boolean;
 }
-
 const SAVE_DEBOUNCE_TIME = 1000;
-
 export function NoteEditor({ note, onSave, readonly = false }: NoteEditorProps) {
     const [title, setTitle] = useState(note.title);
     const [content, setContent] = useState(note.content || "");
     const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "error">("saved");
-
+    const previousValueRef = useRef({ title: note.title, content: note.content || "" });
     const debouncedTitle = useDebounce(title, SAVE_DEBOUNCE_TIME);
     const debouncedContent = useDebounce(content, SAVE_DEBOUNCE_TIME);
-
     useEffect(() => {
         if (readonly) return;
-
+        const hasChanged =
+            debouncedTitle !== previousValueRef.current.title ||
+            debouncedContent !== previousValueRef.current.content;
+        if (!hasChanged) return;
         const saveNote = async () => {
             try {
                 setSaveStatus("saving");
                 await onSave({ title: debouncedTitle, content: debouncedContent });
                 setSaveStatus("saved");
+                previousValueRef.current = { title: debouncedTitle, content: debouncedContent };
             } catch (error) {
                 setSaveStatus("error");
                 toast.error("Failed to save changes");
             }
         };
-
         saveNote();
     }, [debouncedTitle, debouncedContent, readonly, onSave]);
 
-    const getPriorityIcon = (priority: string | null) => {
-        switch (priority) {
-            case "LOW":
-                return <Flag className="h-4 w-4 text-green-500" />;
-            case "MEDIUM":
-                return <Flag className="h-4 w-4 text-yellow-500" />;
-            case "HIGH":
-                return <Flag className="h-4 w-4 text-red-500" />;
-            case "CRITICAL":
-                return <AlertTriangle className="h-4 w-4 text-red-500" />;
-            default:
-                return null;
-        }
-    };
 
     return (
         <motion.div
@@ -89,7 +73,6 @@ export function NoteEditor({ note, onSave, readonly = false }: NoteEditorProps) 
                             </Badge>
                         )}
                     </div>
-
                     <div className="flex justify-between items-center mb-4">
                         <input
                             type="text"
@@ -97,6 +80,7 @@ export function NoteEditor({ note, onSave, readonly = false }: NoteEditorProps) 
                             onChange={(e) => setTitle(e.target.value)}
                             className="text-2xl font-bold text-gray-800 bg-transparent border-none focus:outline-none focus:ring-0 w-full"
                             placeholder="Note title"
+                            readOnly={readonly}
                         />
                     </div>
                     <textarea
@@ -104,6 +88,7 @@ export function NoteEditor({ note, onSave, readonly = false }: NoteEditorProps) 
                         onChange={(e) => setContent(e.target.value)}
                         className="w-full min-h-[300px] text-gray-700 bg-transparent border-none focus:outline-none focus:ring-0 resize-none"
                         placeholder="Start writing your note..."
+                        readOnly={readonly}
                     />
                 </CardContent>
             </Card>

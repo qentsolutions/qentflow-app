@@ -23,27 +23,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import NotePage from "../notes/[noteId]/page";
 import { useAction } from "@/hooks/use-action";
 import { createNote } from "@/actions/notes/create-note";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import NotePage from "./[noteId]/page";
 
-const getPriorityIcon = (priority: string | null) => {
-    switch (priority) {
-        case "LOW":
-            return <Flag className="h-4 w-4 text-green-500" />;
-        case "MEDIUM":
-            return <Flag className="h-4 w-4 text-yellow-500" />;
-        case "HIGH":
-            return <Flag className="h-4 w-4 text-red-500" />;
-        case "CRITICAL":
-            return <AlertCircle className="h-4 w-4 text-red-500" />;
-        default:
-            return null;
-    }
-};
 
 const formatTimeAgo = (date: string) => {
     const now = new Date();
@@ -259,7 +244,7 @@ export default function MyNotesPage() {
                             noteId: selectedNote.id,
                             workspaceId: currentWorkspace?.id || "",
                         }}
-                        readonly={true}
+                        readonly={false}
                     />
                 </div>
             ) : (
