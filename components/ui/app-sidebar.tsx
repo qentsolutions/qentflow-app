@@ -8,6 +8,7 @@ import {
   ListTodo,
   MessageCircle,
   SquareKanban,
+  StickyNote,
 } from "lucide-react";
 import {
   Sidebar,
@@ -49,9 +50,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: CalendarDays,
       },
       {
+        name: "Notes",
+        url: `/${workspaceId}/notes`,
+        icon: StickyNote,
+        count: taskCount,
+      },
+      {
         name: "My Tasks",
         url: `/${workspaceId}/my-tasks`,
-        icon: ListTodo, 
+        icon: ListTodo,
         count: taskCount,
       },
     ],

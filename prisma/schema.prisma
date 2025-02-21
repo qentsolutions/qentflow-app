@@ -75,6 +75,7 @@ model User {
   Notification          Notification[]
   sentInvitations       Invitation[]
   automations           Automation[]
+  notes                 Note[]
 }
 
 model Workspace {
@@ -93,6 +94,7 @@ model Workspace {
   invitations        Invitation[]
   automations        Automation[]
   automationActivity AutomationActivity[]
+  notes               Note[]
 }
 
 model Invitation {
@@ -254,6 +256,7 @@ model Card {
   tags  Tag[]  @relation("CardTags")
   Tag   Tag[]
   tasks Task[]
+  notes Note[]
 
   @@index([listId])
 }
@@ -400,7 +403,7 @@ model Notification {
   workspaceId  String // ID du workspace associé à la notification
   workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   message      String // Message de la notification
-  link         String? 
+  link         String?
   isInvitation Boolean   @default(false) // Indique si la notification est une invitation
   read         Boolean   @default(false) // Statut de lecture de la notification
   createdAt    DateTime  @default(now()) // Date de création de la notification
@@ -471,4 +474,20 @@ model AutomationActivity {
 
   @@index([automationId])
   @@index([workspaceId])
+}
+
+model Note {
+  id          String    @id @default(cuid())
+  title       String?
+  content     String?   @db.Text
+  createdById String
+  createdBy   User      @relation(fields: [createdById], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  cardId      String?
+  card        Card?     @relation(fields: [cardId], references: [id], onDelete: SetNull)
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([createdById])
 }

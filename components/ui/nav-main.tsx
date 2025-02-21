@@ -39,7 +39,7 @@ export function NavMain({
           return (
             <SidebarMenuItem
               key={item.name}
-              className={`rounded-sm hover:font-semibold ${isActive ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"
+              className={`rounded-sm ${isActive ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"
                 }`} // Appliquer le style actif
             >
               <SidebarMenuButton asChild>

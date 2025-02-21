@@ -280,7 +280,7 @@ export default function MyTasksPage() {
                 transition={{ duration: 0.2 }}
               >
                 <Card
-                  className={`m-3 cursor-pointer transition-all duration-200 hover:shadow-md ${selectedCard?.id === card.id ? "border-primary border-2" : ""
+                  className={`m-3 cursor-pointer transition-all duration-200 hover:shadow-md ${selectedCard?.id === card.id ? "border-blue-500 border" : ""
                     }`}
                   onClick={() => setSelectedCard(card)}
                 >
@@ -313,7 +313,7 @@ export default function MyTasksPage() {
                           </Badge>
                         ))}
                     </div>
-                    <p className="font-semibold text-lg mb-2 text-gray-800">{card.title}</p>
+                    <p className="font-semibold text-sm mb-2 text-gray-800">{card.title}</p>
                     <div className="flex items-center justify-between mt-4">
                       <div className="flex items-center w-full justify-between space-x-2">
                         <div className="flex items-center">
