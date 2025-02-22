@@ -8,16 +8,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
     Search,
-    CheckCircle2,
     Calendar,
     Clock,
     AlertCircle,
     ArrowUpDown,
     Filter,
     Plus,
-    Flag,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion, AnimatePresence } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
@@ -29,13 +26,14 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import NotePage from "./[noteId]/page";
 
-
 const formatTimeAgo = (date: string) => {
     const now = new Date();
     const createdAt = new Date(date);
     const diffInSeconds = Math.floor((now.getTime() - createdAt.getTime()) / 1000);
 
-    if (diffInSeconds < 60) {
+    if (diffInSeconds === 0) {
+        return "Just now";
+    } else if (diffInSeconds < 60) {
         return `${diffInSeconds} sec ago`;
     } else if (diffInSeconds < 3600) {
         const minutes = Math.floor(diffInSeconds / 60);
@@ -66,7 +64,7 @@ export default function MyNotesPage() {
     const { currentWorkspace } = useCurrentWorkspace();
     const { setBreadcrumbs } = useBreadcrumbs();
     const [searchTerm, setSearchTerm] = useState("");
-    const [selectedNote, setSelectedNote] = useState<any>(null);
+    const [selectedNote, setSelectedNote] = useState<Note | null>(null);
     const [sortByUpdatedAt, setSortByUpdatedAt] = useState(false);
     const queryClient = useQueryClient();
     const router = useRouter();
@@ -77,7 +75,7 @@ export default function MyNotesPage() {
     }, []);
 
     useEffect(() => {
-        setBreadcrumbs([{ label: "My Notes" }]);
+        setBreadcrumbs([{ label: "Notes" }]);
     }, [setBreadcrumbs]);
 
     const { data: notes, isLoading } = useQuery({
@@ -86,11 +84,10 @@ export default function MyNotesPage() {
         enabled: !!currentWorkspace?.id,
     });
 
-    // Vérifiez que notes est un tableau
     const isNotesArray = Array.isArray(notes);
 
     const filteredNotes = isNotesArray
-        ? notes.filter((note: any) => {
+        ? notes.filter((note: Note) => {
             const matchesSearch =
                 note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 note.content?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -99,15 +96,17 @@ export default function MyNotesPage() {
         : [];
 
     const sortedNotes = sortByUpdatedAt
-        ? [...filteredNotes].sort((a: any, b: any) => {
+        ? [...filteredNotes].sort((a: Note, b: Note) => {
             return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
         })
         : filteredNotes;
 
     const { execute, fieldErrors } = useAction(createNote, {
         onSuccess: (data: any) => {
+            const newNote = data.note;
+            queryClient.invalidateQueries({ queryKey: ["user-notes", currentWorkspace?.id] });
+            setSelectedNote(newNote);
             toast.success("Note created successfully!");
-            setSelectedNote(data.note);
             closeRef.current?.click();
         },
         onError: (error: any) => {
@@ -115,18 +114,25 @@ export default function MyNotesPage() {
         },
     });
 
-    const handleAddNote = () => {
-        execute({ title: "", content: "", workspaceId: currentWorkspace?.id || "" });
+    const handleAddNote = async () => {
+        const newNote = await execute({ title: "", content: "", workspaceId: currentWorkspace?.id || "" });
         queryClient.invalidateQueries({ queryKey: ["user-notes", currentWorkspace?.id] });
+    };
+
+    const handleNoteClick = (note: Note) => {
+        if (selectedNote?.id !== note.id) {
+            setSelectedNote(note);
+        }
+    };
+
+    const handleDeleteNote = () => {
+        setSelectedNote(null);
     };
 
     if (isLoading) {
         return (
             <div className="flex h-screen ">
-                {/* Left Panel */}
                 <div className="w-1/3 h-full bg-gray-100 m-4 rounded"></div>
-
-                {/* Right Panel */}
                 <div className="flex-1 h-full bg-gray-100 m-4 rounded"></div>
             </div>
         );
@@ -141,7 +147,7 @@ export default function MyNotesPage() {
         <div className="flex bg-gradient-to-br from-gray-50 to-gray-100 h-[calc(100vh-70px)]">
             <div className="w-1/3 bg-white border-r border-gray-200 flex flex-col shadow-lg">
                 <div className="p-6 border-b border-gray-200 space-y-4">
-                    <p className="text-3xl font-bold text-gray-800">My Notes</p>
+                    <p className="text-3xl font-bold text-gray-800">Notes</p>
                     <div className="flex items-center gap-x-1 w-full">
                         <div className="relative w-full">
                             <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
@@ -200,7 +206,7 @@ export default function MyNotesPage() {
                 </div>
                 <ScrollArea className="flex-grow">
                     <AnimatePresence>
-                        {sortedNotes.map((note: any) => (
+                        {sortedNotes.map((note: Note) => (
                             <motion.div
                                 key={note.id}
                                 initial={{ opacity: 0, y: 20 }}
@@ -209,12 +215,12 @@ export default function MyNotesPage() {
                                 transition={{ duration: 0.2 }}
                             >
                                 <Card
-                                    className={`m-3 cursor-pointer transition-all duration-200 hover:shadow-md ${selectedNote?.id === note.id ? "border-blue-500 border" : ""
-                                        }`}
-                                    onClick={() => setSelectedNote(note)}
+                                    className={`m-3 cursor-pointer transition-all duration-200 hover:shadow-md ${selectedNote?.id === note.id ? "border-blue-500 border" : ""}`}
+                                    onClick={() => handleNoteClick(note)}
                                 >
                                     <CardContent className="p-4">
-                                        <p className="font-semibold text-sm mb-2 text-gray-800">{note.title}</p>
+                                        <p className="font-semibold text-sm text-gray-800">{note.title}</p>
+                                        <p className="mb-2 text-xs text-gray-700 truncate max-w-36">{note.content}</p>
                                         <div className="flex items-center justify-between mt-4">
                                             <div className="flex items-center w-full justify-between space-x-2">
                                                 <div className="flex items-center">
@@ -238,13 +244,14 @@ export default function MyNotesPage() {
                 </ScrollArea>
             </div>
             {selectedNote ? (
-                <div className="bg-background w-full">
+                <div className="bg-background w-full" key={selectedNote.id}>
                     <NotePage
                         params={{
                             noteId: selectedNote.id,
                             workspaceId: currentWorkspace?.id || "",
                         }}
                         readonly={false}
+                        onDelete={handleDeleteNote}
                     />
                 </div>
             ) : (

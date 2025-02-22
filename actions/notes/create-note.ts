@@ -1,4 +1,3 @@
-// actions/notes/create-note.ts
 "use server";
 
 import { z } from "zod";
@@ -38,7 +37,7 @@ export const createNote = async (values: z.infer<typeof CreateNoteSchema>) => {
     });
 
     revalidatePath(`/${workspaceId}/notes`);
-    return { success: "Note created", note };
+    return { note }; // Retourne uniquement l'objet note
   } catch (error: any) {
     return { error: `Failed to create note: ${error.message}` };
   }

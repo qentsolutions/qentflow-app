@@ -6,13 +6,16 @@ import { currentUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 const EditNoteSchema = z.object({
-  title: z.string().min(1, "Title is required"),
+  title: z.string().optional(), // Rendre le titre optionnel
   content: z.string().optional(),
   workspaceId: z.string(),
   cardId: z.string().optional(),
 });
 
-export const editNote = async (noteId: string, values: z.infer<typeof EditNoteSchema>) => {
+export const editNote = async (
+  noteId: string,
+  values: z.infer<typeof EditNoteSchema>
+) => {
   try {
     const user = await currentUser();
     if (!user) {

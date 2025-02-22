@@ -1,10 +1,11 @@
 "use client";
 // NotePage.tsx
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Calendar, AlertTriangle } from "lucide-react";
 import { NoteEditor } from "../components/NoteEditor";
 import { editNote } from "@/actions/notes/edit-note";
+import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 
 interface Note {
     id: string;
@@ -17,16 +18,14 @@ interface Note {
         name: string;
     };
     priority?: string;
+    workspaceId: string;
 }
 
-interface NotePageProps {
-    params: { noteId: string; workspaceId: string };
-    readonly: boolean;
-}
-
-const NotePage = ({ params, readonly }: NotePageProps) => {
+const NotePage = ({ params, readonly, onDelete }: any) => {
     const { noteId, workspaceId } = params;
     const [note, setNote] = useState<Note | null>(null);
+    const queryClient = useQueryClient();
+    const { currentWorkspace } = useCurrentWorkspace();
 
     const { data, isLoading } = useQuery({
         queryKey: ["note", noteId],
@@ -39,6 +38,8 @@ const NotePage = ({ params, readonly }: NotePageProps) => {
             ...values,
             workspaceId,
         });
+
+        queryClient.invalidateQueries({ queryKey: ["user-notes", currentWorkspace?.id] });
 
         if (result.error) {
             throw new Error(result.error);
@@ -75,7 +76,7 @@ const NotePage = ({ params, readonly }: NotePageProps) => {
         );
     }
 
-    return <NoteEditor note={note} onSave={handleUpdateNote} readonly={readonly} />;
+    return <NoteEditor note={note} onSave={handleUpdateNote} readonly={readonly} onDelete={onDelete} />;
 }
 
 export default NotePage;
