@@ -19,6 +19,7 @@ export function NavMain({
     name: string;
     url: string;
     icon: LucideIcon;
+    disabled?: boolean; // Ajout de l'attribut disabled
   }[];
 }) {
   const pathname = usePathname(); // Récupérer l'URL actuelle
@@ -40,12 +41,13 @@ export function NavMain({
             <SidebarMenuItem
               key={item.name}
               className={`rounded-sm ${isActive ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"
-                }`} // Appliquer le style actif
+                } ${item.disabled ? "pointer-events-none opacity-50" : ""}`} // Appliquer le style actif et désactiver les boutons
             >
               <SidebarMenuButton asChild>
                 <a href={item.url} className="flex items-center gap-2">
                   <item.icon />
                   <span>{item.name}</span>
+                  {item.disabled && <span className="ml-auto bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs">incoming</span>} {/* Ajout du badge incoming */}
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>

@@ -5,7 +5,6 @@ import { Separator } from "@/components/ui/separator";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { BreadcrumbProvider, useBreadcrumbs } from "@/hooks/use-breadcrumb";
 import { FeedbackButton } from "@/components/feedback-button";
-import NotesButton from "./components/notes-button";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -47,7 +46,6 @@ const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
           </header>
           <div className="mt-16">
             {children}
-            <NotesButton />
           </div>
         </main>
       </BreadcrumbProvider>

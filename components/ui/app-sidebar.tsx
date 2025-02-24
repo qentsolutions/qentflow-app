@@ -3,10 +3,13 @@
 import * as React from "react";
 import {
   CalendarDays,
+  CircuitBoard,
   FileText,
   LayoutDashboard,
+  LibraryBig,
   ListTodo,
   MessageCircle,
+  Presentation,
   SquareKanban,
   StickyNote,
 } from "lucide-react";
@@ -35,7 +38,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     queryKey: ["assigned-cards", currentWorkspace?.id],
     queryFn: () => fetcher(`/api/cards/current-user-card-nb?workspaceId=${currentWorkspace?.id}`),
     enabled: !!currentWorkspace?.id,
-  })
+  });
 
   const data = {
     main: [
@@ -74,6 +77,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: `/${workspaceId}/documents`,
         icon: FileText,
         isActive: false,
+      },
+      {
+        name: "Whiteboards",
+        url: `/${workspaceId}/documents`,
+        icon: Presentation,
+        isActive: false,
+        disabled: true, // Ajout de l'attribut disabled
+      },
+      {
+        name: "Formations",
+        url: `/${workspaceId}/documents`,
+        icon: LibraryBig,
+        isActive: false,
+        disabled: true, // Ajout de l'attribut disabled
       },
     ],
   };
