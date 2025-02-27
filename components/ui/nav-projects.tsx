@@ -1,54 +1,59 @@
+"use client";
+
 import { type LucideIcon } from "lucide-react";
+import { Separator } from "@/components/ui/separator"; // Assurez-vous d'importer le composant Separator
+
 import {
-  SidebarGroup,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
+    SidebarGroup,
+    SidebarGroupLabel,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { usePathname } from "next/navigation"; // Importer usePathname
+import { usePathname } from "next/navigation";
 
 export function NavProjects({
-  projects,
+    items,
 }: {
-  projects: {
-    name: string;
-    url: string;
-    icon: LucideIcon;
-    count?: number; // Déclaration de la prop count, qui est optionnelle
-  }[];
+    items: {
+        name: string;
+        url: string;
+        icon: LucideIcon;
+        disabled?: boolean; // Ajout de l'attribut disabled
+    }[];
 }) {
-  const pathname = usePathname(); // Récupérer le chemin actuel
-  return (
-    <SidebarGroup>
-      <SidebarMenu>
-        {projects.map((item, index) => {
-          // Vérifier si le chemin actuel commence par l'URL
-          const isActive = pathname.startsWith(item.url);
+    const pathname = usePathname(); // Récupérer l'URL actuelle
 
-          return (
-            <SidebarMenuItem
-              key={item.name}
-              className={`rounded-sm w-full ${isActive ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"
-                }`} // Ajouter des styles conditionnels pour l'état actif
-            >
-              <SidebarMenuButton asChild>
-                <a href={item.url} className="flex items-center justify-between gap-2 w-full">
-                  <div className="flex items-center gap-2">
-                    <item.icon size={16} />
-                    <span className="group-data-[collapsible=icon]:hidden">{item.name}</span>
-                  </div>
-                  <span className="group-data-[collapsible=icon]:hidden">
-                    {item.name === "My Tasks" && item.count !== undefined && (
-                      <span className="ml-2 text-gray-500 mr-2">{item.count > 0 ? (<>{item.count}</>) : (<></>)}</span>
-                    )}
-                  </span>
+    return (
+        <SidebarGroup>
+            <div className="group-data-[collapsible=icon]:hidden">
+                <SidebarGroupLabel>Collaboration</SidebarGroupLabel>
+            </div>
+            <div className="group-data-[collapsible=icon]:block hidden mb-2">
+                <Separator />
+            </div>
+            <SidebarMenu>
+                {items.map((item) => {
+                    // Vérifie si l'URL actuelle commence par l'URL de l'item
+                    const isActive = pathname.startsWith(item.url);
 
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          );
-        })}
-      </SidebarMenu>
-    </SidebarGroup>
-  );
+                    return (
+                        <SidebarMenuItem
+                            key={item.name}
+                            className={`rounded-sm ${isActive ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"
+                                } ${item.disabled ? "pointer-events-none opacity-50" : ""}`} // Appliquer le style actif et désactiver les boutons
+                        >
+                            <SidebarMenuButton asChild>
+                                <a href={item.url} className="flex items-center gap-2">
+                                    <item.icon />
+                                    <span>{item.name}</span>
+                                    {item.disabled && <span className="ml-auto bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs">incoming</span>} {/* Ajout du badge incoming */}
+                                </a>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    );
+                })}
+            </SidebarMenu>
+        </SidebarGroup>
+    );
 }

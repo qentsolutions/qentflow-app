@@ -21,13 +21,14 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { TeamSwitcher } from "./team-switcher";
+import { NavTools } from "./nav-tools";
 import { NavMain } from "./nav-main";
-import { NavProjects } from "./nav-projects";
 import { NavUser } from "./nav-user";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
+import { NavProjects } from "./nav-projects";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useCurrentUser();
@@ -65,7 +66,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         count: taskCount,
       },
     ],
-    navMain: [
+    navProjects: [
+      {
+        name: "Projects",
+        url: `/${workspaceId}/projects`,
+        icon: SquareKanban,
+        isActive: false,
+        disabled: true,
+      },
+    ],
+    navTools: [
       {
         name: "Boards",
         url: `/${workspaceId}/boards`,
@@ -108,8 +118,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {currentWorkspace ? (
         <SidebarContent className="flex-1">
           {/* `flex-1` permet d'occuper l'espace vertical restant */}
-          <NavProjects projects={data.main} />
-          <NavMain items={data.navMain} />
+          <NavMain projects={data.main} />
+          <NavProjects items={data.navProjects} />
+          <NavTools items={data.navTools} />
         </SidebarContent>
       ) : null}
       <SidebarFooter className="mt-auto"> {/* `mt-auto` pousse le footer vers le bas */}
