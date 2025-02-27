@@ -6,7 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Grip, Trash, ListCheck, ListTodo } from "lucide-react";
+import { Plus, Grip, Trash, ListCheck, ListTodo, Pencil } from "lucide-react";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
@@ -16,6 +16,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createTask } from "@/actions/tasks/create-task";
 import { toggleTask } from "@/actions/tasks/toggle-task";
+import { editTask } from "@/actions/tasks/edit-task"; // Import the editTask function
 
 interface TasksProps {
     cardId: string;
@@ -24,10 +25,12 @@ interface TasksProps {
 export const Tasks = ({ cardId }: TasksProps) => {
     const [newTaskTitle, setNewTaskTitle] = useState("");
     const [isAddingTask, setIsAddingTask] = useState(false);
+    const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+    const [editingTaskTitle, setEditingTaskTitle] = useState("");
     const params = useParams();
     const { currentWorkspace } = useCurrentWorkspace();
     const queryClient = useQueryClient();
-    
+
     const { data: tasks = [], isLoading } = useQuery({
         queryKey: ["card-tasks", cardId],
         queryFn: () => fetcher(`/api/cards/${cardId}/tasks`),
@@ -66,7 +69,6 @@ export const Tasks = ({ cardId }: TasksProps) => {
         }
     };
 
-    // Modifier la fonction handleToggleTask
     const handleToggleTask = async (taskId: string, completed: boolean) => {
         try {
             const response = await toggleTask(
@@ -112,6 +114,31 @@ export const Tasks = ({ cardId }: TasksProps) => {
             toast.success("Task deleted");
         } catch {
             toast.error("Failed to delete task");
+        }
+    };
+
+    const handleEditTask = async (taskId: string, title: string) => {
+        try {
+            const response = await editTask(
+                taskId,
+                title,
+                false, // Vous pouvez ajuster cette valeur selon vos besoins
+                0 // Vous pouvez ajuster cette valeur selon vos besoins
+            );
+
+            if (response.error) {
+                toast.error(response.error);
+                return;
+            }
+
+            queryClient.invalidateQueries({
+                queryKey: ["card-tasks", cardId],
+            });
+
+            setEditingTaskId(null);
+            toast.success("Task edited successfully");
+        } catch {
+            toast.error("Failed to edit task");
         }
     };
 
@@ -185,7 +212,7 @@ export const Tasks = ({ cardId }: TasksProps) => {
                                         <div
                                             ref={provided.innerRef}
                                             {...provided.draggableProps}
-                                            className="flex items-center gap-2 py-2"
+                                            className="flex items-center gap-2 py-2 rounded-md transition-colors duration-200 group"
                                         >
                                             <div {...provided.dragHandleProps}>
                                                 <Grip className="h-4 w-4 text-muted-foreground" />
@@ -196,12 +223,39 @@ export const Tasks = ({ cardId }: TasksProps) => {
                                                     handleToggleTask(task.id, checked as boolean)
                                                 }
                                             />
-                                            <span
-                                                className={`flex-1 ${task.completed ? "line-through text-muted-foreground" : ""
-                                                    }`}
-                                            >
-                                                {task.title}
-                                            </span>
+                                            {editingTaskId === task.id ? (
+                                                <Input
+                                                    autoFocus
+                                                    value={editingTaskTitle}
+                                                    onChange={(e) => setEditingTaskTitle(e.target.value)}
+                                                    onBlur={() => handleEditTask(task.id, editingTaskTitle)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === "Enter") {
+                                                            handleEditTask(task.id, editingTaskTitle);
+                                                        }
+                                                    }}
+                                                />
+                                            ) : (
+                                                <div className="flex-1 flex items-center justify-between">
+                                                    <span
+                                                        className={`${task.completed ? "line-through text-muted-foreground" : ""}`}
+                                                    >
+                                                        {task.title}
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="ml-2 opacity-0 hover:bg-transparent group-hover:opacity-100 transition-opacity"
+                                                            onClick={() => {
+                                                                setEditingTaskId(task.id);
+                                                                setEditingTaskTitle(task.title);
+                                                            }}
+                                                        >
+                                                            <Pencil className="h-4 w-4 text-muted-foreground" />
+                                                        </Button>
+                                                    </span>
+
+                                                </div>
+                                            )}
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
@@ -242,7 +296,6 @@ export const Tasks = ({ cardId }: TasksProps) => {
         </div>
     );
 };
-
 
 Tasks.Skeleton = function TasksSkeleton() {
     return (
