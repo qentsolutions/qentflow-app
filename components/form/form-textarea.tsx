@@ -55,6 +55,7 @@ export const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>((
           </Label>
         ) : null}
         <Textarea
+          autoFocus
           onKeyDown={onKeyDown}
           onBlur={onBlur}
           onClick={onClick}
