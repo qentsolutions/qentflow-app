@@ -1,16 +1,19 @@
+"use client";
+
 import { toast } from "sonner";
 import { ElementRef, useRef, useState } from "react";
-import { Edit, Eye, Layout, Text } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { CardWithList } from "@/types";
 import { useAction } from "@/hooks/use-action";
 import { updateCard } from "@/actions/tasks/update-card";
+import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormInput } from "@/components/form/form-input";
-import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Button } from "@/components/ui/button";
+import { Edit, Eye } from 'lucide-react';
 
 interface HeaderProps {
   data: CardWithList;
@@ -42,7 +45,7 @@ export const Header = ({
 
       toast.success(`Renamed to "${data.title}"`);
       setTitle(data.title);
-      setIsEditing(false); // Change to read-only mode after successful update
+      setIsEditing(false);
     },
     onError: (error) => {
       toast.error(error);
@@ -51,22 +54,24 @@ export const Header = ({
 
   const inputRef = useRef<ElementRef<"input">>(null);
   const [title, setTitle] = useState(data.title);
-  const [isEditing, setIsEditing] = useState(false); // State to toggle between modes
+  const [isEditing, setIsEditing] = useState(false);
 
   const onBlur = () => {
     inputRef.current?.form?.requestSubmit();
-    setIsEditing(false); // Switch to read-only mode when input loses focus
   };
 
   const onSubmit = (formData: FormData) => {
     const title = formData.get("title") as string;
     const boardId = params.boardId as string;
     const workspaceId = currentWorkspace?.id;
+
     if (!workspaceId) {
       toast.error("Workspace ID is required.");
       return;
     }
+
     if (title === data.title) {
+      setIsEditing(false);
       return;
     }
 
@@ -79,76 +84,83 @@ export const Header = ({
   };
 
   const handleEditClick = () => {
-    setIsEditing(true); // Switch to edit mode on click
+    setIsEditing(true);
+    setTimeout(() => {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }, 0);
   };
 
   const onExpand = () => {
-    router.push(`/${currentWorkspace?.id}/boards/${params.boardId}/cards/${data.id}`)
-  }
+    router.push(`/${currentWorkspace?.id}/boards/${params.boardId}/cards/${data.id}`);
+  };
 
   return (
-    <div className="flex items-start gap-x-3 mb-6 w-full">
-      <div className="w-full">
-        {readonly ? (
-          <div className="flex items-center justify-between">
-            <p
-              className="font-semibold text-2xl px-1 text-neutral-700 dark:text-white cursor-pointer"
+    <div className="w-full ml-4">
+      {readonly ? (
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-foreground">
+            {title}
+          </h2>
+          <div className="flex items-center gap-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs gap-1"
             >
-              {title}
-            </p>
-            <div className="flex items-center gap-x-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-xs bg-blue-100 text-blue-700 hover:text-foreground hover:bg-blue-100 hover:text-blue-700"
-              >
-                read-only <Eye className="h-4 w-4" />
-              </Button>
-              <div className="w-[1px] h-5 bg-gray-500" />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onExpand}
-                className="text-muted-foreground hover:text-blue-700"
-              >
-                Edit <Edit className="h-4 w-4" />
-              </Button>
-            </div>
+              <Eye className="h-3.5 w-3.5" />
+              Read-only
+            </Button>
+            <div className="w-px h-5 bg-border" />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onExpand}
+              className="text-xs gap-1"
+            >
+              <Edit className="h-3.5 w-3.5" />
+              Edit
+            </Button>
           </div>
-        ) : (
-          <form action={onSubmit}>
-            {isEditing ? (
-              <FormInput
-                ref={inputRef}
-                onBlur={onBlur} // Add onBlur to handle losing focus
-                id="title"
-                defaultValue={title}
-                className="font-semibold !text-2xl px-1 text-neutral-700 dark:text-white bg-transparent relative -left-1.5 w-[90%] focus-visible:bg-white dark:focus-visible:bg-gray-700 focus-visible:border-input mb-0.5"
-              />
-            ) : (
-              <p
+        </div>
+      ) : (
+        <form action={onSubmit}>
+          {isEditing ? (
+            <FormInput
+              ref={inputRef}
+              onBlur={onBlur}
+              id="title"
+              defaultValue={title}
+              className="font-semibold text-xl px-1 py-1 h-auto bg-transparent focus-visible:bg-background border-none focus-visible:ring-1 w-full"
+            />
+          ) : (
+            <div className="flex items-center gap-x-2">
+              <h2
                 onClick={handleEditClick}
-                className="font-semibold p-1 hover:bg-gray-50 text-2xl px-1 text-neutral-700 dark:text-white cursor-pointer"
+                className="font-semibold text-xl px-1 py-1 w-full cursor-text hover:bg-accent/50 rounded transition"
               >
                 {title}
-              </p>
-            )}
-          </form>
-        )}
-
-      </div>
+              </h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleEditClick}
+                className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </form>
+      )}
     </div>
   );
 };
 
 Header.Skeleton = function HeaderSkeleton() {
   return (
-    <div className="flex items-start gap-x-3 mb-6">
-      <Skeleton className="h-6 w-6 mt-1 bg-neutral-200 dark:bg-gray-700" />
-      <div>
-        <Skeleton className="w-24 h-6 mb-1 bg-neutral-200 dark:bg-gray-700" />
-        <Skeleton className="w-12 h-4 bg-neutral-200 dark:bg-gray-700" />
-      </div>
+    <div className="w-full">
+      <Skeleton className="w-1/3 h-8 bg-neutral-200 dark:bg-gray-700" />
     </div>
   );
 };

@@ -94,7 +94,7 @@ model Workspace {
   invitations        Invitation[]
   automations        Automation[]
   automationActivity AutomationActivity[]
-  notes               Note[]
+  notes              Note[]
 }
 
 model Invitation {
@@ -236,6 +236,7 @@ model Card {
   order       Int
   description String?   @db.Text
   priority    Priority?
+  archived    Boolean?   @default(false) // Ajout du champ "archived" avec valeur par défaut à false
 
   listId String
   list   List   @relation(fields: [listId], references: [id], onDelete: Cascade)

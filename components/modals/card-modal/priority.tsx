@@ -3,14 +3,16 @@
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+
 import { useAction } from "@/hooks/use-action";
 import { updatePriority } from "@/actions/tasks/update-priority";
 import { CardWithList } from "@/types";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
-import { AlertTriangle, ArrowDown, ArrowRight, ArrowUp, OctagonAlert, Radio, SignalHigh, SignalLow, SignalMedium, Minus, Flag } from 'lucide-react';
+
+import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AlertTriangle, Flag, Minus, OctagonAlert } from 'lucide-react';
 
 interface PriorityProps {
   data: CardWithList;
@@ -66,24 +68,26 @@ export const Priority = ({
   ];
 
   const currentPriority = priorityOptions.find(option => option.value === data.priority?.toLowerCase()) || priorityOptions[0];
+  const PriorityIcon = currentPriority.icon;
 
   return (
-    <Card className="mt-4 shadow-none">
-      <CardHeader className="pt-4 pb-2">
-        <div className="flex items-center gap-x-2">
-          <OctagonAlert size={16} />
-          <CardTitle className="font-semibold text-lg">Priority</CardTitle>
-        </div>
-      </CardHeader>
-      <CardContent>
+    <Card className="shadow-none border bg-card mt-4">
+      <CardContent className="p-5">
+        <h3 className="text-lg font-semibold mb-4 flex items-center">
+          <OctagonAlert className="h-5 w-5 mr-2" />
+          Priority
+        </h3>
+
         {readonly ? (
-          <div className="flex items-center gap-2">
-            {/* Affichage de l'icône et du label dans le mode readonly */}
-            <currentPriority.icon className={`h-6 w-6 ${currentPriority.color}`} />
-            {currentPriority.label || "None"}
+          <div className="flex items-center gap-2 p-2 border rounded-md bg-background">
+            <PriorityIcon className={`h-5 w-5 ${currentPriority.color}`} />
+            <span className="font-medium">{currentPriority.label}</span>
           </div>
         ) : (
-          <Select defaultValue={data.priority?.toLowerCase() || "none"} onValueChange={onPriorityChange}>
+          <Select
+            defaultValue={data.priority?.toLowerCase() || "none"}
+            onValueChange={onPriorityChange}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select priority" />
             </SelectTrigger>
@@ -92,7 +96,7 @@ export const Priority = ({
                 <SelectItem key={option.value} value={option.value}>
                   <div className="flex items-center gap-2">
                     <option.icon className={`h-4 w-4 ${option.color}`} />
-                    {option.label}
+                    <span>{option.label}</span>
                   </div>
                 </SelectItem>
               ))}
@@ -106,12 +110,13 @@ export const Priority = ({
 
 Priority.Skeleton = function PrioritySkeleton() {
   return (
-    <Card>
-      <CardHeader>
-        <Skeleton className="h-6 w-24" />
-      </CardHeader>
-      <CardContent>
-        <Skeleton className="h-10 w-full" />
+    <Card className="shadow-none border">
+      <CardContent className="p-5 space-y-4">
+        <div className="flex items-center gap-x-2">
+          <Skeleton className="h-5 w-5 rounded bg-neutral-200 dark:bg-gray-700" />
+          <Skeleton className="h-6 w-24 bg-neutral-200 dark:bg-gray-700" />
+        </div>
+        <Skeleton className="w-full h-10 bg-neutral-200 dark:bg-gray-700" />
       </CardContent>
     </Card>
   );

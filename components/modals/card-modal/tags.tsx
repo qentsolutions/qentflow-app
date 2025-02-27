@@ -176,7 +176,7 @@ export const TagsComponent = ({
             <></>
           ) : (
             <div>
-              <p className="text-lg font-semibold flex items-center gap-x-2 "><UserRound size={16} /> Assigned</p>
+              <p className="text-lg font-semibold flex items-center gap-x-2 mb-2 "><UserRound size={16} /> Assigned</p>
               <Select
                 value={assignedUser?.id || "none"}
                 onValueChange={(value) => handleAssignUser(value === "none" ? null : value)}

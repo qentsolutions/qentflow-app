@@ -1,22 +1,27 @@
 "use client";
+
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 import { useState, useRef, useEffect, ElementRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEventListener } from "usehooks-ts";
-import { TextAlignLeftIcon } from "@radix-ui/react-icons";
+
 import { useAction } from "@/hooks/use-action";
 import { updateCard } from "@/actions/tasks/update-card";
 import { CardWithList } from "@/types";
+import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
-import RichTextEditor from "./components/rich-text-editor";
+import { Card, CardContent } from "@/components/ui/card";
+import { AlignLeft } from 'lucide-react';
+
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
 import FontSize from "tiptap-extension-font-size";
+import RichTextEditor from "./components/rich-text-editor";
 
 interface DescriptionProps {
   data: CardWithList;
@@ -48,7 +53,7 @@ export const Description = ({ data, readonly = false }: DescriptionProps) => {
         queryKey: ["card-logs", updatedData.id],
       });
       toast.success(`Card "${updatedData.title}" updated`);
-      setDescription(updatedData.description || ""); // Update description
+      setDescription(updatedData.description || "");
       disableEditing();
     },
     onError: (error) => {
@@ -96,25 +101,42 @@ export const Description = ({ data, readonly = false }: DescriptionProps) => {
   }, [description, readOnlyEditor]);
 
   return (
-    <div className="flex items-start gap-x-3 w-full">
-      <div className="w-full">
-        <span className="flex items-center font-bold text-lg mb-4">
-          <TextAlignLeftIcon className="mr-2" /> Description
-        </span>
+    <Card className="shadow-none border bg-card">
+      <CardContent className="py-5 px-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold flex items-center">
+            <AlignLeft className="h-5 w-5 mr-2" /> 
+            Description
+          </h3>
+          
+          {!readonly && !isEditing && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={enableEditing}
+              className="text-xs"
+            >
+              Edit
+            </Button>
+          )}
+        </div>
+        
         {readonly ? (
-          <EditorContent
-            editor={readOnlyEditor}
-            className="prose max-w-none p-1"
-          />
+          <div className="prose prose-sm max-w-none dark:prose-invert">
+            <EditorContent
+              editor={readOnlyEditor}
+              className="min-h-[100px]"
+            />
+          </div>
         ) : (
           <>
             {isEditing ? (
-              <form onSubmit={onSubmit} ref={formRef} className="space-y-2">
+              <form onSubmit={onSubmit} ref={formRef} className="space-y-4">
                 <RichTextEditor content={description} onChange={setDescription} />
                 <div className="flex items-center gap-x-2">
                   <Button
                     type="submit"
-                    className="bg-blue-500 text-white hover:bg-blue-700 hover:text-white"
+                    size="sm"
                   >
                     Save
                   </Button>
@@ -122,34 +144,39 @@ export const Description = ({ data, readonly = false }: DescriptionProps) => {
                     type="button"
                     onClick={disableEditing}
                     size="sm"
-                    variant="ghost"
+                    variant="outline"
                   >
                     Cancel
                   </Button>
                 </div>
               </form>
             ) : (
-              <EditorContent
+              <div 
                 onClick={enableEditing}
-                editor={readOnlyEditor}
-                className="prose max-w-none p-4 bg-gray-50 rounded-lg border cursor-pointer"
-              />
+                className="prose prose-sm max-w-none dark:prose-invert min-h-[100px] p-4 rounded-md border cursor-pointer hover:bg-accent/50 transition"
+              >
+                <EditorContent
+                  editor={readOnlyEditor}
+                />
+              </div>
             )}
           </>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
 Description.Skeleton = function DescriptionSkeleton() {
   return (
-    <div className="flex items-start gap-x-3 w-full">
-      <Skeleton className="h-6 w-6 bg-neutral-200" />
-      <div className="w-full">
-        <Skeleton className="w-24 h-6 mb-2 bg-neutral-200" />
-        <Skeleton className="w-full h-[78px] bg-neutral-200" />
-      </div>
-    </div>
+    <Card className="shadow-none border">
+      <CardContent className="p-5 space-y-4">
+        <div className="flex items-center gap-x-2">
+          <Skeleton className="h-5 w-5 rounded bg-neutral-200 dark:bg-gray-700" />
+          <Skeleton className="h-6 w-24 bg-neutral-200 dark:bg-gray-700" />
+        </div>
+        <Skeleton className="w-full h-[120px] bg-neutral-200 dark:bg-gray-700" />
+      </CardContent>
+    </Card>
   );
 };
