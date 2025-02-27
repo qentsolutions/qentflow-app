@@ -27,7 +27,7 @@ export function NavMain({
   return (
     <SidebarGroup>
       <div className="group-data-[collapsible=icon]:hidden">
-        <SidebarGroupLabel>Collaboration</SidebarGroupLabel>
+        <SidebarGroupLabel>Tools</SidebarGroupLabel>
       </div>
       <div className="group-data-[collapsible=icon]:block hidden mb-2">
         <Separator />

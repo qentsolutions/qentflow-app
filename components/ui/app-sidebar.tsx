@@ -86,7 +86,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         disabled: true, // Ajout de l'attribut disabled
       },
       {
-        name: "Formations",
+        name: "Courses",
         url: `/${workspaceId}/documents`,
         icon: LibraryBig,
         isActive: false,
