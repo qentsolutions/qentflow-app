@@ -106,9 +106,9 @@ export const Header = ({
             <Button
               variant="outline"
               size="sm"
-              className="text-xs gap-1"
+              className="text-xs gap-1 bg-blue-100 text-blue-500 hover:bg-blue-100 hover:text-blue-500"
             >
-              <Eye className="h-3.5 w-3.5" />
+              <Eye className="h-3.5 w-3.5 text-blue-500" />
               Read-only
             </Button>
             <div className="w-px h-5 bg-border" />

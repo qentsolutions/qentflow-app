@@ -90,14 +90,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
       {
         name: "Whiteboards",
-        url: `/${workspaceId}/documents`,
+        url: `/${workspaceId}/whiteboards`,
         icon: Presentation,
         isActive: false,
         disabled: true, // Ajout de l'attribut disabled
       },
       {
         name: "Courses",
-        url: `/${workspaceId}/documents`,
+        url: `/${workspaceId}/courses`,
         icon: LibraryBig,
         isActive: false,
         disabled: true, // Ajout de l'attribut disabled

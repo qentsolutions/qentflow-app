@@ -6,6 +6,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation"; // Importer usePathname
+import Link from "next/link";
 
 export function NavMain({
   projects,
@@ -32,7 +33,7 @@ export function NavMain({
                 }`} // Ajouter des styles conditionnels pour l'état actif
             >
               <SidebarMenuButton asChild>
-                <a href={item.url} className="flex items-center justify-between gap-2 w-full">
+                <Link href={item.url} className="flex items-center justify-between gap-2 w-full">
                   <div className="flex items-center gap-2">
                     <item.icon size={16} />
                     <span className="group-data-[collapsible=icon]:hidden">{item.name}</span>
@@ -43,7 +44,7 @@ export function NavMain({
                     )}
                   </span>
 
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           );
