@@ -101,7 +101,7 @@ export const TimelineView = ({ data, boardId }: TimelineViewProps) => {
               className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors"
             >
               <CalendarIcon className="h-3.5 w-3.5" />
-              Aujourd'hui
+              Today
             </button>
           </div>
           <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
