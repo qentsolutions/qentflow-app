@@ -1,27 +1,19 @@
-import { Badge } from "@/components/ui/badge";
-import { TableCell, TableRow } from "@/components/ui/table";
-import { Clock, LayoutList, MoreHorizontal, Trash } from "lucide-react";
-import { format } from "date-fns";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge"
+import { TableCell, TableRow } from "@/components/ui/table"
+import { Clock, MoreHorizontal, Trash } from "lucide-react"
+import { format } from "date-fns"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
 
 interface TableRowProps {
-  item: any;
-  lists: any[];
-  onListChange: (cardId: string, newListId: string) => void;
-  onRowClick: (id: string) => void;
+  item: any
+  lists: any[]
+  onListChange: (cardId: string, newListId: string) => void
+  onRowClick: (id: string) => void
 }
 
-
 export const TableViewRow = ({ item, lists, onListChange, onRowClick }: TableRowProps) => {
-
   const getRandomColor = (id: string): string => {
     const colors = [
       "bg-red-500",
@@ -32,36 +24,34 @@ export const TableViewRow = ({ item, lists, onListChange, onRowClick }: TableRow
       "bg-pink-500",
       "bg-indigo-500",
       "bg-teal-500",
-    ];
-    const index = id
-      .split("")
-      .reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-    return colors[index];
-  };
+    ]
+    const index = id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length
+    return colors[index]
+  }
 
   function onDelete(id: any) {
-    throw new Error("Function not implemented.");
+    throw new Error("Function not implemented.")
   }
 
   return (
     <TableRow
       key={item.id}
-      className="group hover:bg-gray-50 transition-colors"
+      className="group hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0"
     >
       <TableCell
-        className="font-medium cursor-pointer py-2"
+        className="font-medium cursor-pointer py-4 px-6 border-r border-gray-100 last:border-r-0 w-[180px]"
         onClick={() => onRowClick(item.id)}
       >
         <div className="flex items-center space-x-2">
           <span className="group-hover:text-blue-600 transition-colors">{item.title}</span>
         </div>
       </TableCell>
-      <TableCell onClick={(e) => e.stopPropagation()}>
-        <Select
-          defaultValue={item.listId}
-          onValueChange={(value) => onListChange(item.id, value)}
-        >
-          <SelectTrigger className="w-[180px]">
+      <TableCell
+        className="py-4 px-6 border-r border-gray-100 last:border-r-0 w-[180px]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Select defaultValue={item.listId} onValueChange={(value) => onListChange(item.id, value)}>
+          <SelectTrigger className="w-full">
             <div className="flex items-center space-x-2">
               <SelectValue placeholder={item.listTitle} />
             </div>
@@ -76,22 +66,19 @@ export const TableViewRow = ({ item, lists, onListChange, onRowClick }: TableRow
         </Select>
       </TableCell>
       <TableCell
-        className="cursor-pointer"
+        className="cursor-pointer py-4 px-6 border-r border-gray-100 last:border-r-0 w-[180px]"
         onClick={() => onRowClick(item.id)}
       >
         <div className="flex gap-1.5 flex-wrap">
           {item.tags?.map((tag: any) => (
-            <Badge
-              key={tag.id}
-              className={`${getRandomColor(tag.id)} text-white px-2 py-0.5 text-xs font-medium`}
-            >
+            <Badge key={tag.id} className={`${getRandomColor(tag.id)} text-white px-2 py-0.5 text-xs font-medium`}>
               {tag.name}
             </Badge>
           ))}
         </div>
       </TableCell>
       <TableCell
-        className="text-muted-foreground cursor-pointer"
+        className="text-muted-foreground cursor-pointer py-4 px-6 border-r border-gray-100 last:border-r-0 w-[180px]"
         onClick={() => onRowClick(item.id)}
       >
         <div className="flex items-center space-x-2">
@@ -100,7 +87,7 @@ export const TableViewRow = ({ item, lists, onListChange, onRowClick }: TableRow
         </div>
       </TableCell>
       <TableCell
-        className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+        className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium w-[80px]"
         onClick={(e) => e.stopPropagation()}
       >
         <DropdownMenu>
@@ -123,5 +110,6 @@ export const TableViewRow = ({ item, lists, onListChange, onRowClick }: TableRow
         </DropdownMenu>
       </TableCell>
     </TableRow>
-  );
-};
+  )
+}
+

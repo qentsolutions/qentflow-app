@@ -2,27 +2,7 @@
 
 import { useCardModal } from "@/hooks/use-card-modal"
 import { Badge } from "@/components/ui/badge"
-import {
-    ChevronDown,
-    ChevronUp,
-    Plus,
-    TargetIcon,
-    UserRound,
-    Tags,
-    MoreHorizontal,
-    Trash,
-    GripVertical,
-    Calendar,
-    MessageSquare,
-    Paperclip,
-    CheckSquare,
-    SignalLow,
-    SignalMedium,
-    SignalHigh,
-    AlertTriangle,
-    Signal,
-    Flag,
-} from "lucide-react"
+import { ChevronDown, ChevronUp, Plus, TargetIcon, UserRound, Tags, MoreHorizontal, Trash, GripVertical, Calendar, MessageSquare, Paperclip, CheckSquare, SignalLow, SignalMedium, SignalHigh, AlertTriangle, Signal, Flag, Copy } from 'lucide-react'
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
@@ -45,6 +25,7 @@ import { fetcher } from "@/lib/fetcher"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { createNotification } from "@/actions/notifications/create-notification"
 import { useCurrentUser } from "@/hooks/use-current-user"
+import { copyCard } from "@/actions/tasks/copy-card"
 
 interface ListViewProps {
     boardId: string
@@ -167,6 +148,31 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
         setOpenAssign(null)
     }
 
+    const { execute: executeCopyCard, isLoading: isLoadingCopy } = useAction(copyCard, {
+        onSuccess: (data) => {
+            toast.success(`Card "${data.title}" copied`);
+            cardModal.onClose();
+        },
+        onError: (error) => {
+            toast.error(error);
+        },
+    });
+
+    const onCopy = (cardId: string) => {
+        const workspaceId = currentWorkspace?.id;
+        if (!workspaceId) {
+            toast.error("Workspace ID is required.");
+            return;
+        }
+        const boardId = Array.isArray(params.boardId) ? params.boardId[0] : params.boardId || "";
+
+        executeCopyCard({
+            id: cardId,
+            boardId,
+            workspaceId,
+        });
+    };
+
     const { execute: executeDeleteCard } = useAction(deleteCard, {
         onSuccess: (data) => {
             toast.success(`Card "${data.title}" deleted`)
@@ -218,7 +224,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                         key={list.id}
                         open={openLists.includes(list.id)}
                         onOpenChange={() => toggleList(list.id)}
-                        className="rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+                        className="rounded-lg shadow-sm border border-gray-200 overflow-hidden bg-white dark:bg-gray-900"
                     >
                         <CollapsibleTrigger className="bg-gray-50 dark:bg-gray-800 border-b w-full px-6 py-4 flex items-center justify-between hover:bg-gray-100 transition-colors">
                             <div className="flex items-center gap-x-3">
@@ -239,11 +245,11 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                             <Droppable droppableId={list.id}>
                                 {(provided) => (
                                     <div ref={provided.innerRef} {...provided.droppableProps} className="w-full">
-                                        <table className="w-full">
+                                        <table className="w-full border-collapse">
                                             <thead>
-                                                <tr className="border-b border-gray-200">
+                                                <tr className="border-b border-gray-200 bg-gray-50 dark:bg-gray-800">
                                                     {visibleFields.title && (
-                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[180px] border-r border-gray-100 last:border-r-0">
                                                             <div className="flex items-center gap-x-2">
                                                                 <TargetIcon size={14} />
                                                                 Title
@@ -251,7 +257,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                         </th>
                                                     )}
                                                     {visibleFields.priority && (
-                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[180px] border-r border-gray-100 last:border-r-0">
                                                             <div className="flex items-center gap-x-2">
                                                                 <Flag size={14} />
                                                                 Priority
@@ -259,7 +265,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                         </th>
                                                     )}
                                                     {visibleFields.assignee && (
-                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[180px] border-r border-gray-100 last:border-r-0">
                                                             <div className="flex items-center gap-x-2">
                                                                 <UserRound size={14} />
                                                                 Assigned
@@ -267,7 +273,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                         </th>
                                                     )}
                                                     {visibleFields.dueDate && (
-                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[180px] border-r border-gray-100 last:border-r-0">
                                                             <div className="flex items-center gap-x-2">
                                                                 <Calendar size={14} />
                                                                 Due Date
@@ -275,7 +281,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                         </th>
                                                     )}
                                                     {visibleFields.tasks && (
-                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[180px] border-r border-gray-100 last:border-r-0">
                                                             <div className="flex items-center gap-x-2">
                                                                 <CheckSquare size={14} />
                                                                 Tasks
@@ -283,7 +289,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                         </th>
                                                     )}
                                                     {visibleFields.tags && (
-                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[180px] border-r border-gray-100 last:border-r-0">
                                                             <div className="flex items-center gap-x-2">
                                                                 <Tags size={14} />
                                                                 Tags
@@ -304,11 +310,11 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                                     ref={provided.innerRef}
                                                                     {...provided.draggableProps}
                                                                     {...provided.dragHandleProps}
-                                                                    className="group bg-background hover:bg-gray-50 transition-colors cursor-pointer"
+                                                                    className="group bg-background hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-100 last:border-b-0"
                                                                     onClick={() => cardModal.onOpen(card.id)}
                                                                 >
                                                                     {visibleFields.title && (
-                                                                        <td className="px-6 py-4">
+                                                                        <td className="px-6 py-4 border-r border-gray-100 last:border-r-0">
                                                                             <div className="flex items-center gap-x-3">
                                                                                 <GripVertical size={16} className="text-gray-400" />
                                                                                 <span className="text-sm font-medium text-gray-900 line-clamp-2 overflow-hidden">
@@ -318,7 +324,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                                         </td>
                                                                     )}
                                                                     {visibleFields.priority && (
-                                                                        <td>
+                                                                        <td className="px-6 py-4 border-r border-gray-100 last:border-r-0">
                                                                             <div className="mr-1 flex items-center justify-center">
                                                                                 <Tooltip>
                                                                                     <TooltipTrigger>
@@ -332,7 +338,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                                         </td>
                                                                     )}
                                                                     {visibleFields.assignee && (
-                                                                        <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                                                                        <td className="px-6 py-4 border-r border-gray-100 last:border-r-0 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                                                                             <Popover
                                                                                 open={openAssign === card.id}
                                                                                 onOpenChange={(open) => setOpenAssign(open ? card.id : null)}
@@ -413,7 +419,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                                         </td>
                                                                     )}
                                                                     {visibleFields.dueDate && (
-                                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                                        <td className="px-6 py-4 border-r border-gray-100 last:border-r-0 whitespace-nowrap">
                                                                             {card.dueDate && (
                                                                                 <div className="flex items-center text-sm text-gray-600">
                                                                                     <Calendar className="h-4 w-4 mr-2" />
@@ -423,7 +429,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                                         </td>
                                                                     )}
                                                                     {visibleFields.tasks && (
-                                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                                        <td className="px-6 py-4 border-r border-gray-100 last:border-r-0 whitespace-nowrap">
                                                                             {card.tasks && card.tasks.length > 0 && (
                                                                                 <div className="flex flex-col gap-1">
                                                                                     <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -444,7 +450,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                                         </td>
                                                                     )}
                                                                     {visibleFields.tags && (
-                                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                                        <td className="px-6 py-4 border-r border-gray-100 last:border-r-0 whitespace-nowrap">
                                                                             <div className="flex gap-1.5 flex-wrap">
                                                                                 {card.tags?.map((tag: any) => (
                                                                                     <Badge
@@ -471,13 +477,21 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                                             </DropdownMenuTrigger>
                                                                             <DropdownMenuContent align="end">
                                                                                 <DropdownMenuItem
-                                                                                    className="flex items-center justify-between"
+                                                                                    onClick={() => { onCopy(card.id) }}
+                                                                                    disabled={isLoadingCopy}
+                                                                                    className="cursor-pointer"
+                                                                                >
+                                                                                    <Copy className="h-4 w-4 mr-2" />
+                                                                                    <span>Duplicate</span>
+                                                                                </DropdownMenuItem>
+                                                                                <DropdownMenuItem
+                                                                                    className="cursor-pointer"
                                                                                     onClick={() => {
                                                                                         onDelete(card.id)
                                                                                     }}
                                                                                 >
+                                                                                    <Trash size={16} className=" text-red-500 mr-2" />
                                                                                     Delete
-                                                                                    <Trash size={16} className=" text-red-500" />
                                                                                 </DropdownMenuItem>
                                                                             </DropdownMenuContent>
                                                                         </DropdownMenu>
