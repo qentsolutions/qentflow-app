@@ -94,7 +94,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: `/${workspaceId}/whiteboards`,
         icon: Presentation,
         isActive: false,
-        disabled: true, // Ajout de l'attribut disabled
       },
       {
         name: "Courses",

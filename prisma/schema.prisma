@@ -236,7 +236,7 @@ model Card {
   order       Int
   description String?   @db.Text
   priority    Priority?
-  archived    Boolean?   @default(false) // Ajout du champ "archived" avec valeur par défaut à false
+  archived    Boolean?  @default(false) // Ajout du champ "archived" avec valeur par défaut à false
 
   listId String
   list   List   @relation(fields: [listId], references: [id], onDelete: Cascade)
@@ -491,4 +491,13 @@ model Note {
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@index([createdById])
+}
+
+model Whiteboard {
+  id          Int    @id @default(autoincrement())
+  title       String
+  workspaceId String
+  authorId    String
+  authorName  String
+  image       String
 }
