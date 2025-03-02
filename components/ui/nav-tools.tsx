@@ -48,7 +48,7 @@ export function NavTools({
                 <Link href={item.url} className="flex items-center gap-2">
                   <item.icon />
                   <span>{item.name}</span>
-                  {item.disabled && <span className="ml-auto bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs">incoming</span>} {/* Ajout du badge incoming */}
+                  {item.disabled && <span className="ml-auto bg-blue-200 text-gray-700 px-2 py-1 rounded-full text-xs">incoming</span>} {/* Ajout du badge incoming */}
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

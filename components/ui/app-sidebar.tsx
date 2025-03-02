@@ -5,6 +5,7 @@ import {
   CalendarDays,
   CircuitBoard,
   FileText,
+  Folder,
   LayoutDashboard,
   LibraryBig,
   ListTodo,
@@ -70,7 +71,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {
         name: "Projects",
         url: `/${workspaceId}/projects`,
-        icon: SquareKanban,
+        icon: Folder,
         isActive: false,
         disabled: true,
       },
