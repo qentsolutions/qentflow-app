@@ -297,7 +297,7 @@ export const BoardList: React.FC = () => {
                 <BoardCard key={board.id} board={board} onClick={() => handleBoardClick(board)} />
               ))
             ) : (
-              <div className="col-span-full text-center py-10 bg-gray-50 rounded-lg">
+              <div className="col-span-full text-center py-10 rounded-lg">
                 <KanbanSquare className="h-10 w-10 mx-auto text-gray-400 mb-2" />
                 <p className="text-muted-foreground text-sm">No boards found</p>
               </div>

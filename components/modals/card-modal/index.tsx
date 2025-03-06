@@ -72,7 +72,7 @@ export const CardModal = () => {
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="overflow-y-auto p-0 max-w-3xl sm:max-w-3xl md:max-w-4xl lg:max-w-5xl" side="right">
+      <SheetContent className="overflow-y-auto p-0 max-w-3xl sm:max-w-3xl md:max-w-4xl lg:max-w-5xl" side="rightLarge">
         <div className="h-full flex flex-col">
           <div className="p-6 pb-2 border-b">
             {!cardData ? (
