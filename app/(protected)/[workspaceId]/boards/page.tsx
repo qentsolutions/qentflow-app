@@ -13,7 +13,7 @@ const BoardPage = () => {
 
   return (
     <div className="w-full min-h-[calc(100vh-70px)] bg-gray-50">
-      <div className="p-2 w-full max-w-7xl mx-auto">
+      <div className="pl-2 pt-2 w-full max-w-7xl mx-auto">
         <BoardList />
       </div>
     </div>

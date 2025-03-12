@@ -83,7 +83,7 @@ export function NoteEditor({ note, onSave, readonly = false, onDelete }: NoteEdi
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="h-full w-full flex bg-gray-100 p-2"
+            className="h-full w-full flex bg-gray-100 pl-2 pt-2"
         >
             <Card className="w-full bg-white shadow-none rounded-none relative">
                 <CardContent className="p-6">

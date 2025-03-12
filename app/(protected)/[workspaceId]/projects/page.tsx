@@ -46,7 +46,7 @@ export default function ProjectsPage() {
     );
 
     return (
-        <div className="p-6">
+        <div className="pl-2 pt-2">
             <Card className="shadow-none rounded-none">
                 <div className="p-6">
                     <div className="flex items-center justify-between mb-8">

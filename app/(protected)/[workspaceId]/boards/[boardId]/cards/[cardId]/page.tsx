@@ -83,7 +83,7 @@ const CardPage = ({ params, readonly }: any) => {
 
     return (
         <div className="flex h-full bg-gray-50">
-            <div className="flex-1 overflow-y-auto p-2">
+            <div className="flex-1 overflow-y-auto pl-2 pt-2">
                 <div className="max-w-7xl mx-auto p-8 border space-y-6 bg-white">
                     {!cardData ? (
                         <Header.Skeleton />
