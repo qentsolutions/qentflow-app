@@ -76,6 +76,7 @@ model User {
   sentInvitations       Invitation[]
   automations           Automation[]
   notes                 Note[]
+  project               Project[]
 }
 
 model Workspace {
@@ -95,6 +96,7 @@ model Workspace {
   automations        Automation[]
   automationActivity AutomationActivity[]
   notes              Note[]
+  project            Project[]
 }
 
 model Invitation {
@@ -114,11 +116,14 @@ model Invitation {
 }
 
 model Document {
-  id          String    @id @default(cuid())
-  title       String
-  content     String?   @db.Text
+  id        String  @id @default(cuid())
+  title     String
+  content   String? @db.Text
+  projectId String? // Rendre optionnel pour la rétrocompatibilité
+
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  project     Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
   createdById String
   createdBy   User      @relation(fields: [createdById], references: [id])
   createdAt   DateTime  @default(now())
@@ -193,11 +198,14 @@ model Board {
   id          String  @id @default(uuid())
   workspaceId String
   title       String
+  projectId   String? // Rendre optionnel pour la rétrocompatibilité
+
   lists       List[]
   createdById String
   image       String?
 
   workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  project     Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
   automations Automation[]
 
   createdAt DateTime @default(now())
@@ -236,7 +244,7 @@ model Card {
   order       Int
   description String?   @db.Text
   priority    Priority?
-  archived    Boolean?   @default(false) // Ajout du champ "archived" avec valeur par défaut à false
+  archived    Boolean?  @default(false) // Ajout du champ "archived" avec valeur par défaut à false
 
   listId String
   list   List   @relation(fields: [listId], references: [id], onDelete: Cascade)
@@ -490,5 +498,29 @@ model Note {
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
+  @@index([createdById])
+}
+
+model Project {
+  id          String    @id @default(cuid())
+  name        String
+  description String?   @db.Text
+  icon        String? // Pour stocker une icône ou une couleur
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdById String
+  createdBy   User      @relation(fields: [createdById], references: [id])
+
+  // Relations avec les différents outils
+  boards    Board[]
+  documents Document[]
+  // Pour les futurs outils
+  // whiteboards Whiteboard[]
+  // etc...
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([workspaceId])
   @@index([createdById])
 }

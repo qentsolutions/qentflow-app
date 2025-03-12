@@ -73,7 +73,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: `/${workspaceId}/projects`,
         icon: Folder,
         isActive: false,
-        disabled: true,
       },
     ],
     navTools: [
