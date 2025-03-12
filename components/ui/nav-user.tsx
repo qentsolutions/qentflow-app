@@ -122,6 +122,7 @@ export function NavUser({ user }: { user: any }) {
 
     return (
         <SidebarMenu>
+                <Separator className="mb-2" />
             <SidebarMenuItem>
                 <SidebarMenuButton
                     onClick={() => setShowInvitations(true)}

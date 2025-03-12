@@ -35,8 +35,8 @@ export function NavTools({
       </div>
       <SidebarMenu>
         {items.map((item) => {
-          // Vérifie si l'URL actuelle commence par l'URL de l'item
-          const isActive = pathname.startsWith(item.url);
+          // Vérifie si l'URL actuelle correspond exactement à l'URL de l'item
+          const isActive = pathname === item.url;
 
           return (
             <SidebarMenuItem
