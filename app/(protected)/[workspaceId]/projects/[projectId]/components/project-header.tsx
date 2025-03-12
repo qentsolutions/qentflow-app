@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { updateProject } from "@/actions/projects/update-project";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
+import { ProjectAvatar } from "./project-avatar";
 
 interface ProjectHeaderProps {
     project: any;
@@ -35,45 +35,52 @@ export function ProjectHeader({ project }: ProjectHeaderProps) {
             queryClient.invalidateQueries({
                 queryKey: ["project", project.id],
             });
-            setIsEditing(false);
+
             toast.success("Project updated successfully");
+            setIsEditing(false);
         } catch (error) {
             toast.error("Something went wrong");
         }
     };
 
     return (
-        <div className="p-6 border-b">
-            <div className="flex items-center justify-between">
-                {isEditing ? (
-                    <div className="flex items-center gap-2">
-                        <Input
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            className="text-xl font-bold"
-                        />
-                        <Button onClick={handleUpdate}>Save</Button>
-                        <Button variant="ghost" onClick={() => setIsEditing(false)}>
-                            Cancel
-                        </Button>
-                    </div>
-                ) : (
-                    <div className="flex items-center gap-2">
-                        <h1 className="text-2xl font-bold">{project.name}</h1>
-                        <Button
-                            variant="ghost"
-                            size="icon"
+        <div className="flex items-center justify-between px-6 py-4 border-b">
+            <div className="flex items-center gap-4">
+                <ProjectAvatar
+                    projectName={project.name}
+                    projectLogo={project.logo}
+                    size="lg"
+                />
+                <div>
+                    {isEditing ? (
+                        <div className="flex items-center gap-2">
+                            <Input
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                className="h-7 w-[200px]"
+                            />
+                            <Button onClick={handleUpdate} size="sm">
+                                Save
+                            </Button>
+                            <Button
+                                onClick={() => setIsEditing(false)}
+                                variant="ghost"
+                                size="sm"
+                            >
+                                Cancel
+                            </Button>
+                        </div>
+                    ) : (
+                        <h1
+                            className="text-2xl font-bold cursor-pointer hover:underline"
                             onClick={() => setIsEditing(true)}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity"
                         >
-                            <Pencil className="h-4 w-4" />
-                        </Button>
-                    </div>
-                )}
+                            {project.name}
+                        </h1>
+                    )}
+                   
+                </div>
             </div>
-            {project.description && (
-                <p className="text-muted-foreground mt-2">{project.description}</p>
-            )}
         </div>
     );
 }

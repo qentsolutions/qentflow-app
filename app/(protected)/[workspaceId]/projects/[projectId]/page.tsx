@@ -9,13 +9,13 @@ import { fetcher } from "@/lib/fetcher";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProjectHeader } from "./components/project-header";
-import { ProjectOverview } from "./components/project-overview";
 import { ProjectSettings } from "./components/project-settings";
-
-import { KanbanSquare, FileText, Settings2, LayoutDashboard, FolderKanban } from "lucide-react";
+import { ProjectOverview } from "./components/project-overview";
 import { ProjectResources } from "./components/project-resource";
 import { ProjectBoards } from "./components/project-board";
 import { ProjectDocuments } from "./components/project-document";
+
+import { KanbanSquare, FileText, Settings2, LayoutDashboard, FolderKanban } from "lucide-react";
 
 export default function ProjectPage() {
     const params = useParams();
@@ -59,7 +59,7 @@ export default function ProjectPage() {
     }
 
     return (
-        <div className="p-6">
+        <div className="pl-2 pt-2">
             <Card className="shadow-none rounded-none">
                 <ProjectHeader project={project} />
                 <Tabs
