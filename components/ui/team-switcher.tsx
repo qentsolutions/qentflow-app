@@ -29,7 +29,7 @@ export function TeamSwitcher() {
                     <DropdownMenuTrigger asChild>
                         <SidebarMenuButton
                             size="lg"
-                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foregroundx@ dark:bg-gray-800 "
+                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foregroundx@ dark:bg-gray-800"
                         >
                             <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                                 {currentWorkspace?.logo ? (
@@ -57,7 +57,7 @@ export function TeamSwitcher() {
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
-                        className="w-[--radix-dropdown-menu-trigger-width] min-w-56 "
+                        className="w-[--radix-dropdown-menu-trigger-width] ml-2 min-w-60 "
                         align="start"
                         side={isMobile ? "bottom" : "right"}
                         sideOffset={4}

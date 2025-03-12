@@ -13,6 +13,9 @@ import { updateProject } from "@/actions/projects/update-project";
 import { deleteProject } from "@/actions/projects/delete-project";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ProjectLogoUpload } from "./project-logo";
+import { useQueryClient } from "@tanstack/react-query";
+import { ProjectMembers } from "./project-member";
 
 interface ProjectSettingsProps {
     project: any;
@@ -21,6 +24,7 @@ interface ProjectSettingsProps {
 export function ProjectSettings({ project }: ProjectSettingsProps) {
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const router = useRouter();
+    const queryClient = useQueryClient();
     const { currentWorkspace } = useCurrentWorkspace();
     const [formData, setFormData] = useState({
         name: project.name,
@@ -72,6 +76,17 @@ export function ProjectSettings({ project }: ProjectSettingsProps) {
                     <h3 className="text-lg font-semibold mb-4">Project Settings</h3>
                     <div className="space-y-4">
                         <div>
+                            <ProjectLogoUpload
+                                projectId={project.id}
+                                workspaceId={project.workspaceId}
+                                onUploadComplete={() => {
+                                    queryClient.invalidateQueries({
+                                        queryKey: ["project", project.id],
+                                    });
+                                }}
+                            />
+                        </div>
+                        <div>
                             <label className="text-sm font-medium">Project Name</label>
                             <Input
                                 value={formData.name}
@@ -89,6 +104,15 @@ export function ProjectSettings({ project }: ProjectSettingsProps) {
                         </div>
                         <Button onClick={handleUpdate}>Save Changes</Button>
                     </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardContent className="p-6">
+                    <ProjectMembers
+                        projectId={project.id}
+                        currentMembers={project.members}
+                    />
                 </CardContent>
             </Card>
 

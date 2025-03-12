@@ -1,4 +1,4 @@
-import { type LucideIcon, ChevronRight, Folder, File, LayoutList, FileText } from "lucide-react"
+import { type LucideIcon, ChevronRight, Folder, FolderOpen, File, LayoutList, FileText } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { fetcher } from "@/lib/fetcher"
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
@@ -47,7 +47,11 @@ export function NavProjects({
                     >
                         <SidebarMenuButton asChild isActive={pathname === `/${currentWorkspace?.id}/projects`}>
                             <Link href={`/${currentWorkspace?.id}/projects`}>
-                                <Folder className="h-4 w-4" />
+                                {isActive ? (
+                                    <FolderOpen className="h-4 w-4" />
+                                ) : (
+                                    <Folder className="h-4 w-4" />
+                                )}
                                 <span>Projects</span>
                             </Link>
                         </SidebarMenuButton>
@@ -58,7 +62,7 @@ export function NavProjects({
                         </CollapsibleTrigger>
                     </SidebarMenuItem>
 
-                    <CollapsibleContent>
+                    <CollapsibleContent className="group-data-[collapsible=icon]:hidden">
                         <div className="ml-2 space-y-2 mt-2">
                             {!projects && (
                                 <div className="py-3 px-2 flex items-center justify-center">
@@ -89,17 +93,33 @@ export function NavProjects({
                                         key={project.id}
                                         className="group/project-collapsible rounded-lg overflow-hidden"
                                     >
-                                        <CollapsibleTrigger className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-muted/80 transition-colors">
-                                            <div className="flex items-center gap-2">
-                                                <ChevronRight className="h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 group-data-[state=open]/project-collapsible:rotate-90" />
-                                                <ProjectAvatar
-                                                    projectName={project.name}
-                                                    projectLogo={project.logo}
-                                                    size="sm"
-                                                />
-                                                <span className="font-medium truncate">{project.name}</span>
-                                            </div>
-                                        </CollapsibleTrigger>
+                                        <div
+                                            className={cn(
+                                                "w-full flex items-center justify-between px-3 py-2 text-sm transition-colors",
+                                                pathname === `/${currentWorkspace?.id}/projects/${project.id}`
+                                                    ? "bg-blue-100 text-blue-600 font-medium"
+                                                    : "hover:bg-muted/80 text-foreground/80 hover:text-foreground"
+                                            )}
+                                        >
+                                            <CollapsibleTrigger asChild>
+                                                <div className="flex items-center gap-2 w-full">
+                                                    <ChevronRight
+                                                        className="h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 group-data-[state=open]/project-collapsible:rotate-90 hover:bg-blue-50 rounded-sm"
+                                                    />
+                                                    <Link
+                                                        href={`/${currentWorkspace?.id}/projects/${project.id}`}
+                                                        className="flex items-center gap-2 w-full"
+                                                    >
+                                                        <ProjectAvatar
+                                                            projectName={project.name}
+                                                            projectLogo={project.logo}
+                                                            size="sm"
+                                                        />
+                                                        <span className="font-medium truncate">{project.name}</span>
+                                                    </Link>
+                                                </div>
+                                            </CollapsibleTrigger>
+                                        </div>
 
                                         <CollapsibleContent>
                                             <div className="border-l border-primary/10 ml-4 pl-3 py-2 space-y-1">

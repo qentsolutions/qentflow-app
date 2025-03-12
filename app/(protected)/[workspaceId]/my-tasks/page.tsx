@@ -196,7 +196,7 @@ export default function MyTasksPage() {
 
   if (isLoading) {
     return (
-      <div className="flex h-full w-full items-center justify-center">
+      <div className="flex h-[90vh] w-full items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
           <p className="text-muted-foreground">Loading your tasks...</p>
@@ -206,7 +206,7 @@ export default function MyTasksPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-70px)] flex-col md:flex-row">
+    <div className="flex h-[calc(100vh-76px)] flex-col md:flex-row">
       {/* Mobile view - Task list */}
       {isMobile && !showMobileDetail && (
         <div className="flex h-full w-full flex-col bg-background">
@@ -348,7 +348,7 @@ export default function MyTasksPage() {
                 />
               </div>
             </div>
-            <ScrollArea className="h-[calc(100vh-180px)] px-2 py-2">
+            <ScrollArea className="h-[calc(100vh-185px)] px-2 py-2">
               <AnimatePresence>
                 {sortedCards.length > 0 ? (
                   sortedCards.map((card: any) => (

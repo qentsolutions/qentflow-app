@@ -102,7 +102,7 @@ export const ProjectMembers = ({ projectId, currentMembers }: ProjectMembersProp
             </div>
 
             <div className="space-y-4">
-                {currentMembers.map((member: any) => (
+                {currentMembers?.map((member: any) => (
                     <div
                         key={member.id}
                         className="flex items-center justify-between p-4 rounded-lg border"

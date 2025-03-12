@@ -60,7 +60,7 @@ export default function ProjectPage() {
 
     return (
         <div className="pl-2 pt-2">
-            <Card className="shadow-none rounded-none">
+            <Card className="shadow-none rounded-none h-screen">
                 <ProjectHeader project={project} />
                 <Tabs
                     value={activeTab}

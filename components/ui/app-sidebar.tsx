@@ -7,6 +7,7 @@ import {
   FileText,
   Folder,
   LayoutDashboard,
+  LayoutList,
   LibraryBig,
   ListTodo,
   MessageCircle,
@@ -79,7 +80,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {
         name: "Boards",
         url: `/${workspaceId}/boards`,
-        icon: SquareKanban,
+        icon: LayoutList,
         isActive: false,
       },
       {

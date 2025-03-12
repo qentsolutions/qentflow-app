@@ -36,6 +36,10 @@ export function ProjectHeader({ project }: ProjectHeaderProps) {
                 queryKey: ["project", project.id],
             });
 
+            queryClient.invalidateQueries({
+                queryKey: ["projects", currentWorkspace?.id],
+            });
+
             toast.success("Project updated successfully");
             setIsEditing(false);
         } catch (error) {
@@ -78,7 +82,7 @@ export function ProjectHeader({ project }: ProjectHeaderProps) {
                             {project.name}
                         </h1>
                     )}
-                   
+
                 </div>
             </div>
         </div>

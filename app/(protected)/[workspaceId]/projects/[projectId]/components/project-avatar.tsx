@@ -16,9 +16,18 @@ const getColorFromString = (str: string) => {
     }
 
     const colors = [
-        "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4",
-        "#FFEEAD", "#D4A5A5", "#9B59B6", "#3498DB",
-        "#E74C3C", "#2ECC71", "#F1C40F", "#1ABC9C"
+        "#FF6B6B", // Rouge vif
+        "#4ECDC4", // Turquoise
+        "#45B7D1", // Bleu clair
+        "#96CEB4", // Vert menthe
+        "#9B59B6", // Violet
+        "#3498DB", // Bleu
+        "#E74C3C", // Rouge
+        "#2ECC71", // Vert
+        "#1ABC9C", // Cyan
+        "#2C3E50", // Bleu foncé
+        "#8E44AD", // Violet foncé
+        "#E67E22"  // Orange
     ];
 
     return colors[Math.abs(hash) % colors.length];
@@ -28,24 +37,24 @@ export const ProjectAvatar = ({ projectName, projectLogo, size = "md" }: Project
     const backgroundColor = useMemo(() => getColorFromString(projectName), [projectName]);
 
     const sizeClasses = {
-        sm: "h-6 w-6", // Réduit la taille pour "sm"
-        md: "h-8 w-8", // Réduit la taille pour "md"
-        lg: "h-10 w-10", // Réduit la taille pour "lg"
+        sm: "h-6 w-6",  // Taille réduite pour "sm"
+        md: "h-8 w-8",  // Taille réduite pour "md"
+        lg: "h-10 w-10", // Taille réduite pour "lg"
     };
 
     const fontSizes = {
-        sm: "text-xs", // Réduit la taille de la police pour "sm"
-        md: "text-sm", // Réduit la taille de la police pour "md"
-        lg: "text-base", // Réduit la taille de la police pour "lg"
+        sm: "text-xs",  // Taille de police réduite pour "sm"
+        md: "text-sm",  // Taille de police réduite pour "md"
+        lg: "text-base", // Taille de police réduite pour "lg"
     };
 
     return (
-        <Avatar className={`${sizeClasses[size]}`}>
+        <Avatar className={`${sizeClasses[size]} rounded-md border-none`}>  {/* Supprimer toute bordure arrondie */}
             {projectLogo ? (
                 <AvatarImage src={projectLogo} alt={projectName} className="object-cover" />
             ) : (
                 <AvatarFallback
-                    className={`${fontSizes[size]} font-semibold text-white`}
+                    className={`${fontSizes[size]} rounded-md font-semibold text-white`}
                     style={{ backgroundColor }}
                 >
                     {projectName.charAt(0).toUpperCase()}
