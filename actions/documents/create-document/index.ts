@@ -15,7 +15,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  const { title, workspaceId } = data;
+  const { title, workspaceId, projectId } = data;
 
   let document;
 
@@ -26,6 +26,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         workspaceId,
         createdById: user.id,
         content: "",
+        projectId: projectId || undefined, // Add projectId if available
       },
     });
   } catch (error) {

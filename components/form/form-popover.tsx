@@ -17,6 +17,7 @@ interface FormPopoverProps {
   align?: "start" | "center" | "end";
   sideOffset?: number;
   workspaceId: string;
+  projectId?: string; // Add projectId prop
 }
 
 export const FormPopover = ({
@@ -25,6 +26,7 @@ export const FormPopover = ({
   align,
   sideOffset = 0,
   workspaceId,
+  projectId, // Add projectId parameter
 }: FormPopoverProps) => {
   const router = useRouter();
   const closeRef = useRef<ElementRef<"button">>(null);
@@ -43,7 +45,11 @@ export const FormPopover = ({
 
   const onSubmit = (formData: FormData) => {
     const title = formData.get("title") as string;
-    execute({ title, workspaceId });
+    execute({
+      title,
+      workspaceId,
+      projectId: projectId || undefined, // Pass projectId if available
+    });
   }
 
   return (
@@ -81,4 +87,3 @@ export const FormPopover = ({
     </Dialog>
   );
 };
-

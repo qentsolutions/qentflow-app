@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -11,15 +11,17 @@ import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { fetcher } from "@/lib/fetcher";
 import { addProjectMember } from "@/actions/projects/add-member";
 import { Plus, UserPlus } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface ProjectMembersProps {
-    projectId: string;
-    currentMembers: any[];
+    project: any;
+    onUpdate: () => void;
 }
 
-export const ProjectMembers = ({ projectId, currentMembers }: ProjectMembersProps) => {
+export const ProjectMembers = ({ project, onUpdate }: ProjectMembersProps) => {
     const { currentWorkspace } = useCurrentWorkspace();
     const [isOpen, setIsOpen] = useState(false);
+    const queryClient = useQueryClient();
 
     const { data: workspaceMembers } = useQuery({
         queryKey: ["workspace-members", currentWorkspace?.id],
@@ -28,13 +30,13 @@ export const ProjectMembers = ({ projectId, currentMembers }: ProjectMembersProp
     });
 
     const availableMembers = workspaceMembers?.filter(
-        (member: any) => !currentMembers.some((m: any) => m.id === member.user.id)
+        (member: any) => !project.members.some((m: any) => m.id === member.user.id)
     );
 
     const handleAddMember = async (userId: string) => {
         try {
             const result = await addProjectMember({
-                projectId,
+                projectId: project.id,
                 userId,
                 workspaceId: currentWorkspace?.id || "",
             });
@@ -44,6 +46,11 @@ export const ProjectMembers = ({ projectId, currentMembers }: ProjectMembersProp
                 return;
             }
 
+            queryClient.invalidateQueries({
+                queryKey: ["project", project.id],
+            });
+
+            onUpdate();
             toast.success("Member added to project");
             setIsOpen(false);
         } catch (error) {
@@ -52,7 +59,7 @@ export const ProjectMembers = ({ projectId, currentMembers }: ProjectMembersProp
     };
 
     return (
-        <div>
+        <div className="space-y-6">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Project Members</h3>
                 <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -101,23 +108,22 @@ export const ProjectMembers = ({ projectId, currentMembers }: ProjectMembersProp
                 </Dialog>
             </div>
 
-            <div className="space-y-4">
-                {currentMembers?.map((member: any) => (
-                    <div
-                        key={member.id}
-                        className="flex items-center justify-between p-4 rounded-lg border"
-                    >
-                        <div className="flex items-center gap-3">
-                            <Avatar>
-                                <AvatarImage src={member.image} />
-                                <AvatarFallback>{member.name?.[0]}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                                <p className="font-medium">{member.name}</p>
-                                <p className="text-sm text-muted-foreground">{member.email}</p>
+            <div className="grid gap-4">
+                {project.members?.map((member: any) => (
+                    <Card key={member.id}>
+                        <CardContent className="p-4 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <Avatar>
+                                    <AvatarImage src={member.image} />
+                                    <AvatarFallback>{member.name?.[0]}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <p className="font-medium">{member.name}</p>
+                                    <p className="text-sm text-muted-foreground">{member.email}</p>
+                                </div>
                             </div>
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
                 ))}
             </div>
         </div>

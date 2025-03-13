@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Folder, LayoutGrid, FileText } from "lucide-react";
 import { format } from "date-fns";
+import { ProjectAvatar } from "./project-avatar";
 
 interface ProjectCardProps {
     project: any;
@@ -19,9 +20,11 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
         >
             <Card className="p-6 cursor-pointer hover:shadow-md transition-all duration-200">
                 <div className="flex items-center gap-4 mb-4">
-                    <div className="p-3 rounded-lg bg-blue-100">
-                        <Folder className="h-6 w-6 text-blue-600" />
-                    </div>
+                    <ProjectAvatar
+                        projectName={project.name}
+                        projectLogo={project.logo}
+                        size="lg"
+                    />
                     <div>
                         <h3 className="font-semibold text-lg">{project.name}</h3>
                         <p className="text-sm text-muted-foreground">

@@ -5,8 +5,8 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { createSafeAction } from "@/lib/create-safe-action";
 
-import { InputType, ReturnType } from "./types";
 import { CreateBoard } from "./schema";
+import { InputType, ReturnType } from "./types";
 import { createAuditLog } from "@/lib/create-audit-log";
 import { ACTION, ENTITY_TYPE } from "@prisma/client";
 import { currentUser } from "@/lib/auth";
@@ -15,10 +15,12 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   const user = await currentUser();
 
   if (!user) {
-    throw new Error("User not found!");
+    return {
+      error: "Unauthorized",
+    };
   }
 
-  const { title, workspaceId } = data;
+  const { title, workspaceId, projectId } = data;
 
   if (!workspaceId) {
     return {
@@ -33,6 +35,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         title,
         workspaceId,
         createdById: user.id,
+        projectId: projectId || undefined, // Add projectId if available
         // Ajouter l'utilisateur dans la relation User du board
         User: {
           connect: {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
@@ -11,17 +11,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProjectHeader } from "./components/project-header";
 import { ProjectSettings } from "./components/project-settings";
 import { ProjectOverview } from "./components/project-overview";
-import { ProjectResources } from "./components/project-resource";
 import { ProjectBoards } from "./components/project-board";
 import { ProjectDocuments } from "./components/project-document";
+import { ProjectMembers } from "./components/project-member";
 
-import { KanbanSquare, FileText, Settings2, LayoutDashboard, FolderKanban } from "lucide-react";
+import { KanbanSquare, FileText, Settings2, LayoutDashboard, Users } from "lucide-react";
 
 export default function ProjectPage() {
     const params = useParams();
     const { currentWorkspace } = useCurrentWorkspace();
     const { setBreadcrumbs } = useBreadcrumbs();
     const [activeTab, setActiveTab] = useState("overview");
+    const queryClient = useQueryClient();
 
     const { data: project, isLoading } = useQuery({
         queryKey: ["project", params.projectId],
@@ -39,6 +40,13 @@ export default function ProjectPage() {
             ]);
         }
     }, [project, currentWorkspace?.id, setBreadcrumbs]);
+
+    // Refresh project data when boards or documents are updated
+    const refreshProject = () => {
+        queryClient.invalidateQueries({
+            queryKey: ["project", params.projectId],
+        });
+    };
 
     if (isLoading) {
         return (
@@ -72,10 +80,6 @@ export default function ProjectPage() {
                             <LayoutDashboard className="h-4 w-4 mr-2" />
                             Overview
                         </TabsTrigger>
-                        <TabsTrigger value="resources">
-                            <FolderKanban className="h-4 w-4 mr-2" />
-                            Resources
-                        </TabsTrigger>
                         <TabsTrigger value="boards">
                             <KanbanSquare className="h-4 w-4 mr-2" />
                             Boards
@@ -83,6 +87,10 @@ export default function ProjectPage() {
                         <TabsTrigger value="documents">
                             <FileText className="h-4 w-4 mr-2" />
                             Documents
+                        </TabsTrigger>
+                        <TabsTrigger value="members">
+                            <Users className="h-4 w-4 mr-2" />
+                            Members
                         </TabsTrigger>
                         <TabsTrigger value="settings">
                             <Settings2 className="h-4 w-4 mr-2" />
@@ -94,14 +102,14 @@ export default function ProjectPage() {
                         <TabsContent value="overview">
                             <ProjectOverview project={project} />
                         </TabsContent>
-                        <TabsContent value="resources">
-                            <ProjectResources project={project} />
-                        </TabsContent>
                         <TabsContent value="boards">
-                            <ProjectBoards project={project} />
+                            <ProjectBoards project={project} onUpdate={refreshProject} />
                         </TabsContent>
                         <TabsContent value="documents">
-                            <ProjectDocuments project={project} />
+                            <ProjectDocuments project={project} onUpdate={refreshProject} />
+                        </TabsContent>
+                        <TabsContent value="members">
+                            <ProjectMembers project={project} onUpdate={refreshProject} />
                         </TabsContent>
                         <TabsContent value="settings">
                             <ProjectSettings project={project} />

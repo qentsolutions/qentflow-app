@@ -15,7 +15,6 @@ import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ProjectLogoUpload } from "./project-logo";
 import { useQueryClient } from "@tanstack/react-query";
-import { ProjectMembers } from "./project-member";
 
 interface ProjectSettingsProps {
     project: any;
@@ -104,15 +103,6 @@ export function ProjectSettings({ project }: ProjectSettingsProps) {
                         </div>
                         <Button onClick={handleUpdate}>Save Changes</Button>
                     </div>
-                </CardContent>
-            </Card>
-
-            <Card>
-                <CardContent className="p-6">
-                    <ProjectMembers
-                        projectId={project.id}
-                        currentMembers={project.members}
-                    />
                 </CardContent>
             </Card>
 
