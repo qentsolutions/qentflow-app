@@ -132,7 +132,7 @@ export const BoardList: React.FC = () => {
   const [recentBoardIds, setRecentBoardIds] = useState<string[]>([])
 
   useEffect(() => {
-    document.title = "Boards - QentFlow"
+    document.title = "Boards - Qentflow"
     setRecentBoardIds(getRecentBoards())
   }, [])
 

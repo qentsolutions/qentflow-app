@@ -11,7 +11,7 @@ export default function AppearanceSettings() {
   const { setBreadcrumbs } = useBreadcrumbs();
 
   useEffect(() => {
-    document.title = "Appearance - QentFlow";
+    document.title = "Appearance - Qentflow";
   }, []);
 
   useEffect(() => {

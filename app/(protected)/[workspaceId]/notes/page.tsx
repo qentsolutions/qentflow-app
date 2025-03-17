@@ -71,7 +71,7 @@ export default function MyNotesPage() {
     const closeRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
-        document.title = "My Notes - QentFlow";
+        document.title = "My Notes - Qentflow";
     }, []);
 
     useEffect(() => {

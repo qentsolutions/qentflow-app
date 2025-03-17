@@ -28,7 +28,7 @@ export default function ProjectsPage() {
     const router = useRouter();
 
     useEffect(() => {
-        document.title = "Projects - QentFlow";
+        document.title = "Projects - Qentflow";
     }, []);
 
     useEffect(() => {

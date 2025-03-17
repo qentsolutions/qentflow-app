@@ -4,7 +4,7 @@ import { useEffect } from "react";
 const DashboardPage = () => {
 
     useEffect(() => {
-        document.title = "Dashboard - QentFlow";
+        document.title = "Dashboard - Qentflow";
     }, []);
 
     return (

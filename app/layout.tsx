@@ -11,8 +11,8 @@ import { ThemeProvider } from '@/providers/theme-provider'
 
 
 export const metadata: Metadata = {
-  title: 'QentFlow',
-  description: 'Boost your team&apos;s productivity with QentFlow! Discover our innovative WorkOS platform designed for seamless team collaboration, project management, and streamlined workflows.Work smarter, together.',
+  title: 'Qentflow',
+  description: 'Boost your team&apos;s productivity with Qentflow! Discover our innovative WorkOS platform designed for seamless team collaboration, project management, and streamlined workflows.Work smarter, together.',
 }
 
 export default async function RootLayout({

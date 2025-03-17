@@ -468,7 +468,7 @@ function TaskCard({
                   <div className="flex items-center gap-2">
                     <div className="h-2 w-16 overflow-hidden rounded-full bg-gray-100">
                       <div
-                        className="h-full rounded-full bg-primary transition-all"
+                        className="h-full rounded-full bg-blue-600 transition-all"
                         style={{ width: `${progress}%` }}
                       />
                     </div>

@@ -34,7 +34,7 @@ const AccountPage = () => {
     const { setBreadcrumbs } = useBreadcrumbs();
 
     useEffect(() => {
-        document.title = "Account - QentFlow";
+        document.title = "Account - Qentflow";
     }, []);
 
     useEffect(() => {

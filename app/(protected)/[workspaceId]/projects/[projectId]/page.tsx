@@ -33,7 +33,7 @@ export default function ProjectPage() {
 
     useEffect(() => {
         if (project) {
-            document.title = `${project.name} - QentFlow`;
+            document.title = `${project.name} - Qentflow`;
             setBreadcrumbs([
                 { label: "Projects", href: `/${currentWorkspace?.id}/projects` },
                 { label: project.name },

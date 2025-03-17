@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: { params: { boardId: string; 
   if (!board) {
     return { title: "Board Not Found | MyApp" };
   }
-  return { title: `${board.title} - QentFlow` };
+  return { title: `${board.title} - Qentflow` };
 }
 const BoardIdPage = async ({ params }: BoardIdPageProps) => {
   const user = await currentUser();

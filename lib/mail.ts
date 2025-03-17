@@ -180,13 +180,13 @@ export const sendBeautifulEmail = async (
     <body>
       <div class="container">
         <div class="header">
-          <img src="${domain}/logo.png" alt="QentFlow" class="logo">
+          <img src="${domain}/logo.png" alt="Qentflow" class="logo">
         </div>
         <div class="content">
           ${content}
         </div>
         <div class="footer">
-          <p>&copy; ${new Date().getFullYear()} QentFlow. All rights reserved.</p>
+          <p>&copy; ${new Date().getFullYear()} Qentflow. All rights reserved.</p>
           <p>For any questions, contact us at <a href="mailto:support@qentsolutions.com" style="color: #0EA5E9; text-decoration: none;">support@qentsolutions.com</a></p>
           <div class="social-links">
             <a href="#" class="social-link">Twitter</a>
@@ -258,7 +258,7 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
 export const sendVerificationEmail = async (email: string, token: string) => {
   const confirmLink = `${domain}/auth/new-verification?token=${token}`;
   const content = `
-    <h1>Welcome to QentFlow!</h1>
+    <h1>Welcome to Qentflow!</h1>
     <p>Thank you for signing up. To start using your account, please confirm your email address:</p>
     <a class="button" href="${confirmLink}">Confirm My Email</a>
     <p style="margin-top: 24px; color: #6B7280;">This link will expire in 24 hours.</p>
@@ -275,11 +275,11 @@ export const sendWorkspaceInvitationEmail = async (
   inviterName: string,
   workspaceName: string
 ) => {
-  const subject = `${inviterName} invites you to join ${workspaceName} on QentFlow`;
+  const subject = `${inviterName} invites you to join ${workspaceName} on Qentflow`;
   const content = `
     <h1>You've Been Invited to a Workspace!</h1>
-    <p>${inviterName} invites you to join the "${workspaceName}" workspace on QentFlow.</p>
-    <p>QentFlow is a powerful platform that allows you to manage your projects and workflows efficiently. By joining this workspace, you can easily collaborate with your team.</p>
+    <p>${inviterName} invites you to join the "${workspaceName}" workspace on Qentflow.</p>
+    <p>Qentflow is a powerful platform that allows you to manage your projects and workflows efficiently. By joining this workspace, you can easily collaborate with your team.</p>
     <a class="button" href="https://app.qentflow.com/auth/login">Join the Workspace</a>
     <div style="
       background-color: #F3F4F6;
@@ -288,7 +288,7 @@ export const sendWorkspaceInvitationEmail = async (
       margin: 24px 0;
     ">
       <p style="margin: 0; font-size: 14px; color: #4B5563;">
-        ✨ <strong>New to QentFlow?</strong> No worries! We'll guide you through all the steps after accepting the invitation.
+        ✨ <strong>New to Qentflow?</strong> No worries! We'll guide you through all the steps after accepting the invitation.
       </p>
     </div>
     <p style="font-size: 14px; color: #6B7280;">This invitation will expire in 7 days.</p>
