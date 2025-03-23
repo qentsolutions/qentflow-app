@@ -1,45 +1,46 @@
-import { RegisterForm } from "@/components/auth/register-form";
-import Image from "next/image";
-import Link from "next/link";
+import { RegisterForm } from "@/components/auth/register-form"
+import Image from "next/image"
+import Link from "next/link"
 
-const RegisterPage = () => {
+export default function RegisterPage() {
   return (
-    <div className="w-screen flex min-h-screen">
-      {/* Conteneur principal */}
-      <Link href="https://qentflow.com">
-        <div className="absolute top-4 left-4 flex items-center gap-x-2">
-          <Image
-            src="/logo.png"
-            alt="Qentflow Logo"
-            height={30}
-            width={30}
-            className="rounded-lg"
-          />
-          <div className="relative font-black inline-block w-max [filter:drop-shadow(0px_1px_3px_rgba(27,_37,_80,_0.14))]">
-            <div className="relative bg-clip-text text-transparent bg-no-repeat bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500">
-              <span className="z-40 text-xl">Qentflow</span>
-            </div>
-          </div>
-        </div>
+    <div className="flex min-h-screen w-full overflow-hidden">
+      {/* Logo */}
+      <Link
+        href="https://qentflow.com"
+        className="absolute left-2 top-2 z-10 transition-opacity hover:opacity-80 focus:opacity-80"
+      >
+        <Image src="/logo.svg" alt="Qentflow Logo" height={200} width={200}  priority />
       </Link>
 
-
-      <div className="flex-1 flex-col flex items-center justify-center p-8 bg-[#F8FAFC]">
-        <RegisterForm />
+      {/* Left side - Form */}
+      <div className="flex w-full flex-1 flex-col items-center justify-center bg-white px-6 py-12 sm:px-10 md:px-16 lg:w-1/2">
+        <div className="w-full max-w-md">
+          <h1 className="mb-2 text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">Create an account</h1>
+          <p className="mb-8 text-gray-500">Join Qentflow to streamline your workflow</p>
+          <RegisterForm />
+        </div>
       </div>
-      <div className="hidden lg:block flex-1 relative">
-        {/* Image en arrière-plan */}
+
+      {/* Right side - Hero Image */}
+      <div className="hidden lg:relative lg:block lg:flex-1">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/80 to-indigo-600/90 opacity-90 mix-blend-multiply" />
         <Image
-          src="/hero-logo.png" // Chemin de votre image
+          src="/hero-logo.png"
           alt="Hero Image"
-          layout="fill" // Permet de remplir tout le conteneur parent
-          objectFit="cover" // L'image couvre l'espace tout en respectant son ratio
-          objectPosition="center" // Centre l'image dans le conteneur
-          priority // Charge l'image en priorité pour améliorer la performance
+          fill
+          sizes="50vw"
+          className="object-cover object-center"
+          priority
         />
+        <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">
+          <div className="max-w-md space-y-4 text-white">
+            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Join Our Platform</h2>
+            <p className="text-lg text-white/90">Create your account and start managing your projects with ease.</p>
+          </div>
+        </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default RegisterPage;

@@ -180,7 +180,7 @@ export const sendBeautifulEmail = async (
     <body>
       <div class="container">
         <div class="header">
-          <img src="${domain}/logo.png" alt="Qentflow" class="logo">
+          <img src="${domain}/logo.svg" alt="Qentflow" class="logo">
         </div>
         <div class="content">
           ${content}
