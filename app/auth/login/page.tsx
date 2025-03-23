@@ -33,12 +33,6 @@ export default function LoginPage() {
           className="object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">
-          <div className="max-w-md space-y-4 text-white">
-            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Streamline Your Workflow</h2>
-            <p className="text-lg text-white/90">Access your dashboard and manage your projects with ease.</p>
-          </div>
-        </div>
       </div>
     </div>
   )

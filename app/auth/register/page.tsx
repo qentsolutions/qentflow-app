@@ -10,7 +10,7 @@ export default function RegisterPage() {
         href="https://qentflow.com"
         className="absolute left-2 top-2 z-10 transition-opacity hover:opacity-80 focus:opacity-80"
       >
-        <Image src="/logo.svg" alt="Qentflow Logo" height={200} width={200}  priority />
+        <Image src="/logo.svg" alt="Qentflow Logo" height={200} width={200} priority />
       </Link>
 
       {/* Left side - Form */}
@@ -30,15 +30,9 @@ export default function RegisterPage() {
           alt="Hero Image"
           fill
           sizes="50vw"
-          className="object-cover object-center"
+          className="object-cover object-center no-interaction"
           priority
         />
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">
-          <div className="max-w-md space-y-4 text-white">
-            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Join Our Platform</h2>
-            <p className="text-lg text-white/90">Create your account and start managing your projects with ease.</p>
-          </div>
-        </div>
       </div>
     </div>
   )
