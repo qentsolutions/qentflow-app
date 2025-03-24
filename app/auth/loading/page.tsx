@@ -15,18 +15,26 @@ export default function LoadingRedirect() {
 
                 if (error) {
                     console.error("Error fetching workspaces:", error);
-                    router.push("/workspace/select");
+                    setTimeout(() => {
+                        router.push("/workspace/select");
+                    }, 2000); // Attendre 2 secondes avant de rediriger
                     return;
                 }
 
                 if (!workspaces || workspaces.length === 0) {
-                    router.push("/workspace/select");
+                    setTimeout(() => {
+                        router.push("/workspace/select");
+                    }, 2000); // Attendre 2 secondes avant de rediriger
                 } else {
-                    router.push(`/${workspaces[0].id}/home`);
+                    setTimeout(() => {
+                        router.push(`/${workspaces[0].id}/home`);
+                    }, 2000); // Attendre 2 secondes avant de rediriger
                 }
             } catch (error) {
                 console.error("Error in checkWorkspaces:", error);
-                router.push("/workspace/select");
+                setTimeout(() => {
+                    router.push("/workspace/select");
+                }, 2000); // Attendre 2 secondes avant de rediriger
             }
         };
 
