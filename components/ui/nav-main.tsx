@@ -29,7 +29,7 @@ export function NavMain({
           return (
             <SidebarMenuItem
               key={item.name}
-              className={`rounded-sm w-full ${isActive ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"
+              className={`rounded-sm w-full ${isActive ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-slate-600"
                 }`} // Ajouter des styles conditionnels pour l'état actif
             >
               <SidebarMenuButton asChild>

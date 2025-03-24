@@ -126,7 +126,7 @@ export function NavUser({ user }: { user: any }) {
             <SidebarMenuItem>
                 <SidebarMenuButton
                     onClick={() => setShowInvitations(true)}
-                    className="w-full justify-start py-4 hover:bg-gray-100"
+                    className="w-full justify-start py-4 hover:bg-gray-100 text-slate-600"
                 >
                     <Inbox className="mr-1 h-4 w-4" />
                     Invitations
@@ -141,7 +141,7 @@ export function NavUser({ user }: { user: any }) {
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
                             <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-                                <Users className="w-6 h-6 text-primary" />
+                                <Users className="w-6 h-6   " />
                                 Invitations
                             </DialogTitle>
                         </DialogHeader>
@@ -226,9 +226,9 @@ export function NavUser({ user }: { user: any }) {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <SidebarMenuButton className="flex items-center justify-between gap-3 mb-2 py-4 rounded-lg hover:bg-gray-100">
-                            <div className="flex items-center gap-x-2">
+                            <div className="flex items-center gap-x-2 text-slate-600">
                                 <Bell className="mr-1 h-4 w-4" />
-                                <span className="font-medium">Notifications</span>
+                                <span>Notifications</span>
                             </div>
                             {unreadNotifications.length > 0 && (
                                 <div className="text-sm flex items-center justify-center h-6 w-6 bg-red-500 text-white rounded-sm">
@@ -289,7 +289,6 @@ export function NavUser({ user }: { user: any }) {
                                     </ScrollArea>
                                 </TabsContent>
                             ))}
-
                         </Tabs>
                     </DropdownMenuContent>
                 </DropdownMenu>

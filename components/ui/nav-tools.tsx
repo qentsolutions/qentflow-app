@@ -41,7 +41,7 @@ export function NavTools({
           return (
             <SidebarMenuItem
               key={item.name}
-              className={`rounded-sm ${isActive ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"
+              className={`rounded-sm ${isActive ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-slate-600"
                 } ${item.disabled ? "pointer-events-none opacity-50" : ""}`} // Appliquer le style actif et désactiver les boutons
             >
               <SidebarMenuButton asChild>

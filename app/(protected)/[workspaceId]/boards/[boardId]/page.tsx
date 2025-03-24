@@ -88,8 +88,8 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
     redirect(`/${params.workspaceId}/boards`);
   }
   return (
-    <div className="w-full pl-2 pt-2">
-      <Card className="shadow-none rounded-none h-full">
+    <div className="w-full pl-2">
+      <Card className="shadow-none rounded-none h-screen">
         <main className="relative w-full mx-auto h-full">
           <div className="flex flex-col h-full w-full">
             <div className="flex items-center justify-between px-6 pt-4">

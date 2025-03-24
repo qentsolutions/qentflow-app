@@ -43,7 +43,7 @@ export function NavProjects({
             <SidebarMenu>
                 <Collapsible className="group/collapsible">
                     <SidebarMenuItem
-                        className={`group/menu-item rounded-sm ${isActive ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"}`}
+                        className={`group/menu-item rounded-sm ${isActive ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-slate-600"}`}
                     >
                         <SidebarMenuButton asChild isActive={pathname === `/${currentWorkspace?.id}/projects`}>
                             <Link href={`/${currentWorkspace?.id}/projects`}>
@@ -98,7 +98,7 @@ export function NavProjects({
                                                 "w-full flex items-center justify-between px-3 py-2 text-sm transition-colors",
                                                 pathname === `/${currentWorkspace?.id}/projects/${project.id}`
                                                     ? "bg-blue-100 text-blue-600 font-medium"
-                                                    : "hover:bg-muted/80 text-foreground/80 hover:text-foreground"
+                                                    : "hover:bg-muted/80 text-slate-600 hover:text-foreground"
                                             )}
                                         >
                                             <CollapsibleTrigger asChild>

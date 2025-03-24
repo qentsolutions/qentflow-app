@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
-import { useBreadcrumbs } from "@/hooks/use-breadcrumb"
-import { fetcher } from "@/lib/fetcher"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
+import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
+import { fetcher } from "@/lib/fetcher";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Search,
   CheckCircle2,
@@ -21,195 +21,195 @@ import {
   X,
   ChevronRight,
   LayoutDashboard,
-} from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { motion, AnimatePresence } from "framer-motion"
-import { Separator } from "@/components/ui/separator"
-import { Button } from "@/components/ui/button"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
-import CardPage from "../boards/[boardId]/cards/[cardId]/page"
-import { useMediaQuery } from "usehooks-ts"
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { motion, AnimatePresence } from "framer-motion";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+import CardPage from "../boards/[boardId]/cards/[cardId]/page";
+import { useMediaQuery } from "usehooks-ts";
 
 type TaskCardProps = {
   list: {
     board: {
-      title: string
-      id: string
-    }
-  }
-  tags?: any[]
-  tasks?: any[]
-  createdAt: string
-  updatedAt: string
-  dueDate?: string
-  priority?: string
-  title: string
-  description?: string
-  id: string
-}
+      title: string;
+      id: string;
+    };
+  };
+  tags?: any[];
+  tasks?: any[];
+  createdAt: string;
+  updatedAt: string;
+  dueDate?: string;
+  priority?: string;
+  title: string;
+  description?: string;
+  id: string;
+};
 
 const getPriorityIcon = (priority: string | null) => {
   switch (priority) {
     case "LOW":
-      return <Flag className="h-4 w-4 text-green-500" />
+      return <Flag className="h-4 w-4 text-green-500" />;
     case "MEDIUM":
-      return <Flag className="h-4 w-4 text-yellow-500" />
+      return <Flag className="h-4 w-4 text-yellow-500" />;
     case "HIGH":
-      return <Flag className="h-4 w-4 text-red-500" />
+      return <Flag className="h-4 w-4 text-red-500" />;
     case "CRITICAL":
-      return <AlertTriangle className="h-4 w-4 text-red-500" />
+      return <AlertTriangle className="h-4 w-4 text-red-500" />;
     default:
-      return null
+      return null;
   }
-}
+};
 
 const getPriorityColor = (priority: string | null) => {
   switch (priority) {
     case "LOW":
-      return "bg-green-50 border-green-200 text-green-700"
+      return "bg-green-50 border-green-200 text-green-700";
     case "MEDIUM":
-      return "bg-yellow-50 border-yellow-200 text-yellow-700"
+      return "bg-yellow-50 border-yellow-200 text-yellow-700";
     case "HIGH":
-      return "bg-orange-50 border-orange-200 text-orange-700"
+      return "bg-orange-50 border-orange-200 text-orange-700";
     case "CRITICAL":
-      return "bg-red-50 border-red-200 text-red-700"
+      return "bg-red-50 border-red-200 text-red-700";
     default:
-      return "bg-gray-50 border-gray-200 text-gray-700"
+      return "bg-gray-50 border-gray-200 text-gray-700";
   }
-}
+};
 
 export default function MyTasksPage() {
-  const { currentWorkspace } = useCurrentWorkspace()
-  const { setBreadcrumbs } = useBreadcrumbs()
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedCard, setSelectedCard] = useState<TaskCardProps | null>(null)
-  const [sortByDueDate, setSortByDueDate] = useState(false)
-  const [selectedBoards, setSelectedBoards] = useState<string[]>([])
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const [showMobileDetail, setShowMobileDetail] = useState(false)
-  const isMobile = useMediaQuery("(max-width: 768px)")
+  const { currentWorkspace } = useCurrentWorkspace();
+  const { setBreadcrumbs } = useBreadcrumbs();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCard, setSelectedCard] = useState<TaskCardProps | null>(null);
+  const [sortByDueDate, setSortByDueDate] = useState(false);
+  const [selectedBoards, setSelectedBoards] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [showMobileDetail, setShowMobileDetail] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
-    document.title = "My Tasks - Task Manager"
-  }, [])
+    document.title = "My Tasks - Task Manager";
+  }, []);
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "My Tasks" }])
-  }, [setBreadcrumbs])
+    setBreadcrumbs([{ label: "My Tasks" }]);
+  }, [setBreadcrumbs]);
 
   const { data: assignedCards, isLoading } = useQuery({
     queryKey: ["assigned-cards", currentWorkspace?.id],
     queryFn: () => fetcher(`/api/cards/current-user-card?workspaceId=${currentWorkspace?.id}`),
     enabled: !!currentWorkspace?.id,
-  })
+  });
 
   const groupedCards = assignedCards?.reduce((acc: any, card: any) => {
-    const boardTitle = card.list.board.title
+    const boardTitle = card.list.board.title;
     if (!acc[boardTitle]) {
-      acc[boardTitle] = []
+      acc[boardTitle] = [];
     }
-    acc[boardTitle].push(card)
-    return acc
-  }, {})
+    acc[boardTitle].push(card);
+    return acc;
+  }, {});
 
   const filteredGroupedCards = groupedCards
     ? Object.entries(groupedCards).reduce((acc: any, [boardTitle, cards]: [string, any]) => {
-      const filteredCards = (cards as any[]).filter((card) => {
-        const matchesSearch =
-          card.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          card.description?.toLowerCase().includes(searchTerm.toLowerCase())
-        const matchesBoards = selectedBoards.length === 0 || selectedBoards.includes(card.list.board.title)
-        const matchesTags =
-          selectedTags.length === 0 || card.tags?.some((tag: any) => selectedTags.includes(tag.name))
+        const filteredCards = (cards as any[]).filter((card) => {
+          const matchesSearch =
+            card.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            card.description?.toLowerCase().includes(searchTerm.toLowerCase());
+          const matchesBoards = selectedBoards.length === 0 || selectedBoards.includes(card.list.board.title);
+          const matchesTags =
+            selectedTags.length === 0 || card.tags?.some((tag: any) => selectedTags.includes(tag.name));
 
-        return matchesSearch && matchesBoards && matchesTags
-      })
-      if (filteredCards.length > 0) {
-        acc[boardTitle] = filteredCards
-      }
-      return acc
-    }, {})
-    : {}
+          return matchesSearch && matchesBoards && matchesTags;
+        });
+        if (filteredCards.length > 0) {
+          acc[boardTitle] = filteredCards;
+        }
+        return acc;
+      }, {})
+    : {};
 
-  const allCards = Object.values(filteredGroupedCards).flat()
+  const allCards = Object.values(filteredGroupedCards).flat();
   const displayedCards = selectedBoards.length
     ? allCards.filter((card) => selectedBoards.includes((card as TaskCardProps).list.board.title))
-    : allCards
+    : allCards;
 
   const sortedCards = sortByDueDate
     ? [...displayedCards].sort((a: any, b: any) => {
-      if (!a.dueDate) return 1
-      if (!b.dueDate) return -1
-      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-    })
-    : displayedCards
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      })
+    : displayedCards;
 
   const allTags = Array.from(
     new Set(assignedCards?.flatMap((card: any) => card.tags?.map((tag: any) => tag.name)).filter(Boolean)),
-  )
+  );
 
   const toggleTagSelection = (tag: string) => {
     setSelectedTags((prevSelected) =>
       prevSelected.includes(tag) ? prevSelected.filter((t) => t !== tag) : [...prevSelected, tag],
-    )
-  }
+    );
+  };
 
   const clearAllFilters = () => {
-    setSearchTerm("")
-    setSelectedBoards([])
-    setSelectedTags([])
-    setSortByDueDate(false)
-  }
+    setSearchTerm("");
+    setSelectedBoards([]);
+    setSelectedTags([]);
+    setSortByDueDate(false);
+  };
 
   const formatDate = (dateString?: string) => {
-    if (!dateString) return null
+    if (!dateString) return null;
 
-    const date = new Date(dateString)
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    const date = new Date(dateString);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    const tomorrow = new Date(today)
-    tomorrow.setDate(tomorrow.getDate() + 1)
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
 
-    const taskDate = new Date(date)
-    taskDate.setHours(0, 0, 0, 0)
+    const taskDate = new Date(date);
+    taskDate.setHours(0, 0, 0, 0);
 
     if (taskDate.getTime() === today.getTime()) {
-      return "Today"
+      return "Today";
     } else if (taskDate.getTime() === tomorrow.getTime()) {
-      return "Tomorrow"
+      return "Tomorrow";
     } else {
-      return date.toLocaleDateString(undefined, { month: "short", day: "numeric" })
+      return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
     }
-  }
+  };
 
   const getTaskProgress = (card: TaskCardProps) => {
-    if (!card.tasks || card.tasks.length === 0) return 0
-    return Math.round((card.tasks.filter((t) => t.completed).length / card.tasks.length) * 100)
-  }
+    if (!card.tasks || card.tasks.length === 0) return 0;
+    return Math.round((card.tasks.filter((t) => t.completed).length / card.tasks.length) * 100);
+  };
 
-  const activeFiltersCount = selectedBoards.length + selectedTags.length + (sortByDueDate ? 1 : 0)
+  const activeFiltersCount = selectedBoards.length + selectedTags.length + (sortByDueDate ? 1 : 0);
 
   if (isLoading) {
     return (
-      <div className="flex h-[90vh] w-full items-center justify-center">
+      <div className="flex h-screen w-full items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
           <p className="text-muted-foreground">Loading your tasks...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="flex h-[calc(100vh-76px)] flex-col md:flex-row">
+    <div className="flex flex-col md:flex-row">
       {/* Mobile view - Task list */}
       {isMobile && !showMobileDetail && (
-        <div className="flex h-full w-full flex-col bg-background">
+        <div className="flex max-h-screen w-full flex-col bg-background">
           <div className="border-b p-4">
             <div className="mb-4 flex items-center justify-between">
               <h1 className="text-2xl font-bold">My Tasks</h1>
@@ -249,7 +249,7 @@ export default function MyTasksPage() {
               />
             </div>
           </div>
-          <ScrollArea className="flex-1">
+          <ScrollArea className="flex-1 max-h-screen">
             <AnimatePresence>
               {sortedCards.length > 0 ? (
                 sortedCards.map((card: any) => (
@@ -258,8 +258,8 @@ export default function MyTasksPage() {
                     card={card}
                     isSelected={false}
                     onClick={() => {
-                      setSelectedCard(card)
-                      setShowMobileDetail(true)
+                      setSelectedCard(card);
+                      setShowMobileDetail(true);
                     }}
                     formatDate={formatDate}
                     getTaskProgress={getTaskProgress}
@@ -300,7 +300,8 @@ export default function MyTasksPage() {
       {/* Desktop view */}
       {!isMobile && (
         <>
-          <div className="w-1/3 flex-shrink-0 border-r bg-background">
+          {/* Fix the "My Tasks" section */}
+          <div className="w-1/3 flex-shrink-0 border-r bg-background h-screen overflow-y-auto">
             <div className="border-b p-4">
               <div className="mb-4 flex items-center justify-between">
                 <h1 className="text-2xl font-bold">My Tasks</h1>
@@ -348,7 +349,7 @@ export default function MyTasksPage() {
                 />
               </div>
             </div>
-            <ScrollArea className="h-[calc(100vh-185px)] px-2 py-2">
+            <ScrollArea className="h-full px-2 py-2">
               <AnimatePresence>
                 {sortedCards.length > 0 ? (
                   sortedCards.map((card: any) => (
@@ -370,7 +371,8 @@ export default function MyTasksPage() {
             </ScrollArea>
           </div>
 
-          <div className="flex-1 bg-background">
+          {/* Scrollable task detail section */}
+          <div className="flex-1 h-screen bg-background overflow-y-auto">
             {selectedCard ? (
               <CardPage
                 params={{
@@ -387,7 +389,7 @@ export default function MyTasksPage() {
         </>
       )}
     </div>
-  )
+  );
 }
 
 function TaskCard({
@@ -399,17 +401,17 @@ function TaskCard({
   getPriorityColor,
   getPriorityIcon,
 }: {
-  card: TaskCardProps
-  isSelected: boolean
-  onClick: () => void
-  formatDate: (date?: string) => string | null
-  getTaskProgress: (card: TaskCardProps) => number
-  getPriorityColor: (priority: string | null) => string
-  getPriorityIcon: (priority: string | null) => JSX.Element | null
+  card: TaskCardProps;
+  isSelected: boolean;
+  onClick: () => void;
+  formatDate: (date?: string) => string | null;
+  getTaskProgress: (card: TaskCardProps) => number;
+  getPriorityColor: (priority: string | null) => string;
+  getPriorityIcon: (priority: string | null) => JSX.Element | null;
 }) {
-  const progress = getTaskProgress(card)
-  const dueDate = formatDate(card.dueDate)
-  const isOverdue = card.dueDate && new Date(card.dueDate) < new Date() && progress < 100
+  const progress = getTaskProgress(card);
+  const dueDate = formatDate(card.dueDate);
+  const isOverdue = card.dueDate && new Date(card.dueDate) < new Date() && progress < 100;
 
   return (
     <motion.div
@@ -493,7 +495,7 @@ function TaskCard({
         </CardContent>
       </Card>
     </motion.div>
-  )
+  );
 }
 
 function EmptyState() {
@@ -510,7 +512,7 @@ function EmptyState() {
         Clear filters
       </Button>
     </div>
-  )
+  );
 }
 
 function EmptyDetailState() {
@@ -522,7 +524,7 @@ function EmptyDetailState() {
       <h3 className="mb-1 text-xl font-medium">Select a task</h3>
       <p className="max-w-md text-muted-foreground">Choose a task from the list to view its details</p>
     </div>
-  )
+  );
 }
 
 function FilterContent({
@@ -536,15 +538,15 @@ function FilterContent({
   toggleTagSelection,
   clearAllFilters,
 }: {
-  sortByDueDate: boolean
-  setSortByDueDate: (value: boolean) => void
-  groupedCards: any
-  selectedBoards: string[]
-  setSelectedBoards: (value: string[]) => void
-  allTags: any[]
-  selectedTags: string[]
-  toggleTagSelection: (tag: string) => void
-  clearAllFilters: () => void
+  sortByDueDate: boolean;
+  setSortByDueDate: (value: boolean) => void;
+  groupedCards: any;
+  selectedBoards: string[];
+  setSelectedBoards: (value: string[]) => void;
+  allTags: any[];
+  selectedTags: string[];
+  toggleTagSelection: (tag: string) => void;
+  clearAllFilters: () => void;
 }) {
   return (
     <div className="space-y-4">
@@ -608,7 +610,7 @@ function FilterContent({
         </h5>
         <div className="grid grid-cols-1 gap-2">
           {allTags.map((tag) => {
-            const tagString = String(tag)
+            const tagString = String(tag);
             return (
               <div key={tagString} className="flex items-center space-x-2">
                 <Checkbox
@@ -620,11 +622,10 @@ function FilterContent({
                   {tagString}
                 </Label>
               </div>
-            )
+            );
           })}
         </div>
       </div>
     </div>
-  )
+  );
 }
-
