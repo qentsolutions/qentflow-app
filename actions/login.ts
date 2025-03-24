@@ -2,24 +2,15 @@
 
 import * as z from "zod";
 import { AuthError } from "next-auth";
-
 import { db } from "@/lib/db";
 import { signIn } from "@/auth";
 import { LoginSchema } from "@/schemas";
 import { getUserByEmail } from "@/data/user";
 import { getTwoFactorTokenByEmail } from "@/data/two-factor-token";
-import { 
-  sendVerificationEmail,
-  sendTwoFactorTokenEmail,
-} from "@/lib/mail";
+import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation";
+import { generateTwoFactorToken } from "@/lib/tokens";
+import { sendTwoFactorTokenEmail } from "@/lib/mail";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
-import { 
-  generateVerificationToken,
-  generateTwoFactorToken
-} from "@/lib/tokens";
-import { 
-  getTwoFactorConfirmationByUserId
-} from "@/data/two-factor-confirmation";
 
 export const login = async (
   values: z.infer<typeof LoginSchema>,
@@ -36,15 +27,13 @@ export const login = async (
   const existingUser = await getUserByEmail(email);
 
   if (!existingUser || !existingUser.email || !existingUser.password) {
-    return { error: "Email or password is invalid!" }
+    return { error: "Email does not exist!" };
   }
 
   if (!existingUser.emailVerified) {
-    const verificationToken = await generateVerificationToken(
-      existingUser.email,
-    );
+    const verificationToken = await generateTwoFactorToken(existingUser.email);
 
-    await sendVerificationEmail(
+    await sendTwoFactorTokenEmail(
       verificationToken.email,
       verificationToken.token,
     );
@@ -54,9 +43,7 @@ export const login = async (
 
   if (existingUser.isTwoFactorEnabled && existingUser.email) {
     if (code) {
-      const twoFactorToken = await getTwoFactorTokenByEmail(
-        existingUser.email
-      );
+      const twoFactorToken = await getTwoFactorTokenByEmail(existingUser.email);
 
       if (!twoFactorToken) {
         return { error: "Invalid code!" };
@@ -92,7 +79,7 @@ export const login = async (
         }
       });
     } else {
-      const twoFactorToken = await generateTwoFactorToken(existingUser.email)
+      const twoFactorToken = await generateTwoFactorToken(existingUser.email);
       await sendTwoFactorTokenEmail(
         twoFactorToken.email,
         twoFactorToken.token,
@@ -103,16 +90,31 @@ export const login = async (
   }
 
   try {
+    // Récupérer les workspaces de l'utilisateur
+    const workspaces = await db.workspaceMember.findMany({
+      where: {
+        userId: existingUser.id
+      },
+      include: {
+        workspace: true
+      }
+    });
+
+    // Déterminer l'URL de redirection
+    const redirectTo = workspaces.length > 0 
+      ? `/${workspaces[0].workspaceId}/home`
+      : "/workspace/select";
+
     await signIn("credentials", {
       email,
       password,
-      redirectTo: callbackUrl || DEFAULT_LOGIN_REDIRECT,
-    })
+      redirectTo: callbackUrl || redirectTo,
+    });
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
         case "CredentialsSignin":
-          return { error: "Invalid email or password!" }
+          return { error: "Invalid credentials!" }
         default:
           return { error: "Something went wrong!" }
       }

@@ -1,5 +1,4 @@
 import NextAuth from "next-auth";
-
 import authConfig from "@/auth.config";
 import {
   DEFAULT_LOGIN_REDIRECT,
@@ -7,7 +6,7 @@ import {
   authRoutes,
   publicRoutes,
 } from "@/routes";
-import { getUserWorkspaces } from "./actions/workspace";
+import { db } from "@/lib/db";
 
 const { auth } = NextAuth(authConfig);
 
@@ -45,10 +44,19 @@ export default auth(async (req) => {
 
   // Check if user has a workspace when logged in
   if (isLoggedIn && !nextUrl.pathname.startsWith("/workspace/select")) {
-    const { workspaces, error } = await getUserWorkspaces();
+    const userId = req.auth?.user?.id;
     
-    if (!error && (!workspaces || workspaces.length === 0)) {
-      return Response.redirect(new URL("/workspace/select", nextUrl));
+    if (userId) {
+      const workspaceMember = await db.workspaceMember.findFirst({
+        where: {
+          userId: userId,
+        },
+      });
+
+      // Only redirect to workspace/select if user has no workspaces
+      if (!workspaceMember && !nextUrl.pathname.startsWith("/auth")) {
+        return Response.redirect(new URL("/workspace/select", nextUrl));
+      }
     }
   }
 

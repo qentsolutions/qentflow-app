@@ -1,3 +1,6 @@
+import { currentUser } from "@/lib/auth";
+import { getUserWorkspaces } from "./actions/workspace";
+
 /**
  * An array of routes that are accessible to the public
  * These routes do not require authentication
@@ -34,4 +37,16 @@ export const apiAuthPrefix = "/api/auth";
  * The default redirect path after logging in
  * @type {string}
  */
-export const DEFAULT_LOGIN_REDIRECT = "/home";
+export const getDefaultLoginRedirect = async () => {
+  const user = await currentUser();
+  if (!user) return "/auth/login";
+
+  const { workspaces } = await getUserWorkspaces();
+  if (!workspaces || workspaces.length === 0) {
+    return "/workspace/select";
+  }
+
+  return `/${workspaces[0].id}/home`;
+};
+
+export const DEFAULT_LOGIN_REDIRECT = "/workspace/select";

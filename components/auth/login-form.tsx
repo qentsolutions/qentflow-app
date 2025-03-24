@@ -16,8 +16,10 @@ import { Button } from "@/components/ui/button"
 import { FormError } from "@/components/form-error"
 import { FormSuccess } from "@/components/form-success"
 import { login } from "@/actions/login"
+import { useRouter } from "next/navigation"
 
 export const LoginForm = () => {
+  const router = useRouter();
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get("callbackUrl")
   const urlError =
@@ -56,6 +58,12 @@ export const LoginForm = () => {
 
           if (data?.twoFactor) {
             setShowTwoFactor(true)
+          }
+
+          // Si pas d'erreur et pas de 2FA, on force le rafraîchissement
+          if (!data?.error && !data?.twoFactor) {
+            router.refresh();
+            window.location.reload();
           }
         })
         .catch(() => setError("Something went wrong"))
@@ -165,4 +173,3 @@ export const LoginForm = () => {
     </CardWrapper>
   )
 }
-
