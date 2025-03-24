@@ -24,7 +24,7 @@ export default auth(async (req) => {
 
   if (isAuthRoute) {
     if (isLoggedIn) {
-      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+      return Response.redirect(new URL("/auth/loading", nextUrl));
     }
     return null;
   }
@@ -43,7 +43,7 @@ export default auth(async (req) => {
   }
 
   // Check if user has a workspace when logged in
-  if (isLoggedIn && !nextUrl.pathname.startsWith("/workspace/select")) {
+  if (isLoggedIn && !nextUrl.pathname.startsWith("/workspace/select") && !nextUrl.pathname.startsWith("/auth/loading")) {
     const userId = req.auth?.user?.id;
     
     if (userId) {
