@@ -46,18 +46,18 @@ export function NavProjects({
                         className={`group/menu-item rounded-sm ${isActive ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-slate-600"}`}
                     >
                         <SidebarMenuButton asChild isActive={pathname === `/${currentWorkspace?.id}/projects`}>
-                            <Link href={`/${currentWorkspace?.id}/projects`}>
+                            <Link href={`/${currentWorkspace?.id}/projects`} className="ml-2">
                                 {isActive ? (
                                     <FolderOpen className="h-4 w-4" />
                                 ) : (
                                     <Folder className="h-4 w-4" />
                                 )}
-                                <span>Projects</span>
+                                <span className="ml-2">Projects</span>
                             </Link>
                         </SidebarMenuButton>
                         <CollapsibleTrigger asChild>
                             <SidebarMenuAction>
-                                <ChevronRight className="h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                                <ChevronRight className="mr-2 h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-90" />
                             </SidebarMenuAction>
                         </CollapsibleTrigger>
                     </SidebarMenuItem>

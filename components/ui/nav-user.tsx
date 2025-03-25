@@ -121,12 +121,12 @@ export function NavUser({ user }: { user: any }) {
 
 
     return (
-        <SidebarMenu>
+        <SidebarMenu className="pr-2">
                 <Separator className="mb-2" />
             <SidebarMenuItem>
                 <SidebarMenuButton
                     onClick={() => setShowInvitations(true)}
-                    className="w-full justify-start py-4 hover:bg-gray-100 text-slate-600"
+                    className="w-full justify-start py-4 hover:bg-gray-100 text-slate-600 ml-2 pr-2"
                 >
                     <Inbox className="mr-1 h-4 w-4" />
                     Invitations
@@ -174,7 +174,7 @@ export function NavUser({ user }: { user: any }) {
                                                 whileHover={{ scale: 1.02 }}
                                                 onHoverStart={() => setHoveredInvitation(invitation.id)}
                                                 onHoverEnd={() => setHoveredInvitation(null)}
-                                                className="relative bg-card rounded-lg shadow-md overflow-hidden"
+                                                className="relative bg-card rounded-sm shadow-md overflow-hidden"
                                             >
                                                 <div className="p-4">
                                                     <div className="flex items-start justify-between">
@@ -225,13 +225,13 @@ export function NavUser({ user }: { user: any }) {
             <SidebarMenuItem>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <SidebarMenuButton className="flex items-center justify-between gap-3 mb-2 py-4 rounded-lg hover:bg-gray-100">
+                        <SidebarMenuButton className="ml-2 flex items-center justify-between gap-3 mb-2 py-4  rounded-sm hover:bg-gray-100">
                             <div className="flex items-center gap-x-2 text-slate-600">
                                 <Bell className="mr-1 h-4 w-4" />
                                 <span>Notifications</span>
                             </div>
                             {unreadNotifications.length > 0 && (
-                                <div className="text-sm flex items-center justify-center h-6 w-6 bg-red-500 text-white rounded-sm">
+                                <div className="mr-4 text-sm flex items-center justify-center h-6 w-6 bg-red-500 text-white rounded-sm">
                                     {unreadNotifications.length}
                                 </div>
                             )}
@@ -300,7 +300,7 @@ export function NavUser({ user }: { user: any }) {
                     <DropdownMenuTrigger asChild>
                         <SidebarMenuButton
                             size="lg"
-                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground mx-2"
                         >
                             <Avatar className="h-8 w-8 rounded-lg">
                                 {user?.image ? (

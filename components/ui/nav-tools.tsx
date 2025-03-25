@@ -45,10 +45,10 @@ export function NavTools({
                 } ${item.disabled ? "pointer-events-none opacity-50" : ""}`} // Appliquer le style actif et désactiver les boutons
             >
               <SidebarMenuButton asChild>
-                <Link href={item.url} className="flex items-center gap-2">
+                <Link href={item.url} className="flex items-center gap-2 ml-2">
                   <item.icon />
-                  <span>{item.name}</span>
-                  {item.disabled && <span className="ml-auto bg-blue-200 text-gray-700 px-2 py-1 rounded-full text-xs">incoming</span>} {/* Ajout du badge incoming */}
+                  <span className="ml-2">{item.name}</span>
+                  {item.disabled && <span className="ml-auto mr-2 bg-blue-200 text-gray-700 px-2 py-1 rounded-full text-xs">incoming</span>} {/* Ajout du badge incoming */}
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

@@ -33,14 +33,14 @@ export function NavMain({
                 }`} // Ajouter des styles conditionnels pour l'état actif
             >
               <SidebarMenuButton asChild>
-                <Link href={item.url} className="flex items-center justify-between gap-2 w-full">
+                <Link href={item.url} className="flex items-center justify-between gap-2 w-full ml-2">
                   <div className="flex items-center gap-2">
                     <item.icon size={16} />
-                    <span className="group-data-[collapsible=icon]:hidden">{item.name}</span>
+                    <span className="group-data-[collapsible=icon]:hidden ml-2">{item.name}</span>
                   </div>
                   <span className="group-data-[collapsible=icon]:hidden">
                     {item.name === "My Tasks" && item.count !== undefined && (
-                      <span className="ml-2 text-gray-500 mr-2">{item.count > 0 ? (<>{item.count}</>) : (<></>)}</span>
+                      <span className=" text-gray-500 mr-4">{item.count > 0 ? (<>{item.count}</>) : (<></>)}</span>
                     )}
                   </span>
 

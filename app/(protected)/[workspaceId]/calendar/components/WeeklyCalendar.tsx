@@ -130,7 +130,6 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
     const eventsForTimeSlot = getEventsForDateAndHour(day, hour, events);
     return eventsForTimeSlot.map((event: Event) => {
       const eventStart = normalizeDate(event.startDate);
-      const eventEnd = normalizeDate(event.endDate);
 
       const eventHeight = getEventHeight(event);
 
@@ -188,7 +187,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
 
 
   return (
-    <div className="flex flex-col lg:flex-row  dark:bg-gray-900 rounded-lg overflow-hidden mt-4 pb-12">
+    <div className="flex flex-col lg:flex-row  dark:bg-gray-900 rounded-lg overflow-hidden mt-4 pb-12 h-screen">
 
       <div className="w-full lg:w-80 p-4 bg-white dark:bg-gray-800 border-r">
         <div className="text-center mb-6">

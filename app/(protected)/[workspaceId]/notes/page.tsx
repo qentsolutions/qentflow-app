@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
 import { fetcher } from "@/lib/fetcher";
@@ -144,7 +144,7 @@ export default function MyNotesPage() {
     };
 
     return (
-        <div className="flex bg-gradient-to-br from-gray-50 to-gray-100 h-[calc(100vh-70px)]">
+        <div className="flex bg-gradient-to-br from-gray-50 to-gray-100 h-screen">
             <div className="w-1/3 bg-white border-r border-gray-200 flex flex-col shadow-lg">
                 <div className="p-6 border-b border-gray-200 space-y-4">
                     <p className="text-3xl font-bold text-gray-800">Notes</p>
