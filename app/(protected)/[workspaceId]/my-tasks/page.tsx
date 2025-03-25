@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
@@ -107,65 +107,76 @@ export default function MyTasksPage() {
     enabled: !!currentWorkspace?.id,
   });
 
-  const groupedCards = assignedCards?.reduce((acc: any, card: any) => {
-    const boardTitle = card.list.board.title;
-    if (!acc[boardTitle]) {
-      acc[boardTitle] = [];
-    }
-    acc[boardTitle].push(card);
-    return acc;
-  }, {});
+  const groupedCards = useMemo(() => {
+    return assignedCards?.reduce((acc: any, card: any) => {
+      const boardTitle = card.list.board.title;
+      if (!acc[boardTitle]) {
+        acc[boardTitle] = [];
+      }
+      acc[boardTitle].push(card);
+      return acc;
+    }, {});
+  }, [assignedCards]);
 
-  const filteredGroupedCards = groupedCards
-    ? Object.entries(groupedCards).reduce((acc: any, [boardTitle, cards]: [string, any]) => {
-        const filteredCards = (cards as any[]).filter((card) => {
-          const matchesSearch =
-            card.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            card.description?.toLowerCase().includes(searchTerm.toLowerCase());
-          const matchesBoards = selectedBoards.length === 0 || selectedBoards.includes(card.list.board.title);
-          const matchesTags =
-            selectedTags.length === 0 || card.tags?.some((tag: any) => selectedTags.includes(tag.name));
+  const filteredGroupedCards = useMemo(() => {
+    return groupedCards
+      ? Object.entries(groupedCards).reduce((acc: any, [boardTitle, cards]: [string, any]) => {
+          const filteredCards = (cards as any[]).filter((card) => {
+            const matchesSearch =
+              card.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              card.description?.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesBoards = selectedBoards.length === 0 || selectedBoards.includes(card.list.board.title);
+            const matchesTags =
+              selectedTags.length === 0 || card.tags?.some((tag: any) => selectedTags.includes(tag.name));
 
-          return matchesSearch && matchesBoards && matchesTags;
-        });
-        if (filteredCards.length > 0) {
-          acc[boardTitle] = filteredCards;
-        }
-        return acc;
-      }, {})
-    : {};
+            return matchesSearch && matchesBoards && matchesTags;
+          });
+          if (filteredCards.length > 0) {
+            acc[boardTitle] = filteredCards;
+          }
+          return acc;
+        }, {})
+      : {};
+  }, [groupedCards, searchTerm, selectedBoards, selectedTags]);
 
-  const allCards = Object.values(filteredGroupedCards).flat();
-  const displayedCards = selectedBoards.length
-    ? allCards.filter((card) => selectedBoards.includes((card as TaskCardProps).list.board.title))
-    : allCards;
+  const allCards = useMemo(() => Object.values(filteredGroupedCards).flat(), [filteredGroupedCards]);
 
-  const sortedCards = sortByDueDate
-    ? [...displayedCards].sort((a: any, b: any) => {
-        if (!a.dueDate) return 1;
-        if (!b.dueDate) return -1;
-        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
-      })
-    : displayedCards;
+  const displayedCards = useMemo(() => {
+    return selectedBoards.length
+      ? allCards.filter((card) => selectedBoards.includes((card as TaskCardProps).list.board.title))
+      : allCards;
+  }, [allCards, selectedBoards]);
 
-  const allTags = Array.from(
-    new Set(assignedCards?.flatMap((card: any) => card.tags?.map((tag: any) => tag.name)).filter(Boolean)),
-  );
+  const sortedCards = useMemo(() => {
+    return sortByDueDate
+      ? [...displayedCards].sort((a: any, b: any) => {
+          if (!a.dueDate) return 1;
+          if (!b.dueDate) return -1;
+          return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        })
+      : displayedCards;
+  }, [displayedCards, sortByDueDate]);
 
-  const toggleTagSelection = (tag: string) => {
+  const allTags = useMemo(() => {
+    return Array.from(
+      new Set(assignedCards?.flatMap((card: any) => card.tags?.map((tag: any) => tag.name)).filter(Boolean)),
+    );
+  }, [assignedCards]);
+
+  const toggleTagSelection = useCallback((tag: string) => {
     setSelectedTags((prevSelected) =>
       prevSelected.includes(tag) ? prevSelected.filter((t) => t !== tag) : [...prevSelected, tag],
     );
-  };
+  }, []);
 
-  const clearAllFilters = () => {
+  const clearAllFilters = useCallback(() => {
     setSearchTerm("");
     setSelectedBoards([]);
     setSelectedTags([]);
     setSortByDueDate(false);
-  };
+  }, []);
 
-  const formatDate = (dateString?: string) => {
+  const formatDate = useCallback((dateString?: string) => {
     if (!dateString) return null;
 
     const date = new Date(dateString);
@@ -185,12 +196,12 @@ export default function MyTasksPage() {
     } else {
       return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
     }
-  };
+  }, []);
 
-  const getTaskProgress = (card: TaskCardProps) => {
+  const getTaskProgress = useCallback((card: TaskCardProps) => {
     if (!card.tasks || card.tasks.length === 0) return 0;
     return Math.round((card.tasks.filter((t) => t.completed).length / card.tasks.length) * 100);
-  };
+  }, []);
 
   const activeFiltersCount = selectedBoards.length + selectedTags.length + (sortByDueDate ? 1 : 0);
 
@@ -392,7 +403,7 @@ export default function MyTasksPage() {
   );
 }
 
-function TaskCard({
+const TaskCard = React.memo(({
   card,
   isSelected,
   onClick,
@@ -408,7 +419,7 @@ function TaskCard({
   getTaskProgress: (card: TaskCardProps) => number;
   getPriorityColor: (priority: string | null) => string;
   getPriorityIcon: (priority: string | null) => JSX.Element | null;
-}) {
+}) => {
   const progress = getTaskProgress(card);
   const dueDate = formatDate(card.dueDate);
   const isOverdue = card.dueDate && new Date(card.dueDate) < new Date() && progress < 100;
@@ -496,7 +507,7 @@ function TaskCard({
       </Card>
     </motion.div>
   );
-}
+});
 
 function EmptyState() {
   return (
