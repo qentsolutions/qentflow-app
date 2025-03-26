@@ -83,15 +83,6 @@ export function NavUser({ user }: { user: any }) {
         },
     });
 
-    const handleNewWorkspace = () => {
-        router.push("/workspace/select");
-    };
-
-    const handleWorkspaceSelect = (workspace: any) => {
-        setCurrentWorkspace(workspace);
-        router.push(`/${workspace.id}`);
-    };
-
     const handleAcceptInvitation = async (invitationId: string) => {
         try {
             // Supposons que AcceptInvitationParams attend un objet contenant plus d'informations que juste l'invitationId
@@ -294,13 +285,12 @@ export function NavUser({ user }: { user: any }) {
                 </DropdownMenu>
             </SidebarMenuItem>
 
-            <Separator className="mb-2" />
             <SidebarMenuItem>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <SidebarMenuButton
                             size="lg"
-                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground mx-2"
+                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground mx-2 mb-2"
                         >
                             <Avatar className="h-8 w-8 rounded-lg">
                                 {user?.image ? (

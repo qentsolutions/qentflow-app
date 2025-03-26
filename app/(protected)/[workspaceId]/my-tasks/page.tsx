@@ -217,7 +217,7 @@ export default function MyTasksPage() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row">
+    <div className="flex flex-col md:flex-row h-screen">
       {/* Mobile view - Task list */}
       {isMobile && !showMobileDetail && (
         <div className="flex max-h-screen w-full flex-col bg-background">
@@ -403,6 +403,8 @@ export default function MyTasksPage() {
   );
 }
 
+MyTasksPage.displayName = "MyTasksPage";
+
 const TaskCard = React.memo(({
   card,
   isSelected,
@@ -509,6 +511,8 @@ const TaskCard = React.memo(({
   );
 });
 
+TaskCard.displayName = "TaskCard";
+
 function EmptyState() {
   return (
     <div className="flex h-[calc(100vh-180px)] flex-col items-center justify-center p-4 text-center">
@@ -526,6 +530,8 @@ function EmptyState() {
   );
 }
 
+EmptyState.displayName = "EmptyState";
+
 function EmptyDetailState() {
   return (
     <div className="flex h-full flex-col items-center justify-center p-4 text-center">
@@ -537,6 +543,8 @@ function EmptyDetailState() {
     </div>
   );
 }
+
+EmptyDetailState.displayName = "EmptyDetailState";
 
 function FilterContent({
   sortByDueDate,
@@ -640,3 +648,5 @@ function FilterContent({
     </div>
   );
 }
+
+FilterContent.displayName = "FilterContent";

@@ -29,7 +29,7 @@ export function TeamSwitcher() {
                     <DropdownMenuTrigger asChild>
                         <SidebarMenuButton
                             size="lg"
-                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground dark:bg-gray-800 ml-2 mt-2"
+                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground dark:bg-gray-800 ml-2"
                         >
                             <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                                 {currentWorkspace?.logo ? (
@@ -53,7 +53,7 @@ export function TeamSwitcher() {
                             <div className="grid flex-1 text-left text-sm leading-tight">
                                 <span className="truncate font-semibold">{currentWorkspace?.name || "Select a workspace"}</span>
                             </div>
-                            <ChevronsUpDown className="mr-2" />
+                            <ChevronsUpDown className="mr-3" />
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent

@@ -187,9 +187,9 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
 
 
   return (
-    <div className="flex flex-col lg:flex-row  dark:bg-gray-900 rounded-lg overflow-hidden mt-4 pb-12 h-screen">
+    <div className="flex flex-col lg:flex-row  dark:bg-gray-900 rounded-lg overflow-hidden h-screen">
 
-      <div className="w-full lg:w-80 p-4 bg-white dark:bg-gray-800 border-r">
+      <div className="w-full lg:w-80 p-4 h-screen bg-white dark:bg-gray-800 border-r mt-4">
         <div className="text-center mb-6">
           <Button
             onClick={() => setIsCreateEventOpen(true)}
@@ -254,7 +254,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
               {showPastEvents ? "Show Upcoming" : "Show Passed"}
             </Button>
           </div>
-          <div className="space-y-3 max-h-[calc(100vh-24rem)] overflow-y-auto pr-2">
+          <div className="space-y-3 max-h-[calc(100vh-28rem)] overflow-y-auto pr-2 mt-8">
             {events
               .filter((event: Event) =>
                 showPastEvents ? isPast(new Date(event.endDate)) : isFuture(new Date(event.startDate))
@@ -289,7 +289,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>
-        <div ref={scrollContainerRef} className="overflow-auto max-h-[calc(100vh-12rem)]">
+        <div ref={scrollContainerRef} className="overflow-auto max-h-[calc(100vh-8rem)]">
           <div className="min-w-[800px]">
             <div className="grid grid-cols-8 border-b">
               <div className="sticky top-0 bg-white dark:bg-gray-800 z-10"></div>
