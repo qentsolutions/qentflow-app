@@ -90,6 +90,7 @@ export default function MyTasksPage() {
   const [selectedBoards, setSelectedBoards] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showMobileDetail, setShowMobileDetail] = useState(false);
+  const [taskDetails, setTaskDetails] = useState<{ [key: string]: TaskCardProps }>({});
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
@@ -111,6 +112,16 @@ export default function MyTasksPage() {
     queryFn: () => fetcher(`/api/cards/current-user-card?workspaceId=${currentWorkspace?.id}`),
     enabled: !!currentWorkspace?.id,
   });
+
+  useEffect(() => {
+    if (assignedCards) {
+      const details = assignedCards.reduce((acc: any, card: any) => {
+        acc[card.id] = card;
+        return acc;
+      }, {});
+      setTaskDetails(details);
+    }
+  }, [assignedCards]);
 
   const groupedCards = useMemo(() => {
     return assignedCards?.reduce((acc: any, card: any) => {
@@ -274,7 +285,7 @@ export default function MyTasksPage() {
                     card={card}
                     isSelected={false}
                     onClick={() => {
-                      setSelectedCard(card);
+                      setSelectedCard(taskDetails[card.id]);
                       setShowMobileDetail(true);
                     }}
                     formatDate={formatDate}
@@ -374,7 +385,7 @@ export default function MyTasksPage() {
                       key={card.id}
                       card={card}
                       isSelected={selectedCard?.id === card.id}
-                      onClick={() => setSelectedCard(card)}
+                      onClick={() => setSelectedCard(taskDetails[card.id])}
                       formatDate={formatDate}
                       getTaskProgress={getTaskProgress}
                       getPriorityColor={getPriorityColor}
