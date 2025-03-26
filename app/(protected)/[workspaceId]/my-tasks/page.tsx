@@ -1,5 +1,4 @@
-"use client";
-
+"use client"
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
@@ -100,6 +99,12 @@ export default function MyTasksPage() {
   useEffect(() => {
     setBreadcrumbs([{ label: "My Tasks" }]);
   }, [setBreadcrumbs]);
+
+  useEffect(() => {
+    if (selectedCard) {
+      document.title = `Task: ${selectedCard.title} - Task Manager`;
+    }
+  }, [selectedCard]);
 
   const { data: assignedCards, isLoading } = useQuery({
     queryKey: ["assigned-cards", currentWorkspace?.id],
@@ -303,6 +308,7 @@ export default function MyTasksPage() {
                 boardId: selectedCard.list.board.id,
               }}
               readonly={true}
+              key={selectedCard.id} // Add key to ensure the component is updated
             />
           </div>
         </div>
@@ -392,6 +398,7 @@ export default function MyTasksPage() {
                   boardId: selectedCard.list.board.id,
                 }}
                 readonly={true}
+                key={selectedCard.id} // Add key to ensure the component is updated
               />
             ) : (
               <EmptyDetailState />
@@ -405,7 +412,7 @@ export default function MyTasksPage() {
 
 MyTasksPage.displayName = "MyTasksPage";
 
-const TaskCard = React.memo(({
+const TaskCard = ({
   card,
   isSelected,
   onClick,
@@ -509,7 +516,7 @@ const TaskCard = React.memo(({
       </Card>
     </motion.div>
   );
-});
+};
 
 TaskCard.displayName = "TaskCard";
 
