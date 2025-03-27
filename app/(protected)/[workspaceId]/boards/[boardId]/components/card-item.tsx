@@ -1,70 +1,74 @@
-"use client"
-
-import type { Tag, User } from "@prisma/client"
-import { Draggable } from "@hello-pangea/dnd"
-import { useCardModal } from "@/hooks/use-card-modal"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { UserPlus, UserIcon, UserX, MessageSquareText, AlertTriangle, Paperclip, Flag, Check } from "lucide-react"
-import { useEffect, useState } from "react"
-import { toast } from "sonner"
-import { assignUserToCard } from "@/actions/boards/assign-user-to-card"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { useQuery } from "@tanstack/react-query"
-import { fetcher } from "@/lib/fetcher"
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
-import { createNotification } from "@/actions/notifications/create-notification"
-import { useCurrentUser } from "@/hooks/use-current-user"
-import { useParams } from "next/navigation"
-import { cn } from "@/lib/utils"
+import { Copy, MoreVertical, SquareDashedMousePointer, Trash2 } from "lucide-react"; // Importer l'icône MoreVertical
+import type { Tag, User } from "@prisma/client";
+import { Draggable } from "@hello-pangea/dnd";
+import { useCardModal } from "@/hooks/use-card-modal";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { UserPlus, UserIcon, UserX, MessageSquareText, AlertTriangle, Paperclip, Flag, Check } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { assignUserToCard } from "@/actions/boards/assign-user-to-card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useQuery } from "@tanstack/react-query";
+import { fetcher } from "@/lib/fetcher";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { createNotification } from "@/actions/notifications/create-notification";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { useParams } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { useAction } from "@/hooks/use-action";
+import { deleteCard } from "@/actions/tasks/delete-card";
+import { copyCard } from "@/actions/tasks/copy-card";
+import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 
 interface CommentCountResponse {
-  commentCount: number
-  attachmentsCount: number
+  commentCount: number;
+  attachmentsCount: number;
 }
 
 interface CardItemProps {
   data: {
-    id: string
-    title: string
-    order: number
-    description: string | null
-    listId: string
-    createdAt: Date
-    updatedAt: Date
-    assignedUserId?: string | null
-    tags?: Tag[]
-    priority: string | null
-    index?: number
+    id: string;
+    title: string;
+    order: number;
+    description: string | null;
+    listId: string;
+    createdAt: Date;
+    updatedAt: Date;
+    assignedUserId?: string | null;
+    tags?: Tag[];
+    priority: string | null;
+    index?: number;
     tasks?: {
-      id: string
-      completed: boolean
-    }[]
-  }
-  index: number
-  users: User[]
+      id: string;
+      completed: boolean;
+    }[];
+  };
+  index: number;
+  users: User[];
 }
 
 export const CardItem = ({ data, index, users }: CardItemProps) => {
-  const cardModal = useCardModal()
-  const [assignedUserState, setAssignedUserState] = useState<User | null>(null)
-  const currentUser = useCurrentUser()
-  const params = useParams()
+  const cardModal = useCardModal();
+  const [assignedUserState, setAssignedUserState] = useState<User | null>(null);
+  const currentUser = useCurrentUser();
+  const params = useParams();
+  const { currentWorkspace } = useCurrentWorkspace();
 
   useEffect(() => {
-    const assignedUser = users.find((user) => user.id === data.assignedUserId) || null
-    setAssignedUserState(assignedUser)
-  }, [data.assignedUserId, users])
+    const assignedUser = users.find((user) => user.id === data.assignedUserId) || null;
+    setAssignedUserState(assignedUser);
+  }, [data.assignedUserId, users]);
 
   const { data: commentsData } = useQuery<CommentCountResponse>({
     queryKey: ["card-comments", data?.id],
     queryFn: () => fetcher(`/api/cards/${data?.id}/comments/count-in-card`),
-  })
+  });
 
   const handleAssignUser = async (userId: string | null) => {
     try {
-      await assignUserToCard(data.id, userId || "null")
+      await assignUserToCard(data.id, userId || "null");
 
       if (userId) {
         await createNotification(
@@ -72,55 +76,106 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
           params?.workspaceId as string,
           `${currentUser?.name} has assigned you to a card: ${data?.title}!`,
           `/${params?.workspaceId}/boards/${params.boardId}/cards/${data?.id}`,
-        )
+        );
       }
 
       if (userId === null) {
-        setAssignedUserState(null)
-        toast.success("User unassigned from card")
+        setAssignedUserState(null);
+        toast.success("User unassigned from card");
       } else {
-        const assignedUser = users.find((user) => user.id === userId) || null
-        setAssignedUserState(assignedUser)
-        toast.success("User assigned to card")
+        const assignedUser = users.find((user) => user.id === userId) || null;
+        setAssignedUserState(assignedUser);
+        toast.success("User assigned to card");
       }
     } catch (error) {
-      toast.error("Failed to update user assignment")
+      toast.error("Failed to update user assignment");
     }
-  }
+  };
 
   const getPriorityDetails = (priority: string | null) => {
-    if (!priority) return { icon: null, color: "" }
+    if (!priority) return { icon: null, color: "" };
 
     switch (priority) {
       case "LOW":
         return {
           icon: <Flag className="text-emerald-500" size={14} />,
           color: "text-emerald-500",
-        }
+        };
       case "MEDIUM":
         return {
           icon: <Flag className="text-amber-500" size={14} />,
           color: "text-amber-500",
-        }
+        };
       case "HIGH":
         return {
           icon: <Flag className="text-rose-500" size={14} />,
           color: "text-rose-500",
-        }
+        };
       case "CRITICAL":
         return {
           icon: <AlertTriangle className="text-red-600" size={14} />,
           color: "text-red-600",
-        }
+        };
       default:
-        return { icon: null, color: "" }
+        return { icon: null, color: "" };
     }
-  }
+  };
 
-  const priorityDetails = getPriorityDetails(data.priority)
-  const completedTasks = data.tasks?.filter((task) => task.completed).length || 0
-  const totalTasks = data.tasks?.length || 0
-  const progressPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0
+  const priorityDetails = getPriorityDetails(data.priority);
+  const completedTasks = data.tasks?.filter((task) => task.completed).length || 0;
+  const totalTasks = data.tasks?.length || 0;
+  const progressPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+  const { execute: executeDeleteCard } = useAction(deleteCard, {
+    onSuccess: (data) => {
+      toast.success(`Card "${data.title}" deleted`);
+    },
+    onError: (error) => {
+      toast.error(error);
+    },
+  });
+
+  const onDelete = (cardId: string) => {
+    const boardId = params.boardId as string;
+    const workspaceId = params.workspaceId as string;
+
+    if (!workspaceId) {
+      toast.error("Workspace ID is required.");
+      return;
+    }
+
+    executeDeleteCard({
+      id: cardId,
+      boardId,
+      workspaceId,
+    });
+  };
+
+  const {
+    execute: executeCopyCard,
+    isLoading: isLoadingCopy,
+  } = useAction(copyCard, {
+    onSuccess: (data) => {
+      toast.success(`Card "${data.title}" copied`);
+    },
+    onError: (error) => {
+      toast.error(error);
+    },
+  });
+
+  const onCopy = (cardId: string) => {
+    const boardId = params.boardId as string;
+    const workspaceId = currentWorkspace?.id;
+    if (!workspaceId) {
+      toast.error("Workspace ID is required.");
+      return;
+    }
+    executeCopyCard({
+      id: cardId,
+      boardId,
+      workspaceId,
+    });
+  };
 
   return (
     <Draggable draggableId={data.id} index={index}>
@@ -131,8 +186,8 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
           ref={provided.innerRef}
           role="button"
           onClick={() => cardModal.onOpen(data.id)}
-          className="group relative border border-border/40 bg-card dark:bg-gray-800 rounded-lg 
-                    shadow-sm hover:shadow-md transition-all duration-200 
+          className="group relative border border-border/40 bg-card dark:bg-gray-800 rounded-lg
+                    shadow-sm hover:shadow-md transition-all duration-200
                     hover:border-primary/60 z-50 overflow-hidden"
         >
           {/* Priority indicator strip */}
@@ -197,9 +252,7 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                     {(commentsData?.attachmentsCount ?? 0) > 0 && (
                       <div className="flex items-center gap-1">
                         <Paperclip size={13} />
-                        <span>
-                          {commentsData?.attachmentsCount}
-                        </span>
+                        <span>{commentsData?.attachmentsCount}</span>
                       </div>
                     )}
                   </TooltipTrigger>
@@ -212,10 +265,9 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                           {commentsData?.attachmentsCount === 1 ? "attachment" : "attachments"}
                         </span>
                       </div>
-                    )}                  </TooltipContent>
+                    )}
+                  </TooltipContent>
                 </Tooltip>
-
-
               </div>
 
               {/* Right side - Priority & Assignee */}
@@ -242,7 +294,7 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                         <PopoverTrigger onClick={(e) => e.stopPropagation()} asChild>
                           <button className="hover:opacity-75 transition focus:outline-none">
                             {assignedUserState ? (
-                              <Avatar className="h-6 w-6 border-2 border-background">
+                              <Avatar className="h-7 w-7 border-2 border-background">
                                 <AvatarImage
                                   src={assignedUserState.image || ""}
                                   alt={assignedUserState.name || "User"}
@@ -252,7 +304,7 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                                 </AvatarFallback>
                               </Avatar>
                             ) : (
-                              <div className="h-6 w-6 rounded-full border-2 border-dashed border-muted-foreground/50 flex items-center justify-center hover:border-primary/50 transition-colors">
+                              <div className="h-6 w-6 rounded-full border mb-1 border-dashed border-muted-foreground/50 flex items-center justify-center hover:border-primary/50 transition-colors">
                                 <UserPlus size={12} className="text-muted-foreground" />
                               </div>
                             )}
@@ -325,9 +377,55 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
               </span>
             </div>
           )}
+
+          {/* MoreVertical Icon for additional menu */}
+          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  className="hover:opacity-75 transition p-1 rounded-lg hover:bg-gray-100"
+                  onClick={(e) => e.stopPropagation()} // Stop propagation to prevent card click
+                >
+                  <MoreVertical size={16} />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-40 p-2" side="bottom" align="end">
+                <button
+                  onClick={(e) => {
+                    cardModal.onOpen(data.id);
+                    e.stopPropagation()
+                  }
+                  }
+                  className="w-full flex items-center justify-between gap-x-2 hover:bg-muted p-2 rounded-md transition text-left"
+                >
+                  <span className="text-sm">Open</span>
+                  <SquareDashedMousePointer size={14} className="text-gray-700" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    onCopy(data.id);
+                    e.stopPropagation()
+                  }}
+                  className="w-full flex items-center justify-between gap-x-2 hover:bg-muted p-2 rounded-md transition text-left"
+                >
+                  <span className="text-sm">Duplicate</span>
+                  <Copy size={14} className="text-gray-700" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    onDelete(data.id);
+                    e.stopPropagation();
+                  }}
+                  className="w-full flex items-center justify-between gap-x-2 hover:bg-muted p-2 rounded-md transition text-left"
+                >
+                  <span className="text-sm">Delete</span>
+                  <Trash2 size={14} className="text-red-500" />
+                </button>
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
       )}
     </Draggable>
-  )
-}
-
+  );
+};
