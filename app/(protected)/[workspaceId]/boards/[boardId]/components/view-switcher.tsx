@@ -1,38 +1,47 @@
-"use client";
-import { ListTodo, Columns3, Table2, List, Table } from "lucide-react";
+"use client"
 
-export type ViewType = "kanban" | "table" | "list";
+import type React from "react"
+
+import { Columns3, List, Table } from "lucide-react"
+import { cn } from "@/lib/utils"
+
+export type ViewType = "kanban" | "table" | "list"
 
 interface ViewSwitcherProps {
-  onViewChange: (view: ViewType) => void;
-  selectedView: ViewType;
+  onViewChange: (view: ViewType) => void
+  selectedView: ViewType
 }
 
 export const ViewSwitcher = ({ onViewChange, selectedView }: ViewSwitcherProps) => {
   const views: { label: string; value: ViewType; icon: React.ElementType }[] = [
     { label: "Kanban", value: "kanban", icon: Columns3 },
     { label: "List", value: "list", icon: List },
-    { label: "Table", value: "table", icon: Table }
-  ];
+    { label: "Table", value: "table", icon: Table },
+  ]
 
   return (
-    <div className="flex items-center gap-1 p-1 rounded-lg">
-      {views.map((view) => {
-        const Icon = view.icon; // Assignation dynamique de l'icône
-        return (
-          <button
-            key={view.value}
-            onClick={() => onViewChange(view.value)}
-            className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${selectedView === view.value
+    <div className="flex items-center gap-2 pl-4 rounded-lg bg-muted/60 border shadow-sm mt-2">
+      <span className="text-sm font-medium text-muted-foreground px-2 mr-2">View</span>
+      <div className="flex items-center gap-1 bg-background rounded-md p-1">
+        {views.map((view) => {
+          const Icon = view.icon
+          return (
+            <button
+              key={view.value}
+              onClick={() => onViewChange(view.value)}
+              className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${selectedView === view.value
                 ? "bg-blue-100 text-blue-700"
                 : "text-gray-600 hover:text-gray-900"
-              }`}
-          >
-            <Icon size={16} className={`${selectedView === view.value ? "text-blue-700" : "text-gray-600"}`} />
-            {view.label}
-          </button>
-        );
-      })}
+                }`}
+              aria-current={selectedView === view.value ? "page" : undefined}
+            >
+              <Icon size={16} />
+              {view.label}
+            </button>
+          )
+        })}
+      </div>
     </div>
-  );
-};
+  )
+}
+

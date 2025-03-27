@@ -231,7 +231,7 @@ export const CardModal = () => {
                   </h3>
 
                   <Tabs defaultValue="comments" className="w-full">
-                    <TabsList className="grid grid-cols-2 mb-4">
+                    <TabsList className=" mb-4">
                       <TabsTrigger value="comments" className="flex items-center gap-1">
                         <MessageSquareText size={14} /> Comments
                       </TabsTrigger>

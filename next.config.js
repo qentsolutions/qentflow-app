@@ -13,6 +13,10 @@ const nextConfig = {
         hostname: "avatar.vercel.sh", // Ajouter ce domaine ici
         pathname: "/**", // Permet toutes les images de ce domaine
       },
+      {
+        protocol: "https",
+        hostname: "api.microlink.io", // Ajouter ce domaine ici
+      },
     ],
   },
 };

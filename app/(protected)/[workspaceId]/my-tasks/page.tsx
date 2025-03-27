@@ -454,7 +454,7 @@ const TaskCard = ({
     >
       <Card
         className={cn(
-          "mb-3 overflow-hidden transition-all hover:shadow-md m-2",
+          "mb-3 overflow-hidden transition-all hover:shadow-md m-2 cursor-pointer",
           isSelected ? "ring-2 ring-blue-500" : "ring-0",
         )}
         onClick={onClick}

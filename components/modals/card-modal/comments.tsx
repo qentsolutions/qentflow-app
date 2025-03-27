@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { Comment } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -10,17 +10,16 @@ import { createComment } from "@/actions/tasks/create-card-comment";
 import { deleteComment } from "@/actions/tasks/delete-card-comment";
 import { updateComment } from "@/actions/tasks/update-card-comment";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { formatDistanceToNow } from "date-fns";
-import { useCurrentUser } from "@/hooks/use-current-user";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useParams } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
-import { Card } from "@/components/ui/card";
-import { createNotification } from "@/actions/notifications/create-notification";
+import { useCurrentUser } from "@/hooks/use-current-user";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
+import { formatDistanceToNow } from "date-fns";
+import { LinkPreview } from "@/components/ui/link-preview";
 
 interface CommentsProps {
   items: Comment[];
@@ -36,20 +35,9 @@ export const Comments = ({ items, cardId, readonly = false }: CommentsProps) => 
   const [isEditing, setIsEditing] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingText, setEditingText] = useState("");
-  const [mentionQuery, setMentionQuery] = useState("");
-  const [showMentions, setShowMentions] = useState(false);
-  const [mentionPosition, setMentionPosition] = useState({ top: 0, left: 0 });
-  const [selectedMentions, setSelectedMentions] = useState<{ id: string; name: string }[]>([]);
   const user = useCurrentUser();
   const params = useParams();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { currentWorkspace } = useCurrentWorkspace();
-
-  // Fetch board users
-  const { data: boardUsers, isLoading: isLoadingBoardUsers, isError: isErrorBoardUsers } = useQuery({
-    queryKey: ["usersInBoard", params.boardId],
-    queryFn: () => fetcher(`/api/boards/assigned-user?boardId=${params.boardId}`),
-  });
 
   const { execute: executeCreateComment, fieldErrors } = useAction(createComment, {
     onSuccess: (newComment) => {
@@ -94,96 +82,7 @@ export const Comments = ({ items, cardId, readonly = false }: CommentsProps) => 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
     setNewComment(text);
-
-    // Check for @ mentions
-    const cursorPosition = e.target.selectionStart;
-    const textBeforeCursor = text.slice(0, cursorPosition);
-    const matches = textBeforeCursor.match(/@([^\s][^\n]*?)$/);
-
-    if (matches) {
-      setMentionQuery(matches[1]);
-      setShowMentions(true);
-
-      // Calculate mention box position
-      if (textareaRef.current) {
-        const cursorCoords = getCaretCoordinates(textareaRef.current, cursorPosition);
-        setMentionPosition({
-          top: cursorCoords.top + 20,
-          left: cursorCoords.left,
-        });
-      }
-    } else {
-      setShowMentions(false);
-    }
   };
-
-  const getCaretCoordinates = (element: HTMLTextAreaElement, position: number) => {
-    const { offsetLeft, offsetTop } = element;
-    const div = document.createElement('div');
-    const styles = getComputedStyle(element);
-
-    div.style.position = 'absolute';
-    div.style.top = '0';
-    div.style.left = '0';
-    div.style.visibility = 'hidden';
-    div.style.whiteSpace = 'pre-wrap';
-    div.style.font = styles.font;
-    div.style.padding = styles.padding;
-
-    const text = element.value.substring(0, position);
-    div.textContent = text;
-    document.body.appendChild(div);
-
-    const coordinates = {
-      top: offsetTop + div.offsetHeight,
-      left: offsetLeft + div.offsetWidth,
-    };
-
-    document.body.removeChild(div);
-    return coordinates;
-  };
-
-  const handleMentionSelect = (selectedUser: { id: string; name: string }) => {
-    if (!textareaRef.current) return;
-
-    const cursorPosition = textareaRef.current.selectionStart || 0;
-    const textBeforeCursor = newComment.slice(0, cursorPosition);
-    const textAfterCursor = newComment.slice(cursorPosition);
-
-    // Find the last @ symbol before the cursor
-    const lastAtSymbolIndex = textBeforeCursor.lastIndexOf('@');
-    if (lastAtSymbolIndex === -1) return;
-
-    // Combine the text before @, the user's name, and the text after
-    const newText =
-      textBeforeCursor.slice(0, lastAtSymbolIndex) +
-      `@${selectedUser.name} ` +
-      textAfterCursor;
-
-    setNewComment(newText);
-    setShowMentions(false);
-
-    // Add the selected mention to the list
-    setSelectedMentions((prevMentions) => [...prevMentions, selectedUser]);
-
-    // Replace the cursor after the mention
-    setTimeout(() => {
-      const newCursorPosition = lastAtSymbolIndex + selectedUser.name.length + 2; // +2 for @ and space
-      textareaRef.current?.setSelectionRange(newCursorPosition, newCursorPosition);
-      textareaRef.current?.focus();
-    }, 0);
-  };
-
-  const filteredUsers = Array.isArray(boardUsers)
-    ? boardUsers.filter((boardUser: any) =>
-      boardUser.name.toLowerCase().includes(mentionQuery.toLowerCase())
-    )
-    : [];
-
-  if (!user) {
-    toast.error("User not found or not authenticated.");
-    return null;
-  }
 
   const handleSubmit = async (formData: FormData) => {
     const text = formData.get("new-comment") as string;
@@ -209,22 +108,6 @@ export const Comments = ({ items, cardId, readonly = false }: CommentsProps) => 
         userId
       });
 
-      // Extract mentions and create notifications
-      selectedMentions.forEach(async (mention) => {
-        try {
-          await createNotification(
-            mention.id,
-            params.workspaceId as string,
-            `${user?.name} mentioned you in a comment`,
-            `/${currentWorkspace?.id}/boards/${boardId}/cards/${cardId}`
-          );
-        } catch (error) {
-          console.error('Failed to create mention notification:', error);
-        }
-      });
-
-      // Clear selected mentions after submission
-      setSelectedMentions([]);
     } catch {
       toast.error("Failed to add comment.");
     } finally {
@@ -279,7 +162,7 @@ export const Comments = ({ items, cardId, readonly = false }: CommentsProps) => 
 
       setComments((prevComments) =>
         prevComments.map((comment) =>
-          comment.id === commentId
+          comment.id === editingCommentId
             ? { ...comment, text: editingText, modified: true }
             : comment
         )
@@ -299,13 +182,17 @@ export const Comments = ({ items, cardId, readonly = false }: CommentsProps) => 
       : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   );
 
-  const highlightMentions = (text: string) => {
-    const mentionPattern = /@([\w\s]+)/g;
-    const parts = text.split(mentionPattern);
+  const highlightLinks = (text: string) => {
+    const urlPattern = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlPattern);
 
     return parts.map((part, index) => {
-      if (part.startsWith('@')) {
-        return <span key={index} className="text-blue-500">{part}</span>;
+      if (part.startsWith('http')) {
+        return (
+          <LinkPreview key={index} url={part}>
+            <a href={part} target="_blank" className="text-blue-600">{part}</a>
+          </LinkPreview>
+        );
       }
       // Split the part by new lines and render each line in a separate paragraph
       return part.split('\n').map((line, lineIndex) => (
@@ -317,13 +204,6 @@ export const Comments = ({ items, cardId, readonly = false }: CommentsProps) => 
   };
 
 
-  if (isLoadingBoardUsers) {
-    return <Skeleton className="h-6 w-full" />;
-  }
-
-  if (isErrorBoardUsers) {
-    return <p>Failed to load board users.</p>;
-  }
 
   return (
     <div className="space-y-6">
@@ -352,29 +232,6 @@ export const Comments = ({ items, cardId, readonly = false }: CommentsProps) => 
                     className="pb-20 mt-2 pt-2 pl-2 rounded-lg bg-gray-50 dark:text-gray-200 dark:bg-gray-700"
                     errors={fieldErrors}
                   />
-                  {showMentions && filteredUsers && filteredUsers.length > 0 && (
-                    <Card
-                      className="absolute z-50 w-64 max-h-48 overflow-y-auto"
-                      style={{
-                        top: mentionPosition.top,
-                        left: mentionPosition.left,
-                      }}
-                    >
-                      {filteredUsers.map((user: any) => (
-                        <div
-                          key={user.id}
-                          className="p-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
-                          onClick={() => handleMentionSelect(user)}
-                        >
-                          <Avatar className="h-6 w-6">
-                            <AvatarImage src={user.image} />
-                            <AvatarFallback>{user.name[0]}</AvatarFallback>
-                          </Avatar>
-                          <span>{user.name}</span>
-                        </div>
-                      ))}
-                    </Card>
-                  )}
                 </div>
               )}
             </div>
@@ -467,7 +324,7 @@ export const Comments = ({ items, cardId, readonly = false }: CommentsProps) => 
                       </div>
                     ) : (
                       <p className="text-sm text-foreground">
-                        {highlightMentions(comment.text)}
+                        {highlightLinks(comment.text)}
                       </p>
                     )}
                     {!readonly && (
@@ -496,7 +353,6 @@ export const Comments = ({ items, cardId, readonly = false }: CommentsProps) => 
                       )}
                       </div>
                     )}
-
                   </div>
                 </div>
               </li>

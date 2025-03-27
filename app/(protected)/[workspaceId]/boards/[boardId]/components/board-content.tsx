@@ -36,6 +36,7 @@ import CreateTagForm from "./create-tag-form";
 import { TableView } from "./table-view";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface BoardContentProps {
   boardId: string;
@@ -82,8 +83,6 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     queryKey: ["available-tags", boardId],
     queryFn: () => fetcher(`/api/boards/tags?boardId=${boardId}`),
   });
-
-  const selectedUserData = useMemo(() => users.find((user: any) => user.id === selectedUser), [selectedUser, users]);
 
   const filteredTags = useMemo(
     () => availableTags?.filter((tag: any) => tag.name.toLowerCase().includes(tagSearchTerm.toLowerCase())),
@@ -166,6 +165,17 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     }));
   };
 
+  const clearSelectedTags = () => {
+    selectedTags.forEach((tagId) => toggleTag(tagId));
+  };
+
+  const clearAllFilters = () => {
+    setSelectedUser(null);
+    setSelectedPriority(null);
+    setSearchTerm("");
+    clearSelectedTags(); // Réinitialise les tags sélectionnés
+  };
+
   // Sauvegarder la vue sélectionnée dans le localStorage
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -192,7 +202,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                 <Filter className="h-4 w-4" />
                 Filters
                 {getActiveFiltersCount() > 0 && (
-                  <Badge variant="secondary" className="ml-1 px-1 py-0 text-xs">
+                  <Badge variant="secondary" className="ml-1 px-1 py-0 text-xs bg-blue-500 text-white">
                     {getActiveFiltersCount()}
                   </Badge>
                 )}
@@ -250,7 +260,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                         key={priority}
                         onClick={() => setSelectedPriority(selectedPriority === priority ? null : priority)}
                         className={cn(
-                          "flex items-center gap-2 p-2 rounded-md cursor-pointer text-sm",
+                          "flex items-center gap-2 p-2 rounded-md font-medium cursor-pointer text-sm",
                           selectedPriority === priority ? "bg-secondary" : "hover:bg-secondary/50"
                         )}
                       >
@@ -272,7 +282,6 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
-      
                         <CreateTagForm boardId={boardId} />
                       </DialogContent>
                     </Dialog>
@@ -353,6 +362,11 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
               </div>
             </PopoverContent>
           </Popover>
+          {getActiveFiltersCount() > 0 && (
+            <Button variant="outline" size="sm" className="h-9 px-3 gap-1" onClick={clearAllFilters}>
+              Clear All Filters
+            </Button>
+          )}
           {/* Conditionally render the "Fields" button */}
           {(selectedView === "list" || selectedView === "table") && (
             <Popover>
@@ -390,9 +404,16 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
         </div>
         <div className="flex items-center gap-2">
           <ViewSwitcher selectedView={selectedView} onViewChange={setSelectedView} />
-          <Button onClick={RefreshPage} variant="ghost" size="icon" className="h-9 w-9">
-            <RefreshCcw className="h-4 w-4" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger>
+              <Button onClick={RefreshPage} variant="ghost" size="icon" className="h-9 w-9">
+                <RefreshCcw className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              Refresh
+            </TooltipContent>
+          </Tooltip>
         </div>
       </div>
       <main className="w-full max-w-screen shadow-sm overflow-x-auto bg-background h-full px-2">
