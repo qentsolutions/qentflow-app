@@ -1,4 +1,4 @@
-import { Copy, MoreVertical, SquareDashedMousePointer, Trash2 } from "lucide-react"; // Importer l'icône MoreVertical
+import { Archive, Copy, MoreVertical, SquareDashedMousePointer, Trash2 } from "lucide-react";
 import type { Tag, User } from "@prisma/client";
 import { Draggable } from "@hello-pangea/dnd";
 import { useCardModal } from "@/hooks/use-card-modal";
@@ -21,6 +21,8 @@ import { useAction } from "@/hooks/use-action";
 import { deleteCard } from "@/actions/tasks/delete-card";
 import { copyCard } from "@/actions/tasks/copy-card";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
+import { archiveCard } from "@/actions/tasks/archived-card";
+import { unarchiveCard } from "@/actions/tasks/unarchived-card"; // Importer l'action de désarchivage
 
 interface CommentCountResponse {
   commentCount: number;
@@ -44,6 +46,7 @@ interface CardItemProps {
       id: string;
       completed: boolean;
     }[];
+    archived: boolean; // Ajouter le champ archived
   };
   index: number;
   users: User[];
@@ -134,6 +137,56 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
       toast.error(error);
     },
   });
+
+  const { execute: executeArchiveCard } = useAction(archiveCard, {
+    onSuccess: (data) => {
+      toast.success(`Card "${data.title}" archived`);
+    },
+    onError: (error) => {
+      toast.error(error);
+    },
+  });
+
+  const { execute: executeUnarchiveCard } = useAction(unarchiveCard, {
+    onSuccess: (data) => {
+      toast.success(`Card "${data.title}" unarchived`);
+    },
+    onError: (error) => {
+      toast.error(error);
+    },
+  });
+
+  const onArchive = (cardId: string) => {
+    const boardId = params.boardId as string;
+    const workspaceId = params.workspaceId as string;
+
+    if (!workspaceId) {
+      toast.error("Workspace ID is required.");
+      return;
+    }
+
+    executeArchiveCard({
+      cardId: cardId,
+      boardId,
+      workspaceId,
+    });
+  };
+
+  const onUnarchive = (cardId: string) => {
+    const boardId = params.boardId as string;
+    const workspaceId = params.workspaceId as string;
+
+    if (!workspaceId) {
+      toast.error("Workspace ID is required.");
+      return;
+    }
+
+    executeUnarchiveCard({
+      cardId: cardId,
+      boardId,
+      workspaceId,
+    });
+  };
 
   const onDelete = (cardId: string) => {
     const boardId = params.boardId as string;
@@ -393,9 +446,8 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                 <button
                   onClick={(e) => {
                     cardModal.onOpen(data.id);
-                    e.stopPropagation()
-                  }
-                  }
+                    e.stopPropagation();
+                  }}
                   className="w-full flex items-center justify-between gap-x-2 hover:bg-muted p-2 rounded-md transition text-left"
                 >
                   <span className="text-sm">Open</span>
@@ -404,12 +456,26 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                 <button
                   onClick={(e) => {
                     onCopy(data.id);
-                    e.stopPropagation()
+                    e.stopPropagation();
                   }}
                   className="w-full flex items-center justify-between gap-x-2 hover:bg-muted p-2 rounded-md transition text-left"
                 >
                   <span className="text-sm">Duplicate</span>
                   <Copy size={14} className="text-gray-700" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    if (data.archived) {
+                      onUnarchive(data.id);
+                    } else {
+                      onArchive(data.id);
+                    }
+                    e.stopPropagation();
+                  }}
+                  className="w-full flex items-center justify-between gap-x-2 hover:bg-muted p-2 rounded-md transition text-left"
+                >
+                  <span className="text-sm">{data.archived ? "Unarchive" : "Archive"}</span>
+                  <Archive size={14} className="text-gray-700" />
                 </button>
                 <button
                   onClick={(e) => {

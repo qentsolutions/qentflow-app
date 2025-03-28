@@ -13,12 +13,14 @@ import { CalendarView } from "./components/calendar/calendar-view";
 import { Calendar, Clock, LayoutDashboard, ListTodo, SettingsIcon } from "lucide-react";
 import { AddCardButton } from "./components/add-card-button";
 import { Automations } from "./components/automations/automations";
+
 interface BoardIdPageProps {
   params: {
     boardId: string;
     workspaceId: string;
   };
 }
+
 export async function generateMetadata({ params }: { params: { boardId: string; workspaceId: string } }) {
   const board = await db.board.findUnique({
     where: {
@@ -31,6 +33,7 @@ export async function generateMetadata({ params }: { params: { boardId: string; 
   }
   return { title: `${board.title} - Qentflow` };
 }
+
 const BoardIdPage = async ({ params }: BoardIdPageProps) => {
   const user = await currentUser();
   const isMember = await db.workspaceMember.findFirst({
@@ -42,6 +45,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
   if (!isMember) {
     redirect(`/${params.workspaceId}/boards`);
   }
+
   const board = await db.board.findUnique({
     where: {
       id: params.boardId,
@@ -51,6 +55,9 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
       lists: {
         include: {
           cards: {
+            where: {
+              archived: false, // Filtrer les cartes non archivées
+            },
             include: {
               tasks: true,
               tags: {
@@ -76,17 +83,20 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
           name: true,
           email: true,
           image: true,
-        }
+        },
       },
     },
   });
+
   if (!board) {
     return <div>Board not found</div>;
   }
+
   const isBoardMember = board.User.some((boardUser) => boardUser.id === user?.id);
   if (!isBoardMember) {
     redirect(`/${params.workspaceId}/boards`);
   }
+
   return (
     <div className="w-full pl-2">
       <Card className="shadow-none rounded-none h-screen">
@@ -121,16 +131,13 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                     </TabsTrigger>
                   </TabsList>
                   <div className="space-x-2 flex items-center mb-1">
-                    <Automations
-                      board={board}
-                    />
+                    <Automations board={board} />
                     <AddCardButton
                       boardId={params.boardId}
                       workspaceId={params.workspaceId}
                       lists={board.lists}
                     />
                   </div>
-
                 </div>
                 <Separator />
                 <TabsContent value="overview">
@@ -161,4 +168,5 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
     </div>
   );
 };
+
 export default BoardIdPage;

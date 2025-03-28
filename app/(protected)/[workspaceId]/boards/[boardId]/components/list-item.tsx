@@ -125,7 +125,14 @@ export const ListItem = ({ data, index, users }: ListItemProps) => {
                       {data.cards.map((card, index) => (
                         <ContextMenu key={card.id}>
                           <ContextMenuTrigger>
-                            <CardItem index={index} data={card} users={users} />
+                            <CardItem
+                              index={index}
+                              data={{
+                                ...card,
+                                archived: card.archived ?? false, // Assurez-vous que archived est un boolean
+                              }}
+                              users={users}
+                            />
                           </ContextMenuTrigger>
                           <ContextMenuContent>
                             <ContextMenuItem
