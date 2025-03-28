@@ -1,78 +1,73 @@
-import { MoreVertical } from "lucide-react";
-import type { Tag, User } from "@prisma/client";
-import { Draggable } from "@hello-pangea/dnd";
-import { useCardModal } from "@/hooks/use-card-modal";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { UserPlus, UserIcon, UserX, MessageSquareText, AlertTriangle, Paperclip, Flag, Check } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { assignUserToCard } from "@/actions/boards/assign-user-to-card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useQuery } from "@tanstack/react-query";
-import { fetcher } from "@/lib/fetcher";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
-import { createNotification } from "@/actions/notifications/create-notification";
-import { useCurrentUser } from "@/hooks/use-current-user";
-import { useParams } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { useAction } from "@/hooks/use-action";
-import { deleteCard } from "@/actions/tasks/delete-card";
-import { copyCard } from "@/actions/tasks/copy-card";
-import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
-import { archiveCard } from "@/actions/tasks/archived-card";
-import { unarchiveCard } from "@/actions/tasks/unarchived-card"; // Importer l'action de désarchivage
-import CardActions from "./card-actions";
+"use client"
+
+import { MoreVertical } from "lucide-react"
+import type { Tag, User } from "@prisma/client"
+import { Draggable } from "@hello-pangea/dnd"
+import { useCardModal } from "@/hooks/use-card-modal"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { UserPlus, UserIcon, UserX, MessageSquareText, AlertTriangle, Paperclip, Flag, Check } from "lucide-react"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
+import { assignUserToCard } from "@/actions/boards/assign-user-to-card"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { useQuery } from "@tanstack/react-query"
+import { fetcher } from "@/lib/fetcher"
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
+import { createNotification } from "@/actions/notifications/create-notification"
+import { useCurrentUser } from "@/hooks/use-current-user"
+import { useParams } from "next/navigation"
+import { cn } from "@/lib/utils"
+import CardActions from "./card-actions"
 
 interface CommentCountResponse {
-  commentCount: number;
-  attachmentsCount: number;
+  commentCount: number
+  attachmentsCount: number
 }
 
 interface CardItemProps {
   data: {
-    id: string;
-    title: string;
-    order: number;
-    description: string | null;
-    listId: string;
-    createdAt: Date;
-    updatedAt: Date;
-    assignedUserId?: string | null;
-    tags?: Tag[];
-    priority: string | null;
-    index?: number;
+    id: string
+    title: string
+    order: number
+    description: string | null
+    listId: string
+    createdAt: Date
+    updatedAt: Date
+    assignedUserId?: string | null
+    tags?: Tag[]
+    priority: string | null
+    index?: number
     tasks?: {
-      id: string;
-      completed: boolean;
-    }[];
-    archived: boolean; // Ajouter le champ archived
-  };
-  index: number;
-  users: User[];
+      id: string
+      completed: boolean
+    }[]
+    archived: boolean // Ajouter le champ archived
+  }
+  index: number
+  users: User[]
 }
 
 export const CardItem = ({ data, index, users }: CardItemProps) => {
-  const cardModal = useCardModal();
-  const [assignedUserState, setAssignedUserState] = useState<User | null>(null);
-  const currentUser = useCurrentUser();
-  const params = useParams();
-  const { currentWorkspace } = useCurrentWorkspace();
+  const cardModal = useCardModal()
+  const [assignedUserState, setAssignedUserState] = useState<User | null>(null)
+  const currentUser = useCurrentUser()
+  const params = useParams()
 
   useEffect(() => {
-    const assignedUser = users.find((user) => user.id === data.assignedUserId) || null;
-    setAssignedUserState(assignedUser);
-  }, [data.assignedUserId, users]);
+    const assignedUser = users.find((user) => user.id === data.assignedUserId) || null
+    setAssignedUserState(assignedUser)
+  }, [data.assignedUserId, users])
 
   const { data: commentsData } = useQuery<CommentCountResponse>({
     queryKey: ["card-comments", data?.id],
     queryFn: () => fetcher(`/api/cards/${data?.id}/comments/count-in-card`),
-  });
+  })
 
   const handleAssignUser = async (userId: string | null) => {
     try {
-      await assignUserToCard(data.id, userId || "null");
+      await assignUserToCard(data.id, userId || "null")
 
       if (userId) {
         await createNotification(
@@ -80,156 +75,55 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
           params?.workspaceId as string,
           `${currentUser?.name} has assigned you to a card: ${data?.title}!`,
           `/${params?.workspaceId}/boards/${params.boardId}/cards/${data?.id}`,
-        );
+        )
       }
 
       if (userId === null) {
-        setAssignedUserState(null);
-        toast.success("User unassigned from card");
+        setAssignedUserState(null)
+        toast.success("User unassigned from card")
       } else {
-        const assignedUser = users.find((user) => user.id === userId) || null;
-        setAssignedUserState(assignedUser);
-        toast.success("User assigned to card");
+        const assignedUser = users.find((user) => user.id === userId) || null
+        setAssignedUserState(assignedUser)
+        toast.success("User assigned to card")
       }
     } catch (error) {
-      toast.error("Failed to update user assignment");
+      toast.error("Failed to update user assignment")
     }
-  };
+  }
 
   const getPriorityDetails = (priority: string | null) => {
-    if (!priority) return { icon: null, color: "" };
+    if (!priority) return { icon: null, color: "" }
 
     switch (priority) {
       case "LOW":
         return {
           icon: <Flag className="text-emerald-500" size={14} />,
           color: "text-emerald-500",
-        };
+        }
       case "MEDIUM":
         return {
           icon: <Flag className="text-amber-500" size={14} />,
           color: "text-amber-500",
-        };
+        }
       case "HIGH":
         return {
           icon: <Flag className="text-rose-500" size={14} />,
           color: "text-rose-500",
-        };
+        }
       case "CRITICAL":
         return {
           icon: <AlertTriangle className="text-red-600" size={14} />,
           color: "text-red-600",
-        };
+        }
       default:
-        return { icon: null, color: "" };
+        return { icon: null, color: "" }
     }
-  };
+  }
 
-  const priorityDetails = getPriorityDetails(data.priority);
-  const completedTasks = data.tasks?.filter((task) => task.completed).length || 0;
-  const totalTasks = data.tasks?.length || 0;
-  const progressPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-
-  const { execute: executeDeleteCard } = useAction(deleteCard, {
-    onSuccess: (data) => {
-      toast.success(`Card "${data.title}" deleted`);
-    },
-    onError: (error) => {
-      toast.error(error);
-    },
-  });
-
-  const { execute: executeArchiveCard } = useAction(archiveCard, {
-    onSuccess: (data) => {
-      toast.success(`Card "${data.title}" archived`);
-    },
-    onError: (error) => {
-      toast.error(error);
-    },
-  });
-
-  const { execute: executeUnarchiveCard } = useAction(unarchiveCard, {
-    onSuccess: (data) => {
-      toast.success(`Card "${data.title}" unarchived`);
-    },
-    onError: (error) => {
-      toast.error(error);
-    },
-  });
-
-  const onArchive = (cardId: string) => {
-    const boardId = params.boardId as string;
-    const workspaceId = params.workspaceId as string;
-
-    if (!workspaceId) {
-      toast.error("Workspace ID is required.");
-      return;
-    }
-
-    executeArchiveCard({
-      cardId: cardId,
-      boardId,
-      workspaceId,
-    });
-  };
-
-  const onUnarchive = (cardId: string) => {
-    const boardId = params.boardId as string;
-    const workspaceId = params.workspaceId as string;
-
-    if (!workspaceId) {
-      toast.error("Workspace ID is required.");
-      return;
-    }
-
-    executeUnarchiveCard({
-      cardId: cardId,
-      boardId,
-      workspaceId,
-    });
-  };
-
-  const onDelete = (cardId: string) => {
-    const boardId = params.boardId as string;
-    const workspaceId = params.workspaceId as string;
-
-    if (!workspaceId) {
-      toast.error("Workspace ID is required.");
-      return;
-    }
-
-    executeDeleteCard({
-      id: cardId,
-      boardId,
-      workspaceId,
-    });
-  };
-
-  const {
-    execute: executeCopyCard,
-    isLoading: isLoadingCopy,
-  } = useAction(copyCard, {
-    onSuccess: (data) => {
-      toast.success(`Card "${data.title}" copied`);
-    },
-    onError: (error) => {
-      toast.error(error);
-    },
-  });
-
-  const onCopy = (cardId: string) => {
-    const boardId = params.boardId as string;
-    const workspaceId = currentWorkspace?.id;
-    if (!workspaceId) {
-      toast.error("Workspace ID is required.");
-      return;
-    }
-    executeCopyCard({
-      id: cardId,
-      boardId,
-      workspaceId,
-    });
-  };
+  const priorityDetails = getPriorityDetails(data.priority)
+  const completedTasks = data.tasks?.filter((task) => task.completed).length || 0
+  const totalTasks = data.tasks?.length || 0
+  const progressPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0
 
   return (
     <Draggable draggableId={data.id} index={index}>
@@ -240,10 +134,17 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
           ref={provided.innerRef}
           role="button"
           onClick={() => cardModal.onOpen(data.id)}
-          className="group relative border border-border/40 bg-card dark:bg-gray-800 rounded-lg
-                    shadow-sm hover:shadow-md transition-all duration-200
-                    hover:border-primary/60 z-50 overflow-hidden"
+          className={cn(
+            "group relative border border-border/40 bg-card dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:border-primary/60 z-50 overflow-hidden",
+            data.archived && "bg-gray-100 dark:bg-gray-900 border-dashed opacity-75",
+          )}
         >
+          {data.archived && (
+            <div className="absolute -right-9 top-5 bg-gray-500/90 text-white text-xs py-0.5 px-10 transform rotate-45 shadow-sm ">
+              Archived
+            </div>
+          )}
+
           {/* Priority indicator strip */}
           {data.priority && (
             <div
@@ -255,6 +156,10 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                 data.priority === "CRITICAL" && "bg-red-600",
               )}
             />
+          )}
+
+          {data.archived && (
+            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(0,0,0,0.05)_25%,rgba(0,0,0,0.05)_50%,transparent_50%,transparent_75%,rgba(0,0,0,0.05)_75%)] bg-[length:8px_8px] pointer-events-none z-0" />
           )}
 
           <div className="pt-3 px-3 pb-1 space-y-3">
@@ -274,7 +179,14 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
             )}
 
             {/* Title */}
-            <h3 className="text-sm font-medium line-clamp-2 text-foreground">{data.title}</h3>
+            <h3
+              className={cn(
+                "text-sm font-medium line-clamp-2 text-foreground",
+                data.archived && "text-muted-foreground",
+              )}
+            >
+              {data.title}
+            </h3>
 
             {/* Footer with metadata */}
             <div className="flex items-center justify-between pt-1">
@@ -451,5 +363,6 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
         </div>
       )}
     </Draggable>
-  );
-};
+  )
+}
+

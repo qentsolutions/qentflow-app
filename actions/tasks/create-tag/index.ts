@@ -31,7 +31,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         ...tag,
         title: "",
         order: 0,
-        archived: null,
+        archived: false,
         startDate: null,
         dueDate: null,
         priority: null,
