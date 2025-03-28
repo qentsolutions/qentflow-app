@@ -15,12 +15,9 @@ import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 export const ListForm = () => {
   const router = useRouter();
   const params = useParams();
-
   const formRef = useRef<ElementRef<"form">>(null);
   const inputRef = useRef<ElementRef<"input">>(null);
-
   const [isEditing, setIsEditing] = useState(false);
-
   const { currentWorkspace } = useCurrentWorkspace();
 
   const enableEditing = () => {
@@ -57,8 +54,6 @@ export const ListForm = () => {
   const onSubmit = (formData: FormData) => {
     const title = formData.get("title") as string;
     const boardId = formData.get("boardId") as string;
-    
-
     execute({
       title,
       boardId,

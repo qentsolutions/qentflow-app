@@ -1,5 +1,4 @@
 "use server";
-
 import * as z from "zod";
 import { AuthError } from "next-auth";
 import { db } from "@/lib/db";
@@ -10,7 +9,6 @@ import { getTwoFactorTokenByEmail } from "@/data/two-factor-token";
 import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation";
 import { generateTwoFactorToken } from "@/lib/tokens";
 import { sendTwoFactorTokenEmail } from "@/lib/mail";
-import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 
 export const login = async (
   values: z.infer<typeof LoginSchema>,
@@ -119,7 +117,6 @@ export const login = async (
           return { error: "Something went wrong!" }
       }
     }
-
     throw error;
   }
 };

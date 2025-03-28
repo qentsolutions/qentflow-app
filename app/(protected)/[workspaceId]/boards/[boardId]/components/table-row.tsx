@@ -88,8 +88,7 @@ export const TableViewRow = ({ item, lists, onListChange, onRowClick }: TableRow
       </TableCell>
       <TableCell
         className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium w-[80px]"
-        onClick={(e) => e.stopPropagation()}
-      >
+        onClick={(e) => e.stopPropagation()}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm">

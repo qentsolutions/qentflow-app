@@ -15,7 +15,9 @@ import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-import { Copy, Expand, MoreHorizontal, Trash } from 'lucide-react';
+import { Copy, Expand, MoreHorizontal, MoreVertical, Trash } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import CardActions from "@/app/(protected)/[workspaceId]/boards/[boardId]/components/card-actions";
 
 interface ActionsProps {
   card: CardWithList;
@@ -102,40 +104,16 @@ export const Actions = ({ card, boardId, readonly = false }: ActionsProps) => {
       </Tooltip>
 
       <DropdownMenu>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p className="text-xs">More options</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem
-            onClick={onCopy}
-            disabled={isLoadingCopy}
-            className="cursor-pointer"
+        <DropdownMenuTrigger asChild>
+          <button
+            className="transition p-1 rounded-lg hover:bg-gray-100"
+            onClick={(e) => e.stopPropagation()} // Stop propagation to prevent card click
           >
-            <Copy className="h-4 w-4 mr-2" />
-            <span>Duplicate</span>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem
-            onClick={() => setIsDeleteDialogOpen(true)}
-            className="text-red-500 focus:text-red-500 cursor-pointer"
-          >
-            <Trash className="h-4 w-4 mr-2" />
-            <span>Delete</span>
-          </DropdownMenuItem>
+            <MoreVertical size={16} />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-40 p-2" side="bottom" align="end">
+          <CardActions data={card} />
         </DropdownMenuContent>
       </DropdownMenu>
 

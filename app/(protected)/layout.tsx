@@ -1,10 +1,8 @@
 "use client";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/ui/app-sidebar";
-import { Separator } from "@/components/ui/separator";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { BreadcrumbProvider, useBreadcrumbs } from "@/hooks/use-breadcrumb";
-import { FeedbackButton } from "@/components/feedback-button";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;

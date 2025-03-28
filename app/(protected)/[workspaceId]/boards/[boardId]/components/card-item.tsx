@@ -1,4 +1,4 @@
-import { Archive, Copy, MoreVertical, SquareDashedMousePointer, Trash2 } from "lucide-react";
+import { MoreVertical } from "lucide-react";
 import type { Tag, User } from "@prisma/client";
 import { Draggable } from "@hello-pangea/dnd";
 import { useCardModal } from "@/hooks/use-card-modal";
@@ -23,6 +23,7 @@ import { copyCard } from "@/actions/tasks/copy-card";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { archiveCard } from "@/actions/tasks/archived-card";
 import { unarchiveCard } from "@/actions/tasks/unarchived-card"; // Importer l'action de désarchivage
+import CardActions from "./card-actions";
 
 interface CommentCountResponse {
   commentCount: number;
@@ -443,50 +444,7 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                 </button>
               </PopoverTrigger>
               <PopoverContent className="w-40 p-2" side="bottom" align="end">
-                <button
-                  onClick={(e) => {
-                    cardModal.onOpen(data.id);
-                    e.stopPropagation();
-                  }}
-                  className="w-full flex items-center justify-between gap-x-2 hover:bg-muted p-2 rounded-md transition text-left"
-                >
-                  <span className="text-sm">Open</span>
-                  <SquareDashedMousePointer size={14} className="text-gray-700" />
-                </button>
-                <button
-                  onClick={(e) => {
-                    onCopy(data.id);
-                    e.stopPropagation();
-                  }}
-                  className="w-full flex items-center justify-between gap-x-2 hover:bg-muted p-2 rounded-md transition text-left"
-                >
-                  <span className="text-sm">Duplicate</span>
-                  <Copy size={14} className="text-gray-700" />
-                </button>
-                <button
-                  onClick={(e) => {
-                    if (data.archived) {
-                      onUnarchive(data.id);
-                    } else {
-                      onArchive(data.id);
-                    }
-                    e.stopPropagation();
-                  }}
-                  className="w-full flex items-center justify-between gap-x-2 hover:bg-muted p-2 rounded-md transition text-left"
-                >
-                  <span className="text-sm">{data.archived ? "Unarchive" : "Archive"}</span>
-                  <Archive size={14} className="text-gray-700" />
-                </button>
-                <button
-                  onClick={(e) => {
-                    onDelete(data.id);
-                    e.stopPropagation();
-                  }}
-                  className="w-full flex items-center justify-between gap-x-2 hover:bg-muted p-2 rounded-md transition text-left"
-                >
-                  <span className="text-sm">Delete</span>
-                  <Trash2 size={14} className="text-red-500" />
-                </button>
+                <CardActions data={data} />
               </PopoverContent>
             </Popover>
           </div>

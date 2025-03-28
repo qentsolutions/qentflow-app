@@ -36,7 +36,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       entityId: card.id,
       entityTitle: card.title,
       entityType: ENTITY_TYPE.CARD,
-      action: ACTION.UPDATE,
+      action: ACTION.ARCHIVED,
       workspaceId,
     });
 

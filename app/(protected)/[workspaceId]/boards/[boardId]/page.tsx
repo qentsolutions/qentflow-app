@@ -55,9 +55,6 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
       lists: {
         include: {
           cards: {
-            where: {
-              archived: false, // Filtrer les cartes non archivées
-            },
             include: {
               tasks: true,
               tags: {

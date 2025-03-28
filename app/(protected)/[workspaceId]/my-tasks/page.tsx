@@ -32,6 +32,8 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import CardPage from "../boards/[boardId]/cards/[cardId]/page";
 import { useMediaQuery } from "usehooks-ts";
+import Link from "next/link";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 type TaskCardProps = {
   list: {
@@ -137,21 +139,21 @@ export default function MyTasksPage() {
   const filteredGroupedCards = useMemo(() => {
     return groupedCards
       ? Object.entries(groupedCards).reduce((acc: any, [boardTitle, cards]: [string, any]) => {
-          const filteredCards = (cards as any[]).filter((card) => {
-            const matchesSearch =
-              card.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              card.description?.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesBoards = selectedBoards.length === 0 || selectedBoards.includes(card.list.board.title);
-            const matchesTags =
-              selectedTags.length === 0 || card.tags?.some((tag: any) => selectedTags.includes(tag.name));
+        const filteredCards = (cards as any[]).filter((card) => {
+          const matchesSearch =
+            card.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            card.description?.toLowerCase().includes(searchTerm.toLowerCase());
+          const matchesBoards = selectedBoards.length === 0 || selectedBoards.includes(card.list.board.title);
+          const matchesTags =
+            selectedTags.length === 0 || card.tags?.some((tag: any) => selectedTags.includes(tag.name));
 
-            return matchesSearch && matchesBoards && matchesTags;
-          });
-          if (filteredCards.length > 0) {
-            acc[boardTitle] = filteredCards;
-          }
-          return acc;
-        }, {})
+          return matchesSearch && matchesBoards && matchesTags;
+        });
+        if (filteredCards.length > 0) {
+          acc[boardTitle] = filteredCards;
+        }
+        return acc;
+      }, {})
       : {};
   }, [groupedCards, searchTerm, selectedBoards, selectedTags]);
 
@@ -166,10 +168,10 @@ export default function MyTasksPage() {
   const sortedCards = useMemo(() => {
     return sortByDueDate
       ? [...displayedCards].sort((a: any, b: any) => {
-          if (!a.dueDate) return 1;
-          if (!b.dueDate) return -1;
-          return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
-        })
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      })
       : displayedCards;
   }, [displayedCards, sortByDueDate]);
 
@@ -443,6 +445,7 @@ const TaskCard = ({
   const progress = getTaskProgress(card);
   const dueDate = formatDate(card.dueDate);
   const isOverdue = card.dueDate && new Date(card.dueDate) < new Date() && progress < 100;
+  const { currentWorkspace } = useCurrentWorkspace();
 
   return (
     <motion.div
@@ -462,10 +465,13 @@ const TaskCard = ({
         <CardContent className="p-0">
           <div className="flex flex-col">
             <div className="flex items-center justify-between border-b p-3">
-              <Badge variant="outline" className="bg-background font-normal">
-                <LayoutDashboard className="mr-1 h-3.5 w-3.5 text-muted-foreground" />
-                {card.list.board.title}
-              </Badge>
+              <Link href={`/${currentWorkspace?.id}/boards/${card.list.board.id}`}>
+                <Badge variant="outline" className="bg-background font-normal hover:bg-gray-100">
+                  <LayoutDashboard className="mr-1 h-3.5 w-3.5 text-muted-foreground" />
+                  {card.list.board.title}
+                </Badge>
+              </Link>
+
               {card.priority && (
                 <Badge variant="outline" className={cn("border font-normal", getPriorityColor(card.priority))}>
                   {getPriorityIcon(card.priority)}
@@ -501,7 +507,7 @@ const TaskCard = ({
                   <div className="flex items-center gap-2">
                     <div className="h-2 w-16 overflow-hidden rounded-full bg-gray-100">
                       <div
-                        className="h-full rounded-full bg-blue-600 transition-all"
+                        className={`h-full rounded-full transition-all ${progress === 100 ? 'bg-green-500' : 'bg-blue-600'}`}
                         style={{ width: `${progress}%` }}
                       />
                     </div>
@@ -511,15 +517,24 @@ const TaskCard = ({
                   </div>
                 )}
 
-                {dueDate && (
-                  <Badge
-                    variant="outline"
-                    className={cn("font-normal", isOverdue ? "bg-red-50 text-red-600 border-red-200" : "bg-background")}
-                  >
+                <Tooltip>
+                  <TooltipTrigger>
+                    {dueDate && (
+                      <Badge
+                        variant="outline"
+                        className={cn("font-normal", isOverdue ? "bg-red-50 text-red-600 border-red-200" : "bg-background")}
+                      >
+                        <Calendar className="mr-1 h-3 w-3" />
+                        {dueDate}
+                      </Badge>
+                    )}
+                  </TooltipTrigger>
+                  <TooltipContent>
                     <Calendar className="mr-1 h-3 w-3" />
-                    {dueDate}
-                  </Badge>
-                )}
+                    <span> Due date : {dueDate}</span>
+                  </TooltipContent>
+                </Tooltip>
+
               </div>
             </div>
           </div>

@@ -94,9 +94,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
 
     const onDragEnd = (result: any) => {
         const { destination, source } = result
-
         if (!destination) return
-
         if (destination.droppableId === source.droppableId && destination.index === source.index) {
             return
         }
@@ -104,23 +102,18 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
         const newLists = [...lists]
         const sourceList = newLists.find((list) => list.id === source.droppableId)
         const destList = newLists.find((list) => list.id === destination.droppableId)
-
         if (!sourceList || !destList) return
-
         const [movedCard] = sourceList.cards.splice(source.index, 1)
         movedCard.listId = destination.droppableId
         destList.cards.splice(destination.index, 0, movedCard)
-
         destList.cards.forEach((card, idx) => {
             card.order = idx
         })
-
         const workspaceId = currentWorkspace?.id
         if (!workspaceId) {
             toast.error("Workspace not found")
             return
         }
-
         setLists(newLists)
         executeUpdateCardOrder({
             boardId: boardId,
@@ -165,7 +158,6 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
             return;
         }
         const boardId = Array.isArray(params.boardId) ? params.boardId[0] : params.boardId || "";
-
         executeCopyCard({
             id: cardId,
             boardId,
@@ -189,7 +181,6 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
             toast.error("Workspace ID is required.")
             return
         }
-
         executeDeleteCard({
             id: cardId,
             boardId: Array.isArray(params?.boardId) ? params.boardId[0] : params?.boardId || "",

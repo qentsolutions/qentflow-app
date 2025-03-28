@@ -6,7 +6,6 @@ import { useBreadcrumbs } from "@/hooks/use-breadcrumb";
 import { useEffect } from "react";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BreadcrumbHeader } from "@/components/breadcrumbs";
 
 interface BoardNavbarProps {
   board: Board;

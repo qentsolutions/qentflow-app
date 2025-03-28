@@ -8,10 +8,24 @@ export async function GET(
   { params }: { params: { cardId: string; workspaceId: string } }
 ) {
   try {
-    const user = currentUser();
+    const user = await currentUser();
 
     if (!user) {
       return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const workspace = await db.workspace.findFirst({
+      where: {
+        members: {
+          some: {
+            userId: user.id,
+          },
+        },
+      },
+    });
+
+    if (!workspace) {
+      return new NextResponse("Forbidden", { status: 403 });
     }
 
     const card = await db.card.findUnique({

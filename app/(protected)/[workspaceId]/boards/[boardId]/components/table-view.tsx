@@ -15,7 +15,6 @@ import {
   Trash,
   Flag,
   GripVertical,
-  ExternalLink,
   Copy,
 } from "lucide-react"
 import { Progress } from "@/components/ui/progress"

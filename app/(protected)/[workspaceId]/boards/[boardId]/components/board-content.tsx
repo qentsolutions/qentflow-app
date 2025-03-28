@@ -1,5 +1,4 @@
 "use client";
-
 import { ViewSwitcher, type ViewType } from "./view-switcher";
 import { KanbanView } from "./kanban-view";
 import { useState, useEffect, useMemo } from "react";
@@ -30,11 +29,9 @@ import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { AlertDialogHeader } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import CreateTagForm from "./create-tag-form";
 import { TableView } from "./table-view";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -51,6 +48,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
   const [tagSearchTerm, setTagSearchTerm] = useState("");
   const [userSearchTerm, setUserSearchTerm] = useState("");
   const [isCreateTagOpen, setIsCreateTagOpen] = useState(false);
+  const [isArchived, setIsArchived] = useState(false); // Nouvel état pour le filtre "Archived"
   const router = useRouter();
 
   // Add state for visible fields
@@ -77,7 +75,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     setSortBy,
     sortDirection,
     setSortDirection,
-  } = useBoardFilters({ lists });
+  } = useBoardFilters({ lists, isArchived }); // Passer isArchived au hook
 
   const { data: availableTags } = useQuery({
     queryKey: ["available-tags", boardId],
@@ -118,6 +116,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     if (selectedUser) count++;
     if (selectedPriority) count++;
     if (selectedTags.length > 0) count++;
+    if (isArchived) count++; // Ajouter le filtre "Archived" au compteur
     return count;
   };
 
@@ -174,6 +173,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     setSelectedPriority(null);
     setSearchTerm("");
     clearSelectedTags(); // Réinitialise les tags sélectionnés
+    setIsArchived(false); // Réinitialiser le filtre "Archived"
   };
 
   // Sauvegarder la vue sélectionnée dans le localStorage
@@ -320,6 +320,21 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                     </div>
                   </ScrollArea>
                 </div>
+
+                {/* Archived Section */}
+                <div>
+                  <h4 className="text-sm font-semibold mb-2">Archived</h4>
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      id="archived"
+                      checked={isArchived}
+                      onCheckedChange={() => setIsArchived(!isArchived)}
+                    />
+                    <label htmlFor="archived" className="text-sm">
+                      Archived
+                    </label>
+                  </div>
+                </div>
               </div>
             </PopoverContent>
           </Popover>
@@ -367,7 +382,6 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
               Clear All Filters
             </Button>
           )}
-          {/* Conditionally render the "Fields" button */}
           {(selectedView === "list" || selectedView === "table") && (
             <Popover>
               <PopoverTrigger asChild>

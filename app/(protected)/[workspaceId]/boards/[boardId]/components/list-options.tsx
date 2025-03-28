@@ -44,7 +44,6 @@ export const ListOptions = ({ data, onAddCard }: ListOptionsProps) => {
 
   const onDelete = () => {
     const workspaceId = currentWorkspace?.id;
-
     if (!workspaceId) {
       toast.error("Workspace ID is required.");
       return;
@@ -57,7 +56,6 @@ export const ListOptions = ({ data, onAddCard }: ListOptionsProps) => {
     const id = formData.get("id") as string;
     const boardId = formData.get("boardId") as string;
     const workspaceId = currentWorkspace?.id;
-
     if (!workspaceId) {
       toast.error("Workspace ID is required.");
       return;
