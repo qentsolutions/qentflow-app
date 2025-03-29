@@ -10,5 +10,4 @@ export const CreateBoard = z.object({
       message: "Title is too short.",
     }),
   workspaceId: z.string(),
-  projectId: z.string().optional(), // Add optional projectId
 });

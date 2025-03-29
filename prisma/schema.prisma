@@ -77,8 +77,6 @@ model User {
   sentInvitations       Invitation[]
   automations           Automation[]
   notes                 Note[]
-  project               Project[]
-  projectsMember        Project[]              @relation("ProjectMembers")
 }
 
 model Workspace {
@@ -98,7 +96,6 @@ model Workspace {
   automations        Automation[]
   automationActivity AutomationActivity[]
   notes              Note[]
-  project            Project[]
 }
 
 model Invitation {
@@ -121,11 +118,9 @@ model Document {
   id        String  @id @default(cuid())
   title     String
   content   String? @db.Text
-  projectId String? // Rendre optionnel pour la rétrocompatibilité
 
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  project     Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
   createdById String
   createdBy   User      @relation(fields: [createdById], references: [id])
   createdAt   DateTime  @default(now())
@@ -200,14 +195,12 @@ model Board {
   id          String  @id @default(uuid())
   workspaceId String
   title       String
-  projectId   String? // Rendre optionnel pour la rétrocompatibilité
 
   lists       List[]
   createdById String
   image       String?
 
   workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  project     Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
   automations Automation[]
 
   createdAt DateTime @default(now())
@@ -500,28 +493,5 @@ model Note {
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
-  @@index([createdById])
-}
-
-model Project {
-  id          String    @id @default(cuid())
-  name        String
-  description String?   @db.Text
-  icon        String? // Pour stocker une icône ou une couleur
-  logo        String? // Pour stocker le logo
-  workspaceId String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  createdById String
-  createdBy   User      @relation(fields: [createdById], references: [id])
-  members     User[]    @relation("ProjectMembers")
-
-  // Relations avec les différents outils
-  boards    Board[]
-  documents Document[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([workspaceId])
   @@index([createdById])
 }

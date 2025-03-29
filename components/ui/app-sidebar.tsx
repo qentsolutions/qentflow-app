@@ -30,7 +30,6 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
-import { NavProjects } from "./nav-projects";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useCurrentUser();
@@ -66,14 +65,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: `/${workspaceId}/my-tasks`,
         icon: ListTodo,
         count: taskCount,
-      },
-    ],
-    navProjects: [
-      {
-        name: "Projects",
-        url: `/${workspaceId}/projects`,
-        icon: Folder,
-        isActive: false,
       },
     ],
     navTools: [
@@ -114,7 +105,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarContent className="flex-1">
           {/* `flex-1` permet d'occuper l'espace vertical restant */}
           <NavMain projects={data.main} />
-          <NavProjects items={data.navProjects} />
           <NavTools items={data.navTools} />
         </SidebarContent>
       ) : null}

@@ -17,36 +17,6 @@ const BreadcrumbContext = createContext<BreadcrumbContextType | undefined>(undef
 
 export const BreadcrumbProvider = ({ children }: { children: ReactNode }) => {
   const [breadcrumbs, setBreadcrumbs] = useState<Breadcrumb[]>([]);
-  const params = useParams();
-  const pathname = usePathname();
-
-  // Fetch project details if we're in a board or document that belongs to a project
-  const { data: projectData } = useQuery({
-    queryKey: ["project-resource", params.boardId || params.documentId],
-    queryFn: async () => {
-      if (!params.workspaceId || (!params.boardId && !params.documentId)) return null;
-
-      const resourceId = params.boardId || params.documentId;
-      const response = await fetch(`/api/resources/${resourceId}/project`);
-      if (!response.ok) return null;
-      return response.json();
-    },
-    enabled: !!(params.workspaceId && (params.boardId || params.documentId)),
-  });
-
-  useEffect(() => {
-    if (projectData && (pathname.includes("/boards/") || pathname.includes("/documents/"))) {
-      setBreadcrumbs(prev => {
-        const newBreadcrumbs = [...prev];
-        // Insert project link before the current page
-        newBreadcrumbs.splice(-1, 0, {
-          label: projectData.name,
-          href: `/${params.workspaceId}/projects/${projectData.id}`,
-        });
-        return newBreadcrumbs;
-      });
-    }
-  }, [projectData, pathname, params.workspaceId]);
 
   return (
     <BreadcrumbContext.Provider value={{ breadcrumbs, setBreadcrumbs }}>

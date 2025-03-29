@@ -17,7 +17,6 @@ interface FormPopoverProps {
   align?: "start" | "center" | "end";
   sideOffset?: number;
   workspaceId: string;
-  projectId?: string; // Add projectId prop
 }
 
 export const FormPopover = ({
@@ -26,7 +25,6 @@ export const FormPopover = ({
   align,
   sideOffset = 0,
   workspaceId,
-  projectId, // Add projectId parameter
 }: FormPopoverProps) => {
   const router = useRouter();
   const closeRef = useRef<ElementRef<"button">>(null);
@@ -48,7 +46,6 @@ export const FormPopover = ({
     execute({
       title,
       workspaceId,
-      projectId: projectId || undefined, // Pass projectId if available
     });
   }
 

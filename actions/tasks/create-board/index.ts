@@ -20,7 +20,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  const { title, workspaceId, projectId } = data;
+  const { title, workspaceId } = data;
 
   if (!workspaceId) {
     return {
@@ -35,7 +35,6 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         title,
         workspaceId,
         createdById: user.id,
-        projectId: projectId || undefined, // Add projectId if available
         // Ajouter l'utilisateur dans la relation User du board
         User: {
           connect: {

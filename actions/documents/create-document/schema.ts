@@ -10,5 +10,4 @@ export const CreateDocument = z.object({
       message: "Title is too short",
     }),
   workspaceId: z.string(),
-  projectId: z.string().optional(), // Add optional projectId
 });
