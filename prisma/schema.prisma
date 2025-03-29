@@ -33,7 +33,7 @@ enum AutomationTriggerType {
   TASK_COMPLETED
   COMMENT_ADDED
   ATTACHMENT_ADDED
-  TASK_ADDED // Nouveau trigger
+  TASK_ADDED
   DUE_DATE_APPROACHING
   ALL_TASKS_COMPLETED
   USER_MENTIONED
@@ -79,6 +79,7 @@ model User {
   notes                 Note[]
   project               Project[]
   projectsMember        Project[]              @relation("ProjectMembers")
+  teamMembers           TeamMember[]
 }
 
 model Workspace {
@@ -99,12 +100,42 @@ model Workspace {
   automationActivity AutomationActivity[]
   notes              Note[]
   project            Project[]
+  teams              Team[]
+}
+
+model Team {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  members     TeamMember[]
+  boards      Board[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isDefault   Boolean   @default(false)
+
+  @@unique([name, workspaceId])
+  @@index([workspaceId])
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  teamId    String
+  userId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt  DateTime @default(now())
+
+  @@unique([teamId, userId])
+  @@index([teamId])
+  @@index([userId])
 }
 
 model Invitation {
   id          String    @id @default(cuid())
   email       String
-  status      String    @default("PENDING") // PENDING, ACCEPTED, DECLINED
+  status      String    @default("PENDING")
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   inviterId   String
@@ -121,7 +152,7 @@ model Document {
   id        String  @id @default(cuid())
   title     String
   content   String? @db.Text
-  projectId String? // Rendre optionnel pour la rétrocompatibilité
+  projectId String?
 
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
@@ -131,7 +162,7 @@ model Document {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   users       User[]    @relation("DocumentEditors")
-  cards       Card[]    @relation("CardDocuments") // Nouvelle relation
+  cards       Card[]    @relation("CardDocuments")
 
   @@index([workspaceId])
 }
@@ -142,18 +173,15 @@ model CalendarEvent {
   description String?  @db.Text
   startDate   DateTime
   endDate     DateTime
-  color       String? // Pour la personnalisation visuelle
+  color       String?
   isAllDay    Boolean  @default(false)
 
-  // Relation avec Card (optionnelle)
   cardId String?
   card   Card?   @relation(fields: [cardId], references: [id], onDelete: SetNull)
 
-  // Relation avec User
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Relation avec Workspace
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
@@ -199,14 +227,16 @@ model StripeCustomer {
 model Board {
   id          String  @id @default(uuid())
   workspaceId String
+  teamId      String
   title       String
-  projectId   String? // Rendre optionnel pour la rétrocompatibilité
+  projectId   String?
 
   lists       List[]
   createdById String
   image       String?
 
   workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  team        Team         @relation(fields: [teamId], references: [id])
   project     Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
   automations Automation[]
 
@@ -216,6 +246,8 @@ model Board {
   User                 User[]
   Tag                  Tag[]
   automationActivities AutomationActivity[]
+
+  @@index([teamId])
 }
 
 model List {
@@ -246,12 +278,12 @@ model Card {
   order       Int
   description String?   @db.Text
   priority    Priority?
-  archived    Boolean  @default(false) // Ajout du champ "archived" avec valeur par défaut à false
+  archived    Boolean   @default(false)
 
   listId String
   list   List   @relation(fields: [listId], references: [id], onDelete: Cascade)
 
-  assignedUserId String? // Ajout du champ pour stocker l'ID de l'utilisateur assigné
+  assignedUserId String?
   assignedUser   User?   @relation(fields: [assignedUserId], references: [id])
 
   createdAt   DateTime     @default(now())
@@ -259,7 +291,7 @@ model Card {
   startDate   DateTime?
   dueDate     DateTime?
   comments    Comment[]
-  documents   Document[]   @relation("CardDocuments") // Nouvelle relation
+  documents   Document[]   @relation("CardDocuments")
   attachments Attachment[]
 
   calendarEvents CalendarEvent[]
@@ -298,14 +330,14 @@ model Tag {
   Card      Card?    @relation(fields: [cardId], references: [id])
   cardId    String?
 
-  @@unique([name, boardId]) // Un tag doit être unique dans un board
+  @@unique([name, boardId])
 }
 
 model Attachment {
   id        String   @id @default(uuid())
   name      String
   url       String
-  key       String // S3 key for deletion
+  key       String
   cardId    String
   card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
@@ -319,7 +351,7 @@ model Comment {
   text     String  @db.Text
   cardId   String
   userId   String
-  modified Boolean @default(false) // Statut de lecture de la notification
+  modified Boolean @default(false)
 
   card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -403,25 +435,25 @@ model TwoFactorConfirmation {
 model Feedback {
   id        String   @id @default(cuid())
   content   String
-  userId    String? // Le ? indique que ce champ peut être null ou undefined
+  userId    String?
   createdAt DateTime @default(now())
 }
 
 model Notification {
-  id           String    @id @default(cuid()) // ID unique pour la notification
-  userId       String // L'utilisateur auquel la notification appartient
-  user         User      @relation(fields: [userId], references: [id]) // Relation avec l'utilisateur
-  workspaceId  String // ID du workspace associé à la notification
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  workspaceId  String
   workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  message      String // Message de la notification
+  message      String
   link         String?
-  isInvitation Boolean   @default(false) // Indique si la notification est une invitation
-  read         Boolean   @default(false) // Statut de lecture de la notification
-  createdAt    DateTime  @default(now()) // Date de création de la notification
-  updatedAt    DateTime  @updatedAt // Date de mise à jour de la notification
+  isInvitation Boolean   @default(false)
+  read         Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  @@index([userId]) // Index pour l'utilisateur
-  @@index([workspaceId]) // Index pour le workspace
+  @@index([userId])
+  @@index([workspaceId])
 }
 
 model Automation {
@@ -478,7 +510,7 @@ model AutomationActivity {
   board        Board?     @relation(fields: [boardId], references: [id])
   type         String
   description  String
-  status       String     @default("success") // success or error
+  status       String     @default("success")
   error        String?
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
@@ -507,15 +539,14 @@ model Project {
   id          String    @id @default(cuid())
   name        String
   description String?   @db.Text
-  icon        String? // Pour stocker une icône ou une couleur
-  logo        String? // Pour stocker le logo
+  icon        String?
+  logo        String?
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   createdById String
   createdBy   User      @relation(fields: [createdById], references: [id])
   members     User[]    @relation("ProjectMembers")
 
-  // Relations avec les différents outils
   boards    Board[]
   documents Document[]
 

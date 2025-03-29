@@ -22,7 +22,6 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { TeamSwitcher } from "./team-switcher";
 import { NavTools } from "./nav-tools";
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
@@ -31,6 +30,7 @@ import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
 import { NavProjects } from "./nav-projects";
+import { WorkspaceTeamSwitcher } from "./team-switcher";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useCurrentUser();
@@ -113,7 +113,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       className="bg-background flex flex-col h-screen" // Utiliser Flexbox pour un layout en colonne
     >
       <SidebarHeader>
-        <TeamSwitcher />
+        <WorkspaceTeamSwitcher />
       </SidebarHeader>
       {/* Vérification de l'existence de `currentWorkspace` */}
       {currentWorkspace ? (

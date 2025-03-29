@@ -3,6 +3,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { BreadcrumbProvider, useBreadcrumbs } from "@/hooks/use-breadcrumb";
+import { TeamProvider } from "@/hooks/use-current-team";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -29,16 +30,15 @@ const BreadcrumbHeader = () => {
 };
 
 const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
-
   return (
     <SidebarProvider>
       <BreadcrumbProvider>
-        <AppSidebar />
-        <main className="w-full"> 
-          <div>
-            {children}
-          </div>
-        </main>
+        <TeamProvider>
+          <AppSidebar />
+          <main className="w-full">
+            <div>{children}</div>
+          </main>
+        </TeamProvider>
       </BreadcrumbProvider>
     </SidebarProvider>
   );
