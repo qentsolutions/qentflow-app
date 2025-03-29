@@ -78,12 +78,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ],
     navTools: [
       {
-        name: "Boards",
-        url: `/${workspaceId}/boards`,
-        icon: LayoutList,
-        isActive: false,
-      },
-      {
         name: "Documents",
         url: `/${workspaceId}/documents`,
         icon: FileText,
