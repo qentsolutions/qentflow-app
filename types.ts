@@ -1,14 +1,19 @@
 import { Card, List, Tag, Document } from "@prisma/client";
 
 export type ListWithCards = List & {
-  cards: Card[];
+  cards: CardWithList[];
 };
 
 export type CardWithList = Card & {
   list: List;
   tags: Tag[];
   documents: Document[];
+  _count: {
+    comments: number;
+    attachments: number;
+  }; // Ajoutez cette ligne
 };
+
 export type Comment = {
   id: string;
   text: string;
@@ -47,7 +52,6 @@ export interface WhiteboardElement {
   };
   connectedTo?: string[];
 }
-
 
 export interface WhiteboardState {
   elements: WhiteboardElement[];

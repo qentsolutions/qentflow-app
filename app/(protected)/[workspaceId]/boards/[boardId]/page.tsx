@@ -64,6 +64,12 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                   color: true,
                 },
               },
+              _count: {
+                select: {
+                  comments: true, // Compte le nombre de commentaires
+                  attachments: true, // Compte le nombre de pièces jointes
+                },
+              },
             },
             orderBy: {
               order: "asc",
@@ -84,6 +90,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
       },
     },
   });
+
 
   if (!board) {
     return <div>Board not found</div>;

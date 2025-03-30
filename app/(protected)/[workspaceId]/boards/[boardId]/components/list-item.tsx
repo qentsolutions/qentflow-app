@@ -67,7 +67,13 @@ export const ListItem = ({ data, index, users }: ListItemProps) => {
                           <ContextMenuTrigger>
                             <CardItem
                               index={index}
-                              data={card}
+                              data={{
+                                ...card,
+                                _count: {
+                                  comments: card._count.comments,
+                                  attachments: card._count.attachments,
+                                },
+                              }}
                               users={users}
                             />
                           </ContextMenuTrigger>

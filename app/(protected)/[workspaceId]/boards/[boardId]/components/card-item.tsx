@@ -1,73 +1,65 @@
-"use client"
+"use client";
 
-import { MoreVertical } from "lucide-react"
-import type { Tag, User } from "@prisma/client"
-import { Draggable } from "@hello-pangea/dnd"
-import { useCardModal } from "@/hooks/use-card-modal"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { UserPlus, UserIcon, UserX, MessageSquareText, AlertTriangle, Paperclip, Flag, Check } from "lucide-react"
-import { useEffect, useState } from "react"
-import { toast } from "sonner"
-import { assignUserToCard } from "@/actions/boards/assign-user-to-card"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { useQuery } from "@tanstack/react-query"
-import { fetcher } from "@/lib/fetcher"
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
-import { createNotification } from "@/actions/notifications/create-notification"
-import { useCurrentUser } from "@/hooks/use-current-user"
-import { useParams } from "next/navigation"
-import { cn } from "@/lib/utils"
-import CardActions from "./card-actions"
-
-interface CommentCountResponse {
-  commentCount: number
-  attachmentsCount: number
-}
+import { MoreVertical } from "lucide-react";
+import type { Tag, User } from "@prisma/client";
+import { Draggable } from "@hello-pangea/dnd";
+import { useCardModal } from "@/hooks/use-card-modal";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { UserPlus, UserIcon, UserX, MessageSquareText, AlertTriangle, Paperclip, Flag, Check } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { assignUserToCard } from "@/actions/boards/assign-user-to-card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { createNotification } from "@/actions/notifications/create-notification";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { useParams } from "next/navigation";
+import { cn } from "@/lib/utils";
+import CardActions from "./card-actions";
 
 interface CardItemProps {
   data: {
-    id: string
-    title: string
-    order: number
-    description: string | null
-    listId: string
-    createdAt: Date
-    updatedAt: Date
-    assignedUserId?: string | null
-    tags?: Tag[]
-    priority: string | null
-    index?: number
+    id: string;
+    title: string;
+    order: number;
+    description: string | null;
+    listId: string;
+    createdAt: Date;
+    updatedAt: Date;
+    assignedUserId?: string | null;
+    tags?: Tag[];
+    priority: string | null;
+    index?: number;
     tasks?: {
-      id: string
-      completed: boolean
-    }[]
-    archived: boolean // Ajouter le champ archived
-  }
-  index: number
-  users: User[]
+      id: string;
+      completed: boolean;
+    }[];
+    archived: boolean;
+    _count: {
+      comments: number;
+      attachments: number;
+    };
+  };
+  index: number;
+  users: User[];
 }
 
 export const CardItem = ({ data, index, users }: CardItemProps) => {
-  const cardModal = useCardModal()
-  const [assignedUserState, setAssignedUserState] = useState<User | null>(null)
-  const currentUser = useCurrentUser()
-  const params = useParams()
+  const cardModal = useCardModal();
+  const [assignedUserState, setAssignedUserState] = useState<User | null>(null);
+  const currentUser = useCurrentUser();
+  const params = useParams();
 
   useEffect(() => {
-    const assignedUser = users.find((user) => user.id === data.assignedUserId) || null
-    setAssignedUserState(assignedUser)
-  }, [data.assignedUserId, users])
-
-  const { data: commentsData } = useQuery<CommentCountResponse>({
-    queryKey: ["card-comments", data?.id],
-    queryFn: () => fetcher(`/api/cards/${data?.id}/comments/count-in-card`),
-  })
+    const assignedUser = users.find((user) => user.id === data.assignedUserId) || null;
+    setAssignedUserState(assignedUser);
+  }, [data.assignedUserId, users]);
 
   const handleAssignUser = async (userId: string | null) => {
     try {
-      await assignUserToCard(data.id, userId || "null")
+      await assignUserToCard(data.id, userId || "null");
 
       if (userId) {
         await createNotification(
@@ -75,55 +67,55 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
           params?.workspaceId as string,
           `${currentUser?.name} has assigned you to a card: ${data?.title}!`,
           `/${params?.workspaceId}/boards/${params.boardId}/cards/${data?.id}`,
-        )
+        );
       }
 
       if (userId === null) {
-        setAssignedUserState(null)
-        toast.success("User unassigned from card")
+        setAssignedUserState(null);
+        toast.success("User unassigned from card");
       } else {
-        const assignedUser = users.find((user) => user.id === userId) || null
-        setAssignedUserState(assignedUser)
-        toast.success("User assigned to card")
+        const assignedUser = users.find((user) => user.id === userId) || null;
+        setAssignedUserState(assignedUser);
+        toast.success("User assigned to card");
       }
     } catch (error) {
-      toast.error("Failed to update user assignment")
+      toast.error("Failed to update user assignment");
     }
-  }
+  };
 
   const getPriorityDetails = (priority: string | null) => {
-    if (!priority) return { icon: null, color: "" }
+    if (!priority) return { icon: null, color: "" };
 
     switch (priority) {
       case "LOW":
         return {
           icon: <Flag className="text-emerald-500" size={14} />,
           color: "text-emerald-500",
-        }
+        };
       case "MEDIUM":
         return {
           icon: <Flag className="text-amber-500" size={14} />,
           color: "text-amber-500",
-        }
+        };
       case "HIGH":
         return {
           icon: <Flag className="text-rose-500" size={14} />,
           color: "text-rose-500",
-        }
+        };
       case "CRITICAL":
         return {
           icon: <AlertTriangle className="text-red-600" size={14} />,
           color: "text-red-600",
-        }
+        };
       default:
-        return { icon: null, color: "" }
+        return { icon: null, color: "" };
     }
-  }
+  };
 
-  const priorityDetails = getPriorityDetails(data.priority)
-  const completedTasks = data.tasks?.filter((task) => task.completed).length || 0
-  const totalTasks = data.tasks?.length || 0
-  const progressPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0
+  const priorityDetails = getPriorityDetails(data.priority);
+  const completedTasks = data.tasks?.filter((task) => task.completed).length || 0;
+  const totalTasks = data.tasks?.length || 0;
+  const progressPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
   return (
     <Draggable draggableId={data.id} index={index}>
@@ -194,19 +186,19 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
               <div className="flex items-center gap-2 text-muted-foreground text-xs">
                 <Tooltip>
                   <TooltipTrigger>
-                    {(commentsData?.commentCount ?? 0) > 0 && (
+                    {data._count.comments > 0 && (
                       <div className="flex items-center gap-1">
                         <MessageSquareText size={13} />
-                        <span>{commentsData?.commentCount ?? 0}</span>
+                        <span>{data._count.comments}</span>
                       </div>
                     )}
                   </TooltipTrigger>
                   <TooltipContent>
-                    {(commentsData?.commentCount ?? 0) > 0 && (
+                    {data._count.comments > 0 && (
                       <div className="flex items-center gap-1">
                         <MessageSquareText size={13} />
                         <span>
-                          {commentsData?.commentCount} {commentsData?.commentCount === 1 ? "comment" : "comments"}
+                          {data._count.comments} {data._count.comments === 1 ? "comment" : "comments"}
                         </span>
                       </div>
                     )}
@@ -215,20 +207,20 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
 
                 <Tooltip>
                   <TooltipTrigger>
-                    {(commentsData?.attachmentsCount ?? 0) > 0 && (
+                    {data._count.attachments > 0 && (
                       <div className="flex items-center gap-1">
                         <Paperclip size={13} />
-                        <span>{commentsData?.attachmentsCount}</span>
+                        <span>{data._count.attachments}</span>
                       </div>
                     )}
                   </TooltipTrigger>
                   <TooltipContent>
-                    {(commentsData?.attachmentsCount ?? 0) > 0 && (
+                    {data._count.attachments > 0 && (
                       <div className="flex items-center gap-1">
                         <Paperclip size={13} />
                         <span>
-                          {commentsData?.attachmentsCount}{" "}
-                          {commentsData?.attachmentsCount === 1 ? "attachment" : "attachments"}
+                          {data._count.attachments}{" "}
+                          {data._count.attachments === 1 ? "attachment" : "attachments"}
                         </span>
                       </div>
                     )}
@@ -363,6 +355,5 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
         </div>
       )}
     </Draggable>
-  )
-}
-
+  );
+};
