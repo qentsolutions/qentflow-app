@@ -32,7 +32,7 @@ export const CreateBoardModal = ({ isOpen, onClose, workspaceId, templateId }: C
 
   const { execute, isLoading } = useAction(createBoardFromTemplate, {
     onSuccess: (data) => {
-      toast.success("Board created successfully!")
+      toast.success("Project created successfully!")
       router.push(`/${workspaceId}/boards/${data.id}`)
       onClose()
     },
@@ -45,7 +45,7 @@ export const CreateBoardModal = ({ isOpen, onClose, workspaceId, templateId }: C
     e.preventDefault()
 
     if (title.trim().length < 2) {
-      setError("Board title must be at least 2 characters long."); // Set error message
+      setError("Project title must be at least 2 characters long."); // Set error message
       return;
     }
 
@@ -74,7 +74,7 @@ export const CreateBoardModal = ({ isOpen, onClose, workspaceId, templateId }: C
               <DialogTitle className="text-2xl font-bold flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Layout className="w-6 h-6 text-primary" />
-                  Create Board
+                  Create Project
                 </div>
               </DialogTitle>
             </DialogHeader>
@@ -88,7 +88,7 @@ export const CreateBoardModal = ({ isOpen, onClose, workspaceId, templateId }: C
               <form onSubmit={onSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="title" className="text-md font-medium text-gray-700">
-                    Board Title
+                    Project Title
                   </Label>
                   <Input
                     id="title"
@@ -114,7 +114,7 @@ export const CreateBoardModal = ({ isOpen, onClose, workspaceId, templateId }: C
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                   <div className="absolute bottom-4 left-4 text-white">
                     <h3 className="text-xl font-semibold">{template?.title}</h3>
-                    <p className="text-md opacity-80">Create your new board</p>
+                    <p className="text-md opacity-80">Create your new project</p>
                   </div>
                 </div>
                 <div className="flex justify-end gap-x-2">

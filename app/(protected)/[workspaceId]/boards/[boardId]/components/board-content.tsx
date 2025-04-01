@@ -430,7 +430,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
           </Tooltip>
         </div>
       </div>
-      <main className="w-full max-w-screen shadow-sm overflow-x-auto bg-background h-full px-2">
+      <main className="w-full max-w-screen shadow-sm overflow-x-auto bg-background h-[75vh] px-2">
         {renderView()}
       </main>
     </>

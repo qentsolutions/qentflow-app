@@ -180,7 +180,7 @@ export const Tasks = ({ cardId }: TasksProps) => {
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-x-1">
                             <ListTodo size={14} />
-                            <p className="text-lg font-semibold">Tasks</p>
+                            <p className="text-lg font-semibold">Checklist</p>
                             <div className="ml-2">{progress == 100 ? (<p className="text-xs text-green-600">Completed</p>) : (<></>)}</div>
                         </div>
 

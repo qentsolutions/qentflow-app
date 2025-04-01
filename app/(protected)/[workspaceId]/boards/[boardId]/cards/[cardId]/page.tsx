@@ -65,8 +65,8 @@ const CardPage = ({ params, readonly }: any) => {
     useEffect(() => {
         if (boardData && cardData) {
             setBreadcrumbs([
-                { label: "Boards", href: `/${currentWorkspace?.id}/boards` },
-                { label: boardData.title || "no board", href: `/${currentWorkspace?.id}/boards/${params.boardId}` },
+                { label: "Projects", href: `/${currentWorkspace?.id}/boards` },
+                { label: boardData.title || "no project", href: `/${currentWorkspace?.id}/boards/${params.boardId}` },
                 { label: cardData.title }
             ]);
         }

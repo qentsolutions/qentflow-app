@@ -46,7 +46,7 @@ export function NavTools({
   return (
     <SidebarGroup>
       <div className="group-data-[collapsible=icon]:hidden">
-        <SidebarGroupLabel>Tools</SidebarGroupLabel>
+        <SidebarGroupLabel>Collaboration</SidebarGroupLabel>
       </div>
       <div className="group-data-[collapsible=icon]:block hidden mb-2">
         <Separator />
@@ -59,7 +59,7 @@ export function NavTools({
             <SidebarMenuButton asChild>
               <Link href={`/${workspaceId}/boards`} className="ml-2">
                 <LayoutList className="h-4 w-4" />
-                <span className="ml-2">Boards</span>
+                <span className="ml-2">Projects</span>
               </Link>
             </SidebarMenuButton>
             <CollapsibleTrigger asChild>
@@ -83,7 +83,7 @@ export function NavTools({
 
               {!isLoading && boards && boards.length === 0 && (
                 <div className="py-3">
-                  <p className="text-xs text-muted-foreground mb-2">No boards yet</p>
+                  <p className="text-xs text-muted-foreground mb-2">No projects yet</p>
                   <Button
                     asChild
                     variant="ghost"
@@ -92,7 +92,7 @@ export function NavTools({
                   >
                     <Link href={`/${workspaceId}/boards/new`} className="flex items-center text-xs text-primary">
                       <Plus className="mr-1 h-3 w-3" />
-                      Create board
+                      Create project
                     </Link>
                   </Button>
                 </div>
