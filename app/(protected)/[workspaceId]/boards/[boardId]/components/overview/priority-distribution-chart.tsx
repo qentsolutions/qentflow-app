@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
-import { DonutChart, Title, Legend } from "@tremor/react";
+import { DonutChartCenterText } from "@/components/ui/donut-chart-center-text";
+import { Title } from "@tremor/react";
 
 interface PriorityDistribution {
   name: string;
@@ -13,22 +14,16 @@ interface PriorityDistributionChartProps {
 }
 
 export const PriorityDistributionChart = ({ data, selectedUserId }: PriorityDistributionChartProps) => {
+  // Calculer le total des cartes pour l'affichage central
+  const totalCards = data.reduce((acc, item) => acc + item.value, 0);
+
   return (
     <Card className="p-6">
       <Title>Cards by Priority</Title>
-      <div className="flex items-center">
-        <DonutChart
-          className="h-[200px] mt-4"
-          data={data}
-          category="value"
-          index="name"
-          colors={["red", "orange", "yellow", "emerald"]}
-          valueFormatter={(value) => `${value} tasks`}
-        />
-        <Legend
-          className="mt-4"
-          colors={["red", "orange", "yellow", "emerald"]}
-          categories={data.map(item => item.name)}
+      <div className="flex items-center justify-center h-full">
+        <DonutChartCenterText
+          data={data.map(item => ({ name: item.name, value: item.value }))}
+          total={totalCards}
         />
       </div>
     </Card>

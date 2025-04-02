@@ -6,6 +6,7 @@ import { AssignedTasksList } from "./assigned-task";
 import { TeamMembers } from "./team-members";
 import { useState } from "react";
 import { PriorityDistributionChart } from "./priority-distribution-chart";
+import { DonutChartCenterText } from "@/components/ui/donut-chart-center-text";
 
 interface List {
     id: string;
@@ -161,6 +162,7 @@ export const OverviewView = ({ lists, users }: OverviewViewProps) => {
                     changeDirection="neutral"
                 />
             </div>
+
 
             {/* Charts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
