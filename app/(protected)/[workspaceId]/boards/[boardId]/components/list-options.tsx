@@ -105,7 +105,7 @@ export const ListOptions = ({ data, onAddCard }: ListOptionsProps) => {
                 Confirm Deletion
               </h2>
               <p className="text-sm text-gray-600 mt-2">
-                Are you sure you want to delete the list "{data.title}"? All the cards contained in this list will also be deleted. This action cannot be undone.
+                Are you sure you want to delete the list &apos;{data.title}&apos;? All the cards contained in this list will also be deleted. This action cannot be undone.
               </p>
             </div>
             <DialogFooter>

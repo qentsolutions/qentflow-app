@@ -87,6 +87,7 @@ export const Actions = ({ card, boardId, readonly = false, lists, setOrderedData
 
   return (
     <div className="flex items-center gap-1 mr-6">
+      {/*
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
@@ -102,6 +103,7 @@ export const Actions = ({ card, boardId, readonly = false, lists, setOrderedData
           <p className="text-xs">Expand card</p>
         </TooltipContent>
       </Tooltip>
+  */}
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

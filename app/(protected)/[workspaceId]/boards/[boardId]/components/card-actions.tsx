@@ -214,7 +214,7 @@ export default function CardActions({ data, lists, setOrderedData, hideOptions =
                     className="w-full flex items-center gap-x-2 hover:bg-muted p-2 rounded-md transition text-left"
                 >
                     <ArrowRightToLine size={14} className="text-blue-600" />
-                    <span className="text-sm">Move to "{nextListName}"</span>
+                    <span className="text-sm">Move to &apos;{nextListName}&apos;</span>
                 </button>
             )}
             {!hideOptions && (

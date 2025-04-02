@@ -13,7 +13,9 @@ import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormInput } from "@/components/form/form-input";
 import { Button } from "@/components/ui/button";
-import { Edit, Eye } from 'lucide-react';
+import { Edit, Expand, Eye, Maximize2 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useCardModal } from "@/hooks/use-card-modal";
 
 interface HeaderProps {
   data: CardWithList;
@@ -28,6 +30,7 @@ export const Header = ({
   const params = useParams();
   const { currentWorkspace } = useCurrentWorkspace();
   const router = useRouter();
+  const cardModal = useCardModal();
 
   const { execute } = useAction(updateCard, {
     onSuccess: (data) => {
@@ -92,6 +95,7 @@ export const Header = ({
   };
 
   const onExpand = () => {
+    cardModal.onClose();
     router.push(`/${currentWorkspace?.id}/boards/${params.boardId}/cards/${data.id}`);
   };
 
@@ -124,34 +128,51 @@ export const Header = ({
           </div>
         </div>
       ) : (
-        <form action={onSubmit}>
-          {isEditing ? (
-            <FormInput
-              ref={inputRef}
-              onBlur={onBlur}
-              id="title"
-              defaultValue={title}
-              className="font-semibold text-xl px-1 py-1 h-auto bg-transparent focus-visible:bg-background border-none focus-visible:ring-1 w-full"
-            />
-          ) : (
-            <div className="flex items-center gap-x-2">
-              <h2
-                onClick={handleEditClick}
-                className="font-semibold text-xl px-1 py-1 w-full cursor-text hover:bg-accent/50 rounded transition"
-              >
-                {title}
-              </h2>
+        <div className="flex items-center">
+          <Tooltip>
+            <TooltipTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={handleEditClick}
-                className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={onExpand}
+                className="h-8 w-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
               >
-                <Edit className="h-4 w-4" />
+                <Maximize2 className="h-4 w-4" />
               </Button>
-            </div>
-          )}
-        </form>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="text-xs">Expand card</p>
+            </TooltipContent>
+          </Tooltip>
+          <form action={onSubmit}>
+            {isEditing ? (
+              <FormInput
+                ref={inputRef}
+                onBlur={onBlur}
+                id="title"
+                defaultValue={title}
+                className="font-semibold text-xl px-1 py-1 h-auto bg-transparent focus-visible:bg-background border-none focus-visible:ring-1 w-full"
+              />
+            ) : (
+              <div className="flex items-center gap-x-2">
+                <h2
+                  onClick={handleEditClick}
+                  className="font-semibold text-xl ml-2 px-1 py-1 w-full cursor-text hover:bg-accent/50 rounded transition"
+                >
+                  {title}
+                </h2>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleEditClick}
+                  className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </form>
+        </div>
       )}
     </div>
   );

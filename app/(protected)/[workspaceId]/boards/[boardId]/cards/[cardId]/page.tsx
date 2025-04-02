@@ -463,7 +463,7 @@ const CardPage = ({ params, readonly }: any) => {
                                     <Actions card={cardData} readonly={readonly} boardId={params.boardId} lists={[]} setOrderedData={function (data: ListWithCards[]): void {
                                         throw new Error("Function not implemented.");
                                     }} />
-                                </div>a
+                                </div>
                                 <Details card={cardData} />
                                 <TagsComponent data={cardData} availableTags={availableTags ?? []} readonly={readonly} />
                                 <Priority data={cardData} readonly={readonly} />
