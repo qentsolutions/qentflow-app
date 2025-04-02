@@ -25,6 +25,7 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/
 import { FileUpload } from "@/components/file-upload";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { BreadcrumbHeader } from "@/components/breadcrumbs";
+import { ListWithCards } from "@/types";
 
 const CardPage = ({ params, readonly }: any) => {
     const { currentWorkspace } = useCurrentWorkspace();
@@ -459,8 +460,10 @@ const CardPage = ({ params, readonly }: any) => {
                         ) : (
                             <div>
                                 <div className="mb-2 flex items-center justify-end w-full">
-                                    <Actions card={cardData} readonly={readonly} boardId={params.boardId} />
-                                </div>
+                                    <Actions card={cardData} readonly={readonly} boardId={params.boardId} lists={[]} setOrderedData={function (data: ListWithCards[]): void {
+                                        throw new Error("Function not implemented.");
+                                    }} />
+                                </div>a
                                 <Details card={cardData} />
                                 <TagsComponent data={cardData} availableTags={availableTags ?? []} readonly={readonly} />
                                 <Priority data={cardData} readonly={readonly} />

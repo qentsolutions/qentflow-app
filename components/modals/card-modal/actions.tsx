@@ -1,5 +1,3 @@
-"use client";
-
 import { toast } from "sonner";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -8,7 +6,7 @@ import { copyCard } from "@/actions/tasks/copy-card";
 import { deleteCard } from "@/actions/tasks/delete-card";
 import { useCardModal } from "@/hooks/use-card-modal";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
-import type { CardWithList } from "@/types";
+import type { CardWithList, ListWithCards } from "@/types";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -23,9 +21,11 @@ interface ActionsProps {
   card: CardWithList;
   readonly?: boolean;
   boardId: string;
+  lists: ListWithCards[];
+  setOrderedData: (data: ListWithCards[]) => void;
 }
 
-export const Actions = ({ card, boardId, readonly = false }: ActionsProps) => {
+export const Actions = ({ card, boardId, readonly = false, lists, setOrderedData }: ActionsProps) => {
   const params = useParams();
   const router = useRouter();
   const cardModal = useCardModal();
@@ -113,7 +113,7 @@ export const Actions = ({ card, boardId, readonly = false }: ActionsProps) => {
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-40 p-2" side="bottom" align="end">
-          <CardActions data={card} />
+          <CardActions data={card} lists={lists} setOrderedData={setOrderedData} hideOptions={true} />
         </DropdownMenuContent>
       </DropdownMenu>
 

@@ -18,6 +18,7 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import CardActions from "./card-actions";
+import { ListWithCards } from "@/types";
 
 interface CardItemProps {
   data: {
@@ -44,9 +45,11 @@ interface CardItemProps {
   };
   index: number;
   users: User[];
+  lists: ListWithCards[];
+  setOrderedData: (data: ListWithCards[]) => void;
 }
 
-export const CardItem = ({ data, index, users }: CardItemProps) => {
+export const CardItem = ({ data, index, users, lists, setOrderedData }: CardItemProps) => {
   const cardModal = useCardModal();
   const [assignedUserState, setAssignedUserState] = useState<User | null>(null);
   const currentUser = useCurrentUser();
@@ -347,8 +350,8 @@ export const CardItem = ({ data, index, users }: CardItemProps) => {
                   <MoreVertical size={16} />
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-40 p-2" side="bottom" align="end">
-                <CardActions data={data} />
+              <PopoverContent className="p-2 w-full" side="bottom" align="end">
+                <CardActions data={data} lists={lists} setOrderedData={setOrderedData} />
               </PopoverContent>
             </Popover>
           </div>

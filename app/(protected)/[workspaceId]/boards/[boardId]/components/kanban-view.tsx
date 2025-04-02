@@ -159,7 +159,7 @@ export const KanbanView = ({ data, boardId, users }: ListContainerProps) => {
             className="flex gap-x-3 h-full pb-6 p-2 md:max-w-6xl px-4"
           >
             {orderedData.map((list, index) => (
-              <ListItem key={list.id} index={index} data={list} users={users} />
+              <ListItem key={list.id} index={index} data={list} users={users} lists={orderedData} setOrderedData={setOrderedData} />
             ))}
             {provided.placeholder}
             <ListForm />
@@ -168,6 +168,5 @@ export const KanbanView = ({ data, boardId, users }: ListContainerProps) => {
         )}
       </Droppable>
     </DragDropContext>
-
   );
 };

@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { CardWithList, Comment } from "@/types";
+import { CardWithList, Comment, ListWithCards } from "@/types";
 import { AuditLog } from "@prisma/client";
 import { useCardModal } from "@/hooks/use-card-modal";
 import { fetcher } from "@/lib/fetcher";
@@ -70,6 +70,14 @@ export const CardModal = () => {
     queryFn: () => fetcher(`/api/cards/${id}/attachments`),
   });
 
+  const lists: ListWithCards[] = [
+    // Add your lists here
+  ];
+
+  const setOrderedData = (data: ListWithCards[]) => {
+    // Implement your logic to update the ordered data
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="overflow-y-auto p-0 max-w-3xl sm:max-w-3xl md:max-w-4xl lg:max-w-5xl" side="rightLarge">
@@ -80,7 +88,7 @@ export const CardModal = () => {
             ) : (
               <div className="flex items-center justify-between">
                 <Header data={cardData} />
-                <Actions card={cardData} boardId={boardIdString} />
+                <Actions card={cardData} boardId={boardIdString} lists={lists} setOrderedData={setOrderedData} />
               </div>
             )}
           </div>
@@ -231,7 +239,7 @@ export const CardModal = () => {
                   </h3>
 
                   <Tabs defaultValue="comments" className="w-full">
-                    <TabsList className=" mb-4">
+                    <TabsList className="mb-4">
                       <TabsTrigger value="comments" className="flex items-center gap-1">
                         <MessageSquareText size={14} /> Comments
                       </TabsTrigger>

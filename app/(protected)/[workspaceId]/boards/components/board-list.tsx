@@ -132,7 +132,7 @@ export const BoardList: React.FC = () => {
   const [recentBoardIds, setRecentBoardIds] = useState<string[]>([])
 
   useEffect(() => {
-    document.title = "Boards - Qentflow"
+    document.title = "Projects - Qentflow"
     setRecentBoardIds(getRecentBoards())
   }, [])
 
@@ -195,7 +195,7 @@ export const BoardList: React.FC = () => {
             <div className="flex items-center mb-4 gap-x-2">
               <span className="text-2xl font-semibold flex items-center gap-x-2">
                 <KanbanSquare size={24} />
-                Boards
+                Projects
                 <span
                   className={cn("text-2xl font-semibold", openBoards?.length > 0 ? "text-blue-600" : "text-gray-400")}
                 >
