@@ -1,9 +1,5 @@
 import { Card, List, Tag, Document } from "@prisma/client";
 
-export type ListWithCards = List & {
-  cards: CardWithList[];
-};
-
 export type CardWithList = Card & {
   list: List;
   tags: Tag[];
@@ -11,7 +7,23 @@ export type CardWithList = Card & {
   _count: {
     comments: number;
     attachments: number;
-  }; // Ajoutez cette ligne
+  };
+  tasks?: {
+    id: string;
+    completed: boolean;
+  }[];
+  priority: string | null; // Ajoutez cette ligne pour inclure la propriété 'priority'
+  assignedUserId?: string | null; // Ajoutez cette ligne pour inclure la propriété 'assignedUserId'
+  startDate?: Date | null; // Ajoutez cette ligne pour inclure la propriété 'startDate'
+  dueDate?: Date | null; // Ajoutez cette ligne pour inclure la propriété 'dueDate'
+};
+
+export type ListWithCards = List & {
+  cards: CardWithList[];
+  order: number; // Ajoutez cette ligne pour inclure la propriété 'order'
+  boardId: string; // Ajoutez cette ligne pour inclure la propriété 'boardId'
+  createdAt: Date; // Ajoutez cette ligne pour inclure la propriété 'createdAt'
+  updatedAt: Date; // Ajoutez cette ligne pour inclure la propriété 'updatedAt'
 };
 
 export type Comment = {

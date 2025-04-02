@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { useCardModal } from "@/hooks/use-card-modal"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { format } from "date-fns"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import { useCardModal } from "@/hooks/use-card-modal";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   Calendar,
   CheckSquare,
@@ -16,66 +16,46 @@ import {
   Flag,
   GripVertical,
   Copy,
-} from "lucide-react"
-import { Progress } from "@/components/ui/progress"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { deleteCard } from "@/actions/tasks/delete-card"
-import { useAction } from "@/hooks/use-action"
-import { toast } from "sonner"
-import { useParams } from "next/navigation"
-import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
-import { copyCard } from "@/actions/tasks/copy-card"
+} from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { deleteCard } from "@/actions/tasks/delete-card";
+import { useAction } from "@/hooks/use-action";
+import { toast } from "sonner";
+import { useParams } from "next/navigation";
+import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
+import { copyCard } from "@/actions/tasks/copy-card";
+import CardActions from "./card-actions";
+import { ListWithCards, CardWithList } from "@/types";
+import { useState } from "react";
 
 interface TableViewProps {
-  boardId: string
-  users: any
-  data: {
-    id: string
-    title: string
-    cards: {
-      id: string
-      title: string
-      order: number
-      listId: string
-      createdAt: Date
-      priority: string
-      updatedAt: Date
-      assignedUserId?: string | null
-      tags?: {
-        id: string
-        name: string
-        color: string
-      }[]
-      tasks?: {
-        id: string
-        completed: boolean
-      }[]
-      startDate?: Date | null
-      dueDate?: Date | null
-    }[]
-  }[]
+  boardId: string;
+  data: ListWithCards[];
+  users: any;
   visibleFields: {
-    title: boolean
-    priority: boolean
-    assignee: boolean
-    dueDate: boolean
-    tasks: boolean
-    tags: boolean
-  }
+    title: boolean;
+    priority: boolean;
+    assignee: boolean;
+    tags: boolean;
+    dueDate: boolean;
+    tasks: boolean;
+  };
 }
 
 export const TableView = ({ data, visibleFields, users }: TableViewProps) => {
-  const cardModal = useCardModal()
-  const { currentWorkspace } = useCurrentWorkspace()
-  const params = useParams()
+  const cardModal = useCardModal();
+  const { currentWorkspace } = useCurrentWorkspace();
+  const params = useParams();
+  const [lists, setLists] = useState<ListWithCards[]>(data);
 
   const allCards = data.flatMap((list) =>
     list.cards.map((card) => ({
       ...card,
       listTitle: list.title,
     })),
-  )
+  );
 
   const { execute: executeCopyCard, isLoading: isLoadingCopy } = useAction(copyCard, {
     onSuccess: (data) => {
@@ -104,46 +84,46 @@ export const TableView = ({ data, visibleFields, users }: TableViewProps) => {
 
   const PriorityIcon = (priority: string | null) => {
     if (!priority) {
-      return null // Si priority est null, ne rien afficher
+      return null;
     }
     if (priority === "LOW") {
-      return <Flag className="text-green-500" size={14} />
+      return <Flag className="text-green-500" size={14} />;
     }
     if (priority === "MEDIUM") {
-      return <Flag className="text-yellow-500" size={14} />
+      return <Flag className="text-yellow-500" size={14} />;
     }
     if (priority === "HIGH") {
-      return <Flag className="text-red-500" size={14} />
+      return <Flag className="text-red-500" size={14} />;
     }
     if (priority === "CRITICAL") {
-      return <AlertTriangle className="text-red-500" size={14} />
+      return <AlertTriangle className="text-red-500" size={14} />;
     }
-    return null // Si aucune correspondance, ne rien afficher
-  }
+    return null;
+  };
 
   const { execute: executeDeleteCard } = useAction(deleteCard, {
     onSuccess: (data) => {
-      toast.success(`Card "${data.title}" deleted`)
+      toast.success(`Card "${data.title}" deleted`);
     },
     onError: (error) => {
-      toast.error(error)
+      toast.error(error);
     },
-  })
+  });
 
   const onDelete = (cardId: string) => {
-    const workspaceId = currentWorkspace?.id
+    const workspaceId = currentWorkspace?.id;
 
     if (!workspaceId) {
-      toast.error("Workspace ID is required.")
-      return
+      toast.error("Workspace ID is required.");
+      return;
     }
 
     executeDeleteCard({
       id: cardId,
       boardId: Array.isArray(params?.boardId) ? params.boardId[0] : params?.boardId || "",
       workspaceId,
-    })
-  }
+    });
+  };
 
   return (
     <div className="space-y-4 p-4">
@@ -250,7 +230,7 @@ export const TableView = ({ data, visibleFields, users }: TableViewProps) => {
                   )}
                   {visibleFields.tasks && (
                     <TableCell className="px-6 py-4 border-r border-gray-100 last:border-r-0 w-[150px]">
-                      {card.tasks && card.tasks.length > 0 && (
+                      {card?.tasks && card.tasks.length > 0 && (
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center gap-2">
                             <CheckSquare className="h-4 w-4" />
@@ -270,7 +250,7 @@ export const TableView = ({ data, visibleFields, users }: TableViewProps) => {
                     <TableCell className="px-6 py-4 border-r border-gray-100 last:border-r-0 w-[180px]">
                       <div className="flex flex-wrap gap-1">
                         {card.tags?.map((tag) => (
-                          <Badge key={tag.id} className="text-white" style={{ backgroundColor: tag.color }}>
+                          <Badge key={tag.id} className="text-white" style={{ backgroundColor: tag.color || "#ff0000" }}>
                             {tag.name}
                           </Badge>
                         ))}
@@ -288,32 +268,16 @@ export const TableView = ({ data, visibleFields, users }: TableViewProps) => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => { onCopy(card.id) }}
-                          disabled={isLoadingCopy}
-                          className="cursor-pointer"
-                        >
-                          <Copy className="h-4 w-4 mr-2" />
-                          <span>Duplicate</span>
-                        </DropdownMenuItem>
-
-                        <DropdownMenuItem
-                          className="cursor-pointer"
-                          onClick={() => onDelete(card.id)}
-                        >
-                          <Trash size={16} className="text-red-500 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
+                        <CardActions data={card} lists={lists} setOrderedData={setLists} />
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
-              )
+              );
             })}
           </TableBody>
         </Table>
       </div>
     </div>
-  )
-}
-
+  );
+};

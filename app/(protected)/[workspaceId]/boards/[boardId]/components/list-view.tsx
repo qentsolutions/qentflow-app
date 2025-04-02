@@ -1,129 +1,106 @@
-"use client"
+"use client";
 
-import { useCardModal } from "@/hooks/use-card-modal"
-import { Badge } from "@/components/ui/badge"
-import { ChevronDown, ChevronUp, Plus, TargetIcon, UserRound, Tags, MoreHorizontal, Trash, GripVertical, Calendar, MessageSquare, Paperclip, CheckSquare, SignalLow, SignalMedium, SignalHigh, AlertTriangle, Signal, Flag, Copy } from 'lucide-react'
-import { useState, useEffect } from "react"
-import { toast } from "sonner"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd"
-import { useAction } from "@/hooks/use-action"
-import { updateCardOrder } from "@/actions/tasks/update-card-order"
-import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
-import { ListForm } from "./list-form"
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { assignUserToCard } from "@/actions/boards/assign-user-to-card"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { deleteCard } from "@/actions/tasks/delete-card"
-import { useParams } from "next/navigation"
-import { format } from "date-fns"
-import { Progress } from "@/components/ui/progress"
-import { useQuery } from "@tanstack/react-query"
-import { fetcher } from "@/lib/fetcher"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { createNotification } from "@/actions/notifications/create-notification"
-import { useCurrentUser } from "@/hooks/use-current-user"
-import { copyCard } from "@/actions/tasks/copy-card"
+import { useCardModal } from "@/hooks/use-card-modal";
+import { Badge } from "@/components/ui/badge";
+import { ChevronDown, ChevronUp, Plus, TargetIcon, UserRound, Tags, MoreHorizontal, Trash, GripVertical, Calendar, MessageSquare, Paperclip, CheckSquare, SignalLow, SignalMedium, SignalHigh, AlertTriangle, Signal, Flag, Copy } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { useAction } from "@/hooks/use-action";
+import { updateCardOrder } from "@/actions/tasks/update-card-order";
+import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
+import { ListForm } from "./list-form";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { assignUserToCard } from "@/actions/boards/assign-user-to-card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { deleteCard } from "@/actions/tasks/delete-card";
+import { useParams } from "next/navigation";
+import { format } from "date-fns";
+import { Progress } from "@/components/ui/progress";
+import { useQuery } from "@tanstack/react-query";
+import { fetcher } from "@/lib/fetcher";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { createNotification } from "@/actions/notifications/create-notification";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { copyCard } from "@/actions/tasks/copy-card";
+import CardActions from "./card-actions";
+import { ListWithCards } from "@/types";
 
 interface ListViewProps {
-    boardId: string
-    data: {
-        id: string
-        title: string
-        cards: {
-            id: string
-            title: string
-            order: number
-            description: string | null
-            listId: string
-            createdAt: Date
-            updatedAt: Date
-            priority: string
-            assignedUserId?: string | null
-            tags?: {
-                id: string
-                name: string
-                color: string
-            }[]
-            tasks?: {
-                id: string
-                completed: boolean
-            }[]
-            startDate?: Date | null
-            dueDate?: Date | null
-        }[]
-    }[]
-    users: any
+    boardId: string;
+    data: ListWithCards[];
+    users: any;
     visibleFields: {
-        title: boolean
-        priority: boolean
-        assignee: boolean
-        tags: boolean
-        dueDate: boolean
-        tasks: boolean
-    }
+        title: boolean;
+        priority: boolean;
+        assignee: boolean;
+        tags: boolean;
+        dueDate: boolean;
+        tasks: boolean;
+    };
 }
 
 export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewProps) => {
-    const cardModal = useCardModal()
-    const [openLists, setOpenLists] = useState<string[]>(data.map((list) => list.id))
-    const [lists, setLists] = useState(data)
-    const { currentWorkspace } = useCurrentWorkspace()
-    const [openAssign, setOpenAssign] = useState<string | null>(null)
-    const params = useParams()
+    const cardModal = useCardModal();
+    const [openLists, setOpenLists] = useState<string[]>(data.map((list) => list.id));
+    const [lists, setLists] = useState<ListWithCards[]>(data);
+    const { currentWorkspace } = useCurrentWorkspace();
+    const [openAssign, setOpenAssign] = useState<string | null>(null);
+    const params = useParams();
     const currentUser = useCurrentUser();
 
     useEffect(() => {
-        setLists(data)
-    }, [data])
+        setLists(data);
+    }, [data]);
 
     const { execute: executeUpdateCardOrder } = useAction(updateCardOrder, {
         onSuccess: () => {
-            toast.success("Card moved successfully")
+            toast.success("Card moved successfully");
         },
         onError: (error) => {
-            toast.error(error)
+            toast.error(error);
         },
-    })
+    });
 
     const toggleList = (listId: string) => {
-        setOpenLists((prev) => (prev.includes(listId) ? prev.filter((id) => id !== listId) : [...prev, listId]))
-    }
+        setOpenLists((prev) => (prev.includes(listId) ? prev.filter((id) => id !== listId) : [...prev, listId]));
+    };
 
     const onDragEnd = (result: any) => {
-        const { destination, source } = result
-        if (!destination) return
+        const { destination, source } = result;
+        if (!destination) return;
         if (destination.droppableId === source.droppableId && destination.index === source.index) {
-            return
+            return;
         }
 
-        const newLists = [...lists]
-        const sourceList = newLists.find((list) => list.id === source.droppableId)
-        const destList = newLists.find((list) => list.id === destination.droppableId)
-        if (!sourceList || !destList) return
-        const [movedCard] = sourceList.cards.splice(source.index, 1)
-        movedCard.listId = destination.droppableId
-        destList.cards.splice(destination.index, 0, movedCard)
-        destList.cards.forEach((card, idx) => {
-            card.order = idx
-        })
-        const workspaceId = currentWorkspace?.id
+        const newLists = [...lists];
+        const sourceList = newLists.find((list) => list.id === source.droppableId);
+        const destList = newLists.find((list) => list.id === destination.droppableId);
+        if (!sourceList || !destList) return;
+        const [movedCard] = sourceList.cards.splice(source.index, 1);
+        movedCard.listId = destination.droppableId;
+        destList.cards.splice(destination.index, 0, movedCard);
+        destList.cards.forEach((card: any, idx: any) => {
+            card.order = idx;
+        });
+        const workspaceId = currentWorkspace?.id;
         if (!workspaceId) {
-            toast.error("Workspace not found")
-            return
+            toast.error("Workspace not found");
+            return;
         }
-        setLists(newLists)
+        setLists(newLists);
         executeUpdateCardOrder({
             boardId: boardId,
             items: destList.cards,
             workspaceId,
-        })
-    }
+        });
+    };
 
     const handleAssignUser = async (cardId: string, userId: string) => {
-        await assignUserToCard(cardId, userId!)
+        await assignUserToCard(cardId, userId!);
         const card = lists.flatMap(list => list.cards).find(card => card.id === cardId);
         await createNotification(
             userId || "",
@@ -134,12 +111,12 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
         setLists((prevLists) =>
             prevLists.map((list) => ({
                 ...list,
-                cards: list.cards.map((card) => (card.id === cardId ? { ...card, assignedUserId: userId } : card)),
+                cards: list.cards.map((card: any) => (card.id === cardId ? { ...card, assignedUserId: userId } : card)),
             })),
-        )
-        toast.success("User assigned successfully")
-        setOpenAssign(null)
-    }
+        );
+        toast.success("User assigned successfully");
+        setOpenAssign(null);
+    };
 
     const { execute: executeCopyCard, isLoading: isLoadingCopy } = useAction(copyCard, {
         onSuccess: (data) => {
@@ -167,30 +144,30 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
 
     const { execute: executeDeleteCard } = useAction(deleteCard, {
         onSuccess: (data) => {
-            toast.success(`Card "${data.title}" deleted`)
+            toast.success(`Card "${data.title}" deleted`);
         },
         onError: (error) => {
-            toast.error(error)
+            toast.error(error);
         },
-    })
+    });
 
     const onDelete = (cardId: string) => {
-        const workspaceId = currentWorkspace?.id
+        const workspaceId = currentWorkspace?.id;
 
         if (!workspaceId) {
-            toast.error("Workspace ID is required.")
-            return
+            toast.error("Workspace ID is required");
+            return;
         }
         executeDeleteCard({
             id: cardId,
             boardId: Array.isArray(params?.boardId) ? params.boardId[0] : params?.boardId || "",
             workspaceId,
-        })
-    }
+        });
+    };
 
     const PriorityIcon = (priority: string | null) => {
         if (!priority) {
-            return null; // Si priority est null, ne rien afficher
+            return null;
         }
         if (priority === "LOW") {
             return <Flag className="text-green-500" size={14} />;
@@ -204,7 +181,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
         if (priority === "CRITICAL") {
             return <AlertTriangle className="text-red-500" size={14} />;
         }
-        return null; // Si aucune correspondance, ne rien afficher
+        return null;
     };
 
     return (
@@ -240,7 +217,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                             <thead>
                                                 <tr className="border-b border-gray-200 bg-gray-50 dark:bg-gray-800">
                                                     {visibleFields.title && (
-                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[180px] border-r border-gray-100 last:border-r-0">
+                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[250px] border-r border-gray-100 last:border-r-0">
                                                             <div className="flex items-center gap-x-2">
                                                                 <TargetIcon size={14} />
                                                                 Title
@@ -248,7 +225,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                         </th>
                                                     )}
                                                     {visibleFields.priority && (
-                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[180px] border-r border-gray-100 last:border-r-0">
+                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px] border-r border-gray-100 last:border-r-0">
                                                             <div className="flex items-center gap-x-2">
                                                                 <Flag size={14} />
                                                                 Priority
@@ -287,13 +264,11 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                             </div>
                                                         </th>
                                                     )}
-
-
                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {list.cards.map((card, index) => {
+                                                {list.cards.map((card: any, index: any) => {
                                                     return (
                                                         <Draggable key={card.id} draggableId={card.id} index={index}>
                                                             {(provided) => (
@@ -305,9 +280,9 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                                     onClick={() => cardModal.onOpen(card.id)}
                                                                 >
                                                                     {visibleFields.title && (
-                                                                        <td className="px-6 py-4 border-r border-gray-100 last:border-r-0">
-                                                                            <div className="flex items-center gap-x-3">
-                                                                                <GripVertical size={16} className="text-gray-400" />
+                                                                        <td className="py-4 border-r border-gray-100 last:border-r-0 w-[250px]">
+                                                                            <div className="flex items-center gap-x-3 pl-2">
+                                                                                <GripVertical size={16} className="text-gray-400 flex-shrink-0" />
                                                                                 <span className="text-sm font-medium text-gray-900 line-clamp-2 overflow-hidden">
                                                                                     {card.title}
                                                                                 </span>
@@ -315,7 +290,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                                         </td>
                                                                     )}
                                                                     {visibleFields.priority && (
-                                                                        <td className="px-6 py-4 border-r border-gray-100 last:border-r-0">
+                                                                        <td className="px-6 py-4 border-r border-gray-100 last:border-r-0 w-[100px]">
                                                                             <div className="mr-1 flex items-center justify-center">
                                                                                 <Tooltip>
                                                                                     <TooltipTrigger>
@@ -384,9 +359,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                                                                     </p>
                                                                                                 </TooltipContent>
                                                                                             </Tooltip>
-
                                                                                         </div>
-
                                                                                     )}
                                                                                 </PopoverTrigger>
                                                                                 <PopoverContent className="w-[200px] p-0">
@@ -455,7 +428,6 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                                             </div>
                                                                         </td>
                                                                     )}
-
                                                                     <td
                                                                         className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
                                                                         onClick={(e) => e.stopPropagation()}
@@ -467,30 +439,14 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                                                                 </Button>
                                                                             </DropdownMenuTrigger>
                                                                             <DropdownMenuContent align="end">
-                                                                                <DropdownMenuItem
-                                                                                    onClick={() => { onCopy(card.id) }}
-                                                                                    disabled={isLoadingCopy}
-                                                                                    className="cursor-pointer"
-                                                                                >
-                                                                                    <Copy className="h-4 w-4 mr-2" />
-                                                                                    <span>Duplicate</span>
-                                                                                </DropdownMenuItem>
-                                                                                <DropdownMenuItem
-                                                                                    className="cursor-pointer"
-                                                                                    onClick={() => {
-                                                                                        onDelete(card.id)
-                                                                                    }}
-                                                                                >
-                                                                                    <Trash size={16} className=" text-red-500 mr-2" />
-                                                                                    Delete
-                                                                                </DropdownMenuItem>
+                                                                                <CardActions data={card} lists={lists} setOrderedData={setLists} />
                                                                             </DropdownMenuContent>
                                                                         </DropdownMenu>
                                                                     </td>
                                                                 </tr>
                                                             )}
                                                         </Draggable>
-                                                    )
+                                                    );
                                                 })}
                                                 {provided.placeholder}
                                             </tbody>
@@ -504,5 +460,5 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                 <ListForm />
             </div>
         </DragDropContext>
-    )
-}
+    );
+};
