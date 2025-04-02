@@ -3,7 +3,7 @@
 import { toast } from "sonner";
 import { List } from "@prisma/client";
 import { ElementRef, useRef } from "react";
-import { Copy, MoreHorizontal, PlusCircle, Trash } from "lucide-react";
+import { Copy, MoreHorizontal, PlusCircle, Trash2 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { useAction } from "@/hooks/use-action";
@@ -70,36 +70,34 @@ export const ListOptions = ({ data, onAddCard }: ListOptionsProps) => {
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="px-0 w-40 py-2" side="bottom" align="start">
-        <div className="text-sm font-medium text-center text-neutral-600 pb-2">
-          List actions
-        </div>
-        <Separator />
-        <Button
+      <PopoverContent className="w-40 p-2" side="bottom" align="start">
+        <button
           onClick={onAddCard}
-          className="rounded-none w-full h-auto p-2 px-5 justify-between font-normal text-sm"
-          variant="ghost"
+          className="w-full flex items-center gap-x-2 hover:bg-muted p-2 rounded-md transition text-left"
         >
-          Add card <PlusCircle className="text-gray-500" />
-        </Button>
+          <PlusCircle className="text-gray-700" size={14} />
+          <span className="text-sm">Add card</span>
+        </button>
         <form action={onCopy}>
           <input hidden name="id" id="id" value={data.id} />
           <input hidden name="boardId" id="boardId" value={data.boardId} />
-          <Button
-            variant="ghost"
-            className="rounded-none w-full h-auto p-2 px-5 justify-between font-normal text-sm"
+          <button
+            type="submit"
+            className="w-full flex items-center gap-x-2 hover:bg-muted p-2 rounded-md transition text-left"
           >
-            Copy list <Copy className="text-gray-500" />
-          </Button>
+            <Copy className="text-gray-700" size={14} />
+            <span className="text-sm">Copy list</span>
+          </button>
         </form>
+        <Separator />
         <Dialog>
           <DialogTrigger asChild>
-            <Button
-              className="rounded-none w-full h-auto p-2 px-5 justify-between font-normal text-sm"
-              variant="ghost"
+            <button
+              className="w-full flex items-center gap-x-2 hover:bg-muted p-2 rounded-md transition text-left"
             >
-              Delete list <Trash className="text-gray-500" />
-            </Button>
+              <Trash2 className="text-red-500" size={14} />
+              <span className="text-sm">Delete list</span>
+            </button>
           </DialogTrigger>
           <DialogContent>
             <div className="text-center">
@@ -107,25 +105,21 @@ export const ListOptions = ({ data, onAddCard }: ListOptionsProps) => {
                 Confirm Deletion
               </h2>
               <p className="text-sm text-gray-600 mt-2">
-                <p className="text-sm text-gray-600 mt-2">
-                  Are you sure you want to delete the list &quot;{data.title}&quot;? All the cards contained in this list will also be deleted. This action cannot be undone.
-                </p>
+                Are you sure you want to delete the list "{data.title}"? All the cards contained in this list will also be deleted. This action cannot be undone.
               </p>
             </div>
             <DialogFooter>
               <DialogClose>
                 <Button variant="ghost" onClick={() => closeRef.current?.click()}>
-                Cancel
-              </Button>
+                  Cancel
+                </Button>
               </DialogClose>
-              
               <Button variant="destructive" onClick={onDelete}>
                 Confirm
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
-        <Separator />
       </PopoverContent>
     </Popover>
   );

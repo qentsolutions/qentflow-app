@@ -340,11 +340,11 @@ export const CardItem = ({ data, index, users, lists, setOrderedData }: CardItem
           )}
 
           {/* MoreVertical Icon for additional menu */}
-          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-75 hover:opacity-100 transition-opacity">
             <Popover>
               <PopoverTrigger asChild>
                 <button
-                  className="hover:opacity-75 transition p-1 rounded-lg hover:bg-gray-100"
+                  className="transition p-1 rounded-lg bg-gray-100 hover:bg-gray-100"
                   onClick={(e) => e.stopPropagation()} // Stop propagation to prevent card click
                 >
                   <MoreVertical size={16} />
@@ -355,6 +355,8 @@ export const CardItem = ({ data, index, users, lists, setOrderedData }: CardItem
               </PopoverContent>
             </Popover>
           </div>
+
+
         </div>
       )}
     </Draggable>
