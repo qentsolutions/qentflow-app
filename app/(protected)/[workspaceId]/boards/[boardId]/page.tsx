@@ -43,23 +43,34 @@ const transformCardsToGanttFeatures = (cards: any) => {
     endAt: new Date(card.dueDate),
     status: {
       id: card.id,
-      name: card.title,
+      name: card.list.title,
       color: getPriorityColor(card.priority),
     },
+    assignedTo: card.assignedUser ? [{ id: card.assignedUser.id, name: card.assignedUser.name }] : [],
   }));
 };
 
 const getPriorityColor = (priority: any) => {
   switch (priority) {
+    case 'CRITICAL':
+      return '#b91c1c'; // Rouge foncé pour CRITICAL
     case 'HIGH':
-      return '#f87171';
+      return '#dc2626'; // Rouge plus intense pour HIGH
     case 'MEDIUM':
-      return '#fbbf24';
+      return '#f59e0b'; // Orange pour MEDIUM
     case 'LOW':
-      return '#34d399';
+      return '#34d399'; // Vert pour LOW
     default:
-      return '#60a5fa';
+      return ''; // Pas de couleur par défaut
   }
+};
+
+const mapUserToGanttUser = (user: any): { id: string; name: string } | undefined => {
+  if (!user) return undefined;
+  return {
+    id: user.id,
+    name: user.name || "Unknown", // Utilisez une valeur par défaut si name est null ou undefined
+  };
 };
 
 const BoardIdPage = async ({ params }: BoardIdPageProps) => {
@@ -84,7 +95,9 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
         include: {
           cards: {
             include: {
+              list: true,
               tasks: true,
+              assignedUser: true,
               tags: {
                 select: {
                   id: true,
@@ -185,7 +198,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                 </TabsContent>
                 <TabsContent value="timeline">
                   <ScrollArea className="h-[85vh]"> {/* Utilisez ScrollArea ici */}
-                    <TimelineView features={ganttFeatures} />
+                    <TimelineView features={ganttFeatures} currentUser={mapUserToGanttUser(user)} />
                   </ScrollArea>
                 </TabsContent>
                 <TabsContent value="settings">
