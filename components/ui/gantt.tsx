@@ -51,6 +51,7 @@ import type {
     ReactNode,
     RefObject,
 } from 'react';
+import { useSidebar } from './sidebar';
 
 const draggingAtom = atom(false);
 const scrollXAtom = atom(0);
@@ -1057,6 +1058,7 @@ export const GanttProvider: FC<GanttProviderProps> = ({
         createInitialTimelineData(new Date())
     );
     const [, setScrollX] = useGanttScrollX();
+    const { state } = useSidebar(); // Utiliser le contexte de la sidebar
     const sidebarElement = scrollRef.current?.querySelector(
         '[data-roadmap-ui="gantt-sidebar"]'
     );
@@ -1186,14 +1188,14 @@ export const GanttProvider: FC<GanttProviderProps> = ({
         >
             <div
                 className={cn(
-                    'gantt relative grid h-full w-full flex-none select-none overflow-auto rounded-sm bg-secondary',
+                    'gantt relative grid h-full flex-none select-none overflow-auto rounded-sm bg-secondary',
                     range,
                     className
                 )}
                 style={{
                     ...cssVariables,
                     gridTemplateColumns: 'var(--gantt-sidebar-width) 1fr',
-                    maxWidth: 'calc(82vw)', // Limite la largeur maximale
+                    width: state === "collapsed" ? 'calc(100vw - 5rem)' : 'calc(100vw - 17rem)',
                 }}
                 ref={scrollRef}
             >
@@ -1234,30 +1236,29 @@ export const GanttToday: FC<GanttTodayProps> = ({ className, ...props }) => {
     const timelineStartDate = new Date(gantt.timelineData.at(0)?.year ?? 0, 0, 1)
     const offset = differenceIn(date, timelineStartDate)
     const innerOffset = calculateInnerOffset(date, gantt.range, (gantt.columnWidth * gantt.zoom) / 100)
-  
+
     return (
-      <div
-        className="pointer-events-none absolute top-0 left-0 z-20 flex h-full select-none flex-col items-center justify-center overflow-visible"
-        style={{
-          width: 0,
-          transform: `translateX(calc(var(--gantt-column-width) * ${offset} + ${innerOffset}px))`,
-        }}
-        data-today="true"
-        {...props}
-      >
         <div
-          className={cn(
-            "group pointer-events-auto sticky top-0 flex select-auto flex-col flex-nowrap items-center justify-center whitespace-nowrap rounded-b-md bg-card px-2 py-1 text-foreground text-xs",
-            className,
-          )}
+            className="pointer-events-none absolute top-0 left-0 z-20 flex h-full select-none flex-col items-center justify-center overflow-visible"
+            style={{
+                width: 0,
+                transform: `translateX(calc(var(--gantt-column-width) * ${offset} + ${innerOffset}px))`,
+            }}
+            data-today="true"
+            {...props}
         >
-          {label}
-          <span className="max-h-[0] overflow-hidden opacity-80 transition-all group-hover:max-h-[2rem]">
-            {formatDate(date, "MMM dd, yyyy")}
-          </span>
+            <div
+                className={cn(
+                    "group pointer-events-auto sticky top-0 flex select-auto flex-col flex-nowrap items-center justify-center whitespace-nowrap rounded-b-md bg-card px-2 py-1 text-foreground text-xs",
+                    className,
+                )}
+            >
+                {label}
+                <span className="max-h-[0] overflow-hidden opacity-80 transition-all group-hover:max-h-[2rem]">
+                    {formatDate(date, "MMM dd, yyyy")}
+                </span>
+            </div>
+            <div className={cn("h-full w-px bg-card", className)} />
         </div>
-        <div className={cn("h-full w-px bg-card", className)} />
-      </div>
     )
-  }
-  
+}
