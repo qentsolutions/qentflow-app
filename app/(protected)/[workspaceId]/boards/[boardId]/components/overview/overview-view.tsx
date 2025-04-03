@@ -4,9 +4,11 @@ import { Card } from "@/components/ui/card";
 import { MetricCard } from "./metric-card";
 import { AssignedTasksList } from "./assigned-task";
 import { TeamMembers } from "./team-members";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PriorityDistributionChart } from "./priority-distribution-chart";
-import { DonutChartCenterText } from "@/components/ui/donut-chart-center-text";
+import { DonutChartFillableHalf } from "@/components/ui/donut-chart-fillable-half";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 
 interface List {
     id: string;
@@ -43,6 +45,7 @@ interface OverviewViewProps {
 
 export const OverviewView = ({ lists, users }: OverviewViewProps) => {
     const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+    const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
     // Calculate metrics from lists data
     const calculateMetrics = (userId: string | null) => {
@@ -123,6 +126,49 @@ export const OverviewView = ({ lists, users }: OverviewViewProps) => {
         }));
     };
 
+    const getUniqueTags = (lists: List[]) => {
+        const tagSet = new Set<string>();
+        lists.forEach(list => {
+            list.cards.forEach(card => {
+                card.tags.forEach(tag => {
+                    tagSet.add(tag.name);
+                });
+            });
+        });
+        return Array.from(tagSet);
+    };
+
+    const calculateTagCompletion = (tagName: string) => {
+        let totalCardsWithTag = 0;
+        let completedCardsWithTag = 0;
+
+        lists.forEach(list => {
+            list.cards.forEach(card => {
+                if (card.tags.some(tag => tag.name === tagName)) {
+                    totalCardsWithTag++;
+                    if (list.title.toLowerCase() === 'done') {
+                        completedCardsWithTag++;
+                    }
+                }
+            });
+        });
+
+        const completionPercentage = totalCardsWithTag > 0 ? (completedCardsWithTag / totalCardsWithTag) * 100 : 0;
+        return {
+            filled: completionPercentage,
+            empty: 100 - completionPercentage,
+        };
+    };
+
+    const uniqueTags = getUniqueTags(lists);
+
+    useEffect(() => {
+        if (uniqueTags.length > 0 && !selectedTag) {
+            setSelectedTag(uniqueTags[0]);
+        }
+    }, [uniqueTags, selectedTag]);
+
+    const tagCompletionData = selectedTag ? calculateTagCompletion(selectedTag) : null;
     const cardsByUserData = calculateCardsByUser();
     const metrics = calculateMetrics(selectedUserId);
     const priorityData = calculatePriorityDistribution(selectedUserId);
@@ -163,6 +209,7 @@ export const OverviewView = ({ lists, users }: OverviewViewProps) => {
                 />
             </div>
 
+            {/* Tag Selection */}
 
             {/* Charts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -170,14 +217,50 @@ export const OverviewView = ({ lists, users }: OverviewViewProps) => {
                     <AssignedTasksList lists={lists} selectedUserId={selectedUserId} />
                 </div>
                 <div className="lg:col-span-1 space-y-4">
+                    <div>
+                        <Card className="p-6">
+                            <div className="flex justify-between">
+                                <div>
+                                    Tag Progress Overview
+                                </div>
+                                <div className="mb-4 w-48">
+                                    <Select value={selectedTag || ""} onValueChange={setSelectedTag}>
+                                        <SelectTrigger id="tag-select" className="mt-1 w-full">
+                                            {selectedTag || "Select a tag"}
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {uniqueTags.map((tag) => (
+                                                <SelectItem key={tag} value={tag}>
+                                                    {tag}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+
+
+                            {tagCompletionData && (
+                                <div className="mb-4">
+                                    <h3 className="text-lg font-semibold mb-2">{selectedTag}</h3>
+                                    <DonutChartFillableHalf data={[
+                                        { name: "Filled", value: tagCompletionData.filled },
+                                        { name: "Empty", value: tagCompletionData.empty },
+                                    ]} />
+                                </div>
+                            )}
+                        </Card>
+                    </div>
+
+
+                    <PriorityDistributionChart data={priorityData} selectedUserId={selectedUserId} />
                     <TeamMembers
                         users={users}
                         selectedUserId={selectedUserId}
                         onUserSelect={setSelectedUserId}
                     />
-                    <PriorityDistributionChart data={priorityData} selectedUserId={selectedUserId} />
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
