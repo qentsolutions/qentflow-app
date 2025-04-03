@@ -96,9 +96,6 @@ const TimelineView = ({ features, currentUser }: GanttClientComponentProps) => {
     toast.success("Link copied to clipboard")
   }
 
-  const handleRemoveFeature = (id: any) => console.log(`Remove feature: ${id}`)
-  const handleRemoveMarker = (id: any) => console.log(`Remove marker: ${id}`)
-  const handleCreateMarker = (date: any) => console.log(`Create marker: ${date.toISOString()}`)
 
   const handleMoveFeature = async (id: any, startAt: any, endAt: any) => {
     if (!endAt) return
@@ -141,12 +138,6 @@ const TimelineView = ({ features, currentUser }: GanttClientComponentProps) => {
     if (todayElement) {
       todayElement.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" })
     }
-  }
-
-  // Reset all filters
-  const resetFilters = () => {
-    setFilter("all")
-    setIsFilterOpen(false)
   }
 
   // Automatically scroll to today on initial render
@@ -341,7 +332,7 @@ const TimelineView = ({ features, currentUser }: GanttClientComponentProps) => {
                           </ContextMenuItem>
                           <ContextMenuItem
                             className="flex items-center gap-2 text-destructive"
-                            onClick={() => handleRemoveFeature(feature.id)}
+                            onClick={() => {}}
                           >
                             <TrashIcon size={16} />
                             Remove from roadmap
@@ -354,7 +345,6 @@ const TimelineView = ({ features, currentUser }: GanttClientComponentProps) => {
               ))}
             </GanttFeatureList>
             <GanttToday data-today="true" />
-            <GanttCreateMarkerTrigger onCreateMarker={handleCreateMarker} />
           </GanttTimeline>
         </GanttProvider>
       </div>
