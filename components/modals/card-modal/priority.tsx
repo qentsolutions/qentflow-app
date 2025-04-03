@@ -73,7 +73,7 @@ export const Priority = ({
   return (
     <Card className="shadow-none border bg-card mt-4">
       <CardContent className="p-5">
-        <h3 className="text-lg font-semibold mb-4 flex items-center">
+        <h3 className="text-lg font-semibold mb-2 flex items-center">
           <OctagonAlert className="h-5 w-5 mr-2" />
           Priority
         </h3>

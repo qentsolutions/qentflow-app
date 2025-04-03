@@ -1,14 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { CardWithList } from "@/types";
-import { CalendarDays, Clock } from "lucide-react";
 import { updateCard } from "@/actions/tasks/update-card";
 import { useParams } from "next/navigation";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
+import { RangeCalendar } from "@/components/ui/calendar-rac";
+import { fromDate, getLocalTimeZone, today } from "@internationalized/date";
+import type { DateRange } from "react-aria-components";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "lucide-react";
 
 interface DateManagerProps {
     card: CardWithList;
@@ -19,6 +24,12 @@ const DateComponent: React.FC<DateManagerProps> = ({ card, readonly = false }) =
     const params = useParams();
     const { currentWorkspace } = useCurrentWorkspace();
     const queryClient = useQueryClient();
+    const now = today(getLocalTimeZone());
+
+    const [dateRange, setDateRange] = useState<DateRange | null>({
+        start: card.startDate ? fromDate(new Date(card.startDate), getLocalTimeZone()) : now,
+        end: card.dueDate ? fromDate(new Date(card.dueDate), getLocalTimeZone()) : now,
+    });
 
     const updateDates = async (startDate: Date | null = null, dueDate: Date | null = null) => {
         // Validation : dueDate >= startDate
@@ -51,50 +62,51 @@ const DateComponent: React.FC<DateManagerProps> = ({ card, readonly = false }) =
         }
     };
 
+    const handleDateChange = (newDateRange: DateRange | null) => {
+        setDateRange(newDateRange);
+        if (newDateRange) {
+            updateDates(
+                newDateRange.start ? newDateRange.start.toDate(getLocalTimeZone()) : null,
+                newDateRange.end ? newDateRange.end.toDate(getLocalTimeZone()) : null
+            );
+        }
+    };
+
+    const formatDate = (date: Date | null | undefined) => {
+        if (!date) return "";
+        const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Intl.DateTimeFormat('en-US', options).format(date);
+    };
+
     return (
         <Card className="w-full shadow-none mt-4">
             <CardContent>
                 <div className="space-y-2 pt-4">
-                    <p className="text-lg font-semibold">Dates</p>
-                    <div className="gap-4 flex flex-col">
-                        <div className="flex justify-between flex-col">
-                            <div className="flex items-center">
-                                <CalendarDays size={14} />
-                                <span className="ml-1 text-sm text-muted-foreground">Start Date</span>
-                            </div>
-                            <input
-                                type="date"
-                                className="flex h-10 mt-1 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                disabled={readonly}
-                                value={card.startDate ? new Date(card.startDate).toISOString().split("T")[0] : ""}
-                                onChange={(e) => {
-                                    const date = e.target.value ? new Date(e.target.value) : null;
-                                    updateDates(date, card.dueDate ? new Date(card.dueDate) : null);
-                                }}
-                            />
-                        </div>
-
-                        <div className="flex justify-between flex-col">
-                            <div className="flex items-center">
-                                <Clock size={14} />
-                                <span className="ml-1 text-sm text-muted-foreground">Due Date</span>
-                            </div>
-                            <input
-                                type="date"
-                                className="flex mt-1 h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                value={card.dueDate ? new Date(card.dueDate).toISOString().split("T")[0] : ""}
-                                disabled={readonly}
-                                onChange={(e) => {
-                                    const date = e.target.value ? new Date(e.target.value) : null;
-                                    updateDates(card.startDate ? new Date(card.startDate) : null, date);
-                                }}
-                            />
-                        </div>
+                    <div className="flex items-center gap-x-2">
+                        <Calendar size={20} />
+                        <p className="text-lg font-semibold">Start/Due Date</p>
                     </div>
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger className="flex w-full">
+                            <Button variant={"outline"} className="w-full text-xs">
+                                {formatDate(dateRange?.start?.toDate(getLocalTimeZone()) ?? null)} - {formatDate(dateRange?.end?.toDate(getLocalTimeZone()) ?? null)}
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="z-50">
+                            <div className="gap-4 flex flex-col">
+                                <RangeCalendar
+                                    className="rounded-lg border border-border p-2 bg-background"
+                                    value={dateRange}
+                                    onChange={handleDateChange}
+                                    isDisabled={readonly}
+                                />
+                            </div>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </CardContent>
         </Card>
-
     );
 };
 
