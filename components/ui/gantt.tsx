@@ -783,7 +783,7 @@ export const GanttFeatureDragHelper: FC<GanttFeatureDragHelperProps> = ({
                         isPressed && 'block'
                     )}
                 >
-                    {format(subDays(date, 1), 'MMM dd, yyyy')}
+                    {format(date, 'MMM dd, yyyy')}
                 </div>
             )}
         </div>

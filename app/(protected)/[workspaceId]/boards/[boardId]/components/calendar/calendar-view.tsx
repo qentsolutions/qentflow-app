@@ -65,7 +65,7 @@ export const CalendarView = ({ data, boardId }: CalendarViewProps) => {
     return (
         <Card className="p-1 m-4 bg-white dark:bg-gray-800 shadow-none border-none">
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                     {format(currentDate, "MMMM yyyy", { locale: enUS })}
                 </h2>
                 <div className="flex space-x-2">
