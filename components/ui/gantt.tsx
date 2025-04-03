@@ -33,7 +33,7 @@ import {
 } from 'date-fns';
 import { atom, useAtom } from 'jotai';
 import throttle from 'lodash.throttle';
-import { PlusIcon, TrashIcon } from 'lucide-react';
+import { Dot, Loader, PlusIcon, TrashIcon } from 'lucide-react';
 import {
     createContext,
     useCallback,
@@ -604,7 +604,7 @@ export const GanttAddFeatureHelper: FC<GanttAddFeatureHelperProps> = ({
                 type="button"
                 className="flex h-full w-full items-center justify-center rounded-md border border-dashed p-2"
             >
-                <PlusIcon
+                <Loader
                     size={16}
                     className="pointer-events-none select-none text-muted-foreground"
                 />

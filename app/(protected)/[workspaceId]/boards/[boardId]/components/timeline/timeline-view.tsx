@@ -130,7 +130,6 @@ const TimelineView = ({ features, currentUser }: GanttClientComponentProps) => {
     }
   }
 
-  const handleAddFeature = (date: any) => console.log(`Add feature: ${date.toISOString()}`)
 
   // Function to scroll to today
   const scrollToToday = () => {
@@ -288,7 +287,6 @@ const TimelineView = ({ features, currentUser }: GanttClientComponentProps) => {
 
       <div className="flex-1" ref={ganttRef}>
         <GanttProvider
-          onAddItem={handleAddFeature}
           range={getViewSettings().range}
           zoom={getViewSettings().zoom}
           className="h-[78vh]"
@@ -332,7 +330,7 @@ const TimelineView = ({ features, currentUser }: GanttClientComponentProps) => {
                           </ContextMenuItem>
                           <ContextMenuItem
                             className="flex items-center gap-2 text-destructive"
-                            onClick={() => {}}
+                            onClick={() => { }}
                           >
                             <TrashIcon size={16} />
                             Remove from roadmap
