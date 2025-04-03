@@ -559,7 +559,7 @@ export const GanttSidebar: FC<GanttSidebarProps> = ({
     <div
         data-roadmap-ui="gantt-sidebar"
         className={cn(
-            'sticky left-0 z-30 p-2 h-max min-h-full overflow-clip border-border/50 border-r bg-background/90 backdrop-blur-md',
+            'sticky left-0 z-30 h-max min-h-full overflow-clip border-border/50 border-r bg-background/90 backdrop-blur-md',
             className
         )}
     >
@@ -1064,7 +1064,7 @@ export const GanttProvider: FC<GanttProviderProps> = ({
     );
 
     const headerHeight = 60;
-    const sidebarWidth = sidebarElement ? 300 : 0;
+    const sidebarWidth = sidebarElement ? 400 : 0;
     const rowHeight = 36;
     let columnWidth = 50;
 
