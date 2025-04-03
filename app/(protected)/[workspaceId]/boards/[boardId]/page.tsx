@@ -5,14 +5,15 @@ import Settings from "./components/settings/settings-board";
 import { BoardContent } from "./components/board-content";
 import { currentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { TimelineView } from "./components/timeline/timeline-view";
+import { CalendarView } from "./components/calendar/calendar-view";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { OverviewView } from "./components/overview/overview-view";
-import { CalendarView } from "./components/calendar/calendar-view";
 import { Calendar, Clock, LayoutDashboard, ListTodo, SettingsIcon } from "lucide-react";
 import { AddCardButton } from "./components/add-card-button";
 import { Automations } from "./components/automations/automations";
+import TimelineView from "./components/timeline/timeline-view";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface BoardIdPageProps {
   params: {
@@ -33,6 +34,33 @@ export async function generateMetadata({ params }: { params: { boardId: string; 
   }
   return { title: `${board.title} - Qentflow` };
 }
+
+const transformCardsToGanttFeatures = (cards: any) => {
+  return cards.map((card: any) => ({
+    id: card.id,
+    name: card.title,
+    startAt: new Date(card.startDate),
+    endAt: new Date(card.dueDate),
+    status: {
+      id: card.id,
+      name: card.title,
+      color: getPriorityColor(card.priority),
+    },
+  }));
+};
+
+const getPriorityColor = (priority: any) => {
+  switch (priority) {
+    case 'HIGH':
+      return '#f87171';
+    case 'MEDIUM':
+      return '#fbbf24';
+    case 'LOW':
+      return '#34d399';
+    default:
+      return '#60a5fa';
+  }
+};
 
 const BoardIdPage = async ({ params }: BoardIdPageProps) => {
   const user = await currentUser();
@@ -66,18 +94,18 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
               },
               _count: {
                 select: {
-                  comments: true, // Compte le nombre de commentaires
-                  attachments: true, // Compte le nombre de pièces jointes
+                  comments: true,
+                  attachments: true,
                 },
               },
             },
             orderBy: {
-              order: "asc",
+              order: 'asc',
             },
           },
         },
         orderBy: {
-          order: "asc",
+          order: 'asc',
         },
       },
       User: {
@@ -91,7 +119,6 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
     },
   });
 
-
   if (!board) {
     return <div>Board not found</div>;
   }
@@ -101,8 +128,11 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
     redirect(`/${params.workspaceId}/boards`);
   }
 
+  const cards = board.lists.flatMap((list) => list.cards);
+  const ganttFeatures = transformCardsToGanttFeatures(cards);
+
   return (
-    <div className="w-full pl-2">
+    <div className="w-full pl-2 h-screen">
       <Card className="shadow-none rounded-none h-screen">
         <main className="relative w-full mx-auto h-full">
           <div className="flex flex-col h-full w-full">
@@ -145,7 +175,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                 </div>
                 <Separator />
                 <TabsContent value="overview">
-                  <OverviewView lists={board.lists} users={board?.User} />
+                  <OverviewView lists={board.lists} users={board.User} />
                 </TabsContent>
                 <TabsContent value="board">
                   <BoardContent users={board.User} boardId={board.id} lists={board.lists} />
@@ -154,7 +184,9 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                   <CalendarView boardId={board.id} data={board.lists} />
                 </TabsContent>
                 <TabsContent value="timeline">
-                  <TimelineView boardId={board.id} data={board.lists} />
+                  <ScrollArea className="h-[85vh]"> {/* Utilisez ScrollArea ici */}
+                    <TimelineView features={ganttFeatures} />
+                  </ScrollArea>
                 </TabsContent>
                 <TabsContent value="settings">
                   <Settings
