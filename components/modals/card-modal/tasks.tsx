@@ -259,6 +259,7 @@ export const Tasks = ({ cardId }: TasksProps) => {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
+                                                className="opacity-0 hover:bg-transparent group-hover:opacity-100 transition-opacity"
                                                 onClick={() => handleDeleteTask(task.id)}
                                             >
                                                 <Trash className="h-4 w-4 text-muted-foreground" />
