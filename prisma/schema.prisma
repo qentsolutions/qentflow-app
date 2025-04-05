@@ -115,9 +115,9 @@ model Invitation {
 }
 
 model Document {
-  id        String  @id @default(cuid())
-  title     String
-  content   String? @db.Text
+  id      String  @id @default(cuid())
+  title   String
+  content String? @db.Text
 
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
@@ -195,7 +195,7 @@ model Board {
   id          String  @id @default(uuid())
   workspaceId String
   title       String
-
+  description String?
   lists       List[]
   createdById String
   image       String?
@@ -239,7 +239,7 @@ model Card {
   order       Int
   description String?   @db.Text
   priority    Priority?
-  archived    Boolean  @default(false) // Ajout du champ "archived" avec valeur par défaut à false
+  archived    Boolean   @default(false) // Ajout du champ "archived" avec valeur par défaut à false
 
   listId String
   list   List   @relation(fields: [listId], references: [id], onDelete: Cascade)
