@@ -146,7 +146,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
 
   return (
     <div className="w-full pl-2 h-screen">
-      <Card className="shadow-none rounded-none h-screen">
+      <Card className="shadow-none rounded-none">
         <main className="relative w-full mx-auto h-full">
           <div className="flex flex-col h-full w-full">
             <div className="flex items-center justify-between px-6 pt-4">
@@ -197,7 +197,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                   <CalendarView boardId={board.id} data={board.lists} />
                 </TabsContent>
                 <TabsContent value="timeline">
-                  <ScrollArea className="h-[85vh]"> {/* Utilisez ScrollArea ici */}
+                  <ScrollArea className="h-[83vh]"> {/* Utilisez ScrollArea ici */}
                     <TimelineView features={ganttFeatures} currentUser={mapUserToGanttUser(user)} />
                   </ScrollArea>
                 </TabsContent>

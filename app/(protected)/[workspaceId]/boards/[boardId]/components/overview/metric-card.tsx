@@ -23,7 +23,7 @@ export const MetricCard = ({
 }: MetricCardProps) => {
   return (
     <Card className={cn(
-      "p-6 transition-all duration-300 hover:shadow-lg",
+      "p-6 transition-all duration-300",
       "bg-gradient-to-br from-background to-muted/50",
       "border border-border/50 backdrop-blur-sm",
       variant === "success" && "from-green-50 dark:from-green-950/30",

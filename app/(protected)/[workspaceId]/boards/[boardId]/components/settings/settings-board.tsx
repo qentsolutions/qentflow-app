@@ -38,7 +38,7 @@ const Settings = ({ boardId, boardTitle, users, createdById }: BoardSettingsProp
   ];
 
   return (
-    <div className="w-full px-6">
+    <div className="w-full px-6 h-[82vh]">
       <div className="py-2">
         <div className="grid grid-cols-12 gap-8">
           <div className="col-span-3">
@@ -47,8 +47,8 @@ const Settings = ({ boardId, boardTitle, users, createdById }: BoardSettingsProp
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 text-left rounded-md transition-colors ${activeTab === tab.id
-                    ? "bg-blue-50 dark:bg-gray-700 dark:text-blue-500 text-blue-700"
+                  className={`w-full flex items-center font-medium space-x-3 px-4 py-3 text-left rounded-md transition-colors ${activeTab === tab.id
+                    ? "bg-blue-100 dark:bg-gray-700 dark:text-blue-500 text-blue-600"
                     : "text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-300"
                     }`}
                 >

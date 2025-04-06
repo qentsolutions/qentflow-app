@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PieChartLabels } from "./components/pie-chart-label";
 import { cn } from "@/lib/utils";
 import { BarChartMultiVertical } from "./components/bar-chart-multi-vertical";
+import { MemberStats } from "./components/member-stats";
 
 interface List {
     id: string;
@@ -217,6 +218,24 @@ export const OverviewView = ({ lists, users }: OverviewViewProps) => {
 
     const performanceData = calculatePerformanceByMembers();
 
+    const calculateMemberStats = () => {
+        return users.map(user => {
+            const assignedCards = lists.flatMap(list =>
+                list.cards.filter(card => card.assignedUserId === user.id)
+            );
+            const completedCards = assignedCards.filter(card => card.archived || lists[lists.length - 1].cards.some(c => c.id === card.id)).length;
+            const completionRate = assignedCards.length > 0 ? (completedCards / assignedCards.length) * 100 : 0;
+            return {
+                name: user.name || 'Unknown',
+                assignedCards: assignedCards.length,
+                completedCards,
+                completionRate
+            };
+        });
+    };
+
+    const memberStats = calculateMemberStats();
+
     return (
         <div className="py-2 px-4 space-y-4 animate-fade-in">
             {/* Metrics Grid */}
@@ -230,7 +249,7 @@ export const OverviewView = ({ lists, users }: OverviewViewProps) => {
                 <MetricCard
                     title="Overdue Cards"
                     value={metrics.overdueTasks}
-                    variant={metrics.overdueTasks > 0 ? "warning" : "default"}
+                    variant={metrics.overdueTasks > 0 ? "danger" : "default"}
                     tooltipText="Overdue cards are those whose due date has passed and are not archived."
                 />
                 <MetricCard
@@ -246,13 +265,13 @@ export const OverviewView = ({ lists, users }: OverviewViewProps) => {
             </div>
 
             <div>
-                <Tabs>
+                <Tabs defaultValue="teams">
                     <TabsList className="bg-white border rounded-lg px-2 mb-2">
                         <TabsTrigger value="progression"
                             className={cn(
                                 "inline-flex w-28 items-center justify-center whitespace-nowrap px-2.5 py-2 rounded-lg text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
                                 "border-b-2 border-transparent",
-                                "data-[state=active]:bg-blue-100 data-[state=active]:border-none data-[state=active]:text-blue-500",
+                                "data-[state=active]:bg-blue-100 data-[state=active]:border-none data-[state=active]:text-blue-600",
                             )}
                         >
                             Progression
@@ -261,7 +280,7 @@ export const OverviewView = ({ lists, users }: OverviewViewProps) => {
                             className={cn(
                                 "inline-flex w-28 items-center justify-center whitespace-nowrap px-2.5 py-2 rounded-lg text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
                                 "border-b-2 border-transparent",
-                                "data-[state=active]:bg-blue-100 data-[state=active]:border-none data-[state=active]:text-blue-500",
+                                "data-[state=active]:bg-blue-100 data-[state=active]:border-none data-[state=active]:text-blue-600",
                             )}>
                             Teams
                         </TabsTrigger>
@@ -269,7 +288,7 @@ export const OverviewView = ({ lists, users }: OverviewViewProps) => {
                             className={cn(
                                 "inline-flex w-28 items-center justify-center whitespace-nowrap px-2.5 py-2 rounded-lg text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
                                 "border-b-2 border-transparent",
-                                "data-[state=active]:bg-blue-100 data-[state=active]:border-none data-[state=active]:text-blue-500",
+                                "data-[state=active]:bg-blue-100 data-[state=active]:border-none data-[state=active]:text-blue-600",
                             )}>
                             Time
                         </TabsTrigger>
@@ -277,7 +296,7 @@ export const OverviewView = ({ lists, users }: OverviewViewProps) => {
                             className={cn(
                                 "inline-flex w-28 items-center justify-center whitespace-nowrap px-2.5 py-2 rounded-lg text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
                                 "border-b-2 border-transparent",
-                                "data-[state=active]:bg-blue-100 data-[state=active]:border-none data-[state=active]:text-blue-500",
+                                "data-[state=active]:bg-blue-100 data-[state=active]:border-none data-[state=active]:text-blue-600",
                             )}>
                             Quality
                         </TabsTrigger>
@@ -327,18 +346,24 @@ export const OverviewView = ({ lists, users }: OverviewViewProps) => {
 
                     </TabsContent>
                     <TabsContent value="teams">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            <Card className="p-4">
-                                <h3 className="text-lg font-semibold">Assigned Cards by User</h3>
-                                <PieChartLabels data={cardsByUserData} />
-                            </Card>
-                            <Card className="p-4">
-                                <h3 className="text-lg font-semibold mb-4">Performance By Members</h3>
-                                <div className="p-4">
-                                    <BarChartMultiVertical data={performanceData} />
-                                </div>
-                            </Card>
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <Card className="p-4">
+                                    <h3 className="text-lg font-semibold">Assigned Cards by User</h3>
+                                    <PieChartLabels data={cardsByUserData} />
+                                </Card>
+                                <Card className="p-4">
+                                    <h3 className="text-lg font-semibold mb-4">Performance By Members</h3>
+                                    <div className="p-4">
+                                        <BarChartMultiVertical data={performanceData} />
+                                    </div>
+                                </Card>
+                            </div>
+                            <div>
+                                <MemberStats members={memberStats} /> {/* Utilisez le nouveau composant MemberStats */}
+                            </div>
                         </div>
+
                     </TabsContent>
                     <TabsContent value="time">
                         Time
