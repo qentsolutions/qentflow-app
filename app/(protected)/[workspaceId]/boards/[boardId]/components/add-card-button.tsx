@@ -68,7 +68,7 @@ export const AddCardButton = ({ boardId, workspaceId, lists }: AddCardButtonProp
             <Button
                 onClick={() => setOpen(true)}
                 size="sm"
-                className="bg-blue-600 hover:bg-blue-700 gap-1"
+                className="bg-gradient-to-r from-blue-600 to-indigo-700 gap-1"
             >
                 <Plus className="h-4 w-4" />
                 Add card
@@ -116,7 +116,7 @@ export const AddCardButton = ({ boardId, workspaceId, lists }: AddCardButtonProp
                         <Button variant="outline" onClick={() => setOpen(false)}>
                             Cancel
                         </Button>
-                        <Button onClick={onSubmit} className="bg-primary hover:bg-primary/90">
+                        <Button onClick={onSubmit} className="bg-gradient-to-r from-blue-600 to-indigo-700">
                             Create
                         </Button>
                     </DialogFooter>

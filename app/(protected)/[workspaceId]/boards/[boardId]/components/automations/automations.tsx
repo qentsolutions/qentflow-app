@@ -257,7 +257,7 @@ export const Automations = ({ board }: AutomationsProps) => {
                 <div className="mr-4">
                   <Button
                     onClick={() => setIsCreating(true)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white gap-2 shadow-lg shadow-blue-500/20 transition-all duration-200 hover:shadow-xl hover:shadow-blue-500/30"
+                    className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white gap-2 shadow-lg shadow-blue-500/20 transition-all duration-200 hover:shadow-xl hover:shadow-blue-500/30"
                   >
                     <PlusCircle className="h-4 w-4" />
                     New Automation
