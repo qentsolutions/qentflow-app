@@ -289,7 +289,7 @@ const TimelineView = ({ features, currentUser }: GanttClientComponentProps) => {
         <GanttProvider
           range={getViewSettings().range}
           zoom={getViewSettings().zoom}
-          className="h-[76vh]"
+          className="h-[75vh]"
         >
           <GanttSidebar>
             {Object.entries(sortedGroupedFeatures).map(([group, features]: any) => (

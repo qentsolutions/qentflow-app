@@ -9,7 +9,7 @@ import { CalendarView } from "./components/calendar/calendar-view";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { OverviewView } from "./components/overview/overview-view";
-import { Calendar, Clock, LayoutDashboard, ListTodo, SettingsIcon } from "lucide-react";
+import { Calendar, Clock, FileText, LayoutDashboard, ListTodo, PaperclipIcon, SettingsIcon } from "lucide-react";
 import { AddCardButton } from "./components/add-card-button";
 import { Automations } from "./components/automations/automations";
 import TimelineView from "./components/timeline/timeline-view";
@@ -172,6 +172,10 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                       <Clock className="w-4 h-4 mr-2" />
                       Timeline
                     </TabsTrigger>
+                    <TabsTrigger value="documents" disabled={true}>
+                      <FileText className="w-4 h-4 mr-2" />
+                      Documents
+                    </TabsTrigger>
                     <TabsTrigger value="settings">
                       <SettingsIcon className="w-4 h-4 mr-2" />
                       Settings
@@ -197,7 +201,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                   <CalendarView boardId={board.id} data={board.lists} />
                 </TabsContent>
                 <TabsContent value="timeline">
-                  <ScrollArea className="h-[83vh]"> {/* Utilisez ScrollArea ici */}
+                  <ScrollArea className="h-[82vh]"> {/* Utilisez ScrollArea ici */}
                     <TimelineView features={ganttFeatures} currentUser={mapUserToGanttUser(user)} />
                   </ScrollArea>
                 </TabsContent>
