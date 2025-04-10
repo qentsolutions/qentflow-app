@@ -1,52 +1,57 @@
-"use client";
+"use client"; // Ajoutez cette ligne en haut du fichier
 
 import { useEffect, useState, useRef } from "react";
-import { useParams } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import TextStyle from '@tiptap/extension-text-style';
-import Color from '@tiptap/extension-color';
-import TextAlign from '@tiptap/extension-text-align';
-import Underline from '@tiptap/extension-underline';
-import Superscript from '@tiptap/extension-superscript';
-import Subscript from '@tiptap/extension-subscript';
-import Highlight from '@tiptap/extension-highlight';
-import Typography from '@tiptap/extension-typography';
-import Link from '@tiptap/extension-link';
-import Image from '@tiptap/extension-image';
-import Table from '@tiptap/extension-table';
-import TableRow from '@tiptap/extension-table-row';
-import TableCell from '@tiptap/extension-table-cell';
-import TableHeader from '@tiptap/extension-table-header';
-import FontFamily from '@tiptap/extension-font-family';
+import TextStyle from "@tiptap/extension-text-style";
+import Color from "@tiptap/extension-color";
+import TextAlign from "@tiptap/extension-text-align";
+import Underline from "@tiptap/extension-underline";
+import Superscript from "@tiptap/extension-superscript";
+import Subscript from "@tiptap/extension-subscript";
+import Highlight from "@tiptap/extension-highlight";
+import Typography from "@tiptap/extension-typography";
+import Link from "@tiptap/extension-link";
+import Image from "@tiptap/extension-image";
+import Table from "@tiptap/extension-table";
+import TableRow from "@tiptap/extension-table-row";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import FontFamily from "@tiptap/extension-font-family";
+import Placeholder from "@tiptap/extension-placeholder";
 
 import { useDebounce } from "@/hooks/use-debounce";
 import { toast } from "sonner";
 import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { FileDown, Save } from "lucide-react";
+import { fetcher } from "@/lib/fetcher";
 import { updateBoardDocument } from "@/actions/board-documents/update-document";
 import { DocumentToolbar } from "./document-toolbar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { FileDown, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { formatDistanceToNow } from "date-fns";
 
-interface DocumentEditorProps {
-    document: any;
-    boardId: string;
-    workspaceId: string;
-    onTitleChange?: (title: string) => void;
-}
 
-export function DocumentEditor({ document, boardId, workspaceId, onTitleChange }: DocumentEditorProps) {
-    const [title, setTitle] = useState(document.title || "");
-    const [content, setContent] = useState(document.content || "");
+export default function DocumentEditor({ params }: any) {
+    const { documentId, boardId, workspaceId } = params;
+    const [title, setTitle] = useState("");
+    const [content, setContent] = useState("");
     const [isSaving, setIsSaving] = useState(false);
+    const [lastSaved, setLastSaved] = useState<Date | null>(null);
     const debouncedContent = useDebounce(content, 1000);
     const debouncedTitle = useDebounce(title, 1000);
     const { currentWorkspace } = useCurrentWorkspace();
     const queryClient = useQueryClient();
     const editorRef = useRef<HTMLDivElement>(null);
+    const titleRef = useRef<HTMLDivElement>(null);
+
+    // Fetch document data
+    const { data: document, isLoading } = useQuery({
+        queryKey: ["board-document", documentId],
+        queryFn: () => fetcher(`/api/boards/${workspaceId}/${boardId}/documents/${documentId}`),
+        enabled: !!documentId && !!boardId && !!workspaceId,
+    });
 
     const editor = useEditor({
         extensions: [
@@ -70,40 +75,44 @@ export function DocumentEditor({ document, boardId, workspaceId, onTitleChange }
             Link.configure({
                 openOnClick: false,
                 HTMLAttributes: {
-                    class: 'text-blue-600 underline',
+                    class: "text-blue-600 underline",
                 },
             }),
             Image.configure({
                 HTMLAttributes: {
-                    class: 'max-w-full rounded-lg shadow-lg',
+                    class: "max-w-full rounded-lg my-4",
                 },
             }),
             Table.configure({
                 resizable: true,
                 HTMLAttributes: {
-                    class: 'border-collapse table-auto w-full',
+                    class: "border-collapse table-auto w-full my-4",
                 },
             }),
             TableRow,
             TableHeader.configure({
                 HTMLAttributes: {
-                    class: 'border border-gray-300 dark:border-gray-700 p-2 bg-gray-100 dark:bg-gray-800',
+                    class: "border border-gray-200 dark:border-gray-700 p-2 bg-gray-50 dark:bg-gray-800",
                 },
             }),
             TableCell.configure({
                 HTMLAttributes: {
-                    class: 'border border-gray-300 dark:border-gray-700 p-2',
+                    class: "border border-gray-200 dark:border-gray-700 p-2",
                 },
             }),
             FontFamily,
             TextAlign.configure({
-                types: ['heading', 'paragraph'],
+                types: ["heading", "paragraph"],
+            }),
+            Placeholder.configure({
+                placeholder: "Start writing...",
+                emptyEditorClass: "is-editor-empty",
             }),
         ],
-        content: document.content || "",
+        content: "",
         editorProps: {
             attributes: {
-                class: "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none p-6 min-h-[500px]",
+                class: "prose prose-sm sm:prose lg:prose-lg max-w-none focus:outline-none px-8 py-6 min-h-[calc(100vh-120px)]",
             },
         },
         onUpdate: ({ editor }) => {
@@ -113,22 +122,25 @@ export function DocumentEditor({ document, boardId, workspaceId, onTitleChange }
 
     // Update editor content when document changes
     useEffect(() => {
-        if (editor && document.content !== undefined && document.content !== content) {
-            editor.commands.setContent(document.content);
-            setContent(document.content);
+        if (editor && document) {
+            if (document.content !== undefined && document.content !== content) {
+                editor.commands.setContent(document.content || "");
+                setContent(document.content || "");
+            }
+            if (document.title !== title) {
+                setTitle(document.title || "");
+            }
         }
-        if (document.title !== title) {
-            setTitle(document.title);
-        }
-    }, [document.id, document.content, document.title, editor]);
+    }, [document, editor]);
 
     // Save changes when content or title changes
     useEffect(() => {
         const updateContent = async () => {
-            // Only save if content or title has changed
+            // Only save if content or title has changed and we have a document
             if (
+                !document ||
                 (debouncedContent === document.content && debouncedTitle === document.title) ||
-                !debouncedContent || 
+                !debouncedContent ||
                 !debouncedTitle
             ) {
                 return;
@@ -137,7 +149,7 @@ export function DocumentEditor({ document, boardId, workspaceId, onTitleChange }
             setIsSaving(true);
             try {
                 const result = await updateBoardDocument({
-                    id: document.id,
+                    id: documentId,
                     title: debouncedTitle,
                     content: debouncedContent,
                     boardId: boardId,
@@ -149,11 +161,12 @@ export function DocumentEditor({ document, boardId, workspaceId, onTitleChange }
                 } else {
                     // Invalidate queries to refresh data
                     queryClient.invalidateQueries({
-                        queryKey: ["board-document", document.id],
+                        queryKey: ["board-document", documentId],
                     });
                     queryClient.invalidateQueries({
                         queryKey: ["board-documents", boardId],
                     });
+                    setLastSaved(new Date());
                 }
             } catch (error) {
                 toast.error("Failed to save changes");
@@ -163,93 +176,75 @@ export function DocumentEditor({ document, boardId, workspaceId, onTitleChange }
         };
 
         updateContent();
-    }, [debouncedContent, debouncedTitle, document.id, document.content, document.title, boardId, workspaceId, queryClient]);
-
-    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newTitle = e.target.value;
-        setTitle(newTitle);
-        if (onTitleChange) {
-            onTitleChange(newTitle);
-        }
-    };
-
-    const handleSave = async () => {
-        setIsSaving(true);
-        try {
-            const result = await updateBoardDocument({
-                id: document.id,
-                title,
-                content,
-                boardId: boardId,
-                workspaceId: workspaceId,
-            });
-
-            if (result.error) {
-                toast.error(result.error);
-            } else {
-                toast.success("Document saved successfully");
-                queryClient.invalidateQueries({
-                    queryKey: ["board-document", document.id],
-                });
-                queryClient.invalidateQueries({
-                    queryKey: ["board-documents", boardId],
-                });
-            }
-        } catch (error) {
-            toast.error("Failed to save document");
-        } finally {
-            setIsSaving(false);
-        }
-    };
+    }, [debouncedContent, debouncedTitle, documentId, document, boardId, workspaceId, queryClient]);
 
     const exportToPDF = () => {
         toast.info("PDF export functionality coming soon");
     };
 
-    if (!editor) {
-        return <div>Loading editor...</div>;
+    if (isLoading) {
+        return (
+            <div className="p-8 space-y-4">
+                <Skeleton className="h-10 w-1/3" />
+                <Skeleton className="h-6 w-full mt-8" />
+                <Skeleton className="h-6 w-5/6" />
+                <Skeleton className="h-6 w-4/6" />
+                <Skeleton className="h-6 w-full" />
+            </div>
+        );
+    }
+
+    if (!document) {
+        return (
+            <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                    <h3 className="text-xl font-medium text-gray-600">Document not found</h3>
+                    <p className="text-sm text-gray-500 mt-2">
+                        The document you&apos;re looking for doesn&apos;t exist or has been deleted
+                    </p>
+                </div>
+            </div>
+        );
     }
 
     return (
-        <Card className="shadow-none border-none">
-            <CardContent className="p-0">
-                <div className="flex flex-col h-full">
-                    <div className="border-b p-4 flex justify-between items-center">
-                        <Input
-                            value={title}
-                            onChange={handleTitleChange}
-                            placeholder="Untitled Document"
-                            className="text-xl font-bold border-none shadow-none focus-visible:ring-0 px-0 max-w-md"
-                        />
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={exportToPDF}
-                                className="flex items-center gap-1"
-                            >
-                                <FileDown className="h-4 w-4" />
-                                Export
-                            </Button>
-                            <Button
-                                onClick={handleSave}
-                                disabled={isSaving}
-                                size="sm"
-                                className="flex items-center gap-1"
-                            >
-                                <Save className="h-4 w-4" />
-                                {isSaving ? "Saving..." : "Save"}
-                            </Button>
+        <div className="flex flex-col h-full">
+            {/* Title input that looks like part of the document */}
+            <div ref={titleRef} className="px-8 pt-8 pb-0" onClick={() => titleRef.current?.querySelector("input")?.focus()}>
+                <input
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Untitled Document"
+                    className="text-3xl font-bold w-full border-none shadow-none focus:outline-none focus:ring-0 p-0 bg-transparent"
+                />
+                <div className="flex items-center gap-2 text-xs text-gray-400 mt-2">
+                    {lastSaved && (
+                        <div className="flex items-center">
+                            <Clock className="h-3 w-3 mr-1" />
+                            <span>Last saved {formatDistanceToNow(lastSaved, { addSuffix: true })}</span>
                         </div>
-                    </div>
+                    )}
+                    {isSaving && <span>Saving...</span>}
+                </div>
+            </div>
 
+            {/* Floating toolbar */}
+            <div className="sticky top-0 z-10 mx-8 mt-4">
+                <div className="bg-white border rounded-lg shadow-sm flex items-center justify-between">
                     <DocumentToolbar editor={editor} />
-
-                    <div className="flex-1 overflow-y-auto bg-white" ref={editorRef}>
-                        <EditorContent editor={editor} className="min-h-[calc(100vh-200px)]" />
+                    <div className="px-2">
+                        <Button variant="ghost" size="sm" onClick={exportToPDF} className="text-xs">
+                            <FileDown className="h-3.5 w-3.5 mr-1" />
+                            Export
+                        </Button>
                     </div>
                 </div>
-            </CardContent>
-        </Card>
+            </div>
+
+            {/* Editor content */}
+            <div className="flex-1 overflow-y-auto" ref={editorRef}>
+                {editor && <EditorContent editor={editor} className="min-h-[calc(100vh-200px)]" />}
+            </div>
+        </div>
     );
 }

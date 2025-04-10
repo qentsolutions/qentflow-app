@@ -1,72 +1,106 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetcher } from "@/lib/fetcher";
-import { DocumentSidebar } from "../components/board-documents/document-sidebar";
-import { File, FileText } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { createBoardDocument } from "@/actions/board-documents/create-document";
-import { toast } from "sonner";
-import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Search, Plus, X } from "lucide-react"
+import { DocumentSidebar } from "../components/board-documents/document-sidebar"
 
 
 
-const BoardDocumentsPage= ({ onSelectDocument, selectedDocumentId }:any) => {
-  const router = useRouter();
-  const params = useParams();
-  const { currentWorkspace } = useCurrentWorkspace();
-  const queryClient = useQueryClient();
-  const boardId = params.boardId as string;
-  const workspaceId = params.workspaceId as string;
+const DocumentsView = ({
+    onSelectDocument,
+    selectedDocumentId,
+    onCreateDocument,
+    refetchDocuments,
+    documentsData,
+}: any) => {
+    const [searchQuery, setSearchQuery] = useState("")
+    const [isSearching, setIsSearching] = useState(false)
+    const [filteredDocuments, setFilteredDocuments] = useState<any[]>([])
 
-  // Fetch documents data
-  const { data: documentsData, isLoading, refetch } = useQuery({
-    queryKey: ["board-documents", boardId],
-    queryFn: () => fetcher(`/api/boards/${workspaceId}/${boardId}/documents`),
-    enabled: !!boardId && !!workspaceId,
-  });
+    useEffect(() => {
+        if (documentsData && searchQuery) {
+            const allDocs = documentsData.documents || []
+            const filtered = allDocs.filter((doc: any) => doc.title.toLowerCase().includes(searchQuery.toLowerCase()))
+            setFilteredDocuments(filtered)
+        } else {
+            setFilteredDocuments([])
+        }
+    }, [searchQuery, documentsData])
 
-  const handleSelectDocument = (documentId: string) => {
-    onSelectDocument(documentId);
-  };
+    return (
+        <div className="w-64 h-full flex flex-col bg-white">
+            <div className="p-3 border-b flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-sm text-gray-700">Documents</h3>
+                    <Button variant="ghost" size="icon" onClick={onCreateDocument} className="h-7 w-7">
+                        <Plus className="h-4 w-4" />
+                    </Button>
+                </div>
 
-  const handleCreateDocument = async () => {
-    try {
-      const result = await createBoardDocument({
-        title: "Untitled Document",
-        boardId: boardId,
-        workspaceId: currentWorkspace?.id as string,
-      });
+                {isSearching ? (
+                    <div className="flex items-center gap-1">
+                        <Input
+                            placeholder="Search documents..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="h-8 text-sm"
+                            autoFocus
+                        />
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                                setSearchQuery("")
+                                setIsSearching(false)
+                            }}
+                            className="h-7 w-7"
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div>
+                ) : (
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsSearching(true)}
+                        className="justify-start text-gray-500 h-8 text-sm"
+                    >
+                        <Search className="h-3.5 w-3.5 mr-2" />
+                        Search documents...
+                    </Button>
+                )}
+            </div>
 
-      if (result.error) {
-        toast.error(result.error);
-      } else if (result.data?.id) {
-        // Invalidate the documents query to refresh the list
-        queryClient.invalidateQueries({
-          queryKey: ["board-documents", boardId],
-        });
+            {searchQuery ? (
+                <div className="flex-1 overflow-y-auto p-2">
+                    <p className="text-xs text-gray-500 px-2 py-1">Search results</p>
+                    {filteredDocuments.length > 0 ? (
+                        filteredDocuments.map((doc) => (
+                            <div
+                                key={doc.id}
+                                className={`flex items-center px-2 py-1.5 rounded-md cursor-pointer text-sm ${selectedDocumentId === doc.id ? "bg-gray-100" : "hover:bg-gray-50"
+                                    }`}
+                                onClick={() => onSelectDocument(doc.id)}
+                            >
+                                <span className="truncate">{doc.title}</span>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-4 text-sm text-gray-500">No documents found</div>
+                    )}
+                </div>
+            ) : (
+                <DocumentSidebar
+                    onSelectDocument={onSelectDocument}
+                    selectedDocumentId={selectedDocumentId}
+                    onCreateDocument={onCreateDocument}
+                    refetchDocuments={refetchDocuments}
+                />
+            )}
+        </div>
+    )
+}
 
-        // Select the newly created document
-        onSelectDocument(result.data.id);
-        toast.success("Document created successfully");
-      }
-    } catch (error) {
-      toast.error("Failed to create document");
-    }
-  };
-
-  return (
-    <div className="flex h-full">
-      <DocumentSidebar
-        onSelectDocument={handleSelectDocument}
-        selectedDocumentId={selectedDocumentId}
-        onCreateDocument={handleCreateDocument}
-        refetchDocuments={refetch}
-      />
-    </div>
-  );
-};
-
-export default BoardDocumentsPage;
+export default DocumentsView

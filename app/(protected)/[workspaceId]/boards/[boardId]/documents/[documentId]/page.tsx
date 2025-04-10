@@ -4,8 +4,8 @@ import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
-import { DocumentEditor } from "../../components/board-documents/document-editor";
 import { Skeleton } from "@/components/ui/skeleton";
+import DocumentEditor from "../../components/board-documents/document-editor";
 
 export default function DocumentDynamic({ params }: any) {
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function DocumentDynamic({ params }: any) {
     enabled: !!documentId && !!boardId,
   });
 
-  if (isDocumentLoading) {
+  if (isDocumentLoading) { 
     return (
       <div className="flex-1 p-6">
         <Skeleton className="h-10 w-1/3 mb-6" />
