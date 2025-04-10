@@ -77,6 +77,8 @@ model User {
   sentInvitations       Invitation[]
   automations           Automation[]
   notes                 Note[]
+  boardDocuments        BoardDocument[]        @relation("CreatedByUser")
+  boardFolders          BoardFolder[]          @relation("CreatedByUser")
 }
 
 model Workspace {
@@ -209,6 +211,53 @@ model Board {
   User                 User[]
   Tag                  Tag[]
   automationActivities AutomationActivity[]
+  
+  // Board Documents
+  documents BoardDocument[]
+  folders   BoardFolder[]
+}
+
+model BoardDocument {
+  id        String  @id @default(uuid())
+  title     String
+  content   String? @db.Text
+  order     Int     @default(0)
+  
+  // Relations
+  boardId     String
+  board       Board        @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  folderId    String?
+  folder      BoardFolder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  createdById String
+  createdBy   User         @relation("CreatedByUser", fields: [createdById], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([boardId])
+  @@index([folderId])
+}
+
+model BoardFolder {
+  id        String  @id @default(uuid())
+  name      String
+  order     Int     @default(0)
+  
+  // Relations
+  boardId     String
+  board       Board         @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  parentId    String?
+  parent      BoardFolder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  subfolders  BoardFolder[] @relation("FolderHierarchy")
+  documents   BoardDocument[]
+  createdById String
+  createdBy   User          @relation("CreatedByUser", fields: [createdById], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([boardId])
+  @@index([parentId])
 }
 
 model List {

@@ -14,6 +14,7 @@ import { AddCardButton } from "./components/add-card-button";
 import { Automations } from "./components/automations/automations";
 import TimelineView from "./components/timeline/timeline-view";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import BoardDocumentsPage from "./documents/page";
 
 interface BoardIdPageProps {
   params: {
@@ -172,7 +173,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                       <Clock className="w-4 h-4 mr-2" />
                       Timeline
                     </TabsTrigger>
-                    <TabsTrigger value="documents" disabled={true}>
+                    <TabsTrigger value="documents">
                       <FileText className="w-4 h-4 mr-2" />
                       Documents
                     </TabsTrigger>
@@ -201,9 +202,12 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                   <CalendarView boardId={board.id} data={board.lists} />
                 </TabsContent>
                 <TabsContent value="timeline">
-                  <ScrollArea className="h-[82vh]"> {/* Utilisez ScrollArea ici */}
+                  <ScrollArea className="h-[82vh]">
                     <TimelineView features={ganttFeatures} currentUser={mapUserToGanttUser(user)} />
                   </ScrollArea>
+                </TabsContent>
+                <TabsContent value="documents">
+                  <BoardDocumentsPage />
                 </TabsContent>
                 <TabsContent value="settings">
                   <Settings
