@@ -4,7 +4,7 @@ import { currentUser } from "@/lib/auth";
 
 export async function GET(
   req: Request,
-  { params }: { params: { boardId: string } }
+  { params }: { params: { boardId: string; workspaceId: string } }
 ) {
   try {
     const user = await currentUser();
@@ -12,12 +12,13 @@ export async function GET(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { boardId } = params;
+    const { boardId, workspaceId } = params;
 
     // Check if the board exists and the user has access to it
     const board = await db.board.findFirst({
       where: {
         id: boardId,
+        workspaceId,
         User: {
           some: {
             id: user.id,
@@ -27,9 +28,7 @@ export async function GET(
     });
 
     if (!board) {
-      return new NextResponse("Board not found or access denied", {
-        status: 404,
-      });
+      return new NextResponse("Board not found or access denied", { status: 404 });
     }
 
     // Get all documents and folders for the board
@@ -60,7 +59,7 @@ export async function GET(
 
 export async function POST(
   req: Request,
-  { params }: { params: { boardId: string } }
+  { params }: { params: { boardId: string; workspaceId: string } }
 ) {
   try {
     const user = await currentUser();
@@ -68,13 +67,14 @@ export async function POST(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { boardId } = params;
+    const { boardId, workspaceId } = params;
     const { title, content, folderId } = await req.json();
 
     // Check if the board exists and the user has access to it
     const board = await db.board.findFirst({
       where: {
         id: boardId,
+        workspaceId,
         User: {
           some: {
             id: user.id,

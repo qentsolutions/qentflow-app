@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
@@ -15,7 +15,8 @@ import {
     MoreVertical,
     Trash,
     Edit,
-    FolderOpen
+    FolderOpen,
+    Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -41,12 +42,10 @@ import { renameBoardDocument } from "@/actions/board-documents/rename-document";
 import { renameBoardFolder } from "@/actions/board-documents/rename-folder";
 
 interface DocumentSidebarProps {
-    params: {
-        boardId: string;
-        workspaceId: string;
-    };
-    selectedDocumentId?: string;
+    selectedDocumentId?: string | null;
     onSelectDocument: (documentId: string) => void;
+    onCreateDocument?: () => void;
+    refetchDocuments?: () => void;
 }
 
 interface Document {
@@ -66,7 +65,12 @@ interface DocumentsData {
     folders: Folder[];
 }
 
-export function DocumentSidebar({ params, selectedDocumentId, onSelectDocument }: DocumentSidebarProps) {
+export function DocumentSidebar({
+    selectedDocumentId,
+    onSelectDocument,
+    onCreateDocument,
+    refetchDocuments
+}: DocumentSidebarProps) {
     const router = useRouter();
     const { currentWorkspace } = useCurrentWorkspace();
     const queryClient = useQueryClient();
@@ -79,14 +83,40 @@ export function DocumentSidebar({ params, selectedDocumentId, onSelectDocument }
     const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
     const [itemToRename, setItemToRename] = useState<{ id: string; type: 'document' | 'folder'; name: string } | null>(null);
     const [newName, setNewName] = useState("");
+    const params = useParams();
 
-    const { data: documentsData, isLoading } = useQuery<DocumentsData>({
+    const { data: documentsData, isLoading, refetch } = useQuery<DocumentsData>({
         queryKey: ["board-documents", params.boardId],
         queryFn: () => fetcher(`/api/boards/${currentWorkspace?.id}/${params.boardId}/documents`),
-        enabled: !!params.boardId,
+        enabled: !!params.boardId && !!currentWorkspace?.id,
     });
 
-    const toggleFolder = (folderId: string) => {
+    // Expand parent folders when a document is selected
+    useEffect(() => {
+        if (selectedDocumentId && documentsData) {
+            const selectedDoc = documentsData.documents.find(doc => doc.id === selectedDocumentId);
+            if (selectedDoc && selectedDoc.folderId) {
+                // Find all parent folders recursively
+                const expandParentFolders = (folderId: string) => {
+                    setExpandedFolders(prev => {
+                        const newSet = new Set(prev);
+                        newSet.add(folderId);
+                        return newSet;
+                    });
+
+                    const folder = documentsData.folders.find(f => f.id === folderId);
+                    if (folder && folder.parentId) {
+                        expandParentFolders(folder.parentId);
+                    }
+                };
+
+                expandParentFolders(selectedDoc.folderId);
+            }
+        }
+    }, [selectedDocumentId, documentsData]);
+
+    const toggleFolder = (folderId: string, e: React.MouseEvent) => {
+        e.stopPropagation();
         setExpandedFolders(prev => {
             const newSet = new Set(prev);
             if (newSet.has(folderId)) {
@@ -109,15 +139,15 @@ export function DocumentSidebar({ params, selectedDocumentId, onSelectDocument }
                 title: newDocumentTitle,
                 boardId: params.boardId as string,
                 workspaceId: currentWorkspace?.id as string,
+                folderId: selectedFolderId ?? undefined,
             });
 
             if (result.error) {
                 toast.error(result.error);
             } else {
                 toast.success("Document created successfully");
-                queryClient.invalidateQueries({
-                    queryKey: ["board-documents", params.boardId],
-                });
+                await refetch();
+                if (refetchDocuments) refetchDocuments();
                 setNewDocumentTitle("");
                 setIsCreateDocumentOpen(false);
                 if (result.data?.id) {
@@ -140,15 +170,15 @@ export function DocumentSidebar({ params, selectedDocumentId, onSelectDocument }
                 name: newFolderName,
                 boardId: params.boardId as string,
                 workspaceId: currentWorkspace?.id as string,
+                parentId: selectedFolderId ?? undefined,
             });
 
             if (result.error) {
                 toast.error(result.error);
             } else {
                 toast.success("Folder created successfully");
-                queryClient.invalidateQueries({
-                    queryKey: ["board-documents", params.boardId],
-                });
+                await refetch();
+                if (refetchDocuments) refetchDocuments();
                 setNewFolderName("");
                 setIsCreateFolderOpen(false);
 
@@ -166,7 +196,8 @@ export function DocumentSidebar({ params, selectedDocumentId, onSelectDocument }
         }
     };
 
-    const handleDeleteDocument = async (documentId: string) => {
+    const handleDeleteDocument = async (documentId: string, e: React.MouseEvent) => {
+        e.stopPropagation();
         try {
             const result = await deleteBoardDocument({
                 id: documentId,
@@ -178,13 +209,12 @@ export function DocumentSidebar({ params, selectedDocumentId, onSelectDocument }
                 toast.error(result.error);
             } else {
                 toast.success("Document deleted successfully");
-                queryClient.invalidateQueries({
-                    queryKey: ["board-documents", params.boardId],
-                });
+                await refetch();
+                if (refetchDocuments) refetchDocuments();
 
                 // If the deleted document was selected, clear the selection
                 if (selectedDocumentId === documentId) {
-                    onSelectDocument(null);
+                    onSelectDocument(null as any);
                 }
             }
         } catch (error) {
@@ -192,7 +222,8 @@ export function DocumentSidebar({ params, selectedDocumentId, onSelectDocument }
         }
     };
 
-    const handleDeleteFolder = async (folderId: string) => {
+    const handleDeleteFolder = async (folderId: string, e: React.MouseEvent) => {
+        e.stopPropagation();
         try {
             const result = await deleteBoardFolder({
                 id: folderId,
@@ -204,68 +235,78 @@ export function DocumentSidebar({ params, selectedDocumentId, onSelectDocument }
                 toast.error(result.error);
             } else {
                 toast.success("Folder deleted successfully");
-                queryClient.invalidateQueries({
-                    queryKey: ["board-documents", params.boardId],
-                });
+                await refetch();
+                if (refetchDocuments) refetchDocuments();
+
+                // If any document in the deleted folder was selected, clear the selection
+                if (selectedDocumentId) {
+                    const selectedDoc = documentsData?.documents.find(doc => doc.id === selectedDocumentId);
+                    if (selectedDoc && (selectedDoc.folderId === folderId ||
+                        documentsData?.folders.find(f => f.parentId === folderId)?.id === selectedDoc.folderId)) {
+                        onSelectDocument(null as any);
+                    }
+                }
             }
         } catch (error) {
             toast.error("Failed to delete folder");
         }
     };
 
-    const handleRenameItem = () => {
-        if (!itemToRename || !newName.trim()) return;
-
-        if (itemToRename.type === 'document') {
-            renameBoardDocument({
-                id: itemToRename.id,
-                title: newName,
-                boardId: params.boardId as string,
-                workspaceId: currentWorkspace?.id as string,
-            }).then((result) => {
-                if (result.error) {
-                    toast.error(result.error);
-                } else {
-                    toast.success("Document renamed successfully");
-                    queryClient.invalidateQueries({
-                        queryKey: ["board-documents", params.boardId],
-                    });
-                    setIsRenameDialogOpen(false);
-                }
-            }).catch(() => {
-                toast.error("Failed to rename document");
-            });
-        } else {
-            renameBoardFolder({
-                id: itemToRename.id,
-                name: newName,
-                boardId: params.boardId as string,
-                workspaceId: currentWorkspace?.id as string,
-            }).then((result) => {
-                if (result.error) {
-                    toast.error(result.error);
-                } else {
-                    toast.success("Folder renamed successfully");
-                    queryClient.invalidateQueries({
-                        queryKey: ["board-documents", params.boardId],
-                    });
-                    setIsRenameDialogOpen(false);
-                }
-            }).catch(() => {
-                toast.error("Failed to rename folder");
-            });
-        }
-    };
-
-    const openRenameDialog = (id: string, type: 'document' | 'folder', currentName: string) => {
+    const openRenameDialog = (id: string, type: 'document' | 'folder', currentName: string, e: React.MouseEvent) => {
+        e.stopPropagation();
         setItemToRename({ id, type, name: currentName });
         setNewName(currentName);
         setIsRenameDialogOpen(true);
     };
 
+    const handleRenameItem = async () => {
+        if (!itemToRename || !newName.trim()) return;
+
+        try {
+            if (itemToRename.type === 'document') {
+                const result = await renameBoardDocument({
+                    id: itemToRename.id,
+                    title: newName,
+                    boardId: params.boardId as string,
+                    workspaceId: currentWorkspace?.id as string,
+                });
+
+                if (result.error) {
+                    toast.error(result.error);
+                } else {
+                    toast.success("Document renamed successfully");
+                    await refetch();
+                    if (refetchDocuments) refetchDocuments();
+                    setIsRenameDialogOpen(false);
+                }
+            } else {
+                const result = await renameBoardFolder({
+                    id: itemToRename.id,
+                    name: newName,
+                    boardId: params.boardId as string,
+                    workspaceId: currentWorkspace?.id as string,
+                });
+
+                if (result.error) {
+                    toast.error(result.error);
+                } else {
+                    toast.success("Folder renamed successfully");
+                    await refetch();
+                    if (refetchDocuments) refetchDocuments();
+                    setIsRenameDialogOpen(false);
+                }
+            }
+        } catch (error) {
+            toast.error(`Failed to rename ${itemToRename.type}`);
+        }
+    };
+
+    // Function to render folders and their contents recursively
     const renderFolderContents = (folderId: string | null, level = 0) => {
-        const folders = documentsData?.folders.filter(f => f.parentId === folderId) || [];
-        const documents = documentsData?.documents.filter(d => d.folderId === folderId) || [];
+        if (!documentsData) return null;
+
+        const folders = documentsData.folders.filter(f => f.parentId === folderId);
+        const documents = documentsData.documents.filter(d => d.folderId === folderId);
 
         return (
             <>
@@ -276,10 +317,11 @@ export function DocumentSidebar({ params, selectedDocumentId, onSelectDocument }
                                 "flex items-center justify-between py-1 px-2 rounded-md hover:bg-gray-100 cursor-pointer",
                                 level > 0 && `ml-${level * 4}`
                             )}
+                            onClick={(e) => e.stopPropagation()} // Prevent click from bubbling
                         >
                             <div
                                 className="flex items-center gap-2 flex-1"
-                                onClick={() => toggleFolder(folder.id)}
+                                onClick={(e) => toggleFolder(folder.id, e)}
                             >
                                 <ChevronRight
                                     className={cn(
@@ -297,7 +339,7 @@ export function DocumentSidebar({ params, selectedDocumentId, onSelectDocument }
 
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
                                         <MoreVertical className="h-4 w-4" />
                                     </Button>
                                 </DropdownMenuTrigger>
@@ -323,19 +365,13 @@ export function DocumentSidebar({ params, selectedDocumentId, onSelectDocument }
                                         New Folder
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            openRenameDialog(folder.id, 'folder', folder.name);
-                                        }}
+                                        onClick={(e) => openRenameDialog(folder.id, 'folder', folder.name, e)}
                                     >
                                         <Edit className="h-4 w-4 mr-2" />
                                         Rename
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDeleteFolder(folder.id);
-                                        }}
+                                        onClick={(e) => handleDeleteFolder(folder.id, e)}
                                         className="text-red-600"
                                     >
                                         <Trash className="h-4 w-4 mr-2" />
@@ -361,10 +397,10 @@ export function DocumentSidebar({ params, selectedDocumentId, onSelectDocument }
                             selectedDocumentId === document.id && "bg-blue-50",
                             level > 0 && `ml-${level * 4}`
                         )}
+                        onClick={() => onSelectDocument(document.id)}
                     >
                         <div
                             className="flex items-center gap-2 flex-1"
-                            onClick={() => onSelectDocument(document.id)}
                         >
                             <File className="h-4 w-4 text-blue-500 ml-6" />
                             <span className="text-sm truncate">{document.title}</span>
@@ -372,25 +408,19 @@ export function DocumentSidebar({ params, selectedDocumentId, onSelectDocument }
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
                                     <MoreVertical className="h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        openRenameDialog(document.id, 'document', document.title);
-                                    }}
+                                    onClick={(e) => openRenameDialog(document.id, 'document', document.title, e)}
                                 >
                                     <Edit className="h-4 w-4 mr-2" />
                                     Rename
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDeleteDocument(document.id);
-                                    }}
+                                    onClick={(e) => handleDeleteDocument(document.id, e)}
                                     className="text-red-600"
                                 >
                                     <Trash className="h-4 w-4 mr-2" />
@@ -414,8 +444,12 @@ export function DocumentSidebar({ params, selectedDocumentId, onSelectDocument }
                             variant="ghost"
                             size="sm"
                             onClick={() => {
-                                setSelectedFolderId(null);
-                                setIsCreateDocumentOpen(true);
+                                if (onCreateDocument) {
+                                    onCreateDocument();
+                                } else {
+                                    setSelectedFolderId(null);
+                                    setIsCreateDocumentOpen(true);
+                                }
                             }}
                             className="h-8 w-8 p-0"
                         >
@@ -439,7 +473,8 @@ export function DocumentSidebar({ params, selectedDocumentId, onSelectDocument }
             <div className="p-2">
                 {isLoading ? (
                     <div className="flex items-center justify-center h-20">
-                        <p className="text-sm text-gray-500">Loading documents...</p>
+                        <Loader2 className="h-5 w-5 text-gray-500 animate-spin" />
+                        <p className="text-sm text-gray-500 ml-2">Loading documents...</p>
                     </div>
                 ) : documentsData && (documentsData.folders.length > 0 || documentsData.documents.length > 0) ? (
                     renderFolderContents(null)
@@ -451,8 +486,12 @@ export function DocumentSidebar({ params, selectedDocumentId, onSelectDocument }
                             variant="outline"
                             size="sm"
                             onClick={() => {
-                                setSelectedFolderId(null);
-                                setIsCreateDocumentOpen(true);
+                                if (onCreateDocument) {
+                                    onCreateDocument();
+                                } else {
+                                    setSelectedFolderId(null);
+                                    setIsCreateDocumentOpen(true);
+                                }
                             }}
                             className="text-xs"
                         >

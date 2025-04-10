@@ -38,7 +38,7 @@ export default function DocumentDynamic({ params }: any) {
 
   return (
     <div className="flex-1 overflow-y-auto">
-      <DocumentEditor document={document} />
+      <DocumentEditor document={document} boardId={boardId} workspaceId={workspaceId} />
     </div>
   );
 }

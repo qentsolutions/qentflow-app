@@ -4,7 +4,7 @@ import { currentUser } from "@/lib/auth";
 
 export async function GET(
   req: Request,
-  { params }: { params: { boardId: string; documentId: string } }
+  { params }: { params: { boardId: string; documentId: string; workspaceId: string } }
 ) {
   try {
     const user = await currentUser();
@@ -12,12 +12,13 @@ export async function GET(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { boardId, documentId } = params;
+    const { boardId, documentId, workspaceId } = params;
 
     // Check if the board exists and the user has access to it
     const board = await db.board.findFirst({
       where: {
         id: boardId,
+        workspaceId,
         User: {
           some: {
             id: user.id,
@@ -60,7 +61,7 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { boardId: string; documentId: string } }
+  { params }: { params: { boardId: string; documentId: string; workspaceId: string } }
 ) {
   try {
     const user = await currentUser();
@@ -68,13 +69,14 @@ export async function PATCH(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { boardId, documentId } = params;
+    const { boardId, documentId, workspaceId } = params;
     const { title, content } = await req.json();
 
     // Check if the board exists and the user has access to it
     const board = await db.board.findFirst({
       where: {
         id: boardId,
+        workspaceId,
         User: {
           some: {
             id: user.id,
@@ -94,8 +96,8 @@ export async function PATCH(
         boardId,
       },
       data: {
-        title,
-        content,
+        title: title !== undefined ? title : undefined,
+        content: content !== undefined ? content : undefined,
       },
     });
 
@@ -108,7 +110,7 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { boardId: string; documentId: string } }
+  { params }: { params: { boardId: string; documentId: string; workspaceId: string } }
 ) {
   try {
     const user = await currentUser();
@@ -116,12 +118,13 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { boardId, documentId } = params;
+    const { boardId, documentId, workspaceId } = params;
 
     // Check if the board exists and the user has access to it
     const board = await db.board.findFirst({
       where: {
         id: boardId,
+        workspaceId,
         User: {
           some: {
             id: user.id,

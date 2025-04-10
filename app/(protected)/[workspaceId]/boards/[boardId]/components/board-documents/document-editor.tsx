@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -33,17 +33,20 @@ import { DocumentToolbar } from "./document-toolbar";
 
 interface DocumentEditorProps {
     document: any;
+    boardId: string;
+    workspaceId: string;
     onTitleChange?: (title: string) => void;
 }
 
-export function DocumentEditor({ document, onTitleChange }: DocumentEditorProps) {
+export function DocumentEditor({ document, boardId, workspaceId, onTitleChange }: DocumentEditorProps) {
     const [title, setTitle] = useState(document.title || "");
     const [content, setContent] = useState(document.content || "");
     const [isSaving, setIsSaving] = useState(false);
     const debouncedContent = useDebounce(content, 1000);
+    const debouncedTitle = useDebounce(title, 1000);
     const { currentWorkspace } = useCurrentWorkspace();
-    const params = useParams();
     const queryClient = useQueryClient();
+    const editorRef = useRef<HTMLDivElement>(null);
 
     const editor = useEditor({
         extensions: [
@@ -97,7 +100,7 @@ export function DocumentEditor({ document, onTitleChange }: DocumentEditorProps)
                 types: ['heading', 'paragraph'],
             }),
         ],
-        content: document.content,
+        content: document.content || "",
         editorProps: {
             attributes: {
                 class: "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none p-6 min-h-[500px]",
@@ -108,25 +111,48 @@ export function DocumentEditor({ document, onTitleChange }: DocumentEditorProps)
         },
     });
 
+    // Update editor content when document changes
+    useEffect(() => {
+        if (editor && document.content !== undefined && document.content !== content) {
+            editor.commands.setContent(document.content);
+            setContent(document.content);
+        }
+        if (document.title !== title) {
+            setTitle(document.title);
+        }
+    }, [document.id, document.content, document.title, editor]);
+
+    // Save changes when content or title changes
     useEffect(() => {
         const updateContent = async () => {
-            if (debouncedContent === document.content) return;
+            // Only save if content or title has changed
+            if (
+                (debouncedContent === document.content && debouncedTitle === document.title) ||
+                !debouncedContent || 
+                !debouncedTitle
+            ) {
+                return;
+            }
 
             setIsSaving(true);
             try {
                 const result = await updateBoardDocument({
                     id: document.id,
-                    title,
+                    title: debouncedTitle,
                     content: debouncedContent,
-                    boardId: params.boardId as string,
-                    workspaceId: currentWorkspace?.id as string,
+                    boardId: boardId,
+                    workspaceId: workspaceId,
                 });
 
                 if (result.error) {
                     toast.error(result.error);
                 } else {
+                    // Invalidate queries to refresh data
                     queryClient.invalidateQueries({
                         queryKey: ["board-document", document.id],
+                    });
+                    queryClient.invalidateQueries({
+                        queryKey: ["board-documents", boardId],
                     });
                 }
             } catch (error) {
@@ -137,7 +163,7 @@ export function DocumentEditor({ document, onTitleChange }: DocumentEditorProps)
         };
 
         updateContent();
-    }, [debouncedContent, document.id, document.content, title, params.boardId, currentWorkspace?.id, queryClient]);
+    }, [debouncedContent, debouncedTitle, document.id, document.content, document.title, boardId, workspaceId, queryClient]);
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newTitle = e.target.value;
@@ -154,8 +180,8 @@ export function DocumentEditor({ document, onTitleChange }: DocumentEditorProps)
                 id: document.id,
                 title,
                 content,
-                boardId: params.boardId as string,
-                workspaceId: currentWorkspace?.id as string,
+                boardId: boardId,
+                workspaceId: workspaceId,
             });
 
             if (result.error) {
@@ -164,6 +190,9 @@ export function DocumentEditor({ document, onTitleChange }: DocumentEditorProps)
                 toast.success("Document saved successfully");
                 queryClient.invalidateQueries({
                     queryKey: ["board-document", document.id],
+                });
+                queryClient.invalidateQueries({
+                    queryKey: ["board-documents", boardId],
                 });
             }
         } catch (error) {
@@ -216,7 +245,7 @@ export function DocumentEditor({ document, onTitleChange }: DocumentEditorProps)
 
                     <DocumentToolbar editor={editor} />
 
-                    <div className="flex-1 overflow-y-auto bg-white">
+                    <div className="flex-1 overflow-y-auto bg-white" ref={editorRef}>
                         <EditorContent editor={editor} className="min-h-[calc(100vh-200px)]" />
                     </div>
                 </div>
