@@ -41,6 +41,10 @@ import { renameBoardDocument } from "@/actions/board-documents/rename-document";
 import { renameBoardFolder } from "@/actions/board-documents/rename-folder";
 
 interface DocumentSidebarProps {
+    params: {
+        boardId: string;
+        workspaceId: string;
+    };
     selectedDocumentId?: string;
     onSelectDocument: (documentId: string) => void;
 }
@@ -62,8 +66,7 @@ interface DocumentsData {
     folders: Folder[];
 }
 
-export function DocumentSidebar({ selectedDocumentId, onSelectDocument }: DocumentSidebarProps) {
-    const params = useParams();
+export function DocumentSidebar({ params, selectedDocumentId, onSelectDocument }: DocumentSidebarProps) {
     const router = useRouter();
     const { currentWorkspace } = useCurrentWorkspace();
     const queryClient = useQueryClient();
@@ -181,7 +184,7 @@ export function DocumentSidebar({ selectedDocumentId, onSelectDocument }: Docume
 
                 // If the deleted document was selected, clear the selection
                 if (selectedDocumentId === documentId) {
-                    router.push(`/${params.workspaceId}/boards/${params.boardId}/documents`);
+                    onSelectDocument(null);
                 }
             }
         } catch (error) {

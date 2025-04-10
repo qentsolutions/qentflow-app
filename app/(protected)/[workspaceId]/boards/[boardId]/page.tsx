@@ -9,12 +9,12 @@ import { CalendarView } from "./components/calendar/calendar-view";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { OverviewView } from "./components/overview/overview-view";
-import { Calendar, Clock, FileText, LayoutDashboard, ListTodo, PaperclipIcon, SettingsIcon } from "lucide-react";
+import { Calendar, Clock, FileText, LayoutDashboard, ListTodo, SettingsIcon } from "lucide-react";
 import { AddCardButton } from "./components/add-card-button";
 import { Automations } from "./components/automations/automations";
 import TimelineView from "./components/timeline/timeline-view";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import BoardDocumentsPage from "./documents/page";
+import ClientBoardContent from "./components/client-board-content";
 
 interface BoardIdPageProps {
   params: {
@@ -207,7 +207,7 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                   </ScrollArea>
                 </TabsContent>
                 <TabsContent value="documents">
-                  <BoardDocumentsPage />
+                  <ClientBoardContent params={params} />
                 </TabsContent>
                 <TabsContent value="settings">
                   <Settings
