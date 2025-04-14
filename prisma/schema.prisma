@@ -53,6 +53,13 @@ enum AutomationActionType {
   SEND_EMAIL
 }
 
+enum RelationshipType {
+  PARENT_CHILD
+  DEPENDS_ON
+  BLOCKED_BY
+  RELATES_TO
+}
+
 model User {
   id                    String                 @id @default(cuid())
   name                  String?
@@ -296,6 +303,15 @@ model Card {
   assignedUserId String? // Ajout du champ pour stocker l'ID de l'utilisateur assigné
   assignedUser   User?   @relation(fields: [assignedUserId], references: [id])
 
+  // Card hierarchy and dependencies
+  parentId String? // Parent card ID
+  parent   Card?   @relation("CardHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children Card[]  @relation("CardHierarchy")
+
+  // Card relationships
+  sourceRelationships      CardRelationship[] @relation("SourceCard")
+  destinationRelationships CardRelationship[] @relation("DestinationCard")
+
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   startDate   DateTime?
@@ -312,6 +328,22 @@ model Card {
   notes Note[]
 
   @@index([listId])
+  @@index([parentId])
+}
+
+model CardRelationship {
+  id             String          @id @default(uuid())
+  sourceCardId   String
+  sourceCard     Card            @relation("SourceCard", fields: [sourceCardId], references: [id], onDelete: Cascade)
+  destCardId     String
+  destCard       Card            @relation("DestinationCard", fields: [destCardId], references: [id], onDelete: Cascade)
+  relationshipType RelationshipType
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@unique([sourceCardId, destCardId, relationshipType])
+  @@index([sourceCardId])
+  @@index([destCardId])
 }
 
 model Task {

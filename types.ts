@@ -1,4 +1,4 @@
-import { Card, List, Tag, Document } from "@prisma/client";
+import { Card, List, Tag, Document, RelationshipType } from "@prisma/client";
 
 export type CardWithList = Card & {
   list: List;
@@ -12,18 +12,33 @@ export type CardWithList = Card & {
     id: string;
     completed: boolean;
   }[];
-  priority: string | null; // Ajoutez cette ligne pour inclure la propriété 'priority'
-  assignedUserId?: string | null; // Ajoutez cette ligne pour inclure la propriété 'assignedUserId'
-  startDate?: Date | null; // Ajoutez cette ligne pour inclure la propriété 'startDate'
-  dueDate?: Date | null; // Ajoutez cette ligne pour inclure la propriété 'dueDate'
+  priority: string | null;
+  assignedUserId?: string | null;
+  startDate?: Date | null;
+  dueDate?: Date | null;
+  parent?: CardWithList | null;
+  children?: CardWithList[];
+  sourceRelationships?: CardRelationship[];
+  destinationRelationships?: CardRelationship[];
+};
+
+export type CardRelationship = {
+  id: string;
+  sourceCardId: string;
+  destCardId: string;
+  relationshipType: RelationshipType;
+  sourceCard?: CardWithList;
+  destCard?: CardWithList;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type ListWithCards = List & {
   cards: CardWithList[];
-  order: number; // Ajoutez cette ligne pour inclure la propriété 'order'
-  boardId: string; // Ajoutez cette ligne pour inclure la propriété 'boardId'
-  createdAt: Date; // Ajoutez cette ligne pour inclure la propriété 'createdAt'
-  updatedAt: Date; // Ajoutez cette ligne pour inclure la propriété 'updatedAt'
+  order: number;
+  boardId: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type Comment = {

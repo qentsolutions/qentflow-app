@@ -7,7 +7,14 @@ import { useCardModal } from "@/hooks/use-card-modal";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { UserPlus, UserIcon, UserX, MessageSquareText, AlertTriangle, Paperclip, Flag, Check } from "lucide-react";
+import {
+  UserPlus,
+  UserIcon,
+  UserX,
+  MessageSquareText,
+  Paperclip,
+  Check,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { assignUserToCard } from "@/actions/boards/assign-user-to-card";
@@ -18,7 +25,9 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import CardActions from "./card-actions";
-import { ListWithCards } from "@/types";
+import type { ListWithCards } from "@/types";
+import { useQuery } from "@tanstack/react-query";
+import { fetcher } from "@/lib/fetcher";
 
 interface CardItemProps {
   data: {
@@ -87,31 +96,19 @@ export const CardItem = ({ data, index, users, lists, setOrderedData }: CardItem
   };
 
   const getPriorityDetails = (priority: string | null) => {
-    if (!priority) return { icon: null, color: "" };
+    if (!priority) return { color: "" };
 
     switch (priority) {
       case "LOW":
-        return {
-          icon: <Flag className="text-emerald-500" size={14} />,
-          color: "text-emerald-500",
-        };
+        return { color: "text-emerald-500" };
       case "MEDIUM":
-        return {
-          icon: <Flag className="text-amber-500" size={14} />,
-          color: "text-amber-500",
-        };
+        return { color: "text-amber-500" };
       case "HIGH":
-        return {
-          icon: <Flag className="text-rose-500" size={14} />,
-          color: "text-rose-500",
-        };
+        return { color: "text-rose-500" };
       case "CRITICAL":
-        return {
-          icon: <AlertTriangle className="text-red-600" size={14} />,
-          color: "text-red-600",
-        };
+        return { color: "text-red-600" };
       default:
-        return { icon: null, color: "" };
+        return { color: "" };
     }
   };
 
@@ -140,24 +137,33 @@ export const CardItem = ({ data, index, users, lists, setOrderedData }: CardItem
             </div>
           )}
 
-          {/* Priority indicator strip */}
+          {/* Priority indicator strip with tooltip */}
           {data.priority && (
-            <div
-              className={cn(
-                "absolute top-0 left-0 w-1 h-full",
-                data.priority === "LOW" && "bg-emerald-500",
-                data.priority === "MEDIUM" && "bg-amber-500",
-                data.priority === "HIGH" && "bg-rose-500",
-                data.priority === "CRITICAL" && "bg-red-600",
-              )}
-            />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className={cn(
+                      "absolute top-0 left-0 w-1 h-full",
+                      data.priority === "LOW" && "bg-emerald-500",
+                      data.priority === "MEDIUM" && "bg-amber-500",
+                      data.priority === "HIGH" && "bg-rose-500",
+                      data.priority === "CRITICAL" && "bg-red-600",
+                    )}
+                  />
+                </TooltipTrigger>
+                <TooltipContent side="left" className={cn("text-xs font-medium", priorityDetails.color)}>
+                  {data.priority}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
 
           {data.archived && (
             <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(0,0,0,0.05)_25%,rgba(0,0,0,0.05)_50%,transparent_50%,transparent_75%,rgba(0,0,0,0.05)_75%)] bg-[length:8px_8px] pointer-events-none z-0" />
           )}
 
-          <div className="pt-3 px-3 pb-1 space-y-3">
+          <div className={cn("px-3 pb-1 space-y-3 pt-3")}>
             {/* Tags */}
             {data?.tags && data.tags.length > 0 && (
               <div className="flex items-start gap-1.5 flex-wrap">
@@ -231,22 +237,8 @@ export const CardItem = ({ data, index, users, lists, setOrderedData }: CardItem
                 </Tooltip>
               </div>
 
-              {/* Right side - Priority & Assignee */}
+              {/* Right side - Assignee */}
               <div className="flex items-center gap-2">
-                {/* Priority */}
-                {priorityDetails.icon && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="cursor-help">{priorityDetails.icon}</div>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className={cn("text-xs font-medium", priorityDetails.color)}>
-                        {data.priority}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-
                 {/* Assignee */}
                 <TooltipProvider>
                   <Tooltip>
@@ -345,7 +337,7 @@ export const CardItem = ({ data, index, users, lists, setOrderedData }: CardItem
               <PopoverTrigger asChild>
                 <button
                   className="transition p-1 rounded-lg bg-gray-100 hover:bg-gray-100"
-                  onClick={(e) => e.stopPropagation()} // Stop propagation to prevent card click
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <MoreVertical size={16} />
                 </button>
@@ -355,8 +347,6 @@ export const CardItem = ({ data, index, users, lists, setOrderedData }: CardItem
               </PopoverContent>
             </Popover>
           </div>
-
-
         </div>
       )}
     </Draggable>
