@@ -189,7 +189,7 @@ export const BoardList: React.FC = () => {
 
   return (
     <div className="bg-gray-50 h-full">
-      <Card className="shadow-sm rounded-none w-full">
+      <Card className="shadow-none border-none rounded-none w-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">
             <div className="flex items-center mb-4 gap-x-2">

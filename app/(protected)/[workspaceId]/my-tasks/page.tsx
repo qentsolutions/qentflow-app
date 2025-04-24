@@ -278,7 +278,7 @@ export default function MyTasksPage() {
               />
             </div>
           </div>
-          <ScrollArea className="flex-1 max-h-screen">
+          <ScrollArea className="flex-1">
             <AnimatePresence>
               {sortedCards.length > 0 ? (
                 sortedCards.map((card: any) => (
@@ -331,7 +331,7 @@ export default function MyTasksPage() {
       {!isMobile && (
         <>
           {/* Fix the "My Tasks" section */}
-          <div className="w-1/3 flex-shrink-0 border-r bg-background h-screen overflow-y-auto">
+          <div className="w-1/3 flex-shrink-0 border-r bg-background h-screen">
             <div className="border-b p-4">
               <div className="mb-4 flex items-center justify-between">
                 <h1 className="text-2xl font-bold">My Tasks</h1>
@@ -379,7 +379,7 @@ export default function MyTasksPage() {
                 />
               </div>
             </div>
-            <ScrollArea className="h-full px-2 py-2">
+            <ScrollArea className="h-full px-2 py-2 max-h-[85vh]">
               <AnimatePresence>
                 {sortedCards.length > 0 ? (
                   sortedCards.map((card: any) => (

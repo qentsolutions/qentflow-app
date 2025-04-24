@@ -146,8 +146,8 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
   const ganttFeatures = transformCardsToGanttFeatures(cards);
 
   return (
-    <div className="w-full pl-2 h-screen">
-      <Card className="shadow-none rounded-none">
+    <div className="w-full h-screen">
+      <Card className="shadow-none border-none rounded-none">
         <main className="relative w-full mx-auto h-full">
           <div className="flex flex-col h-full w-full">
             <div className="flex items-center justify-between px-6 pt-4">

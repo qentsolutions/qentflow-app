@@ -185,7 +185,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
 
   return (
     <>
-      <div className="flex items-center justify-between gap-4 mb-2 px-6">
+      <div className="flex items-center justify-between gap-4 px-6">
         <div className="flex items-center gap-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -430,7 +430,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
           </Tooltip>
         </div>
       </div>
-      <main className="w-full max-w-screen shadow-sm overflow-x-auto bg-background h-[75vh] px-2">
+      <main className="w-full max-w-screen shadow-sm overflow-x-auto bg-background h-[78vh] px-2">
         {renderView()}
       </main>
     </>

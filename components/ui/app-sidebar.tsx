@@ -67,28 +67,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         count: taskCount,
       },
     ],
-    navTools: [
-      {
-        name: "Documents",
-        url: `/${workspaceId}/documents`,
-        icon: FileText,
-        isActive: false,
-      },
-      {
-        name: "Whiteboards",
-        url: `/${workspaceId}/whiteboards`,
-        icon: Presentation,
-        isActive: false,
-        disabled: true, // Ajout de l'attribut disabled
-      },
-      {
-        name: "Courses",
-        url: `/${workspaceId}/courses`,
-        icon: LibraryBig,
-        isActive: false,
-        disabled: true, // Ajout de l'attribut disabled
-      },
-    ],
+    navTools: [],
   };
 
   return (
