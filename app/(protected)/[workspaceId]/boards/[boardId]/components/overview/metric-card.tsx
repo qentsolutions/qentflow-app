@@ -26,9 +26,6 @@ export const MetricCard = ({
       "p-6 transition-all duration-300",
       "bg-gradient-to-br from-background to-muted/50",
       "border border-border/50 backdrop-blur-sm",
-      variant === "success" && "from-green-50 dark:from-green-950/30",
-      variant === "warning" && "from-yellow-50 dark:from-yellow-950/30",
-      variant === "danger" && "from-red-50 dark:from-red-950/30"
     )}>
       <div className="space-y-2">
         <div className="flex items-center justify-between">

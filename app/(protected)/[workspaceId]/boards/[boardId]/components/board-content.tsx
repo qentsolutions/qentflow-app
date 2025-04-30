@@ -420,7 +420,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
           <ViewSwitcher selectedView={selectedView} onViewChange={setSelectedView} />
           <Tooltip>
             <TooltipTrigger>
-              <Button onClick={RefreshPage} variant="ghost" size="icon" className="h-9 w-9">
+              <Button onClick={RefreshPage} variant="outline" size="icon" className="h-9 w-9 mt-2">
                 <RefreshCcw className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
@@ -430,7 +430,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
           </Tooltip>
         </div>
       </div>
-      <main className="w-full max-w-screen shadow-sm overflow-x-auto bg-background h-[78vh] px-2">
+      <main className="w-full max-w-screen shadow-sm overflow-x-auto bg-background h-[75vh] px-2 mt-4">
         {renderView()}
       </main>
     </>

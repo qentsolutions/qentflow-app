@@ -8,8 +8,8 @@ export const CreateBoardFromTemplate = z.object({
   .min(2, {
     message: "Title is too short.",
   })
-  .refine(title => /^[a-zA-Z0-9\s]+$/.test(title), {
-    message: "Title must not contain special characters",
+  .refine(title => /^[^<>{}]+$/.test(title), {
+    message: "Title must not contain special characters <, >, {, or }",
   }),
   workspaceId: z.string(),
   templateId: z.string(),

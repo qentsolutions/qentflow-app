@@ -75,7 +75,7 @@ export const FormPopover = ({
             className="text-sm focus-visible:ring-blue-400"
             placeholder="Enter board title"
           />
-          <FormSubmit className="w-full bg-blue-600 hover:bg-blue-700 hover:text-white text-white transition-colors duration-200 flex items-center justify-center gap-2 py-2 rounded-md">
+          <FormSubmit className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:text-white text-white transition-colors duration-200 flex items-center justify-center gap-2 py-2 rounded-md">
             <PlusCircle className="w-5 h-5" />
             Create Board
           </FormSubmit>

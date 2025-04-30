@@ -93,7 +93,7 @@ export const BoardCard = ({ board, onClick }: BoardCardProps) => {
                     transition={{ duration: 0.2 }}
                     className="rounded-full bg-white px-4 py-2 font-medium text-indigo-600 shadow-md"
                   >
-                    Open Board
+                    Open Project
                   </motion.div>
                 </div>
               )}

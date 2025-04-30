@@ -2,8 +2,8 @@ export const boardTemplates = [
   // Modèles existants
   {
     id: "blank",
-    title: "Blank Board",
-    description: "Start from scratch with an empty board",
+    title: "Blank Project",
+    description: "Start from scratch with an empty project",
     icon: "✨",
     lists: [],
     tags: [],
@@ -102,7 +102,7 @@ export const boardTemplates = [
   {
     id: "kanban",
     title: "Kanban System",
-    description: "Classic Kanban board setup",
+    description: "Classic Kanban project setup",
     icon: "📋",
     lists: [
       {

@@ -1,37 +1,36 @@
-"use client"
-
-import type React from "react"
-import { useState, useEffect, useMemo } from "react"
-import { Search, KanbanSquare, Clock } from "lucide-react"
-import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
-import { useQuery } from "@tanstack/react-query"
-import { fetcher } from "@/lib/fetcher"
-import { BoardCard } from "./board-card"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
-import { boardTemplates } from "@/constants/board-templates"
-import { CreateBoardModal } from "@/components/modals/create-board-modal"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { cn } from "@/lib/utils"
-import { addRecentBoard, getRecentBoards } from "@/utils/localStorage"
-import { Separator } from "@/components/ui/separator"
+import { useEffect, useState, useMemo } from "react";
+import { Search, KanbanSquare, LayoutGrid, List, Users } from "lucide-react";
+import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery } from "@tanstack/react-query";
+import { fetcher } from "@/lib/fetcher";
+import { BoardCard } from "./board-card";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { boardTemplates } from "@/constants/board-templates";
+import { CreateBoardModal } from "@/components/modals/create-board-modal";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
+import { addRecentBoard, getRecentBoards } from "@/utils/localStorage";
+import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 // Dynamically force re-render
-export const dynamic = "force-dynamic"
+export const dynamic = "force-dynamic";
 
 interface TemplateExplorerProps {
-  onSelectTemplate: (templateId: string) => void
+  onSelectTemplate: (templateId: string) => void;
 }
 
 const TemplateExplorer: React.FC<TemplateExplorerProps> = ({ onSelectTemplate }) => {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedType, setSelectedType] = useState("All")
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedType, setSelectedType] = useState("All");
 
   const uniqueTypes = useMemo(() => {
     const types = ["All"];
@@ -102,8 +101,8 @@ const TemplateExplorer: React.FC<TemplateExplorerProps> = ({ onSelectTemplate })
         </ScrollArea>
       </div>
     </div>
-  )
-}
+  );
+};
 
 interface Board {
   id: string;
@@ -119,22 +118,33 @@ interface Board {
   image: string;
 }
 
-
 export const BoardList: React.FC = () => {
-  const { currentWorkspace } = useCurrentWorkspace()
-  const workspaceId = currentWorkspace?.id
-  const router = useRouter()
-  const [searchTerm, setSearchTerm] = useState<string>("")
-  const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true)
-  const [isCreateBoardModalOpen, setIsCreateBoardModalOpen] = useState<boolean>(false)
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("")
-  const [isExploreDialogOpen, setIsExploreDialogOpen] = useState<boolean>(false)
-  const [recentBoardIds, setRecentBoardIds] = useState<string[]>([])
+  const { currentWorkspace } = useCurrentWorkspace();
+  const workspaceId = currentWorkspace?.id;
+  const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true);
+  const [isCreateBoardModalOpen, setIsCreateBoardModalOpen] = useState<boolean>(false);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
+  const [isExploreDialogOpen, setIsExploreDialogOpen] = useState<boolean>(false);
+  const [recentBoardIds, setRecentBoardIds] = useState<string[]>([]);
+  const [selectedFilter, setSelectedFilter] = useState<string>("All");
+
+  // Initialize isCardView from localStorage
+  const [isCardView, setIsCardView] = useState<boolean>(() => {
+    const savedValue = localStorage.getItem('isCardView');
+    return savedValue ? JSON.parse(savedValue) : false;
+  });
 
   useEffect(() => {
-    document.title = "Projects - Qentflow"
-    setRecentBoardIds(getRecentBoards())
-  }, [])
+    document.title = "Projects - Qentflow";
+    setRecentBoardIds(getRecentBoards());
+  }, []);
+
+  useEffect(() => {
+    // Save isCardView to localStorage whenever it changes
+    localStorage.setItem('isCardView', JSON.stringify(isCardView));
+  }, [isCardView]);
 
   const {
     data: boards,
@@ -144,51 +154,70 @@ export const BoardList: React.FC = () => {
     queryKey: ["boards", workspaceId],
     queryFn: () => (workspaceId ? fetcher(`/api/boards?workspaceId=${workspaceId}`) : Promise.resolve([])),
     enabled: !!workspaceId,
-  })
+  });
 
   const safeBoards = Array.isArray(boards) ? boards : [];
 
   const filteredBoards = useMemo(() => {
     return safeBoards.filter((board: Board) =>
-      board.title.toLowerCase().includes(searchTerm.toLowerCase())
+      board.isMember && board.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [safeBoards, searchTerm]);
 
+
   const openBoards = useMemo(() => {
-    return filteredBoards.filter((board: Board) => board.isMember);
-  }, [filteredBoards]);
+    return filteredBoards.filter((board: Board) => {
+      if (selectedFilter === "All") return true;
+      if (selectedFilter === "Mine" && board.isMember) return true;
+      if (selectedFilter === "Not Mine" && !board.isMember) return true;
+      return false;
+    });
+  }, [filteredBoards, selectedFilter]);
 
   const recentBoards = useMemo(() => {
     return recentBoardIds
       .map(id => safeBoards.find((board: Board) => board.id === id))
-      .filter((board): board is Board => board !== undefined);
-  }, [recentBoardIds, safeBoards]);
+      .filter((board): board is Board => board !== undefined && board.isMember)
+      .filter((board: Board) => {
+        if (selectedFilter === "All") return true;
+        if (selectedFilter === "Mine" && board.isMember) return true;
+        if (selectedFilter === "Not Mine" && !board.isMember) return true;
+        return false;
+      });
+  }, [recentBoardIds, safeBoards, selectedFilter]);
+
+  // Combine recent boards and open boards, with recent boards first
+  const combinedBoards = useMemo(() => {
+    const recentBoardSet = new Set(recentBoards.map(board => board.id));
+    const filteredOpenBoards = openBoards.filter(board => !recentBoardSet.has(board.id));
+    return [...recentBoards, ...filteredOpenBoards];
+  }, [recentBoards, openBoards]);
 
   // Handle board click
   const handleBoardClick = (board: any) => {
     if (!board.isMember) {
-      toast.error("You are not a member of this board.")
-      return
+      toast.error("You are not a member of this board.");
+      return;
     }
-    addRecentBoard(board.id)
-    setRecentBoardIds(getRecentBoards())
-    router.push(`/${workspaceId}/boards/${board.id}`)
-  }
+    addRecentBoard(board.id);
+    setRecentBoardIds(getRecentBoards());
+    router.push(`/${workspaceId}/boards/${board.id}`);
+  };
 
   // Delay showing "No boards available"
   useEffect(() => {
     if (!isLoading) {
-      const timer = setTimeout(() => setIsFirstLoad(false), 500)
-      return () => clearTimeout(timer)
+      const timer = setTimeout(() => setIsFirstLoad(false), 500);
+      return () => clearTimeout(timer);
     }
-  }, [isLoading])
+  }, [isLoading]);
 
   if (error) {
-    return <div>Error loading boards. Please try again later.</div>
+    return <div>Error loading boards. Please try again later.</div>;
   }
 
   return (
-    <div className="bg-gray-50 h-full">
+    <div className="h-full">
       <Card className="shadow-none border-none rounded-none w-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">
@@ -197,30 +226,32 @@ export const BoardList: React.FC = () => {
                 <KanbanSquare size={24} />
                 Projects
                 <span
-                  className={cn("text-2xl font-semibold", openBoards?.length > 0 ? "text-blue-600" : "text-gray-400")}
+                  className={cn("text-2xl font-semibold", combinedBoards?.length > 0 ? "text-blue-600" : "text-gray-400")}
                 >
-                  {openBoards?.length || 0}
+                  {combinedBoards?.length || 0}
                 </span>
               </span>
             </div>
           </CardTitle>
-          <Dialog open={isExploreDialogOpen} onOpenChange={setIsExploreDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline">Explore templates</Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-6xl">
-              <DialogHeader>
-                <DialogTitle>Explore Board Templates</DialogTitle>
-              </DialogHeader>
-              <TemplateExplorer
-                onSelectTemplate={(templateId) => {
-                  setSelectedTemplateId(templateId)
-                  setIsExploreDialogOpen(false)
-                  setIsCreateBoardModalOpen(true)
-                }}
-              />
-            </DialogContent>
-          </Dialog>
+          <div className="flex items-center space-x-4">
+            <Dialog open={isExploreDialogOpen} onOpenChange={setIsExploreDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline">Explore templates</Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-6xl">
+                <DialogHeader>
+                  <DialogTitle>Explore Board Templates</DialogTitle>
+                </DialogHeader>
+                <TemplateExplorer
+                  onSelectTemplate={(templateId) => {
+                    setSelectedTemplateId(templateId);
+                    setIsExploreDialogOpen(false);
+                    setIsCreateBoardModalOpen(true);
+                  }}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
         </CardHeader>
         <CardContent>
           {/* Template Carousel */}
@@ -242,8 +273,8 @@ export const BoardList: React.FC = () => {
                       template.id === "blank" ? "bg-white" : "bg-gradient-to-br from-blue-50 to-indigo-50",
                     )}
                     onClick={() => {
-                      setSelectedTemplateId(template.id)
-                      setIsCreateBoardModalOpen(true)
+                      setSelectedTemplateId(template.id);
+                      setIsCreateBoardModalOpen(true);
                     }}
                   >
                     <div className="text-2xl mb-2">{template.icon}</div>
@@ -259,43 +290,92 @@ export const BoardList: React.FC = () => {
             <CarouselNext className="absolute top-1/2 -right-2 transform -translate-y-1/2 bg-white hover:bg-gray-100 rounded-full p-2 shadow-md" />
           </Carousel>
 
-          {/* Search Input */}
-          <div className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              className="pl-10"
-              placeholder="Search boards"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+          <div className="flex justify-between items-center gap-x-2 mb-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                className="pl-10 w-80"
+                placeholder="Search projects"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
 
-          {/* Recent Boards */}
-          {recentBoards.length > 0 && (
-            <div className="mb-6">
-              <p className="text-lg font-semibold mb-4 flex items-center gap-x-2">
-                <Clock size={18} />
-                Recently Opened
-              </p>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                {recentBoards.map((board) => (
-                  <BoardCard key={board.id} board={board} onClick={() => handleBoardClick(board)} />
-                ))}
+            <div className="flex items-center gap-x-2">
+              <p className="text-gray-600 text-sm">Filter by</p>
+              <Select value={selectedFilter} onValueChange={setSelectedFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All Projects</SelectItem>
+                  <SelectItem value="Mine">My Projects</SelectItem>
+                  <SelectItem value="Not Mine">Not My Projects</SelectItem>
+                </SelectContent>
+              </Select>
+              <Separator orientation="vertical" className="text-gray-500 h-8" />
+              <div className="flex gap-x-1">
+                <Button
+                  variant={isCardView ? "default" : "outline"}
+                  size="icon"
+                  onClick={() => setIsCardView(true)}
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={!isCardView ? "default" : "outline"}
+                  size="icon"
+                  onClick={() => setIsCardView(false)}
+                >
+                  <List className="h-4 w-4" />
+                </Button>
               </div>
             </div>
-          )}
-          {recentBoardIds.length > 0 && <Separator className="mb-6" />}
+          </div>
 
           {/* All Boards */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className={cn("grid", isCardView ? "gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" : "grid-cols-1")}>
             {isLoading || isFirstLoad ? (
               Array.from({ length: 4 }).map((_, idx) => (
                 <Skeleton key={idx} className="h-36 rounded-md bg-gray-200 dark:bg-gray-700" />
               ))
-            ) : openBoards.length > 0 ? (
-              openBoards.map((board) => (
-                <BoardCard key={board.id} board={board} onClick={() => handleBoardClick(board)} />
-              ))
+            ) : combinedBoards.length > 0 ? (
+              combinedBoards.map((board) =>
+                isCardView ? (
+                  <BoardCard key={board.id} board={board} onClick={() => handleBoardClick(board)} />
+                ) : (
+                  <div
+                    key={board.id}
+                    className="flex items-center p-4 border-b cursor-pointer transition hover:bg-gray-100"
+                    onClick={() => handleBoardClick(board)}
+                  >
+                    <div className="flex-shrink-0 mr-4">
+                      {board.image ? (
+                        <img src={board.image} alt={board.title} className="w-12 h-12 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-50 to-indigo-100 flex items-center justify-center">
+                          <span className="text-xl font-semibold text-indigo-500">{board.title.charAt(0).toUpperCase()}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-medium text-neutral-900">{board.title}</h3>
+                      <p className="text-sm text-gray-500">Created by {board.creator.name}</p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      {recentBoardIds.includes(board.id) && (
+                        <div className="flex items-center space-x-1 rounded-full bg-blue-100 text-blue-800 px-2 py-1">
+                          <span className="text-xs font-medium">Recently opened</span>
+                        </div>
+                      )}
+                      <div className="flex items-center space-x-1 rounded-full bg-neutral-100 px-2 py-1">
+                        <Users className="h-3 w-3 text-neutral-600" />
+                        <span className="text-xs font-medium text-neutral-600">{board.memberCount}</span>
+                      </div>
+                    </div>
+                  </div>
+                )
+              )
             ) : (
               <div className="col-span-full text-center py-10 rounded-lg">
                 <KanbanSquare className="h-10 w-10 mx-auto text-gray-400 mb-2" />
@@ -313,13 +393,6 @@ export const BoardList: React.FC = () => {
           templateId={selectedTemplateId}
         />
       </Card>
-      <CreateBoardModal
-        isOpen={isCreateBoardModalOpen}
-        onClose={() => setIsCreateBoardModalOpen(false)}
-        workspaceId={workspaceId || ""}
-        templateId={selectedTemplateId}
-      />
     </div>
-  )
-}
-
+  );
+};
