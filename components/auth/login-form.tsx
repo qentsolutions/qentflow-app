@@ -76,7 +76,7 @@ export const LoginForm = () => {
 
   return (
     <CardWrapper
-      headerLabel="Sign In"
+      headerLabel=""
       backButtonLabel="Don't have an account?"
       backButtonHref="/auth/register"
       showSocial
@@ -106,14 +106,14 @@ export const LoginForm = () => {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel className="text-white">Email</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
                           disabled={isPending}
                           placeholder="john.doe@example.com"
                           type="email"
-                          className="h-11"
+                          className="h-11 border-[#3A3A3A] text-white focus:border-blue-500"
                         />
                       </FormControl>
                       <FormMessage />
@@ -126,9 +126,9 @@ export const LoginForm = () => {
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex items-center justify-between">
-                        <FormLabel>Password</FormLabel>
+                        <FormLabel className="text-white">Password</FormLabel>
                         <Button size="sm" variant="link" asChild className="px-0 font-normal text-xs">
-                          <Link href="/auth/reset">Forgot password?</Link>
+                          <Link href="/auth/reset" className="text-white">Forgot password?</Link>
                         </Button>
                       </div>
                       <FormControl>
@@ -138,13 +138,13 @@ export const LoginForm = () => {
                             disabled={isPending}
                             placeholder="******"
                             type={showPassword ? "text" : "password"}
-                            className="h-11 pr-10"
+                            className="h-11 pr-10 border-[#3A3A3A] text-white focus:border-blue-500"
                           />
                           <Button
                             type="button"
                             variant="ghost"
                             size="icon"
-                            className="absolute right-0 top-0 h-11 w-11"
+                            className="hover:bg-transparent absolute right-0 top-0 h-11 w-11"
                             onClick={togglePasswordVisibility}
                           >
                             {showPassword ? (

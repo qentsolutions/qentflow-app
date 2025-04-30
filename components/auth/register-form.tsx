@@ -56,7 +56,7 @@ export const RegisterForm = () => {
 
   return (
     <CardWrapper
-      headerLabel="Create an account"
+      headerLabel=""
       backButtonLabel="Already have an account?"
       backButtonHref="/auth/login"
       showSocial
@@ -69,9 +69,10 @@ export const RegisterForm = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel className="text-white">Name</FormLabel>
                   <FormControl>
-                    <Input {...field} disabled={isPending} placeholder="John Doe" className="h-11" />
+                    <Input {...field} disabled={isPending} placeholder="John Doe" className="h-11 border-[#3A3A3A] text-white focus:border-blue-500"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -82,14 +83,14 @@ export const RegisterForm = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-white">Email</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       disabled={isPending}
                       placeholder="john.doe@example.com"
                       type="email"
-                      className="h-11"
+                      className="h-11 border-[#3A3A3A] text-white focus:border-blue-500"
                     />
                   </FormControl>
                   <FormMessage />
@@ -101,7 +102,7 @@ export const RegisterForm = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel className="text-white">Password</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
@@ -109,13 +110,13 @@ export const RegisterForm = () => {
                         disabled={isPending}
                         placeholder="******"
                         type={showPassword ? "text" : "password"}
-                        className="h-11 pr-10"
+                        className="h-11 pr-10 border-[#3A3A3A] text-white focus:border-blue-500"
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="absolute right-0 top-0 h-11 w-11"
+                        className="hover:bg-transparent absolute right-0 top-0 h-11 w-11"
                         onClick={togglePasswordVisibility}
                       >
                         {showPassword ? (
@@ -137,10 +138,10 @@ export const RegisterForm = () => {
               id="terms"
               checked={isTermsAccepted}
               onCheckedChange={(checked) => setIsTermsAccepted(checked === true)}
-              className="mt-1"
+              className="mt-1 border-[#3A3A3A]"
             />
             <div className="grid gap-1.5 leading-none">
-              <label htmlFor="terms" className="text-sm text-muted-foreground leading-relaxed">
+              <label htmlFor="terms" className="text-sm text-white leading-relaxed">
                 I agree to the{" "}
                 <Link href="https://www.qentflow.com/terms-of-service" target="_blank" className="text-blue-500 hover:text-blue-700">
                   Terms of Service
@@ -156,7 +157,7 @@ export const RegisterForm = () => {
           <FormError message={error} />
           <FormSuccess message={success} />
           <Button disabled={isPending} type="submit" className="w-full h-11 text-base font-medium">
-            {isPending ? "Creating account..." : "Create account"}
+            {isPending ? "Signing up..." : "Sign up"}
           </Button>
         </form>
       </Form>

@@ -34,7 +34,7 @@ const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
     <SidebarProvider>
       <BreadcrumbProvider>
         <AppSidebar />
-        <main className="w-full"> 
+        <main className="w-full">
           <div>
             {children}
           </div>

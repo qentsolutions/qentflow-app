@@ -1,9 +1,11 @@
 import { ResetForm } from "@/components/auth/reset-form";
 
 const ResetPage = () => {
-  return ( 
-    <ResetForm />
+  return (
+    <div className="bg-[#272727]">
+      <ResetForm />
+    </div>
   );
 }
- 
+
 export default ResetPage;
