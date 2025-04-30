@@ -91,8 +91,9 @@ const CardPage = ({ params, readonly }: any) => {
                     {!cardData ? (
                         <Header.Skeleton />
                     ) : (
-                        <Header data={cardData} readonly={readonly} />
+                        <Header data={cardData} readonly={readonly} boardId={cardData.list.board.id} /> // Modifiez cette ligne
                     )}
+
                     <div className="grid grid-cols-1 md:grid-cols-4 md:gap-4">
                         <div className="col-span-3">
                             <div className="w-full space-y-6">

@@ -17,6 +17,7 @@ export default auth(async (req) => {
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
+  const isOnboardingRoute = nextUrl.pathname === "/onboarding";
 
   if (isApiAuthRoute) {
     return null;
@@ -42,10 +43,39 @@ export default auth(async (req) => {
     );
   }
 
-  // Check if user has a workspace when logged in
-  if (isLoggedIn && !nextUrl.pathname.startsWith("/workspace/select") && !nextUrl.pathname.startsWith("/auth/loading")) {
+  // Check if user has completed onboarding
+  if (
+    isLoggedIn &&
+    !isOnboardingRoute &&
+    !nextUrl.pathname.startsWith("/auth/loading")
+  ) {
     const userId = req.auth?.user?.id;
-    
+
+    if (userId) {
+      const user = await db.user.findUnique({
+        where: { id: userId },
+        select: { hasCompletedOnboarding: true },
+      });
+
+      if (
+        user &&
+        !user.hasCompletedOnboarding &&
+        nextUrl.pathname !== "/onboarding"
+      ) {
+        return Response.redirect(new URL("/onboarding", nextUrl));
+      }
+    }
+  }
+
+  // Check if user has a workspace when logged in
+  if (
+    isLoggedIn &&
+    !nextUrl.pathname.startsWith("/workspace/select") &&
+    !nextUrl.pathname.startsWith("/auth/loading") &&
+    !isOnboardingRoute
+  ) {
+    const userId = req.auth?.user?.id;
+
     if (userId) {
       const workspaceMember = await db.workspaceMember.findFirst({
         where: {

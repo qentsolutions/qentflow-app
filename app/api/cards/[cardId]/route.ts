@@ -31,16 +31,16 @@ export async function GET(
     const card = await db.card.findUnique({
       where: {
         id: params.cardId,
-        list: {
-          board: {
-            workspaceId: params.workspaceId,
-          },
-        },
       },
       include: {
         list: {
           select: {
             title: true,
+            board: {
+              select: {
+                id: true,
+              },
+            },
           },
         },
         tags: {

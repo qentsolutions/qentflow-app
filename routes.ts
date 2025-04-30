@@ -41,6 +41,16 @@ export const getDefaultLoginRedirect = async () => {
   const user = await currentUser();
   if (!user) return "/auth/login";
 
+  // Check if user has completed onboarding
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_APP_URL}/api/user/me`
+  );
+  const userData = await response.json();
+
+  if (!userData.hasCompletedOnboarding) {
+    return "/onboarding";
+  }
+
   const { workspaces } = await getUserWorkspaces();
   if (!workspaces || workspaces.length === 0) {
     return "/workspace/select";
@@ -49,4 +59,4 @@ export const getDefaultLoginRedirect = async () => {
   return `/${workspaces[0].id}/home`;
 };
 
-export const DEFAULT_LOGIN_REDIRECT = "/workspace/select";
+export const DEFAULT_LOGIN_REDIRECT = "/auth/loading";

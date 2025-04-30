@@ -98,7 +98,7 @@ export const CardModal = () => {
               <Header.Skeleton />
             ) : (
               <div className="flex items-center justify-between">
-                <Header data={cardData} />
+                <Header data={cardData} boardId={boardIdString} />
                 <Actions card={cardData} boardId={boardIdString} lists={lists} setOrderedData={setOrderedData} />
               </div>
             )}

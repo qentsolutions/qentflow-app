@@ -61,31 +61,32 @@ enum RelationshipType {
 }
 
 model User {
-  id                    String                 @id @default(cuid())
-  name                  String?
-  email                 String?                @unique
-  emailVerified         DateTime?
-  image                 String?
-  password              String?
-  role                  UserRole               @default(USER)
-  accounts              Account[]
-  isTwoFactorEnabled    Boolean                @default(false)
-  twoFactorConfirmation TwoFactorConfirmation?
-  workspaces            WorkspaceMember[]
-  createdWorkspaces     Workspace[]            @relation("CreatedBy")
-  boards                Board[]
-  auditLogs             AuditLog[]
-  Comment               Comment[]
-  Card                  Card[]
-  calendarEvents        CalendarEvent[]
-  documents             Document[]             @relation("DocumentEditors")
-  createdDocuments      Document[]
-  Notification          Notification[]
-  sentInvitations       Invitation[]
-  automations           Automation[]
-  notes                 Note[]
-  boardDocuments        BoardDocument[]        @relation("CreatedByUser")
-  boardFolders          BoardFolder[]          @relation("CreatedByUser")
+  id                     String                 @id @default(cuid())
+  name                   String?
+  email                  String?                @unique
+  emailVerified          DateTime?
+  image                  String?
+  password               String?
+  role                   UserRole               @default(USER)
+  accounts               Account[]
+  isTwoFactorEnabled     Boolean                @default(false)
+  twoFactorConfirmation  TwoFactorConfirmation?
+  workspaces             WorkspaceMember[]
+  createdWorkspaces      Workspace[]            @relation("CreatedBy")
+  boards                 Board[]
+  auditLogs              AuditLog[]
+  Comment                Comment[]
+  Card                   Card[]
+  calendarEvents         CalendarEvent[]
+  documents              Document[]             @relation("DocumentEditors")
+  createdDocuments       Document[]
+  Notification           Notification[]
+  sentInvitations        Invitation[]
+  automations            Automation[]
+  notes                  Note[]
+  boardDocuments         BoardDocument[]        @relation("CreatedByUser")
+  boardFolders           BoardFolder[]          @relation("CreatedByUser")
+  hasCompletedOnboarding Boolean                @default(false)
 }
 
 model Workspace {
@@ -218,18 +219,18 @@ model Board {
   User                 User[]
   Tag                  Tag[]
   automationActivities AutomationActivity[]
-  
+
   // Board Documents
   documents BoardDocument[]
   folders   BoardFolder[]
 }
 
 model BoardDocument {
-  id        String  @id @default(uuid())
-  title     String
-  content   String? @db.Text
-  order     Int     @default(0)
-  
+  id      String  @id @default(uuid())
+  title   String
+  content String? @db.Text
+  order   Int     @default(0)
+
   // Relations
   boardId     String
   board       Board        @relation(fields: [boardId], references: [id], onDelete: Cascade)
@@ -237,7 +238,7 @@ model BoardDocument {
   folder      BoardFolder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
   createdById String
   createdBy   User         @relation("CreatedByUser", fields: [createdById], references: [id])
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -246,20 +247,20 @@ model BoardDocument {
 }
 
 model BoardFolder {
-  id        String  @id @default(uuid())
-  name      String
-  order     Int     @default(0)
-  
+  id    String @id @default(uuid())
+  name  String
+  order Int    @default(0)
+
   // Relations
   boardId     String
-  board       Board         @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  board       Board           @relation(fields: [boardId], references: [id], onDelete: Cascade)
   parentId    String?
-  parent      BoardFolder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
-  subfolders  BoardFolder[] @relation("FolderHierarchy")
+  parent      BoardFolder?    @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  subfolders  BoardFolder[]   @relation("FolderHierarchy")
   documents   BoardDocument[]
   createdById String
-  createdBy   User          @relation("CreatedByUser", fields: [createdById], references: [id])
-  
+  createdBy   User            @relation("CreatedByUser", fields: [createdById], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -332,14 +333,14 @@ model Card {
 }
 
 model CardRelationship {
-  id             String          @id @default(uuid())
-  sourceCardId   String
-  sourceCard     Card            @relation("SourceCard", fields: [sourceCardId], references: [id], onDelete: Cascade)
-  destCardId     String
-  destCard       Card            @relation("DestinationCard", fields: [destCardId], references: [id], onDelete: Cascade)
+  id               String           @id @default(uuid())
+  sourceCardId     String
+  sourceCard       Card             @relation("SourceCard", fields: [sourceCardId], references: [id], onDelete: Cascade)
+  destCardId       String
+  destCard         Card             @relation("DestinationCard", fields: [destCardId], references: [id], onDelete: Cascade)
   relationshipType RelationshipType
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 
   @@unique([sourceCardId, destCardId, relationshipType])
   @@index([sourceCardId])
@@ -575,4 +576,10 @@ model Note {
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@index([createdById])
+}
+
+model OnboardingSurvey {
+  id        String   @id @default(cuid())
+  responses Json // Store all responses as JSON
+  createdAt DateTime @default(now())
 }

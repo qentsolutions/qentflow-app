@@ -20,11 +20,13 @@ import { useCardModal } from "@/hooks/use-card-modal";
 interface HeaderProps {
   data: CardWithList;
   readonly?: boolean;
+  boardId: string; // Ajoutez cette ligne
 }
 
 export const Header = ({
   data,
-  readonly = false
+  readonly = false,
+  boardId // Ajoutez cette ligne
 }: HeaderProps) => {
   const queryClient = useQueryClient();
   const params = useParams();
@@ -65,7 +67,6 @@ export const Header = ({
 
   const onSubmit = (formData: FormData) => {
     const title = formData.get("title") as string;
-    const boardId = params.boardId as string;
     const workspaceId = currentWorkspace?.id;
 
     if (!workspaceId) {
@@ -96,7 +97,7 @@ export const Header = ({
 
   const onExpand = () => {
     cardModal.onClose();
-    router.push(`/${currentWorkspace?.id}/boards/${params.boardId}/cards/${data.id}`);
+    router.push(`/${currentWorkspace?.id}/boards/${boardId}/cards/${data.id}`); // Modifiez cette ligne
   };
 
   return (
