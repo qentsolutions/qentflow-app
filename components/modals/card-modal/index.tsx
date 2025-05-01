@@ -1,105 +1,134 @@
-import { useQuery } from "@tanstack/react-query"
-import { useState } from "react"
-import type { CardWithList, Comment, ListWithCards } from "@/types"
-import type { AuditLog } from "@prisma/client"
-import { useCardModal } from "@/hooks/use-card-modal"
-import { fetcher } from "@/lib/fetcher"
-import { useParams } from "next/navigation"
-import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import type { CardWithList, Comment, ListWithCards } from "@/types";
+import type { AuditLog } from "@prisma/client";
+import { useCardModal } from "@/hooks/use-card-modal";
+import { fetcher } from "@/lib/fetcher";
+import { useParams, useRouter } from "next/navigation";
+import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 
-import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { Tabs, TabsTrigger, TabsContent, TabsList } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Tabs, TabsTrigger, TabsContent, TabsList } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu"; // Importez les composants de menu déroulant
 
-import { Header } from "./header"
-import { Description } from "./description"
-import { Actions } from "./actions"
-import { Activity } from "./activity"
-import { Comments } from "./comments"
-import { AttachmentList } from "./attachment-list"
-import { FileUpload } from "@/components/file-upload"
-import { DocumentSelector } from "./document-selector"
-import { Priority } from "./priority"
-import { Tasks } from "./tasks"
-import { TagsComponent } from "./tags"
-import { Hierarchy } from "./hierarchy"
+import { Header } from "./header";
+import { Description } from "./description";
+import { Actions } from "./actions";
+import { Activity } from "./activity";
+import { Comments } from "./comments";
+import { AttachmentList } from "./attachment-list";
+import { FileUpload } from "@/components/file-upload";
+import { DocumentSelector } from "./document-selector";
+import { Priority } from "./priority";
+import { Tasks } from "./tasks";
+import { TagsComponent } from "./tags";
+import { Hierarchy } from "./hierarchy";
 
 import {
   ActivityIcon,
+  Contact,
   ExternalLink,
   FileText,
+  Layers,
   LogInIcon as Logs,
   MessageSquareText,
   Paperclip,
   Plus,
   Trash2,
-} from "lucide-react"
-import Details from "./details"
-import DateComponent from "./date"
+} from "lucide-react";
+import Details from "./details";
+import DateComponent from "./date";
 
 export const CardModal = () => {
-  const id = useCardModal((state) => state.id)
-  const isOpen = useCardModal((state) => state.isOpen)
-  const onClose = useCardModal((state) => state.onClose)
-  const { boardId } = useParams()
-  const { currentWorkspace } = useCurrentWorkspace()
-  const [isDocumentSelectorOpen, setIsDocumentSelectorOpen] = useState(false)
-  const [isAttachmentDialogOpen, setIsAttachmentDialogOpen] = useState(false)
-  const [isAssociateCardOpen, setIsAssociateCardOpen] = useState(false)
-  const [isChildCardOpen, setIsChildCardOpen] = useState(false)
-  const [visibleDocuments, setVisibleDocuments] = useState(2)
-  const boardIdString = Array.isArray(boardId) ? boardId[0] : boardId
+  const id = useCardModal((state) => state.id);
+  const isOpen = useCardModal((state) => state.isOpen);
+  const onClose = useCardModal((state) => state.onClose);
+  const { boardId } = useParams();
+  const { currentWorkspace } = useCurrentWorkspace();
+  const [isDocumentSelectorOpen, setIsDocumentSelectorOpen] = useState(false);
+  const [isAttachmentDialogOpen, setIsAttachmentDialogOpen] = useState(false);
+  const [isAssociateCardOpen, setIsAssociateCardOpen] = useState(false);
+  const [isChildCardOpen, setIsChildCardOpen] = useState(false);
+  const [visibleDocuments, setVisibleDocuments] = useState(2);
+  const [isMaximized, setIsMaximized] = useState(false);
+  const boardIdString = Array.isArray(boardId) ? boardId[0] : boardId;
+  const router = useRouter();
 
   const { data: cardData } = useQuery<CardWithList>({
     queryKey: ["card", id],
     queryFn: () => fetcher(`/api/cards/${id}`),
-  })
+  });
 
   const { data: commentsData } = useQuery<Comment[]>({
     queryKey: ["card-comments", id],
     queryFn: () => fetcher(`/api/cards/${id}/comments`),
-  })
+  });
 
   const { data: auditLogsData } = useQuery<AuditLog[]>({
     queryKey: ["card-logs", id],
     queryFn: () => fetcher(`/api/cards/${id}/logs`),
-  })
+  });
 
   const { data: availableTags } = useQuery({
     queryKey: ["available-tags", boardId],
     queryFn: () => fetcher(`/api/boards/tags?boardId=${boardId}`),
-  })
+  });
 
   const handleDocumentClick = (documentId: string) => {
-    window.open(`/${currentWorkspace?.id}/documents/${documentId}`, "_blank")
-  }
+    window.open(`/${currentWorkspace?.id}/documents/${documentId}`, "_blank");
+  };
 
   const { data: attachments, refetch: refetchAttachments } = useQuery({
     queryKey: ["card-attachments", id],
     queryFn: () => fetcher(`/api/cards/${id}/attachments`),
-  })
+  });
 
   const lists: ListWithCards[] = [
     // Add your lists here
-  ]
+  ];
 
   const setOrderedData = (data: ListWithCards[]) => {
     // Implement your logic to update the ordered data
-  }
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      setIsMaximized(false);
+    }
+    onClose();
+  };
+
+  const onExpand = (dataId: string) => {
+    onClose();
+    router.push(`/${currentWorkspace?.id}/boards/${boardId}/cards/${dataId}`);
+  };
 
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="overflow-y-auto p-0 max-w-3xl sm:max-w-3xl md:max-w-4xl lg:max-w-5xl" side="rightLarge">
+    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+      <SheetContent
+        className={`overflow-y-auto p-0 transition-all duration-300 ${isMaximized ? "w-screen" : ""}`}
+        side="rightLarge"
+      >
         <div className="h-full flex flex-col">
           <div className="pr-6 pt-6 pb-2 border-b">
             {!cardData ? (
               <Header.Skeleton />
             ) : (
               <div className="flex items-center justify-between">
-                <Header data={cardData} boardId={boardIdString} />
-                <Actions card={cardData} boardId={boardIdString} lists={lists} setOrderedData={setOrderedData} />
+                <Header
+                  data={cardData}
+                  boardId={boardIdString}
+                  isMaximized={isMaximized}
+                  onToggleMaximize={() => setIsMaximized((prev) => !prev)}
+                />
               </div>
             )}
           </div>
@@ -108,42 +137,48 @@ export const CardModal = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
               <div className="col-span-2 space-y-6">
                 <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setIsDocumentSelectorOpen(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Document
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setIsAttachmentDialogOpen(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Attachment
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setIsAssociateCardOpen(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Associate Card
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setIsChildCardOpen(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Child Card
-                  </Button>
+                  <DropdownMenu >
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex items-center gap-2"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Add
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-48" align="start">
+                      <DropdownMenuItem
+                        onClick={() => setIsDocumentSelectorOpen(true)}
+                        className="flex items-center gap-2 cursor-pointer hover:bg-gray-100"
+                      >
+                        <FileText className="h-4 w-4 text-muted-foreground" />
+                        Document
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => setIsAttachmentDialogOpen(true)}
+                        className="flex items-center gap-2 cursor-pointer hover:bg-gray-100"
+                      >
+                        <Paperclip className="h-4 w-4 text-muted-foreground" />
+                        Attachment
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => setIsAssociateCardOpen(true)}
+                        className="flex items-center gap-2 cursor-pointer hover:bg-gray-100"
+                      >
+                        <Contact className="h-4 w-4 text-muted-foreground" />
+                        Associate Card
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => setIsChildCardOpen(true)}
+                        className="flex items-center gap-2 cursor-pointer hover:bg-gray-100"
+                      >
+                        <Layers className="h-4 w-4 text-muted-foreground" />
+                        Child Card
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
                 <DocumentSelector
@@ -160,8 +195,8 @@ export const CardModal = () => {
                       cardId={cardData?.id || ""}
                       workspaceId={currentWorkspace?.id!}
                       onUploadComplete={() => {
-                        refetchAttachments()
-                        setIsAttachmentDialogOpen(false)
+                        refetchAttachments();
+                        setIsAttachmentDialogOpen(false);
                       }}
                     />
                     {attachments && attachments.length > 0 && (
@@ -311,6 +346,12 @@ export const CardModal = () => {
                   <Description.Skeleton />
                 ) : (
                   <>
+                    <div className="flex items-center justify-end gap-x-2">
+                      <Button variant={"outline"} className="border-none shadow-none" onClick={() => { onExpand(cardData.id) }}>
+                        <ExternalLink />
+                      </Button>
+                      <Actions card={cardData} boardId={boardIdString} lists={lists} setOrderedData={setOrderedData} />
+                    </div>
                     <Details card={cardData} />
                     <TagsComponent data={cardData} availableTags={availableTags ?? []} />
                     <Priority data={cardData} />
@@ -323,5 +364,5 @@ export const CardModal = () => {
         </div>
       </SheetContent>
     </Sheet>
-  )
-}
+  );
+};

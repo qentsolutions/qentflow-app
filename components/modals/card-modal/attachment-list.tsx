@@ -79,7 +79,7 @@ export const AttachmentList = ({ cardId, readonly = false }: AttachmentListProps
                   <Paperclip className="h-4 w-4 text-blue-500" />
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <p className="font-medium text-sm truncate max-w-[200px]">
+                      <p className="font-medium text-sm">
                         {attachment.name}
                       </p>
                     </TooltipTrigger>

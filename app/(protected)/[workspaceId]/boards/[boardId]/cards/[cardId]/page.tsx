@@ -26,12 +26,16 @@ import { FileUpload } from "@/components/file-upload";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { BreadcrumbHeader } from "@/components/breadcrumbs";
 import { ListWithCards } from "@/types";
+import { Hierarchy } from "@/components/modals/card-modal/hierarchy";
 
 const CardPage = ({ params, readonly }: any) => {
     const { currentWorkspace } = useCurrentWorkspace();
     const [isDocumentSelectorOpen, setIsDocumentSelectorOpen] = useState(false);
     const { setBreadcrumbs } = useBreadcrumbs();
     const [visibleDocuments, setVisibleDocuments] = useState(2);
+    const [isAttachmentDialogOpen, setIsAttachmentDialogOpen] = useState(false);
+    const [isAssociateCardOpen, setIsAssociateCardOpen] = useState(false);
+    const [isChildCardOpen, setIsChildCardOpen] = useState(false);
 
     const { data: cardData } = useQuery({
         queryKey: ["card", params.cardId],
@@ -102,6 +106,21 @@ const CardPage = ({ params, readonly }: any) => {
                                 ) : (
                                     <Description data={cardData} readonly={readonly} />
                                 )}
+                                {!cardData ? (
+                                    <Description.Skeleton />
+                                ) : (
+                                    <div className="mt-2">
+                                        <Hierarchy
+                                            data={cardData}
+                                            isAssociateCardOpen={isAssociateCardOpen}
+                                            setIsAssociateCardOpen={setIsAssociateCardOpen}
+                                            isChildCardOpen={isChildCardOpen}
+                                            setIsChildCardOpen={setIsChildCardOpen}
+                                            readonly={readonly}
+                                        />
+                                    </div>
+                                )}
+
                                 {readonly ? (
                                     <div>
                                         {!cardData ? (

@@ -16,6 +16,8 @@ import {
   Archive,
   Copy,
   ArrowRightToLine,
+  MoreVertical,
+  CheckSquare,
 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
@@ -53,6 +55,7 @@ interface ListViewProps {
     priority: boolean
     assignee: boolean
     tags: boolean
+    startDate: boolean
     dueDate: boolean
     tasks: boolean
   }
@@ -179,11 +182,10 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
     if (!priority) return null
 
     const colors: Record<string, { bg: string; text: string }> = {
-      LOW: { bg: "bg-gray-100", text: "text-gray-500" },
-      MEDIUM: { bg: "bg-amber-100", text: "text-amber-600" },
-      HIGH: { bg: "bg-indigo-100", text: "text-indigo-600" },
-      NORMAL: { bg: "bg-indigo-100", text: "text-indigo-600" },
-      CRITICAL: { bg: "bg-red-100", text: "text-red-600" },
+      LOW: { bg: "bg-green-100", text: "text-green-500" },
+      MEDIUM: { bg: "bg-orange-100", text: "text-orange-600" },
+      HIGH: { bg: "bg-red-100", text: "text-red-600" },
+      CRITICAL: { bg: "bg-red-200", text: "text-red-600" },
     }
 
     const style = colors[priority] || { bg: "bg-gray-100", text: "text-gray-500" }
@@ -405,266 +407,292 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                 <Droppable droppableId={list.id}>
                   {(provided) => (
                     <div ref={provided.innerRef} {...provided.droppableProps} className="w-full pl-8">
-                      <table className="w-full border-collapse">
-                        <thead>
-                          <tr className="border-b border-gray-100">
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 w-8">
-                              {/* Header checkbox for select all functionality */}
-                              <Checkbox
-                                checked={
-                                  list.cards.length > 0 &&
-                                  list.cards.every((card: any) => selectedCards.includes(card.id))
-                                }
-                                onCheckedChange={(checked) => {
-                                  if (checked) {
-                                    setSelectedCards((prev) => [
-                                      ...prev,
-                                      ...list.cards.map((card: any) => card.id).filter((id) => !prev.includes(id)),
-                                    ])
-                                  } else {
-                                    setSelectedCards((prev) =>
-                                      prev.filter((id) => !list.cards.some((card: any) => card.id === id)),
-                                    )
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse table-fixed">
+                          <thead>
+                            <tr className="border-b border-gray-100">
+                              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 w-8">
+                                {/* Header checkbox for select all functionality */}
+                                <Checkbox
+                                  checked={
+                                    list.cards.length > 0 &&
+                                    list.cards.every((card: any) => selectedCards.includes(card.id))
                                   }
-                                }}
-                              />
-                            </th>
-                            {visibleFields.title && (
-                              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[250px]">
-                                Name
+                                  onCheckedChange={(checked) => {
+                                    if (checked) {
+                                      setSelectedCards((prev) => [
+                                        ...prev,
+                                        ...list.cards.map((card: any) => card.id).filter((id) => !prev.includes(id)),
+                                      ])
+                                    } else {
+                                      setSelectedCards((prev) =>
+                                        prev.filter((id) => !list.cards.some((card: any) => card.id === id)),
+                                      )
+                                    }
+                                  }}
+                                />
                               </th>
-                            )}
-                            {visibleFields.assignee && (
-                              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px]">
-                                Assigned
-                              </th>
-                            )}
-                            {visibleFields.dueDate && (
-                              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px]">
-                                Due date
-                              </th>
-                            )}
-                            {visibleFields.priority && (
-                              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px]">
-                                Priority
-                              </th>
-                            )}
-                            {visibleFields.tasks && (
-                              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px]">
-                                Tasks
-                              </th>
-                            )}
-                            {visibleFields.tags && (
-                              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px]">
-                                Tags
-                              </th>
-                            )}
-                            <th className="px-4 py-2 w-8"></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {list.cards.map((card: any, index: any) => {
-                            return (
-                              <Draggable key={card.id} draggableId={card.id} index={index}>
-                                {(provided) => (
-                                  <tr
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    className="group hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0"
-                                    onMouseEnter={() => setHoveredRow(card.id)}
-                                    onMouseLeave={() => setHoveredRow(null)}
-                                  >
-                                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                                      <div
-                                        className={`${hoveredRow === card.id || selectedCards.includes(card.id) ? "opacity-100" : "opacity-0"} group-hover:opacity-100 transition-opacity`}
-                                      >
-                                        <Checkbox
-                                          checked={selectedCards.includes(card.id)}
-                                          onCheckedChange={(checked) => {
-                                            if (checked) {
-                                              setSelectedCards((prev) => [...prev, card.id])
-                                            } else {
-                                              setSelectedCards((prev) => prev.filter((id) => id !== card.id))
-                                            }
-                                          }}
-                                        />
-                                      </div>
-                                    </td>
-                                    {visibleFields.title && (
-                                      <td className="px-4 py-3" onClick={() => cardModal.onOpen(card.id)}>
-                                        <div className="flex items-center gap-x-3">
-                                          <div className="flex-shrink-0 w-4 opacity-0 group-hover:opacity-100">
-                                            <GripVertical size={16} className="text-gray-400" />
-                                          </div>
-                                          <span className="text-sm font-medium text-gray-900">{card.title}</span>
+                              {visibleFields.title && (
+                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[250px]">
+                                  Name
+                                </th>
+                              )}
+                              {visibleFields.assignee && (
+                                <th className="px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px] text-center">
+                                  Assigned
+                                </th>
+                              )}
+                              {visibleFields.startDate && (
+                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
+                                  Start date
+                                </th>
+                              )}
+                              {visibleFields.dueDate && (
+                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
+                                  Due date
+                                </th>
+                              )}
+                              {visibleFields.priority && (
+                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
+                                  Priority
+                                </th>
+                              )}
+                              {visibleFields.tasks && (
+                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
+                                  Tasks
+                                </th>
+                              )}
+                              {visibleFields.tags && (
+                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px]">
+                                  Tags
+                                </th>
+                              )}
+                              <th className="px-4 py-2 w-8"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {list.cards.map((card: any, index: any) => {
+                              return (
+                                <Draggable key={card.id} draggableId={card.id} index={index}>
+                                  {(provided) => (
+                                    <tr
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      {...provided.dragHandleProps}
+                                      className="group hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0"
+                                      onMouseEnter={() => setHoveredRow(card.id)}
+                                      onMouseLeave={() => setHoveredRow(null)}
+                                    >
+                                      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                                        <div
+                                          className={`${hoveredRow === card.id || selectedCards.includes(card.id) ? "opacity-100" : "opacity-0"} group-hover:opacity-100 transition-opacity`}
+                                        >
+                                          <Checkbox
+                                            checked={selectedCards.includes(card.id)}
+                                            onCheckedChange={(checked) => {
+                                              if (checked) {
+                                                setSelectedCards((prev) => [...prev, card.id])
+                                              } else {
+                                                setSelectedCards((prev) => prev.filter((id) => id !== card.id))
+                                              }
+                                            }}
+                                          />
                                         </div>
                                       </td>
-                                    )}
-                                    {visibleFields.assignee && (
-                                      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                                        <Popover
-                                          open={openAssign === card.id}
-                                          onOpenChange={(open) => setOpenAssign(open ? card.id : null)}
-                                        >
-                                          <PopoverTrigger asChild>
-                                            {card.assignedUserId ? (
-                                              <div className="flex items-center justify-center">
-                                                <Tooltip>
-                                                  <TooltipTrigger>
-                                                    <Avatar className="h-7 w-7 border">
-                                                      <AvatarImage
-                                                        src={
+                                      {visibleFields.title && (
+                                        <td className="px-4 py-3" onClick={() => cardModal.onOpen(card.id)}>
+                                          <div className="flex items-center gap-x-3">
+                                            <div className="flex-shrink-0 w-4 opacity-0 group-hover:opacity-100">
+                                              <GripVertical size={16} className="text-gray-400" />
+                                            </div>
+                                            <span className="text-sm font-medium text-gray-900 line-clamp-2">
+                                              {card.title}
+                                            </span>
+                                          </div>
+                                        </td>
+                                      )}
+                                      {visibleFields.assignee && (
+                                        <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                                          <Popover
+                                            open={openAssign === card.id}
+                                            onOpenChange={(open) => setOpenAssign(open ? card.id : null)}
+                                          >
+                                            <PopoverTrigger asChild>
+                                              {card.assignedUserId ? (
+                                                <div className="flex items-center justify-center">
+                                                  <Tooltip>
+                                                    <TooltipTrigger>
+                                                      <Avatar className="h-7 w-7 border">
+                                                        <AvatarImage
+                                                          src={
+                                                            users.find(
+                                                              (
+                                                                u: { id: string | null | undefined },
+                                                              ) => u.id === card.assignedUserId,
+                                                            )?.image || ""
+                                                          }
+                                                        />
+                                                        <AvatarFallback>
+                                                          {users.find(
+                                                            (u: { id: string | null | undefined }) =>
+                                                              u.id === card.assignedUserId,
+                                                          )?.name?.[0] || <UserRound size={12} />}
+                                                        </AvatarFallback>
+                                                      </Avatar>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                      <span className="text-sm">
+                                                        {
                                                           users.find(
                                                             (u: { id: string | null | undefined }) =>
                                                               u.id === card.assignedUserId,
-                                                          )?.image || ""
+                                                          )?.name
                                                         }
-                                                      />
-                                                      <AvatarFallback>
-                                                        {users.find(
-                                                          (u: { id: string | null | undefined }) =>
-                                                            u.id === card.assignedUserId,
-                                                        )?.name?.[0] || <UserRound size={12} />}
-                                                      </AvatarFallback>
+                                                      </span>
+                                                    </TooltipContent>
+                                                  </Tooltip>
+                                                </div>
+                                              ) : (
+                                                <div className="flex items-center justify-center">
+                                                  <Tooltip>
+                                                    <TooltipTrigger>
+                                                      <Avatar className="h-7 w-7 border">
+                                                        <AvatarFallback>
+                                                          <UserRound size={14} />
+                                                        </AvatarFallback>
+                                                      </Avatar>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                      <p className="text-sm">Assign user</p>
+                                                    </TooltipContent>
+                                                  </Tooltip>
+                                                </div>
+                                              )}
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-[200px] p-0">
+                                              <div className="py-2">
+                                                {users.map((user: any) => (
+                                                  <button
+                                                    key={user.id}
+                                                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"
+                                                    onClick={() => handleAssignUser(card.id, user.id)}
+                                                  >
+                                                    <Avatar className="h-6 w-6">
+                                                      <AvatarImage src={user.image || ""} />
+                                                      <AvatarFallback>{user.name[0]}</AvatarFallback>
                                                     </Avatar>
-                                                  </TooltipTrigger>
-                                                  <TooltipContent>
-                                                    <span className="text-sm">
-                                                      {
-                                                        users.find(
-                                                          (u: { id: string | null | undefined }) =>
-                                                            u.id === card.assignedUserId,
-                                                        )?.name
-                                                      }
-                                                    </span>
-                                                  </TooltipContent>
-                                                </Tooltip>
+                                                    {user.name}
+                                                  </button>
+                                                ))}
                                               </div>
-                                            ) : (
-                                              <div className="flex items-center justify-center">
-                                                <Tooltip>
-                                                  <TooltipTrigger>
-                                                    <Avatar className="h-7 w-7 border">
-                                                      <AvatarFallback>
-                                                        <UserRound size={14} />
-                                                      </AvatarFallback>
-                                                    </Avatar>
-                                                  </TooltipTrigger>
-                                                  <TooltipContent>
-                                                    <p className="text-sm">Assign user</p>
-                                                  </TooltipContent>
-                                                </Tooltip>
-                                              </div>
-                                            )}
-                                          </PopoverTrigger>
-                                          <PopoverContent className="w-[200px] p-0">
-                                            <div className="py-2">
-                                              {users.map((user: any) => (
-                                                <button
-                                                  key={user.id}
-                                                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"
-                                                  onClick={() => handleAssignUser(card.id, user.id)}
-                                                >
-                                                  <Avatar className="h-6 w-6">
-                                                    <AvatarImage src={user.image || ""} />
-                                                    <AvatarFallback>{user.name[0]}</AvatarFallback>
-                                                  </Avatar>
-                                                  {user.name}
-                                                </button>
-                                              ))}
-                                            </div>
-                                          </PopoverContent>
-                                        </Popover>
-                                      </td>
-                                    )}
-                                    {visibleFields.dueDate && (
-                                      <td
-                                        className="px-4 py-3 whitespace-nowrap"
-                                        onClick={() => cardModal.onOpen(card.id)}
-                                      >
-                                        {card.dueDate && (
-                                          <span
-                                            className={`text-sm ${new Date(card.dueDate) < new Date() ? "text-red-500" : "text-gray-500"}`}
-                                          >
-                                            {format(new Date(card.dueDate), "dd/MM/yy")}
-                                          </span>
-                                        )}
-                                      </td>
-                                    )}
-                                    {visibleFields.priority && (
-                                      <td
-                                        className="px-4 py-3 whitespace-nowrap"
-                                        onClick={() => cardModal.onOpen(card.id)}
-                                      >
-                                        {getPriorityBadge(card.priority)}
-                                      </td>
-                                    )}
-                                    {visibleFields.tasks && (
-                                      <td
-                                        className="px-4 py-3 whitespace-nowrap"
-                                        onClick={() => cardModal.onOpen(card.id)}
-                                      >
-                                        {card.tasks && card.tasks.length > 0 && (
-                                          <div className="flex flex-col gap-1">
-                                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                                              <span>
-                                                {card.tasks.filter((t: any) => t.completed).length}/{card.tasks.length}
-                                              </span>
-                                            </div>
-                                            <Progress
-                                              value={
-                                                (card.tasks.filter((task: any) => task.completed).length /
-                                                  card.tasks.length) *
-                                                100
-                                              }
-                                              className="h-1.5"
-                                            />
-                                          </div>
-                                        )}
-                                      </td>
-                                    )}
-                                    {visibleFields.tags && (
-                                      <td
-                                        className="px-4 py-3 whitespace-nowrap"
-                                        onClick={() => cardModal.onOpen(card.id)}
-                                      >
-                                        <div className="flex gap-1.5 flex-wrap">
-                                          {card.tags?.map((tag: any) => (
-                                            <Badge
-                                              key={tag.id}
-                                              className={`text-white text-xs`}
-                                              style={{ backgroundColor: tag?.color || "#ff0000" }}
+                                            </PopoverContent>
+                                          </Popover>
+                                        </td>
+                                      )}
+                                      {visibleFields.startDate && (
+                                        <td
+                                          className="px-4 py-3 whitespace-nowrap text-left"
+                                          onClick={() => cardModal.onOpen(card.id)}
+                                        >
+                                          {card.startDate && (
+                                            <span
+                                              className={`text-sm ${new Date(card.startDate) < new Date() ? "text-red-500" : "text-gray-500"}`}
                                             >
-                                              {tag.name}
-                                            </Badge>
-                                          ))}
-                                        </div>
+                                              {format(new Date(card.startDate), "MMM d, yyyy")}
+                                            </span>
+                                          )}
+                                        </td>
+                                      )}
+                                      {visibleFields.dueDate && (
+                                        <td
+                                          className="px-4 py-3 whitespace-nowrap text-left"
+                                          onClick={() => cardModal.onOpen(card.id)}
+                                        >
+                                          {card.dueDate && (
+                                            <span
+                                              className={`text-sm ${new Date(card.dueDate) < new Date() ? "text-red-500" : "text-gray-500"}`}
+                                            >
+                                              {format(new Date(card.dueDate), "MMM d, yyyy")}
+                                            </span>
+                                          )}
+                                        </td>
+                                      )}
+                                      {visibleFields.priority && (
+                                        <td
+                                          className="px-4 py-3 whitespace-nowrap text-left"
+                                          onClick={() => cardModal.onOpen(card.id)}
+                                        >
+                                          {getPriorityBadge(card.priority)}
+                                        </td>
+                                      )}
+                                      {visibleFields.tasks && (
+                                        <td
+                                          className="px-4 py-3 whitespace-nowrap text-left"
+                                          onClick={() => cardModal.onOpen(card.id)}
+                                        >
+                                          {card.tasks && card.tasks.length > 0 && (
+                                            <div className="flex flex-col gap-1">
+                                              <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                <CheckSquare className="h-4 w-4 text-gray-400" />
+                                                <span>
+                                                  {card.tasks.filter((t: any) => t.completed).length}/
+                                                  {card.tasks.length}
+                                                </span>
+                                              </div>
+                                              <Progress
+                                                value={
+                                                  (card.tasks.filter((task: any) => task.completed).length /
+                                                    card.tasks.length) *
+                                                  100
+                                                }
+                                                className="h-1.5"
+                                              />
+                                            </div>
+                                          )}
+                                        </td>
+                                      )}
+                                      {visibleFields.tags && (
+                                        <td
+                                          className="px-4 py-3 whitespace-nowrap"
+                                          onClick={() => cardModal.onOpen(card.id)}
+                                        >
+                                          <div className="flex gap-1.5 flex-wrap">
+                                            {card.tags?.map((tag: any) => (
+                                              <Badge
+                                                key={tag.id}
+                                                className={`text-white text-xs`}
+                                                style={{ backgroundColor: tag?.color || "#ff0000" }}
+                                              >
+                                                {tag.name}
+                                              </Badge>
+                                            ))}
+                                          </div>
+                                        </td>
+                                      )}
+                                      <td
+                                        className="px-2 py-3 whitespace-nowrap text-right"
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        <DropdownMenu>
+                                          <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" size="sm" className="h-8 hover:bg-transparent w-8 p-0">
+                                              <MoreVertical size={16} />
+                                            </Button>
+                                          </DropdownMenuTrigger>
+                                          <DropdownMenuContent align="end" className="w-full">
+                                            <CardActions data={card} lists={lists} setOrderedData={setLists} />
+                                          </DropdownMenuContent>
+                                        </DropdownMenu>
                                       </td>
-                                    )}
-                                    <td
-                                      className="px-4 py-3 whitespace-nowrap text-right"
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                            <MoreHorizontal size={16} />
-                                          </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="w-full">
-                                          <CardActions data={card} lists={lists} setOrderedData={setLists} />
-                                        </DropdownMenuContent>
-                                      </DropdownMenu>
-                                    </td>
-                                  </tr>
-                                )}
-                              </Draggable>
-                            )
-                          })}
-                          {provided.placeholder}
-                        </tbody>
-                      </table>
+                                    </tr>
+                                  )}
+                                </Draggable>
+                              )
+                            })}
+                            {provided.placeholder}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   )}
                 </Droppable>
@@ -747,4 +775,3 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
     </TooltipProvider>
   )
 }
-

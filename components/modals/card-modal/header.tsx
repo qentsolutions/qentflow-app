@@ -13,20 +13,24 @@ import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormInput } from "@/components/form/form-input";
 import { Button } from "@/components/ui/button";
-import { Edit, Expand, Eye, Maximize2 } from 'lucide-react';
+import { Edit, Expand, Eye, Maximize2, Minimize2 } from 'lucide-react'; // Importez Minimize2
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useCardModal } from "@/hooks/use-card-modal";
 
 interface HeaderProps {
   data: CardWithList;
   readonly?: boolean;
-  boardId: string; // Ajoutez cette ligne
+  boardId: string;
+  isMaximized?: boolean; // Ajoutez cette ligne pour l'état isMaximized
+  onToggleMaximize?: () => void; // Ajoutez cette ligne pour la fonction de rappel
 }
 
 export const Header = ({
   data,
   readonly = false,
-  boardId // Ajoutez cette ligne
+  boardId,
+  isMaximized, // Ajoutez cette ligne
+  onToggleMaximize // Ajoutez cette ligne
 }: HeaderProps) => {
   const queryClient = useQueryClient();
   const params = useParams();
@@ -97,7 +101,7 @@ export const Header = ({
 
   const onExpand = () => {
     cardModal.onClose();
-    router.push(`/${currentWorkspace?.id}/boards/${boardId}/cards/${data.id}`); // Modifiez cette ligne
+    router.push(`/${currentWorkspace?.id}/boards/${boardId}/cards/${data.id}`);
   };
 
   return (
@@ -135,14 +139,18 @@ export const Header = ({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={onExpand}
+                onClick={onToggleMaximize} // Appelez la fonction de rappel ici
                 className="h-8 w-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
               >
-                <Maximize2 className="h-4 w-4" />
+                {isMaximized ? (
+                  <Minimize2 className="h-4 w-4" /> // Utilisez l'icône Minimize2 si isMaximized est true
+                ) : (
+                  <Maximize2 className="h-4 w-4" /> // Utilisez l'icône Maximize2 sinon
+                )}
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p className="text-xs">Expand card</p>
+              <p className="text-xs">{isMaximized ? "Minimize card" : "Expand card"}</p>
             </TooltipContent>
           </Tooltip>
           <form action={onSubmit}>
@@ -181,7 +189,7 @@ export const Header = ({
 
 Header.Skeleton = function HeaderSkeleton() {
   return (
-    <div className="w-full">
+    <div className="w-full ml-4">
       <Skeleton className="w-1/3 h-8 bg-neutral-200 dark:bg-gray-700" />
     </div>
   );

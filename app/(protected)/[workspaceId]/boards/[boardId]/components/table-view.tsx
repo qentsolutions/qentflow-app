@@ -44,6 +44,7 @@ interface TableViewProps {
     priority: boolean
     assignee: boolean
     tags: boolean
+    startDate: boolean
     dueDate: boolean
     tasks: boolean
   }
@@ -202,6 +203,27 @@ export const TableView = ({ data, visibleFields, users, boardId }: TableViewProp
     })
   }
 
+  const getPriorityBadge = (priority: string | null) => {
+    if (!priority) return null
+
+    const colors: Record<string, { bg: string; text: string }> = {
+      LOW: { bg: "bg-green-100", text: "text-green-500" },
+      MEDIUM: { bg: "bg-orange-100", text: "text-orange-600" },
+      HIGH: { bg: "bg-red-100", text: "text-red-600" },
+      CRITICAL: { bg: "bg-red-200", text: "text-red-600" },
+    }
+
+    const style = colors[priority] || { bg: "bg-gray-100", text: "text-gray-500" }
+
+    return (
+      <span
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium ${style.bg} ${style.text}`}
+      >
+        {priority.charAt(0).toUpperCase() + priority.slice(1).toLowerCase()}
+      </span>
+    )
+  }
+
   const handleBulkMoveToNextList = () => {
     if (selectedCards.length === 0) return
 
@@ -317,7 +339,12 @@ export const TableView = ({ data, visibleFields, users, boardId }: TableViewProp
                 )}
                 {visibleFields.assignee && (
                   <TableHead className="font-medium text-gray-500 w-[120px] border-r border-gray-50 last:border-r-0 py-4 px-6 text-center">
-                    Assigned To
+                    Assigned
+                  </TableHead>
+                )}
+                {visibleFields.startDate && (
+                  <TableHead className="font-medium text-gray-500 w-[150px] border-r border-gray-50 last:border-r-0 py-4 px-6">
+                    Start Date
                   </TableHead>
                 )}
                 {visibleFields.dueDate && (
@@ -348,7 +375,7 @@ export const TableView = ({ data, visibleFields, users, boardId }: TableViewProp
                     onMouseLeave={() => setHoveredRow(null)}
                   >
                     <TableCell
-                      className="px-4 py-5 border-r border-gray-50 last:border-r-0 w-[40px]"
+                      className="px-4 py-2 border-r border-gray-50 last:border-r-0 w-[40px]"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div
@@ -368,22 +395,22 @@ export const TableView = ({ data, visibleFields, users, boardId }: TableViewProp
                     </TableCell>
                     {visibleFields.title && (
                       <TableCell
-                        className="px-6 py-5 border-r border-gray-50 last:border-r-0 w-[250px]"
+                        className="px-6 py-2 border-r border-gray-50 last:border-r-0 w-[250px]"
                         onClick={() => cardModal.onOpen(card.id)}
                       >
                         <div className="flex items-center gap-x-3">
-                          <span className="text-sm font-medium text-gray-900">{card.title}</span>
+                          <span className="text-sm font-medium text-gray-900 line-clamp-2">{card.title}</span>
                         </div>
                       </TableCell>
                     )}
                     {visibleFields.priority && (
                       <TableCell
-                        className="px-6 py-5 border-r border-gray-50 last:border-r-0 w-[120px] text-center"
+                        className="px-6 py-2 border-r border-gray-50 last:border-r-0 w-[120px] text-center"
                         onClick={() => cardModal.onOpen(card.id)}
                       >
                         <div className="flex items-center justify-center">
                           <Tooltip>
-                            <TooltipTrigger>{PriorityIcon(card?.priority)}</TooltipTrigger>
+                            <TooltipTrigger>{getPriorityBadge(card?.priority)}</TooltipTrigger>
                             <TooltipContent className="flex items-center justify-center bg-white border border-gray-100 shadow-md text-xs font-medium">
                               {card.priority}
                             </TooltipContent>
@@ -393,7 +420,7 @@ export const TableView = ({ data, visibleFields, users, boardId }: TableViewProp
                     )}
                     {visibleFields.assignee && (
                       <TableCell
-                        className="px-6 py-5 border-r border-gray-50 last:border-r-0 w-[120px] text-center"
+                        className="px-6 py-2 border-r border-gray-50 last:border-r-0 w-[120px] text-center"
                         onClick={() => cardModal.onOpen(card.id)}
                       >
                         {card.assignedUserId && (
@@ -420,22 +447,41 @@ export const TableView = ({ data, visibleFields, users, boardId }: TableViewProp
                         )}
                       </TableCell>
                     )}
+                    {visibleFields.startDate && (
+                      <TableCell
+                        className="px-6 py-2 border-r border-gray-50 last:border-r-0 w-[150px]"
+                        onClick={() => cardModal.onOpen(card.id)}
+                      >
+                        {card.startDate && (
+                          <span
+                            className={`text-sm ${new Date(card.startDate) < new Date() ? "text-red-500" : "text-gray-600"}`}
+                          >
+                            <div className="flex items-center text-s">
+                              {format(new Date(card.startDate), "MMM d, yyyy")}
+                            </div>
+                          </span>
+                        )}
+                      </TableCell>
+                    )}
                     {visibleFields.dueDate && (
                       <TableCell
-                        className="px-6 py-5 border-r border-gray-50 last:border-r-0 w-[150px]"
+                        className="px-6 py-2 border-r border-gray-50 last:border-r-0 w-[150px]"
                         onClick={() => cardModal.onOpen(card.id)}
                       >
                         {card.dueDate && (
-                          <div className="flex items-center text-sm text-gray-600">
-                            <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                            {format(new Date(card.dueDate), "MMM d, yyyy")}
+                          <div className="flex items-center text-sm ">
+                            <span
+                              className={`text-sm ${new Date(card.dueDate) < new Date() ? "text-red-500" : "text-gray-600"}`}
+                            >
+                              {format(new Date(card.dueDate), "MMM d, yyyy")}
+                            </span>
                           </div>
                         )}
                       </TableCell>
                     )}
                     {visibleFields.tasks && (
                       <TableCell
-                        className="px-6 py-5 border-r border-gray-50 last:border-r-0 w-[150px]"
+                        className="px-6 py-2 border-r border-gray-50 last:border-r-0 w-[150px]"
                         onClick={() => cardModal.onOpen(card.id)}
                       >
                         {card?.tasks && card.tasks.length > 0 && (
@@ -458,14 +504,14 @@ export const TableView = ({ data, visibleFields, users, boardId }: TableViewProp
                     )}
                     {visibleFields.tags && (
                       <TableCell
-                        className="px-6 py-5 border-r border-gray-50 last:border-r-0 w-[180px]"
+                        className="px-6 py-2 border-r border-gray-50 last:border-r-0 w-[180px]"
                         onClick={() => cardModal.onOpen(card.id)}
                       >
                         <div className="flex flex-wrap gap-1.5">
                           {card.tags?.map((tag: any) => (
                             <Badge
                               key={tag.id}
-                              className="text-white text-xs font-medium px-2 py-0.5 rounded-full"
+                              className="text-white text-xs font-medium px-2 py-0.5"
                               style={{ backgroundColor: tag.color || "#ff0000" }}
                             >
                               {tag.name}
@@ -475,7 +521,7 @@ export const TableView = ({ data, visibleFields, users, boardId }: TableViewProp
                       </TableCell>
                     )}
                     <TableCell
-                      className="px-6 py-5 whitespace-nowrap text-center text-sm font-medium w-[80px]"
+                      className="px-6 py-2 whitespace-nowrap text-center text-sm font-medium w-[80px]"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <DropdownMenu>

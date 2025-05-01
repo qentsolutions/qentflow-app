@@ -14,7 +14,11 @@ export const useBoardFilters = ({ lists, isArchived }: UseCardFiltersProps) => {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const toggleTag = (tagId: string) => {
-    setSelectedTags((prev) => (prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]));
+    setSelectedTags((prev) =>
+      prev.includes(tagId)
+        ? prev.filter((id) => id !== tagId)
+        : [...prev, tagId]
+    );
   };
 
   const sortCards = (cards: any[]) => {
@@ -22,25 +26,13 @@ export const useBoardFilters = ({ lists, isArchived }: UseCardFiltersProps) => {
     return [...cards].sort((a, b) => {
       let compareA, compareB;
       switch (sortBy) {
-        case "title":
-          compareA = a.title.toLowerCase();
-          compareB = b.title.toLowerCase();
-          break;
-        case "status":
-          compareA = a.status;
-          compareB = b.status;
-          break;
-        case "priority":
-          compareA = a.priority;
-          compareB = b.priority;
-          break;
-        case "assigned":
-          compareA = a.assignedUserId || "";
-          compareB = b.assignedUserId || "";
-          break;
         case "startDate":
           compareA = a.startDate || "";
           compareB = b.startDate || "";
+          break;
+        case "dueDate":
+          compareA = a.dueDate || "";
+          compareB = b.dueDate || "";
           break;
         default:
           return 0;
@@ -56,7 +48,9 @@ export const useBoardFilters = ({ lists, isArchived }: UseCardFiltersProps) => {
       ...list,
       cards: sortCards(
         list.cards.filter((card: any) => {
-          const matchesSearch = card.title.toLowerCase().includes(searchTerm.toLowerCase());
+          const matchesSearch = card.title
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase());
           const matchesUser =
             selectedUser === "unassigned"
               ? !card.assignedUserId
@@ -65,15 +59,37 @@ export const useBoardFilters = ({ lists, isArchived }: UseCardFiltersProps) => {
               : true;
           const matchesTags =
             selectedTags.length > 0
-              ? selectedTags.every((tagId) => card.tags.some((cardTag: any) => cardTag.id === tagId))
+              ? selectedTags.every((tagId) =>
+                  card.tags.some((cardTag: any) => cardTag.id === tagId)
+                )
               : true;
-          const matchesPriority = selectedPriority ? card.priority === selectedPriority : true;
-          const matchesArchived = isArchived ? card.archived === true : card.archived === false; // Modifier la condition pour "Archived"
-          return matchesSearch && matchesUser && matchesTags && matchesPriority && matchesArchived;
+          const matchesPriority = selectedPriority
+            ? card.priority === selectedPriority
+            : true;
+          const matchesArchived = isArchived
+            ? card.archived === true
+            : card.archived === false; // Modifier la condition pour "Archived"
+          return (
+            matchesSearch &&
+            matchesUser &&
+            matchesTags &&
+            matchesPriority &&
+            matchesArchived
+          );
         })
       ),
     }));
-  }, [lists, searchTerm, selectedUser, selectedTags, selectedPriority, sortBy, sortDirection, sortCards, isArchived]);
+  }, [
+    lists,
+    searchTerm,
+    selectedUser,
+    selectedTags,
+    selectedPriority,
+    sortBy,
+    sortDirection,
+    sortCards,
+    isArchived,
+  ]);
 
   return {
     searchTerm,

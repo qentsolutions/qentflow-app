@@ -47,12 +47,12 @@ const Settings = ({ boardId, boardTitle, users, createdById }: BoardSettingsProp
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center font-medium space-x-3 px-4 py-3 text-left rounded-md transition-colors ${activeTab === tab.id
+                  className={`w-full flex items-center font-medium space-x-3 px-4 py-2 text-left rounded-md transition-colors ${activeTab === tab.id
                     ? "bg-blue-100 dark:bg-gray-700 dark:text-blue-500 text-blue-600"
                     : "text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-300"
                     }`}
                 >
-                  <tab.icon className="w-5 h-5" />
+                  <tab.icon size={16} />
                   <span className="text-sm">{tab.label}</span>
                 </button>
               ))}

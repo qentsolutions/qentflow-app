@@ -86,7 +86,7 @@ export const Actions = ({ card, boardId, readonly = false, lists, setOrderedData
   if (readonly) return null;
 
   return (
-    <div className="flex items-center gap-1 mr-6">
+    <div className="flex items-center gap-1">
       {/*
       <Tooltip>
         <TooltipTrigger asChild>
@@ -107,12 +107,13 @@ export const Actions = ({ card, boardId, readonly = false, lists, setOrderedData
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button
-            className="transition p-1 rounded-lg hover:bg-gray-100"
+          <Button
+            variant={"outline"}
+            className="transition p-1 w-8 rounded-lg border-none shadow-none"
             onClick={(e) => e.stopPropagation()} // Stop propagation to prevent card click
           >
             <MoreVertical size={16} />
-          </button>
+          </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-40 p-2" side="bottom" align="end">
           <CardActions data={card} lists={lists} setOrderedData={setOrderedData} hideOptions={true} />

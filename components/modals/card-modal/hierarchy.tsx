@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react"
 import { useParams } from "next/navigation"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
@@ -13,9 +15,14 @@ import { RelationshipType } from "@prisma/client"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { GitBranch, ArrowDown, AlertTriangle, Link2, X, ExternalLink } from "lucide-react"
+import { GitBranch, ArrowDown, AlertTriangle, Link2, ArrowUp, Plus, Search, MoreVertical } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { useCardModal } from "@/hooks/use-card-modal"
+import { createCard } from "@/actions/tasks/create-card"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent } from "@/components/ui/card"
 
 interface HierarchyProps {
   data: CardWithList
@@ -37,11 +44,17 @@ export const Hierarchy = ({
   const params = useParams()
   const { currentWorkspace } = useCurrentWorkspace()
   const queryClient = useQueryClient()
+  const cardModal = useCardModal()
   const [selectedRelationshipType, setSelectedRelationshipType] = useState<RelationshipType>(
     RelationshipType.RELATES_TO,
   )
   const [selectedDestCardId, setSelectedDestCardId] = useState<string | null>(null)
   const [selectedChildCardId, setSelectedChildCardId] = useState<string | null>(null)
+  const [isCreateNewCardOpen, setIsCreateNewCardOpen] = useState(false)
+  const [newCardTitle, setNewCardTitle] = useState("")
+  const [newCardType, setNewCardType] = useState<"child" | "associated">("child")
+  const [isCreatingCard, setIsCreatingCard] = useState(false)
+  const [activeTab, setActiveTab] = useState<"create" | "link">("create")
 
   const { data: relationshipsData, isLoading: isLoadingRelationships } = useQuery({
     queryKey: ["card-relationships", data.id],
@@ -51,6 +64,12 @@ export const Hierarchy = ({
   const { data: boardCards, isLoading: isLoadingBoardCards } = useQuery({
     queryKey: ["board-cards", params.boardId],
     queryFn: () => fetcher(`/api/boards/${currentWorkspace?.id}/${params.boardId}/cards`),
+  })
+
+  const { data: lists } = useQuery({
+    queryKey: ["board-lists", params.boardId],
+    queryFn: () => fetcher(`/api/boards/lists?boardId=${params.boardId}`),
+    enabled: !!params.boardId,
   })
 
   const getValidParentOptions = () => {
@@ -123,6 +142,45 @@ export const Hierarchy = ({
     },
   })
 
+  const { execute: executeCreateCard } = useAction(createCard, {
+    onSuccess: (newCard) => {
+      toast.success(`Card "${newCard.title}" created`)
+
+      if (newCardType === "child") {
+        // Set the new card as a child of the current card
+        executeSetParent({
+          cardId: newCard.id,
+          parentId: data.id,
+          workspaceId: currentWorkspace?.id as string,
+          boardId: params.boardId as string,
+        })
+      } else {
+        // Associate the new card with the current card
+        executeAddRelationship({
+          sourceCardId: data.id,
+          destCardId: newCard.id,
+          relationshipType: selectedRelationshipType,
+          workspaceId: currentWorkspace?.id as string,
+          boardId: params.boardId as string,
+        })
+      }
+
+      setNewCardTitle("")
+      setIsCreateNewCardOpen(false)
+
+      // Close the respective panels
+      if (newCardType === "child") {
+        setIsChildCardOpen(false)
+      } else {
+        setIsAssociateCardOpen(false)
+      }
+    },
+    onError: (error) => {
+      toast.error(error)
+      setIsCreatingCard(false)
+    },
+  })
+
   const handleAddChildCard = () => {
     if (!currentWorkspace?.id || !selectedChildCardId) return
 
@@ -154,6 +212,27 @@ export const Hierarchy = ({
       workspaceId: currentWorkspace.id,
       boardId: params.boardId as string,
     })
+  }
+
+  const handleCreateNewCard = () => {
+    if (!newCardTitle.trim() || !lists || lists.length === 0) return
+
+    setIsCreatingCard(true)
+
+    // Use the first list as default
+    const defaultListId = lists[0].id
+
+    executeCreateCard({
+      title: newCardTitle,
+      listId: defaultListId,
+      boardId: params.boardId as string,
+      workspaceId: currentWorkspace?.id as string,
+    })
+  }
+
+  const openCreateNewCardDialog = (type: "child" | "associated") => {
+    setNewCardType(type)
+    setIsCreateNewCardOpen(true)
   }
 
   const getRelationshipLabel = (type: RelationshipType) => {
@@ -192,6 +271,9 @@ export const Hierarchy = ({
 
   const hasChildCards = relationshipsData?.children && relationshipsData.children.length > 0
 
+  // Check if the card has a parent
+  const hasParentCard = relationshipsData?.parent
+
   if (isLoadingRelationships || isLoadingBoardCards) {
     return <Skeleton className="h-40 w-full" />
   }
@@ -201,21 +283,78 @@ export const Hierarchy = ({
 
   const shouldRenderChildCard = hasChildCards || isChildCardOpen
   const shouldRenderAssociatedCard = hasAssociatedCards || isAssociateCardOpen
+  const shouldRenderParentCard = hasParentCard
+
+  // Function to handle opening a related card
+  const handleOpenRelatedCard = (cardId: string) => {
+    // Close the current card modal
+    cardModal.onClose()
+
+    // Open the new card modal with the selected card ID
+    setTimeout(() => {
+      cardModal.onOpen(cardId)
+    }, 100)
+  }
 
   return (
     <>
-      {(shouldRenderChildCard || shouldRenderAssociatedCard) && (
+      {(shouldRenderParentCard || shouldRenderChildCard || shouldRenderAssociatedCard) && (
         <div className="space-y-4">
+          {/* Parent Card Section */}
+          {shouldRenderParentCard && (
+            <div className="space-y-2 mb-4">
+              <p className="text-sm font-medium flex items-center text-muted-foreground">
+                Parent Card
+              </p>
+              <div className="space-y-1.5">
+                <div
+                  key={relationshipsData.parent.id}
+                  className="p-2 bg-white dark:bg-gray-800 rounded-md border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between text-xs"
+                  onClick={() => handleOpenRelatedCard(relationshipsData.parent.id)}
+                >
+                  <div className="flex items-center gap-x-2 overflow-hidden w-full">
+                    <ArrowUp className="h-3.5 w-3.5 text-blue-500 shrink-0" />
+                    <p className="font-medium truncate min-w-0 flex-1">{relationshipsData.parent.title}</p>
+                    <Badge className="shrink-0 ml-1 bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 px-2 py-0.5 text-xs">
+                      {relationshipsData.parent.list.title}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center shrink-0 ml-2">
+                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                      <MoreVertical className="h-3.5 w-3.5 text-gray-500" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Child Cards Section */}
           {shouldRenderChildCard && (
             <div className="space-y-2 mb-4">
-              <h3 className="text-sm font-medium flex items-center text-muted-foreground">
-                <GitBranch size={14} className="mr-1.5 shrink-0" /> Child Cards
-              </h3>
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium flex items-center text-muted-foreground">
+                  Child Cards
+                </p>
+
+                {!isChildCardOpen && !readonly && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-none shadow-none py-0"
+                    onClick={() => setIsChildCardOpen(true)}
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                  </Button>
+                )}
+
+              </div>
               <div className="space-y-1.5">
                 {relationshipsData?.children.map((child: any) => (
                   <div
                     key={child.id}
                     className="p-2 bg-white dark:bg-gray-800 rounded-md border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between text-xs"
+                    onClick={() => handleOpenRelatedCard(child.id)}
                   >
                     <div className="flex items-center gap-x-2 overflow-hidden w-full">
                       <GitBranch className="h-3.5 w-3.5 text-blue-500 shrink-0" />
@@ -226,58 +365,130 @@ export const Hierarchy = ({
                     </div>
                     <div className="flex items-center shrink-0 ml-2">
                       <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <ExternalLink className="h-3.5 w-3.5 text-blue-500" />
+                        <MoreVertical className="h-3.5 w-3.5 text-gray-500" />
                       </Button>
                     </div>
                   </div>
                 ))}
                 {isChildCardOpen && (
-                  <div className="flex items-center mt-2  dark:bg-gray-800/50 p-2 rounded-md">
-                    <div className="flex-1 gap-2">
-                      <Select value={selectedChildCardId || ""} onValueChange={setSelectedChildCardId}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a card" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {validParentOptions.length === 0 ? (
-                            <SelectItem value="none" disabled>
-                              No available cards
-                            </SelectItem>
-                          ) : (
-                            validParentOptions.map((card: any) => (
-                              <SelectItem key={card.id} value={card.id}>
-                                <span className="truncate block max-w-[200px]">{card.title}</span>
-                              </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Button
-                      onClick={handleAddChildCard}
-                      disabled={!selectedChildCardId}
-                      className="ml-2 h-8 w-8 p-0 flex items-center justify-center"
-                      variant="outline"
-                    >
-                      <span>+</span>
-                    </Button>
-                    <Button
-                      onClick={() => setIsChildCardOpen(false)}
-                      className="ml-2 h-8 w-8 p-0 flex items-center justify-center"
-                      variant="outline"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
+                  <Card className="mt-2 border-dashed border-2 border-gray-200 dark:border-gray-700 shadow-sm">
+
+                    <CardContent className="p-3 pt-0">
+                      <Tabs
+                        defaultValue="create"
+                        className="w-full"
+                        onValueChange={(value) => setActiveTab(value as "create" | "link")}
+                      >
+                        <TabsList className="grid grid-cols-2 mb-3">
+                          <TabsTrigger value="create" className="text-xs">
+                            <Plus className="h-3 w-3 mr-1.5" />
+                            Create New
+                          </TabsTrigger>
+                          <TabsTrigger value="link" className="text-xs">
+                            <Link2 className="h-3 w-3 mr-1.5" />
+                            Link Existing
+                          </TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="create" className="mt-0">
+                          <div className="space-y-2">
+                            <Input
+                              placeholder="Enter card title"
+                              value={newCardTitle}
+                              onChange={(e) => setNewCardTitle(e.target.value)}
+                              className="h-8 text-xs"
+                            />
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-7 text-xs"
+                                onClick={() => setIsChildCardOpen(false)}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                size="sm"
+                                className="h-7 text-xs"
+                                onClick={() => handleCreateNewCard()}
+                                disabled={!newCardTitle.trim()}
+                              >
+                                Create Card
+                              </Button>
+                            </div>
+                          </div>
+                        </TabsContent>
+
+                        <TabsContent value="link" className="mt-0">
+                          <div className="space-y-2">
+                            <div className="relative">
+                              <Search className="absolute left-2 top-1.5 h-3.5 w-3.5 text-muted-foreground" />
+                              <Select value={selectedChildCardId || ""} onValueChange={setSelectedChildCardId}>
+                                <SelectTrigger className="h-8 text-xs pl-8">
+                                  <SelectValue placeholder="Select existing card" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {validParentOptions.length === 0 ? (
+                                    <SelectItem value="none" disabled>
+                                      No available cards
+                                    </SelectItem>
+                                  ) : (
+                                    validParentOptions.map((card: any) => (
+                                      <SelectItem key={card.id} value={card.id}>
+                                        <span className="block">{card.title}</span>
+                                      </SelectItem>
+                                    ))
+                                  )}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-7 text-xs"
+                                onClick={() => setIsChildCardOpen(false)}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                size="sm"
+                                className="h-7 text-xs"
+                                onClick={handleAddChildCard}
+                                disabled={!selectedChildCardId}
+                              >
+                                Link Card
+                              </Button>
+                            </div>
+                          </div>
+                        </TabsContent>
+                      </Tabs>
+                    </CardContent>
+                  </Card>
                 )}
               </div>
             </div>
           )}
+
+          {/* Associated Cards Section */}
           {shouldRenderAssociatedCard && (
             <div className="space-y-2 mt-4">
-              <h3 className="text-sm font-medium flex items-center text-muted-foreground">
-                <Link2 size={14} className="mr-1.5 shrink-0" /> Associated Cards
-              </h3>
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium flex items-center text-muted-foreground">
+                  Associated Cards
+                </p>
+
+                {!isAssociateCardOpen && !readonly && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-none shadow-none py-0"
+                    onClick={() => setIsAssociateCardOpen(true)}
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                  </Button>
+                )}
+              </div>
               <div className="space-y-1.5">
                 {relationshipsData?.relationships
                   .filter((rel: any) => rel.sourceCardId === data.id)
@@ -285,6 +496,7 @@ export const Hierarchy = ({
                     <div
                       key={rel.id}
                       className="p-2 bg-white dark:bg-gray-800 rounded-md border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between text-xs"
+                      onClick={() => handleOpenRelatedCard(rel.destCard.id)}
                     >
                       <div className="flex items-center gap-x-2 overflow-hidden w-full">
                         {getRelationshipIcon(rel.relationshipType)}
@@ -293,22 +505,14 @@ export const Hierarchy = ({
                             {getRelationshipLabel(rel.relationshipType)}
                           </span>
                           <span className="whitespace-nowrap shrink-0">→</span>
-                          <span className="font-medium truncate min-w-0">{rel.destCard.title}</span>
+                          <span className="font-medium min-w-0">{rel.destCard.title}</span>
                         </div>
                       </div>
                       <Badge className="shrink-0 ml-1 bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 px-2 py-0.5 text-xs">
                         {rel.destCard.list.title}
                       </Badge>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 p-0 shrink-0 ml-2"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleRemoveRelationship(rel.id)
-                        }}
-                      >
-                        <X className="h-3.5 w-3.5 text-red-500" />
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0 ml-2">
+                        <MoreVertical className="h-3.5 w-3.5 text-gray-500" />
                       </Button>
                     </div>
                   ))}
@@ -319,6 +523,7 @@ export const Hierarchy = ({
                     <div
                       key={rel.id}
                       className="p-2 bg-white dark:bg-gray-800 rounded-md border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between text-xs"
+                      onClick={() => handleOpenRelatedCard(rel.sourceCard.id)}
                     >
                       <div className="flex items-center gap-x-2 overflow-hidden w-full">
                         {getRelationshipIcon(rel.relationshipType)}
@@ -327,7 +532,7 @@ export const Hierarchy = ({
                             {getRelationshipLabel(rel.relationshipType)}
                           </span>
                           <span className="whitespace-nowrap shrink-0">→</span>
-                          <span className="whitespace-nowrap font-medium truncate shrink-0">
+                          <span className="whitespace-nowrap font-medium shrink-0">
                             {rel.sourceCard.title}
                           </span>
                         </div>
@@ -336,94 +541,197 @@ export const Hierarchy = ({
                         <Badge className="shrink-0 ml-1 bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 px-2 py-0.5 text-xs">
                           {rel.sourceCard.list.title}
                         </Badge>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0 shrink-0"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleRemoveRelationship(rel.id)
-                          }}
-                        >
-                          <X className="h-3.5 w-3.5 text-red-500" />
+                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                          <MoreVertical className="h-3.5 w-3.5 text-gray-500" />
                         </Button>
                       </div>
                     </div>
                   ))}
 
                 {isAssociateCardOpen && (
-                  <div className="space-y-2 mt-2  dark:bg-gray-800/50 p-2 rounded-md">
-                    <div className="flex items-center">
-                      <div className="flex-1">
-                        <Select
-                          value={selectedRelationshipType}
-                          onValueChange={(value) => setSelectedRelationshipType(value as RelationshipType)}
-                        >
-                          <SelectTrigger className="h-8">
-                            <SelectValue placeholder="Relationship type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value={RelationshipType.RELATES_TO}>Relates To</SelectItem>
-                            <SelectItem value={RelationshipType.DEPENDS_ON}>Depends On</SelectItem>
-                            <SelectItem value={RelationshipType.BLOCKED_BY}>Blocked By</SelectItem>
-                            <SelectItem value={RelationshipType.PARENT_CHILD}>Parent/Child</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <div className="flex gap-2 items-center">
-                      <div className="flex-1">
-                        <Select value={selectedDestCardId || ""} onValueChange={setSelectedDestCardId}>
-                          <SelectTrigger className="h-8">
-                            <SelectValue placeholder="Select a card" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <div className="p-2 sticky top-0 bg-white dark:bg-gray-950 z-10">
-                              <Input
-                                placeholder="Search cards..."
-                                className="h-8"
-                                onChange={(e) => {
-                                  // This would be implemented with actual filtering logic
-                                }}
-                              />
+                  <Card className="mt-2 border-dashed border-2 border-gray-200 dark:border-gray-700 shadow-sm">
+                    <CardContent className="p-3 pt-0">
+                      <Tabs
+                        defaultValue="create"
+                        className="w-full"
+                        onValueChange={(value) => setActiveTab(value as "create" | "link")}
+                      >
+                        <TabsList className="grid grid-cols-2 mb-3">
+                          <TabsTrigger value="create" className="text-xs">
+                            <Plus className="h-3 w-3 mr-1.5" />
+                            Create New
+                          </TabsTrigger>
+                          <TabsTrigger value="link" className="text-xs">
+                            <Link2 className="h-3 w-3 mr-1.5" />
+                            Link Existing
+                          </TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="create" className="mt-0">
+                          <div className="space-y-2">
+                            <div className="space-y-2">
+                              <Select
+                                value={selectedRelationshipType}
+                                onValueChange={(value) => setSelectedRelationshipType(value as RelationshipType)}
+                              >
+                                <SelectTrigger className="h-8 text-xs">
+                                  <SelectValue placeholder="Relationship type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value={RelationshipType.RELATES_TO}>Relates To</SelectItem>
+                                  <SelectItem value={RelationshipType.DEPENDS_ON}>Depends On</SelectItem>
+                                  <SelectItem value={RelationshipType.BLOCKED_BY}>Blocked By</SelectItem>
+                                  <SelectItem value={RelationshipType.PARENT_CHILD}>Parent/Child</SelectItem>
+                                </SelectContent>
+                              </Select>
                             </div>
-                            {validRelationshipOptions.length === 0 ? (
-                              <SelectItem value="none" disabled>
-                                No available cards
-                              </SelectItem>
-                            ) : (
-                              validRelationshipOptions.map((card: any) => (
-                                <SelectItem key={card.id} value={card.id}>
-                                  <span className="truncate block max-w-[200px]">{card.title}</span>
-                                </SelectItem>
-                              ))
-                            )}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <Button
-                        onClick={handleAddRelationship}
-                        disabled={!selectedDestCardId}
-                        className="h-8 w-8 p-0 flex items-center justify-center"
-                        variant="outline"
-                      >
-                        <span>+</span>
-                      </Button>
-                      <Button
-                        onClick={() => setIsAssociateCardOpen(false)}
-                        className=" h-8 w-8 p-0 flex items-center justify-center"
-                        variant="outline"
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
+                            <Input
+                              placeholder="Enter card title"
+                              value={newCardTitle}
+                              onChange={(e) => setNewCardTitle(e.target.value)}
+                              className="h-8 text-xs"
+                            />
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-7 text-xs"
+                                onClick={() => setIsAssociateCardOpen(false)}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                size="sm"
+                                className="h-7 text-xs"
+                                onClick={() => {
+                                  setNewCardType("associated")
+                                  handleCreateNewCard()
+                                }}
+                                disabled={!newCardTitle.trim()}
+                              >
+                                Create Card
+                              </Button>
+                            </div>
+                          </div>
+                        </TabsContent>
+
+                        <TabsContent value="link" className="mt-0">
+                          <div className="space-y-2">
+                            <div className="space-y-2">
+                              <Select
+                                value={selectedRelationshipType}
+                                onValueChange={(value) => setSelectedRelationshipType(value as RelationshipType)}
+                              >
+                                <SelectTrigger className="h-8 text-xs">
+                                  <SelectValue placeholder="Relationship type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value={RelationshipType.RELATES_TO}>Relates To</SelectItem>
+                                  <SelectItem value={RelationshipType.DEPENDS_ON}>Depends On</SelectItem>
+                                  <SelectItem value={RelationshipType.BLOCKED_BY}>Blocked By</SelectItem>
+                                  <SelectItem value={RelationshipType.PARENT_CHILD}>Parent/Child</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="relative">
+                              <Search className="absolute left-2 top-1.5 h-3.5 w-3.5 text-muted-foreground" />
+                              <Select value={selectedDestCardId || ""} onValueChange={setSelectedDestCardId}>
+                                <SelectTrigger className="h-8 text-xs pl-8">
+                                  <SelectValue placeholder="Select existing card" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {validRelationshipOptions.length === 0 ? (
+                                    <SelectItem value="none" disabled>
+                                      No available cards
+                                    </SelectItem>
+                                  ) : (
+                                    validRelationshipOptions.map((card: any) => (
+                                      <SelectItem key={card.id} value={card.id}>
+                                        <span>{card.title}</span>
+                                      </SelectItem>
+                                    ))
+                                  )}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-7 text-xs"
+                                onClick={() => setIsAssociateCardOpen(false)}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                size="sm"
+                                className="h-7 text-xs"
+                                onClick={handleAddRelationship}
+                                disabled={!selectedDestCardId}
+                              >
+                                Link Card
+                              </Button>
+                            </div>
+                          </div>
+                        </TabsContent>
+                      </Tabs>
+                    </CardContent>
+                  </Card>
                 )}
+
               </div>
             </div>
           )}
         </div>
       )}
+
+      {/* Dialog for creating a new card */}
+      <Dialog open={isCreateNewCardOpen} onOpenChange={setIsCreateNewCardOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New {newCardType === "child" ? "Child" : "Associated"} Card</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Card Title</label>
+              <Input
+                placeholder="Enter card title"
+                value={newCardTitle}
+                onChange={(e) => setNewCardTitle(e.target.value)}
+                autoFocus
+              />
+            </div>
+
+            {newCardType === "associated" && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Relationship Type</label>
+                <Select
+                  value={selectedRelationshipType}
+                  onValueChange={(value) => setSelectedRelationshipType(value as RelationshipType)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select relationship type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={RelationshipType.RELATES_TO}>Relates To</SelectItem>
+                    <SelectItem value={RelationshipType.DEPENDS_ON}>Depends On</SelectItem>
+                    <SelectItem value={RelationshipType.BLOCKED_BY}>Blocked By</SelectItem>
+                    <SelectItem value={RelationshipType.PARENT_CHILD}>Parent/Child</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCreateNewCardOpen(false)} disabled={isCreatingCard}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreateNewCard} disabled={!newCardTitle.trim() || isCreatingCard}>
+              {isCreatingCard ? "Creating..." : "Create Card"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

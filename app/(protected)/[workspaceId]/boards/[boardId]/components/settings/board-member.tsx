@@ -84,8 +84,7 @@ export const BoardMembers = ({ boardId, users, createdById, boardTitle }: BoardM
   return (
     <div className="p-6">
       {isCreator && (
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Board Members</h2>
+        <div className="mb-6 flex items-center justify-end">
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
               <Button className="bg-blue-600 hover:bg-blue-700">
@@ -95,9 +94,9 @@ export const BoardMembers = ({ boardId, users, createdById, boardTitle }: BoardM
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>Add Board Members</DialogTitle>
+                <DialogTitle>Add Project Members</DialogTitle>
                 <DialogDescription>
-                  Add members from your workspace to this board.
+                  Add members from your workspace to this project.
                 </DialogDescription>
               </DialogHeader>
               <ScrollArea className="mt-4 max-h-[60vh]">
@@ -163,7 +162,7 @@ export const BoardMembers = ({ boardId, users, createdById, boardTitle }: BoardM
                   <p className="font-medium text-gray-900 dark:text-white">{user.name}</p>
                   {user.id === createdById && (
                     <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                      Creator
+                      Owner
                     </Badge>
                   )}
                 </div>

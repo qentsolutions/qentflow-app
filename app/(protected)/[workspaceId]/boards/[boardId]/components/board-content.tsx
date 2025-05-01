@@ -56,6 +56,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     title: true,
     priority: true,
     assignee: true,
+    startDate: true,
     dueDate: true,
     tasks: true,
     tags: true,
@@ -150,11 +151,8 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
   };
 
   const sortOptions = [
-    { label: "Title", value: "title" },
-    { label: "Status", value: "status" },
-    { label: "Priority", value: "priority" },
-    { label: "Assigned", value: "assigned" },
     { label: "Start Date", value: "startDate" },
+    { label: "Due Date", value: "dueDate" },
   ];
 
   const toggleField = (field: keyof typeof visibleFields) => {
@@ -202,7 +200,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                 <Filter className="h-4 w-4" />
                 Filters
                 {getActiveFiltersCount() > 0 && (
-                  <Badge variant="secondary" className="ml-1 px-1 py-0 text-xs bg-blue-500 text-white">
+                  <Badge variant="secondary" className="ml-1 px-1 hover:bg-blue-500 py-0 text-xs bg-blue-500 text-white">
                     {getActiveFiltersCount()}
                   </Badge>
                 )}
@@ -237,7 +235,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                           onClick={() => setSelectedUser(selectedUser === user.id ? null : user.id)}
                           className={cn(
                             "flex items-center gap-2 p-2 rounded-md cursor-pointer text-sm",
-                            selectedUser === user.id ? "bg-secondary" : "hover:bg-secondary/50"
+                            selectedUser === user.id ? "bg-blue-50" : "hover:bg-secondary/50"
                           )}
                         >
                           <Avatar className="h-5 w-5">
@@ -260,8 +258,8 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                         key={priority}
                         onClick={() => setSelectedPriority(selectedPriority === priority ? null : priority)}
                         className={cn(
-                          "flex items-center gap-2 p-2 rounded-md font-medium cursor-pointer text-sm",
-                          selectedPriority === priority ? "bg-secondary" : "hover:bg-secondary/50"
+                          "flex items-center gap-2 p-2 rounded-md font-normal cursor-pointer text-sm",
+                          selectedPriority === priority ? "bg-blue-50" : "hover:bg-secondary/50"
                         )}
                       >
                         {getPriorityIcon(priority)}
@@ -303,7 +301,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                             onClick={() => toggleTag(tag.id)}
                             className={cn(
                               "flex items-center justify-between p-2 rounded-md cursor-pointer text-sm",
-                              selectedTags.includes(tag.id) ? "bg-secondary" : "hover:bg-secondary/50"
+                              selectedTags.includes(tag.id) ? "bg-blue-50" : "hover:bg-secondary/50"
                             )}
                           >
                             <div className="flex items-center gap-2">
@@ -344,7 +342,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                 <ArrowUpDown className="h-4 w-4" />
                 Sort
                 {sortBy && (
-                  <Badge variant="secondary" className="ml-1 px-1 py-0 text-xs">
+                  <Badge variant="secondary" className="bg-blue-50 ml-1 px-1 py-0 text-xs">
                     {sortBy}
                   </Badge>
                 )}
@@ -364,7 +362,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                       variant="ghost"
                       className={cn(
                         "w-full justify-between font-normal",
-                        sortBy === option.value && "bg-accent text-accent-foreground"
+                        sortBy === option.value && "bg-blue-50 text-accent-foreground"
                       )}
                       onClick={() => handleSort(option.value)}
                     >
