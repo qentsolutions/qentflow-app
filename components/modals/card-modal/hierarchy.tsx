@@ -1,36 +1,42 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useParams } from "next/navigation"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
-import type { CardWithList } from "@/types"
-import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
-import { fetcher } from "@/lib/fetcher"
-import { useAction } from "@/hooks/use-action"
-import { setCardParent } from "@/actions/cards/set-card-parent"
-import { addCardRelationship } from "@/actions/cards/add-card-relationship"
-import { removeCardRelationship } from "@/actions/cards/remove-card-relationship"
-import { RelationshipType } from "@prisma/client"
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { GitBranch, ArrowDown, AlertTriangle, Link2, ArrowUp, Plus, Search, MoreVertical } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { useCardModal } from "@/hooks/use-card-modal"
-import { createCard } from "@/actions/tasks/create-card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent } from "@/components/ui/card"
+import { useState } from "react";
+import { useParams } from "next/navigation";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import type { CardWithList } from "@/types";
+import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
+import { fetcher } from "@/lib/fetcher";
+import { useAction } from "@/hooks/use-action";
+import { setCardParent } from "@/actions/cards/set-card-parent";
+import { addCardRelationship } from "@/actions/cards/add-card-relationship";
+import { removeCardRelationship } from "@/actions/cards/remove-card-relationship";
+import { RelationshipType } from "@prisma/client";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { GitBranch, ArrowDown, AlertTriangle, Link2, ArrowUp, Plus, Search, MoreVertical } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { useCardModal } from "@/hooks/use-card-modal";
+import { createCard } from "@/actions/tasks/create-card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface HierarchyProps {
-  data: CardWithList
-  readonly?: boolean
-  isAssociateCardOpen?: boolean
-  setIsAssociateCardOpen?: (open: boolean) => void
-  isChildCardOpen?: boolean
-  setIsChildCardOpen?: (open: boolean) => void
+  data: CardWithList;
+  readonly?: boolean;
+  isAssociateCardOpen?: boolean;
+  setIsAssociateCardOpen?: (open: boolean) => void;
+  isChildCardOpen?: boolean;
+  setIsChildCardOpen?: (open: boolean) => void;
 }
 
 export const Hierarchy = ({
@@ -41,110 +47,110 @@ export const Hierarchy = ({
   isChildCardOpen = false,
   setIsChildCardOpen = () => { },
 }: HierarchyProps) => {
-  const params = useParams()
-  const { currentWorkspace } = useCurrentWorkspace()
-  const queryClient = useQueryClient()
-  const cardModal = useCardModal()
+  const params = useParams();
+  const { currentWorkspace } = useCurrentWorkspace();
+  const queryClient = useQueryClient();
+  const cardModal = useCardModal();
   const [selectedRelationshipType, setSelectedRelationshipType] = useState<RelationshipType>(
-    RelationshipType.RELATES_TO,
-  )
-  const [selectedDestCardId, setSelectedDestCardId] = useState<string | null>(null)
-  const [selectedChildCardId, setSelectedChildCardId] = useState<string | null>(null)
-  const [isCreateNewCardOpen, setIsCreateNewCardOpen] = useState(false)
-  const [newCardTitle, setNewCardTitle] = useState("")
-  const [newCardType, setNewCardType] = useState<"child" | "associated">("child")
-  const [isCreatingCard, setIsCreatingCard] = useState(false)
-  const [activeTab, setActiveTab] = useState<"create" | "link">("create")
+    RelationshipType.RELATES_TO
+  );
+  const [selectedDestCardId, setSelectedDestCardId] = useState<string | null>(null);
+  const [selectedChildCardId, setSelectedChildCardId] = useState<string | null>(null);
+  const [isCreateNewCardOpen, setIsCreateNewCardOpen] = useState(false);
+  const [newCardTitle, setNewCardTitle] = useState("");
+  const [newCardType, setNewCardType] = useState<"child" | "associated">("child");
+  const [isCreatingCard, setIsCreatingCard] = useState(false);
+  const [activeTab, setActiveTab] = useState<"create" | "link">("create");
 
   const { data: relationshipsData, isLoading: isLoadingRelationships } = useQuery({
     queryKey: ["card-relationships", data.id],
     queryFn: () => fetcher(`/api/cards/${data.id}/relationships`),
-  })
+  });
 
   const { data: boardCards, isLoading: isLoadingBoardCards } = useQuery({
     queryKey: ["board-cards", params.boardId],
     queryFn: () => fetcher(`/api/boards/${currentWorkspace?.id}/${params.boardId}/cards`),
-  })
+  });
 
   const { data: lists } = useQuery({
     queryKey: ["board-lists", params.boardId],
     queryFn: () => fetcher(`/api/boards/lists?boardId=${params.boardId}`),
     enabled: !!params.boardId,
-  })
+  });
 
   const getValidParentOptions = () => {
-    if (!boardCards) return []
+    if (!boardCards) return [];
 
     const getDescendantIds = (cardId: string, cards: any[]): string[] => {
-      const directChildren = cards.filter((c) => c.parentId === cardId)
-      if (directChildren.length === 0) return []
+      const directChildren = cards.filter((c) => c.parentId === cardId);
+      if (directChildren.length === 0) return [];
 
-      const childIds = directChildren.map((c) => c.id)
-      const descendantIds = directChildren.flatMap((c) => getDescendantIds(c.id, cards))
+      const childIds = directChildren.map((c) => c.id);
+      const descendantIds = directChildren.flatMap((c) => getDescendantIds(c.id, cards));
 
-      return [...childIds, ...descendantIds]
-    }
+      return [...childIds, ...descendantIds];
+    };
 
-    const descendantIds = getDescendantIds(data.id, boardCards)
+    const descendantIds = getDescendantIds(data.id, boardCards);
 
-    return boardCards.filter((card: { id: string }) => card.id !== data.id && !descendantIds.includes(card.id))
-  }
+    return boardCards.filter((card: { id: string }) => card.id !== data.id && !descendantIds.includes(card.id));
+  };
 
   const getValidRelationshipOptions = () => {
-    if (!boardCards || !relationshipsData) return []
+    if (!boardCards || !relationshipsData) return [];
 
-    const existingRelationships = relationshipsData.relationships || []
-    const existingRelatedCardIds = existingRelationships.flatMap((rel: any) => [rel.sourceCardId, rel.destCardId])
+    const existingRelationships = relationshipsData.relationships || [];
+    const existingRelatedCardIds = existingRelationships.flatMap((rel: any) => [rel.sourceCardId, rel.destCardId]);
 
-    return boardCards.filter((card: { id: string }) => card.id !== data.id && !existingRelatedCardIds.includes(card.id))
-  }
+    return boardCards.filter((card: { id: string }) => card.id !== data.id && !existingRelatedCardIds.includes(card.id));
+  };
 
   const { execute: executeSetParent } = useAction(setCardParent, {
     onSuccess: () => {
-      toast.success("Child card added")
-      setSelectedChildCardId(null)
-      setIsChildCardOpen(false)
+      toast.success("Child card added");
+      setSelectedChildCardId(null);
+      setIsChildCardOpen(false);
       queryClient.invalidateQueries({
         queryKey: ["card-relationships", data.id],
-      })
+      });
       queryClient.invalidateQueries({
         queryKey: ["card", data.id],
-      })
+      });
     },
     onError: (error) => {
-      toast.error(error)
+      toast.error(error);
     },
-  })
+  });
 
   const { execute: executeAddRelationship } = useAction(addCardRelationship, {
     onSuccess: () => {
-      toast.success("Card associated successfully")
-      setSelectedDestCardId(null)
-      setIsAssociateCardOpen(false)
+      toast.success("Card associated successfully");
+      setSelectedDestCardId(null);
+      setIsAssociateCardOpen(false);
       queryClient.invalidateQueries({
         queryKey: ["card-relationships", data.id],
-      })
+      });
     },
     onError: (error) => {
-      toast.error(error)
+      toast.error(error);
     },
-  })
+  });
 
   const { execute: executeRemoveRelationship } = useAction(removeCardRelationship, {
     onSuccess: () => {
-      toast.success("Card relationship removed")
+      toast.success("Card relationship removed");
       queryClient.invalidateQueries({
         queryKey: ["card-relationships", data.id],
-      })
+      });
     },
     onError: (error) => {
-      toast.error(error)
+      toast.error(error);
     },
-  })
+  });
 
   const { execute: executeCreateCard } = useAction(createCard, {
     onSuccess: (newCard) => {
-      toast.success(`Card "${newCard.title}" created`)
+      toast.success(`Card "${newCard.title}" created`);
 
       if (newCardType === "child") {
         // Set the new card as a child of the current card
@@ -153,7 +159,7 @@ export const Hierarchy = ({
           parentId: data.id,
           workspaceId: currentWorkspace?.id as string,
           boardId: params.boardId as string,
-        })
+        });
       } else {
         // Associate the new card with the current card
         executeAddRelationship({
@@ -162,38 +168,38 @@ export const Hierarchy = ({
           relationshipType: selectedRelationshipType,
           workspaceId: currentWorkspace?.id as string,
           boardId: params.boardId as string,
-        })
+        });
       }
 
-      setNewCardTitle("")
-      setIsCreateNewCardOpen(false)
+      setNewCardTitle("");
+      setIsCreateNewCardOpen(false);
 
       // Close the respective panels
       if (newCardType === "child") {
-        setIsChildCardOpen(false)
+        setIsChildCardOpen(false);
       } else {
-        setIsAssociateCardOpen(false)
+        setIsAssociateCardOpen(false);
       }
     },
     onError: (error) => {
-      toast.error(error)
-      setIsCreatingCard(false)
+      toast.error(error);
+      setIsCreatingCard(false);
     },
-  })
+  });
 
   const handleAddChildCard = () => {
-    if (!currentWorkspace?.id || !selectedChildCardId) return
+    if (!currentWorkspace?.id || !selectedChildCardId) return;
 
     executeSetParent({
       cardId: selectedChildCardId,
       parentId: data.id,
       workspaceId: currentWorkspace.id,
       boardId: params.boardId as string,
-    })
-  }
+    });
+  };
 
   const handleAddRelationship = () => {
-    if (!currentWorkspace?.id || !selectedDestCardId) return
+    if (!currentWorkspace?.id || !selectedDestCardId) return;
 
     executeAddRelationship({
       sourceCardId: data.id,
@@ -201,100 +207,100 @@ export const Hierarchy = ({
       relationshipType: selectedRelationshipType,
       workspaceId: currentWorkspace.id,
       boardId: params.boardId as string,
-    })
-  }
+    });
+  };
 
   const handleRemoveRelationship = (relationshipId: string) => {
-    if (!currentWorkspace?.id) return
+    if (!currentWorkspace?.id) return;
 
     executeRemoveRelationship({
       relationshipId,
       workspaceId: currentWorkspace.id,
       boardId: params.boardId as string,
-    })
-  }
+    });
+  };
 
   const handleCreateNewCard = () => {
-    if (!newCardTitle.trim() || !lists || lists.length === 0) return
+    if (!newCardTitle.trim() || !lists || lists.length === 0) return;
 
-    setIsCreatingCard(true)
+    setIsCreatingCard(true);
 
     // Use the first list as default
-    const defaultListId = lists[0].id
+    const defaultListId = lists[0].id;
 
     executeCreateCard({
       title: newCardTitle,
       listId: defaultListId,
       boardId: params.boardId as string,
       workspaceId: currentWorkspace?.id as string,
-    })
-  }
+    });
+  };
 
   const openCreateNewCardDialog = (type: "child" | "associated") => {
-    setNewCardType(type)
-    setIsCreateNewCardOpen(true)
-  }
+    setNewCardType(type);
+    setIsCreateNewCardOpen(true);
+  };
 
   const getRelationshipLabel = (type: RelationshipType) => {
     switch (type) {
       case "PARENT_CHILD":
-        return "Parent/Child"
+        return "Parent/Child";
       case "DEPENDS_ON":
-        return "Depends On"
+        return "Depends On";
       case "BLOCKED_BY":
-        return "Blocked By"
+        return "Blocked By";
       case "RELATES_TO":
-        return "Relates To"
+        return "Relates To";
       default:
-        return type
+        return type;
     }
-  }
+  };
 
   const getRelationshipIcon = (type: RelationshipType) => {
     switch (type) {
       case "PARENT_CHILD":
-        return <GitBranch className="h-3 w-3" />
+        return <GitBranch className="h-3 w-3" />;
       case "DEPENDS_ON":
-        return <ArrowDown className="h-3 w-3" />
+        return <ArrowDown className="h-3 w-3" />;
       case "BLOCKED_BY":
-        return <AlertTriangle className="h-3 w-3" />
+        return <AlertTriangle className="h-3 w-3" />;
       case "RELATES_TO":
-        return <Link2 className="h-3 w-3" />
+        return <Link2 className="h-3 w-3" />;
       default:
-        return <Link2 className="h-3 w-3" />
+        return <Link2 className="h-3 w-3" />;
     }
-  }
+  };
 
   const hasAssociatedCards = relationshipsData?.relationships?.some(
-    (rel: any) => rel.sourceCardId === data.id || rel.destCardId === data.id,
-  )
+    (rel: any) => rel.sourceCardId === data.id || rel.destCardId === data.id
+  );
 
-  const hasChildCards = relationshipsData?.children && relationshipsData.children.length > 0
+  const hasChildCards = relationshipsData?.children && relationshipsData.children.length > 0;
 
   // Check if the card has a parent
-  const hasParentCard = relationshipsData?.parent
+  const hasParentCard = relationshipsData?.parent;
 
   if (isLoadingRelationships || isLoadingBoardCards) {
-    return <Skeleton className="h-40 w-full" />
+    return <Skeleton className="h-40 w-full" />;
   }
 
-  const validParentOptions = getValidParentOptions()
-  const validRelationshipOptions = getValidRelationshipOptions()
+  const validParentOptions = getValidParentOptions();
+  const validRelationshipOptions = getValidRelationshipOptions();
 
-  const shouldRenderChildCard = hasChildCards || isChildCardOpen
-  const shouldRenderAssociatedCard = hasAssociatedCards || isAssociateCardOpen
-  const shouldRenderParentCard = hasParentCard
+  const shouldRenderChildCard = hasChildCards || isChildCardOpen;
+  const shouldRenderAssociatedCard = hasAssociatedCards || isAssociateCardOpen;
+  const shouldRenderParentCard = hasParentCard;
 
   // Function to handle opening a related card
   const handleOpenRelatedCard = (cardId: string) => {
     // Close the current card modal
-    cardModal.onClose()
+    cardModal.onClose();
 
     // Open the new card modal with the selected card ID
     setTimeout(() => {
-      cardModal.onOpen(cardId)
-    }, 100)
-  }
+      cardModal.onOpen(cardId);
+    }, 100);
+  };
 
   return (
     <>
@@ -310,7 +316,10 @@ export const Hierarchy = ({
                 <div
                   key={relationshipsData.parent.id}
                   className="p-2 bg-white dark:bg-gray-800 rounded-md border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between text-xs"
-                  onClick={() => handleOpenRelatedCard(relationshipsData.parent.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenRelatedCard(relationshipsData.parent.id);
+                  }}
                 >
                   <div className="flex items-center gap-x-2 overflow-hidden w-full">
                     <ArrowUp className="h-3.5 w-3.5 text-blue-500 shrink-0" />
@@ -320,9 +329,28 @@ export const Hierarchy = ({
                     </Badge>
                   </div>
                   <div className="flex items-center shrink-0 ml-2">
-                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                      <MoreVertical className="h-3.5 w-3.5 text-gray-500" />
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <MoreVertical className="h-3.5 w-3.5 text-gray-500" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveRelationship(relationshipsData.parent.relationshipId);
+                          }}
+                        >
+                          Delete relationship
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               </div>
@@ -347,14 +375,16 @@ export const Hierarchy = ({
                     <Plus className="h-3.5 w-3.5" />
                   </Button>
                 )}
-
               </div>
               <div className="space-y-1.5">
                 {relationshipsData?.children.map((child: any) => (
                   <div
                     key={child.id}
                     className="p-2 bg-white dark:bg-gray-800 rounded-md border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between text-xs"
-                    onClick={() => handleOpenRelatedCard(child.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenRelatedCard(child.id);
+                    }}
                   >
                     <div className="flex items-center gap-x-2 overflow-hidden w-full">
                       <GitBranch className="h-3.5 w-3.5 text-blue-500 shrink-0" />
@@ -364,15 +394,33 @@ export const Hierarchy = ({
                       </Badge>
                     </div>
                     <div className="flex items-center shrink-0 ml-2">
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                        <MoreVertical className="h-3.5 w-3.5 text-gray-500" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <MoreVertical className="h-3.5 w-3.5 text-gray-500" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveRelationship(child.relationshipId);
+                            }}
+                          >
+                            Delete relationship
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
                 ))}
                 {isChildCardOpen && (
                   <Card className="mt-2 border-dashed border-2 border-gray-200 dark:border-gray-700 shadow-sm">
-
                     <CardContent className="p-3 pt-0">
                       <Tabs
                         defaultValue="create"
@@ -496,7 +544,10 @@ export const Hierarchy = ({
                     <div
                       key={rel.id}
                       className="p-2 bg-white dark:bg-gray-800 rounded-md border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between text-xs"
-                      onClick={() => handleOpenRelatedCard(rel.destCard.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenRelatedCard(rel.destCard.id);
+                      }}
                     >
                       <div className="flex items-center gap-x-2 overflow-hidden w-full">
                         {getRelationshipIcon(rel.relationshipType)}
@@ -511,9 +562,28 @@ export const Hierarchy = ({
                       <Badge className="shrink-0 ml-1 bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 px-2 py-0.5 text-xs">
                         {rel.destCard.list.title}
                       </Badge>
-                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0 ml-2">
-                        <MoreVertical className="h-3.5 w-3.5 text-gray-500" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0 ml-2"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <MoreVertical className="h-3.5 w-3.5 text-gray-500" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveRelationship(rel.id);
+                            }}
+                          >
+                            Delete relationship
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   ))}
 
@@ -523,7 +593,10 @@ export const Hierarchy = ({
                     <div
                       key={rel.id}
                       className="p-2 bg-white dark:bg-gray-800 rounded-md border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between text-xs"
-                      onClick={() => handleOpenRelatedCard(rel.sourceCard.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenRelatedCard(rel.sourceCard.id);
+                      }}
                     >
                       <div className="flex items-center gap-x-2 overflow-hidden w-full">
                         {getRelationshipIcon(rel.relationshipType)}
@@ -541,9 +614,28 @@ export const Hierarchy = ({
                         <Badge className="shrink-0 ml-1 bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 px-2 py-0.5 text-xs">
                           {rel.sourceCard.list.title}
                         </Badge>
-                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                          <MoreVertical className="h-3.5 w-3.5 text-gray-500" />
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 w-6 p-0"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <MoreVertical className="h-3.5 w-3.5 text-gray-500" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemoveRelationship(rel.id);
+                              }}
+                            >
+                              Delete relationship
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
                   ))}
@@ -604,8 +696,8 @@ export const Hierarchy = ({
                                 size="sm"
                                 className="h-7 text-xs"
                                 onClick={() => {
-                                  setNewCardType("associated")
-                                  handleCreateNewCard()
+                                  setNewCardType("associated");
+                                  handleCreateNewCard();
                                 }}
                                 disabled={!newCardTitle.trim()}
                               >
@@ -678,7 +770,6 @@ export const Hierarchy = ({
                     </CardContent>
                   </Card>
                 )}
-
               </div>
             </div>
           )}
@@ -733,8 +824,8 @@ export const Hierarchy = ({
         </DialogContent>
       </Dialog>
     </>
-  )
-}
+  );
+};
 
 Hierarchy.Skeleton = function HierarchySkeleton() {
   return (
@@ -745,5 +836,5 @@ Hierarchy.Skeleton = function HierarchySkeleton() {
       </div>
       <Skeleton className="w-full h-[200px] bg-neutral-200 dark:bg-gray-700" />
     </div>
-  )
-}
+  );
+};
