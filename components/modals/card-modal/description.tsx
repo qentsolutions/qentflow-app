@@ -101,24 +101,13 @@ export const Description = ({ data, readonly = false }: DescriptionProps) => {
   }, [description, readOnlyEditor]);
 
   return (
-    <Card className="shadow-none border bg-card">
-      <CardContent className="py-5 px-4">
+    <Card className="shadow-none border-none">
+      <CardContent className=" px-0 border-none">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold flex items-center">
-            <AlignLeft className="h-5 w-5 mr-2" /> 
+            <AlignLeft size={18} className="mr-2" /> 
             Description
           </h3>
-          
-          {!readonly && !isEditing && (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={enableEditing}
-              className="text-xs"
-            >
-              Edit
-            </Button>
-          )}
         </div>
         
         {readonly ? (

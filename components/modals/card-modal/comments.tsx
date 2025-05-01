@@ -206,7 +206,7 @@ export const Comments = ({ items, cardId, readonly = false }: CommentsProps) => 
 
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-10">
       {!readonly &&
         <div className="mt-4">
           <form

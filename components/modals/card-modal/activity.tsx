@@ -16,7 +16,7 @@ export const Activity = ({ items }: ActivityProps) => {
       {items.length === 0 ? (
         <p className="text-sm text-muted-foreground text-center py-6">No activity yet</p>
       ) : (
-        <ol className="space-y-4">
+        <ol className="space-y-8 pl-4">
           {items.map((item) => (
             <ActivityItem
               key={item.id}

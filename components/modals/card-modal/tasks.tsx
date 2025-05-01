@@ -178,20 +178,19 @@ export const Tasks = ({ cardId }: TasksProps) => {
             <div className="flex items-center justify-between">
                 <div className="flex-1">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-x-1">
-                            <ListTodo size={14} />
+                        <div className="flex items-center">
+                            <ListTodo size={18} className="mr-2" />
                             <p className="text-lg font-semibold">Checklist</p>
                             <div className="ml-2">{progress == 100 ? (<p className="text-xs text-green-600">Completed</p>) : (<></>)}</div>
                         </div>
-
                         <Button
                             variant="outline"
-                            className="shadow-none border-none"
+                            size="sm"
+                            className="shadow-none border-none py-0"
                             onClick={() => setIsAddingTask(true)}
                         >
-                            <Plus className="h-4 w-4" />
+                            <Plus className="h-3.5 w-3.5" />
                         </Button>
-
                     </div>
                     <div className="flex items-center gap-2 mt-4">
                         <Progress value={progress} className="h-2" />

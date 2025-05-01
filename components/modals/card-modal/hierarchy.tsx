@@ -15,7 +15,7 @@ import { RelationshipType } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { GitBranch, ArrowDown, AlertTriangle, Link2, ArrowUp, Plus, Search, MoreVertical } from "lucide-react";
+import { GitBranch, ArrowDown, AlertTriangle, Link2, ArrowUp, Plus, Search, MoreVertical, Trash } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useCardModal } from "@/hooks/use-card-modal";
@@ -29,6 +29,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { removeCardParent } from "@/actions/cards/remove-card-parent";
+import { removeChildCards } from "@/actions/cards/remove-card-child";
 
 interface HierarchyProps {
   data: CardWithList;
@@ -187,6 +189,58 @@ export const Hierarchy = ({
     },
   });
 
+  const { execute: executeRemoveParent } = useAction(removeCardParent, {
+    onSuccess: () => {
+      toast.success("Parent relationship removed");
+      queryClient.invalidateQueries({
+        queryKey: ["card-relationships", data.id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["card", data.id],
+      });
+    },
+    onError: (error) => {
+      toast.error(error);
+    },
+  });
+
+  const handleRemoveParentRelationship = (cardId: string) => {
+    if (!currentWorkspace?.id) return;
+
+    executeRemoveParent({
+      cardId,
+      workspaceId: currentWorkspace.id,
+      boardId: params.boardId as string,
+    });
+  };
+
+  const { execute: executeRemoveChildCards } = useAction(removeChildCards, {
+    onSuccess: () => {
+      toast.success("Child relationships removed");
+      queryClient.invalidateQueries({
+        queryKey: ["card-relationships", data.id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["card", data.id],
+      });
+    },
+    onError: (error) => {
+      toast.error(error);
+    },
+  });
+
+  const handleRemoveChildRelationships = (parentCardId: string) => {
+    if (!currentWorkspace?.id) return;
+
+    executeRemoveChildCards({
+      parentCardId,
+      workspaceId: currentWorkspace.id,
+      boardId: params.boardId as string,
+    });
+  };
+
+
+
   const handleAddChildCard = () => {
     if (!currentWorkspace?.id || !selectedChildCardId) return;
 
@@ -211,7 +265,7 @@ export const Hierarchy = ({
   };
 
   const handleRemoveRelationship = (relationshipId: string) => {
-    if (!currentWorkspace?.id) return;
+    if (!currentWorkspace?.id || !relationshipId) return;
 
     executeRemoveRelationship({
       relationshipId,
@@ -344,10 +398,10 @@ export const Hierarchy = ({
                         <DropdownMenuItem
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleRemoveRelationship(relationshipsData.parent.relationshipId);
+                            handleRemoveParentRelationship(data.id);
                           }}
                         >
-                          Delete relationship
+                          <Trash className="text-red-600" />      Remove relationship
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -409,10 +463,10 @@ export const Hierarchy = ({
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleRemoveRelationship(child.relationshipId);
+                              handleRemoveChildRelationships(data.id);
                             }}
                           >
-                            Delete relationship
+                            <Trash className="text-red-600" />    Remove relationship
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -580,7 +634,7 @@ export const Hierarchy = ({
                               handleRemoveRelationship(rel.id);
                             }}
                           >
-                            Delete relationship
+                            <Trash className="text-red-600" />   Remove relationship
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -632,7 +686,7 @@ export const Hierarchy = ({
                                 handleRemoveRelationship(rel.id);
                               }}
                             >
-                              Delete relationship
+                              <Trash className="text-red-600" />    Remove relationship
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>

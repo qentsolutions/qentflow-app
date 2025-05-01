@@ -18,10 +18,7 @@ export async function GET(
     // Get all relationships where this card is either source or destination
     const relationships = await db.cardRelationship.findMany({
       where: {
-        OR: [
-          { sourceCardId: cardId },
-          { destCardId: cardId },
-        ],
+        OR: [{ sourceCardId: cardId }, { destCardId: cardId }],
       },
       include: {
         sourceCard: {
@@ -84,9 +81,18 @@ export async function GET(
     });
 
     return NextResponse.json({
-      relationships,
-      parent: card?.parent || null,
-      children: card?.children || [],
+      relationships: relationships.map((rel) => ({
+        ...rel,
+        relationshipId: rel.id, // Include the relationship ID
+      })),
+      parent: card?.parent
+        ? { ...card.parent, relationshipId: card.parentId }
+        : null,
+      children:
+        card?.children.map((child) => ({
+          ...child,
+          relationshipId: child.id, // Include the relationship ID
+        })) || [],
     });
   } catch (error) {
     console.error("[CARD_RELATIONSHIPS_GET]", error);
@@ -155,7 +161,6 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { cardId } = params;
     const { relationshipId } = await req.json();
 
     if (!relationshipId) {

@@ -313,16 +313,16 @@ export const CardModal = () => {
 
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold flex items-center">
-                    <ActivityIcon size={16} className="mr-2" /> Activity
+                    <ActivityIcon size={18} className="mr-2" /> Activity
                   </h3>
 
                   <Tabs defaultValue="comments" className="w-full">
-                    <TabsList className="mb-4">
+                    <TabsList className="mb-2">
                       <TabsTrigger value="comments" className="flex items-center gap-1">
-                        <MessageSquareText size={14} /> Comments
+                        <MessageSquareText size={14} className="mr-2" /> Comments
                       </TabsTrigger>
                       <TabsTrigger value="logs" className="flex items-center gap-1">
-                        <Logs size={14} /> History
+                        <Logs size={14} className="mr-2" /> History
                       </TabsTrigger>
                     </TabsList>
 
@@ -341,21 +341,24 @@ export const CardModal = () => {
                 </div>
               </div>
 
-              <div className="space-y-6">
+              <div>
                 {!cardData ? (
                   <Description.Skeleton />
                 ) : (
                   <>
-                    <div className="flex items-center justify-end gap-x-2">
+                    <div className="flex items-center justify-end gap-x-2 mb-2">
                       <Button variant={"outline"} className="border-none shadow-none" onClick={() => { onExpand(cardData.id) }}>
                         <ExternalLink />
                       </Button>
                       <Actions card={cardData} boardId={boardIdString} lists={lists} setOrderedData={setOrderedData} />
                     </div>
-                    <Details card={cardData} />
-                    <TagsComponent data={cardData} availableTags={availableTags ?? []} />
-                    <Priority data={cardData} />
-                    <DateComponent card={cardData} />
+                    <div className="space-y-6">
+                      <Details card={cardData} />
+                      <TagsComponent data={cardData} availableTags={availableTags ?? []} />
+                      <Priority data={cardData} />
+                      <DateComponent card={cardData} />
+                    </div>
+
                   </>
                 )}
               </div>
