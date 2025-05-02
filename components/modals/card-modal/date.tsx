@@ -32,7 +32,6 @@ const DateComponent: React.FC<DateManagerProps> = ({ card, readonly = false }) =
     });
 
     const updateDates = async (startDate: Date | null = null, dueDate: Date | null = null) => {
-        // Validation : dueDate >= startDate
         if (startDate && dueDate && dueDate < startDate) {
             toast.error("Due date cannot be earlier than the start date.");
             return;
@@ -84,12 +83,12 @@ const DateComponent: React.FC<DateManagerProps> = ({ card, readonly = false }) =
                 <div className="space-y-2 pt-4">
                     <div className="flex items-center gap-x-2">
                         <Calendar size={20} />
-                        <p className="text-lg font-semibold">Start/Due Date</p>
+                        <p className="text-lg font-semibold">Timeline</p>
                     </div>
 
                     <DropdownMenu>
                         <DropdownMenuTrigger className="flex w-full">
-                            <Button variant={"outline"} className="w-full text-xs">
+                            <Button variant={"outline"} className="w-full text-xs truncate">
                                 {formatDate(dateRange?.start?.toDate(getLocalTimeZone()) ?? null)} - {formatDate(dateRange?.end?.toDate(getLocalTimeZone()) ?? null)}
                             </Button>
                         </DropdownMenuTrigger>

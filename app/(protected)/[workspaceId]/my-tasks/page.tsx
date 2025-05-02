@@ -11,12 +11,10 @@ import {
   CheckCircle2,
   Calendar,
   Clock,
-  AlertTriangle,
   ArrowUpDown,
   Filter,
   Tag,
   KanbanSquare,
-  Flag,
   X,
   ChevronRight,
   LayoutDashboard,
@@ -53,20 +51,26 @@ type TaskCardProps = {
   id: string;
 };
 
-const getPriorityIcon = (priority: string | null) => {
-  switch (priority) {
-    case "LOW":
-      return <Flag className="h-4 w-4 text-green-500" />;
-    case "MEDIUM":
-      return <Flag className="h-4 w-4 text-yellow-500" />;
-    case "HIGH":
-      return <Flag className="h-4 w-4 text-red-500" />;
-    case "CRITICAL":
-      return <AlertTriangle className="h-4 w-4 text-red-500" />;
-    default:
-      return null;
+const getPriorityBadge = (priority: string | null) => {
+  if (!priority) return null
+
+  const colors: Record<string, { bg: string; text: string }> = {
+    LOW: { bg: "bg-green-100", text: "text-green-500" },
+    MEDIUM: { bg: "bg-orange-100", text: "text-orange-600" },
+    HIGH: { bg: "bg-red-100", text: "text-red-600" },
+    CRITICAL: { bg: "bg-red-200", text: "text-red-600" },
   }
-};
+
+  const style = colors[priority] || { bg: "bg-gray-100", text: "text-gray-500" }
+
+  return (
+    <span
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium ${style.bg} ${style.text}`}
+    >
+      {priority.charAt(0).toUpperCase() + priority.slice(1).toLowerCase()}
+    </span>
+  )
+}
 
 const getPriorityColor = (priority: string | null) => {
   switch (priority) {
@@ -293,7 +297,7 @@ export default function MyTasksPage() {
                     formatDate={formatDate}
                     getTaskProgress={getTaskProgress}
                     getPriorityColor={getPriorityColor}
-                    getPriorityIcon={getPriorityIcon}
+                    getPriorityIcon={getPriorityBadge}
                   />
                 ))
               ) : (
@@ -391,7 +395,7 @@ export default function MyTasksPage() {
                       formatDate={formatDate}
                       getTaskProgress={getTaskProgress}
                       getPriorityColor={getPriorityColor}
-                      getPriorityIcon={getPriorityIcon}
+                      getPriorityIcon={getPriorityBadge}
                     />
                   ))
                 ) : (
@@ -473,9 +477,8 @@ const TaskCard = ({
               </Link>
 
               {card.priority && (
-                <Badge variant="outline" className={cn("border font-normal", getPriorityColor(card.priority))}>
+                <Badge variant="outline" className={cn("font-normal border-none")}>
                   {getPriorityIcon(card.priority)}
-                  <span className="ml-1 text-xs">{card.priority}</span>
                 </Badge>
               )}
             </div>
