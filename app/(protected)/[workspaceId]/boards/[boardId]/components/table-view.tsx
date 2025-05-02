@@ -7,11 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
-  Calendar,
   CheckSquare,
-  AlertTriangle,
   UserRound,
-  Flag,
   MoreVertical,
   Trash2,
   Archive,
@@ -120,25 +117,6 @@ export const TableView = ({ data, visibleFields, users, boardId }: TableViewProp
       toast.error(error)
     },
   })
-
-  const PriorityIcon = (priority: string | null) => {
-    if (!priority) {
-      return null
-    }
-    if (priority === "LOW") {
-      return <Flag className="text-emerald-500" size={14} />
-    }
-    if (priority === "MEDIUM") {
-      return <Flag className="text-amber-500" size={14} />
-    }
-    if (priority === "HIGH") {
-      return <Flag className="text-rose-500" size={14} />
-    }
-    if (priority === "CRITICAL") {
-      return <AlertTriangle className="text-rose-600" size={14} />
-    }
-    return null
-  }
 
   const handleBulkDelete = () => {
     if (selectedCards.length === 0) return

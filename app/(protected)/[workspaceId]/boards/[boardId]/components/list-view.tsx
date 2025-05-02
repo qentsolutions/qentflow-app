@@ -7,11 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import {
   ChevronDown,
   ChevronUp,
-  MoreHorizontal,
   GripVertical,
   UserRound,
-  Flag,
-  AlertTriangle,
   Trash2,
   Archive,
   Copy,
@@ -199,23 +196,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
     )
   }
 
-  const PriorityIcon = (priority: string | null) => {
-    if (!priority) return null
 
-    if (priority === "LOW") {
-      return <Flag className="text-gray-500" size={14} />
-    }
-    if (priority === "MEDIUM") {
-      return <Flag className="text-amber-500" size={14} />
-    }
-    if (priority === "HIGH" || priority === "NORMAL") {
-      return <Flag className="text-indigo-500" size={14} />
-    }
-    if (priority === "CRITICAL") {
-      return <AlertTriangle className="text-red-500" size={14} />
-    }
-    return null
-  }
 
   const toggleCardSelection = (e: React.MouseEvent, cardId: string) => {
     e.stopPropagation()

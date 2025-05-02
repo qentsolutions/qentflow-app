@@ -16,7 +16,6 @@ import {
   Plus,
   CheckIcon,
   Settings2,
-  Flag,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
@@ -121,20 +120,26 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
     return count;
   };
 
-  const getPriorityIcon = (priority: string) => {
-    switch (priority) {
-      case "LOW":
-        return <Flag className="h-4 w-4 text-green-500" />;
-      case "MEDIUM":
-        return <Flag className="h-4 w-4 text-yellow-500" />;
-      case "HIGH":
-        return <Flag className="h-4 w-4 text-red-500" />;
-      case "CRITICAL":
-        return <AlertTriangle className="h-4 w-4 text-red-500" />;
-      default:
-        return null;
+  const getPriorityBadge = (priority: string | null) => {
+    if (!priority) return null
+
+    const colors: Record<string, { bg: string; text: string }> = {
+      LOW: { bg: "bg-green-100", text: "text-green-500" },
+      MEDIUM: { bg: "bg-orange-100", text: "text-orange-600" },
+      HIGH: { bg: "bg-red-100", text: "text-red-600" },
+      CRITICAL: { bg: "bg-red-200", text: "text-red-600" },
     }
-  };
+
+    const style = colors[priority] || { bg: "bg-gray-100", text: "text-gray-500" }
+
+    return (
+      <span
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium ${style.bg} ${style.text}`}
+      >
+        {priority.charAt(0).toUpperCase() + priority.slice(1).toLowerCase()}
+      </span>
+    )
+  }
 
   const handleSort = (newSortBy: string) => {
     if (sortBy === newSortBy) {
@@ -262,8 +267,7 @@ export const BoardContent = ({ boardId, lists, users }: BoardContentProps) => {
                           selectedPriority === priority ? "bg-blue-50" : "hover:bg-secondary/50"
                         )}
                       >
-                        {getPriorityIcon(priority)}
-                        <span>{priority}</span>
+                        {getPriorityBadge(priority)}
                       </div>
                     ))}
                   </div>
