@@ -9,7 +9,7 @@ import { CalendarView } from "./components/calendar/calendar-view";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { OverviewView } from "./components/overview/overview-view";
-import { Calendar, Clock, FileText, LayoutDashboard, ListTodo, SettingsIcon, ShoppingBag } from "lucide-react";
+import { Calendar, Clock, FileText, LayoutDashboard, ListTodo, SettingsIcon } from "lucide-react";
 import { AddCardButton } from "./components/add-card-button";
 import { Automations } from "./components/automations/automations";
 import TimelineView from "./components/timeline/timeline-view";
@@ -161,10 +161,6 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                       <LayoutDashboard className="w-4 h-4 mr-2" />
                       Overview
                     </TabsTrigger>
-                    <TabsTrigger value="backlog">
-                      <ShoppingBag className="w-4 h-4 mr-2" />
-                      Backlog
-                    </TabsTrigger>
                     <TabsTrigger value="board">
                       <ListTodo className="w-4 h-4 mr-2" />
                       Board
@@ -198,9 +194,6 @@ const BoardIdPage = async ({ params }: BoardIdPageProps) => {
                 <Separator />
                 <TabsContent value="overview">
                   <OverviewView lists={board.lists} users={board.User} />
-                </TabsContent>
-                <TabsContent value="backlog">
-                  backlog
                 </TabsContent>
                 <TabsContent value="board">
                   <BoardContent users={board.User} boardId={board.id} lists={board.lists} />

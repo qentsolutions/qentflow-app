@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreVertical } from "lucide-react";
+import { Clock, MoreVertical } from "lucide-react";
 import type { Tag, User } from "@prisma/client";
 import { Draggable } from "@hello-pangea/dnd";
 import { useCardModal } from "@/hooks/use-card-modal";
@@ -31,6 +31,7 @@ import { fetcher } from "@/lib/fetcher";
 
 interface CardItemProps {
   data: {
+    dueDate: any;
     id: string;
     title: string;
     order: number;
@@ -63,6 +64,9 @@ export const CardItem = ({ data, index, users, lists, setOrderedData }: CardItem
   const [assignedUserState, setAssignedUserState] = useState<User | null>(null);
   const currentUser = useCurrentUser();
   const params = useParams();
+  const dueDate = data.dueDate ? new Date(data.dueDate) : null;
+  const isOverdue = dueDate ? dueDate.getTime() < Date.now() : false;
+
 
   useEffect(() => {
     const assignedUser = users.find((user) => user.id === data.assignedUserId) || null;
@@ -239,6 +243,20 @@ export const CardItem = ({ data, index, users, lists, setOrderedData }: CardItem
 
               {/* Right side - Assignee */}
               <div className="flex items-center gap-2">
+
+                {isOverdue && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Clock
+                        size={16}
+                        className="text-red-500"
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="text-xs">
+                      {`Overdue since ${dueDate!.toLocaleDateString()}`}
+                    </TooltipContent>
+                  </Tooltip>
+                )}
                 {/* Assignee */}
                 <TooltipProvider>
                   <Tooltip>

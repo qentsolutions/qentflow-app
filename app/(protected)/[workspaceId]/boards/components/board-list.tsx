@@ -336,8 +336,8 @@ export const BoardList: React.FC = () => {
           {/* All Boards */}
           <div className={cn("grid", isCardView ? "gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" : "grid-cols-1")}>
             {isLoading || isFirstLoad ? (
-              Array.from({ length: 4 }).map((_, idx) => (
-                <Skeleton key={idx} className="h-36 rounded-md bg-gray-200 dark:bg-gray-700" />
+              Array.from({ length: 6 }).map((_, idx) => (
+                <Skeleton key={idx} className="h-20 my-1 rounded-md bg-gray-200 dark:bg-gray-700" />
               ))
             ) : combinedBoards.length > 0 ? (
               combinedBoards.map((board) =>

@@ -1,6 +1,6 @@
 "use client";
 
-import { type LucideIcon, ChevronRight, LayoutList, Plus } from "lucide-react";
+import { type LucideIcon, ChevronRight, LayoutList, LibraryBig, Plus } from "lucide-react";
 import { Separator } from "@/components/ui/separator"; // Assurez-vous d'importer le composant Separator
 import {
   SidebarGroup,
@@ -54,7 +54,7 @@ export function NavTools({
       <SidebarMenu>
         <Collapsible className="group/collapsible">
           <SidebarMenuItem
-            className={`group/menu-item rounded-sm ${pathname.includes(`/${workspaceId}/boards`) ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-slate-600"}`}
+            className={`group/menu-item rounded-sm ${pathname.includes(`/${workspaceId}/boards`) ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-slate-600"}`}
           >
             <SidebarMenuButton asChild>
               <Link href={`/${workspaceId}/boards`} className="ml-2">
@@ -70,7 +70,7 @@ export function NavTools({
           </SidebarMenuItem>
 
           <CollapsibleContent className="group-data-[collapsible=icon]:hidden">
-            <div className="pl-9 pr-2 space-y-1 mt-1">
+            <div className="pl-6 pr-2 space-y-1 mt-1">
               {isLoading && (
                 <div className="py-3 flex items-center">
                   <div className="space-y-1.5 w-full">
@@ -116,7 +116,7 @@ export function NavTools({
                           className={cn(
                             "absolute left-0 top-0 bottom-0 w-0.5 rounded-full transition-all",
                             isActive
-                              ? "bg-primary h-full"
+                              ? "bg-blue-500 h-full"
                               : "bg-transparent h-0 group-hover:bg-muted-foreground/20 group-hover:h-full",
                           )}
                         />
@@ -128,13 +128,17 @@ export function NavTools({
                         ) : (
                           <div
                             className={cn(
-                              "flex h-5 w-5 shrink-0 items-center justify-center rounded-sm",
-                              isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground",
+                              "flex h-5 w-5 text-xs shrink-0 items-center justify-center rounded-sm uppercase font-medium",
+                              // Couleurs actives vs inactives, à ajuster selon votre thème
+                              isActive
+                                ? "bg-blue-500 text-white"
+                                : "bg-blue-100 text-blue-800 "
                             )}
                           >
-                            <LayoutList size={14} />
+                            {board.title.charAt(0)}
                           </div>
                         )}
+
 
                         <span className={cn("truncate transition-colors", isActive ? "font-medium" : "font-normal")}>
                           {board.title}
