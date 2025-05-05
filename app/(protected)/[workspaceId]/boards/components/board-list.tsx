@@ -63,7 +63,7 @@ const TemplateExplorer: React.FC<TemplateExplorerProps> = ({ onSelectTemplate })
               key={type}
               className={cn(
                 "block w-full text-left px-2 py-1 rounded",
-                selectedType === type ? "bg-blue-100 text-blue-800" : "hover:bg-gray-100",
+                selectedType === type ? "bg-blue-100 text-blue-800 dark:text-blue-500 dark:bg-gray-700" : "hover:bg-gray-100 dark:hover:bg-gray-700",
               )}
               onClick={() => setSelectedType(type)}
             >
@@ -269,8 +269,8 @@ export const BoardList: React.FC = () => {
                     className={cn(
                       "aspect-[16/10] relative group rounded-lg border-2 border-dashed",
                       "hover:border-blue-500 transition-all duration-200",
-                      "flex flex-col items-center justify-center cursor-pointer p-4 overflow-hidden",
-                      template.id === "blank" ? "bg-white" : "bg-gradient-to-br from-blue-50 to-indigo-50",
+                      "flex flex-col items-center justify-center cursor-pointer p-4 overflow-hidden ",
+                      template.id === "blank" ? "bg-background dark:bg-gray-700" : "dark:bg-gray-800 bg-blue-50",
                     )}
                     onClick={() => {
                       setSelectedTemplateId(template.id);
@@ -278,7 +278,7 @@ export const BoardList: React.FC = () => {
                     }}
                   >
                     <div className="text-2xl mb-2">{template.icon}</div>
-                    <p className="text-sm text-center font-medium text-gray-600 group-hover:text-gray-900">
+                    <p className="text-sm text-center font-medium dark:text-gray-400 text-gray-600 group-hover:text-gray-900">
                       {template.title}
                     </p>
                     <p className="text-xs text-center text-gray-500 mt-1">{template.description}</p>
@@ -286,8 +286,8 @@ export const BoardList: React.FC = () => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="absolute top-1/2 -left-2 transform -translate-y-1/2 bg-white hover:bg-gray-100 rounded-full p-2 shadow-md" />
-            <CarouselNext className="absolute top-1/2 -right-2 transform -translate-y-1/2 bg-white hover:bg-gray-100 rounded-full p-2 shadow-md" />
+            <CarouselPrevious className="absolute top-1/2 -left-2 transform -translate-y-1/2 bg-background hover:bg-gray-100 rounded-full p-2 shadow-md" />
+            <CarouselNext className="absolute top-1/2 -right-2 transform -translate-y-1/2 bg-background hover:bg-gray-100 rounded-full p-2 shadow-md" />
           </Carousel>
 
           <div className="flex justify-between items-center gap-x-2 mb-4">
@@ -346,7 +346,7 @@ export const BoardList: React.FC = () => {
                 ) : (
                   <div
                     key={board.id}
-                    className="flex items-center p-4 border-b cursor-pointer transition hover:bg-gray-100"
+                    className="flex items-center p-4 border-b cursor-pointer transition hover:bg-gray-100 dark:hover:bg-gray-700"
                     onClick={() => handleBoardClick(board)}
                   >
                     <div className="flex-shrink-0 mr-4">
@@ -359,16 +359,16 @@ export const BoardList: React.FC = () => {
                       )}
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-medium text-neutral-900">{board.title}</h3>
+                      <h3 className="font-medium text-neutral-900 dark:text-gray-400">{board.title}</h3>
                       <p className="text-sm text-gray-500">Created by {board.creator.name}</p>
                     </div>
                     <div className="flex items-center space-x-2">
                       {recentBoardIds.includes(board.id) && (
-                        <div className="flex items-center space-x-1 rounded-full bg-blue-100 text-blue-800 px-2 py-1">
+                        <div className="flex items-center space-x-1 rounded-full bg-blue-100 dark:bg-blue-400 text-blue-800 px-2 py-1">
                           <span className="text-xs font-medium">Recently opened</span>
                         </div>
                       )}
-                      <div className="flex items-center space-x-1 rounded-full bg-neutral-100 px-2 py-1">
+                      <div className="flex items-center space-x-1 rounded-full bg-neutral-100 dark:bg-background px-2 py-1">
                         <Users className="h-3 w-3 text-neutral-600" />
                         <span className="text-xs font-medium text-neutral-600">{board.memberCount}</span>
                       </div>

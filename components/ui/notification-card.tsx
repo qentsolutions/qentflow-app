@@ -154,7 +154,7 @@ export function NotificationCard({
 
   // Get icon based on notification type
   const getNotificationIcon = () => {
-    if (!metadata) return <Bell className="w-4 h-4" />
+    if (!metadata) return <Bell className="w-4 h-4 " />
 
     switch (metadata.type) {
       case "card_created":
@@ -176,7 +176,7 @@ export function NotificationCard({
     <div
       className={`
       relative px-4 py-3
-      ${isRead ? 'bg-white' : 'bg-blue-50'}
+      ${isRead ? 'bg-background' : 'bg-blue-50 dark:bg-gray-800'}
       ${isHovered ? (isRead ? 'bg-gray-50' : 'bg-blue-100') : ''}
       ${isClickable || link ? 'cursor-pointer' : 'cursor-default'}
       ${(isClickable || link) && isHovered ? 'ring-2 ring-blue-200 shadow-sm' : ''}
@@ -202,7 +202,7 @@ export function NotificationCard({
         <div className={`
         flex-shrink-0 rounded-full p-2 mt-1
         ${isRead
-            ? 'bg-gray-100 text-gray-600'
+            ? 'bg-gray-100  text-gray-600'
             : 'bg-blue-200 text-blue-700'}
       `}>
           {getNotificationIcon()}
@@ -258,7 +258,7 @@ export function NotificationCard({
             className={`
             h-7 w-7 rounded-full border shadow-sm
             ${isRead
-                ? 'bg-white hover:bg-blue-50 border-gray-200'
+                ? 'bg-background hover:bg-blue-50 border-gray-200'
                 : 'bg-blue-100 hover:bg-blue-200 border-blue-200'}
           `}
             onClick={(e) => {
@@ -277,7 +277,7 @@ export function NotificationCard({
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 bg-white hover:bg-red-50 rounded-full border border-gray-200 shadow-sm"
+            className="h-7 w-7 bg-background hover:bg-red-50 rounded-full border border-gray-200 shadow-sm"
             onClick={(e) => {
               e.stopPropagation();
               handleDelete();

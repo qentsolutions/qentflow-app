@@ -69,9 +69,9 @@ export const RegisterForm = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white">Name</FormLabel>
+                  <FormLabel className="text-black">Name</FormLabel>
                   <FormControl>
-                    <Input {...field} disabled={isPending} placeholder="John Doe" className="h-11 border-[#3A3A3A] text-white focus:border-blue-500"
+                    <Input {...field} disabled={isPending} placeholder="John Doe" className="h-11 text-black focus:border-blue-500"
                     />
                   </FormControl>
                   <FormMessage />
@@ -83,14 +83,14 @@ export const RegisterForm = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white">Email</FormLabel>
+                  <FormLabel className="text-black">Email</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       disabled={isPending}
                       placeholder="john.doe@example.com"
                       type="email"
-                      className="h-11 border-[#3A3A3A] text-white focus:border-blue-500"
+                      className="h-11 text-black focus:border-blue-500"
                     />
                   </FormControl>
                   <FormMessage />
@@ -102,7 +102,7 @@ export const RegisterForm = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white">Password</FormLabel>
+                  <FormLabel className="text-black">Password</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
@@ -110,7 +110,7 @@ export const RegisterForm = () => {
                         disabled={isPending}
                         placeholder="******"
                         type={showPassword ? "text" : "password"}
-                        className="h-11 pr-10 border-[#3A3A3A] text-white focus:border-blue-500"
+                        className="h-11 pr-10 text-black focus:border-blue-500"
                       />
                       <Button
                         type="button"
@@ -141,7 +141,7 @@ export const RegisterForm = () => {
               className="mt-1 border-[#3A3A3A]"
             />
             <div className="grid gap-1.5 leading-none">
-              <label htmlFor="terms" className="text-sm text-white leading-relaxed">
+              <label htmlFor="terms" className="text-sm text-black leading-relaxed">
                 I agree to the{" "}
                 <Link href="https://www.qentflow.com/terms-of-service" target="_blank" className="text-blue-500 hover:text-blue-700">
                   Terms of Service

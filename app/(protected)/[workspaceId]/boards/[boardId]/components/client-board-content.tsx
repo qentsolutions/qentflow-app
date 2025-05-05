@@ -71,7 +71,7 @@ const ClientBoardContent = ({ params }: ClientBoardContentProps) => {
   }, [selectedDocumentId])
 
   return (
-    <div className="flex h-[82vh] bg-gray-50">
+    <div className="flex h-[82vh] bg-background">
       <div className="flex flex-col h-full">
         <DocumentsView
           onSelectDocument={handleSelectDocument}
@@ -82,7 +82,7 @@ const ClientBoardContent = ({ params }: ClientBoardContentProps) => {
         />
       </div>
 
-      <div ref={contentRef} className="flex-1 overflow-y-auto bg-white border-l">
+      <div ref={contentRef} className="flex-1 overflow-y-auto bg-background border-l">
         {selectedDocumentId ? (
           <DocumentEditor
             params={{

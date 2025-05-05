@@ -30,7 +30,7 @@ const DocumentsView = ({
     }, [searchQuery, documentsData])
 
     return (
-        <div className="w-64 h-full flex flex-col bg-white">
+        <div className="w-64 h-full flex flex-col bg-background">
             <div className="p-3 border-b flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                     <h3 className="font-medium text-sm text-gray-700">Documents</h3>

@@ -83,9 +83,9 @@ export function NoteEditor({ note, onSave, readonly = false, onDelete }: NoteEdi
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="h-full w-full flex bg-gray-100 pl-2 pt-2"
+            className="h-full w-full flex"
         >
-            <Card className="w-full bg-white shadow-none rounded-none relative">
+            <Card className="w-full bg-background shadow-none rounded-none relative">
                 <CardContent className="p-6">
                     <div className="absolute top-2 right-2 flex items-center gap-2">
                         {!readonly && (

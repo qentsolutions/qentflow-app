@@ -52,18 +52,18 @@ export const AutomationUsage = ({ boardId, workspaceId }: AutomationUsageProps) 
             <div className="space-y-6 px-4 pb-4">
                 {/* Stats Overview */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Card className="p-6 bg-white shadow-sm hover:shadow-md transition-shadow">
+                    <Card className="p-6 bg-background shadow-sm hover:shadow-md transition-shadow">
                         <h3 className="text-sm font-medium text-gray-500">Total Executions</h3>
                         <p className="text-3xl font-bold mt-2">{totalExecutions}</p>
                     </Card>
-                    <Card className="p-6 bg-white shadow-sm hover:shadow-md transition-shadow">
+                    <Card className="p-6 bg-background shadow-sm hover:shadow-md transition-shadow">
                         <h3 className="text-sm font-medium text-gray-500">Success Rate</h3>
                         <div className="flex items-center gap-2">
                             <p className="text-3xl font-bold mt-2">{successRate}%</p>
                             <div className={`h-2 w-2 rounded-full mt-2 ${successRate >= 90 ? 'bg-green-500' : successRate >= 70 ? 'bg-yellow-500' : 'bg-red-500'}`} />
                         </div>
                     </Card>
-                    <Card className="p-6 bg-white shadow-sm hover:shadow-md transition-shadow">
+                    <Card className="p-6 bg-background shadow-sm hover:shadow-md transition-shadow">
                         <h3 className="text-sm font-medium text-gray-500">Most Used Automation</h3>
                         <p className="text-xl font-semibold mt-2">{mostUsedAutomation?.name || "N/A"}</p>
                         <p className="text-sm text-gray-500">{mostUsedAutomation?.executions || 0} executions</p>
@@ -71,7 +71,7 @@ export const AutomationUsage = ({ boardId, workspaceId }: AutomationUsageProps) 
                 </div>
 
                 {/* Hourly Usage Chart */}
-                <Card className="p-6 bg-white shadow-sm">
+                <Card className="p-6 bg-background shadow-sm">
                     <Title>Hourly Automation Executions</Title>
                     <BarChart
                         className="mt-6 h-72"
@@ -86,7 +86,7 @@ export const AutomationUsage = ({ boardId, workspaceId }: AutomationUsageProps) 
 
                 {/* Automation Type Distribution */}
                 {usageData?.automationTypes && (
-                    <Card className="p-6 bg-white shadow-sm">
+                    <Card className="p-6 bg-background shadow-sm">
                         <Title>Automation Type Distribution</Title>
                         <BarChart
                             className="mt-6 h-72"

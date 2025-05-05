@@ -97,7 +97,7 @@ export default function DocsPage() {
   return (
     <div className="pl-2 pt-2 h-[calc(100vh-70px)] bg-gray-50">
       <Card className="shadow-sm rounded-none w-full">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+        <div className="bg-background dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <div className="flex flex-col space-y-4">
             <div className="flex justify-between items-center">
               <div>

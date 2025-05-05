@@ -36,10 +36,10 @@ export const CardWrapper = ({
       </CardContent>
       <div className="relative mb-4">
         <div className="absolute inset-0 flex items-center justify-center">
-          <Separator className="w-3/4 text-[#C7C7C7]" />
+          <Separator className="w-3/4" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-[#272727] px-2 text-[#C7C7C7]">
+          <span className="bg-background px-2 text-black">
             Or continue with
           </span>
         </div>

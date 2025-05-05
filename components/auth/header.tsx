@@ -7,7 +7,7 @@ export const Header = ({
 }: HeaderProps) => {
   return (
     <div className="w-full flex flex-col gap-y-4 items-center justify-center">
-      <p className=" text-lg text-white">
+      <p className=" text-lg text-black">
         {label}
       </p>
     </div>

@@ -72,7 +72,7 @@ export default function DocumentPage() {
             transition={{ duration: 0.3 }}
             className="flex flex-col dark:bg-gray-900"
         >
-            <div className="border-b bg-white dark:bg-gray-800 shadow-sm">
+            <div className="border-b bg-background dark:bg-gray-800 shadow-sm">
                 <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between">
                         <DocumentHeader document={document} />
@@ -91,7 +91,7 @@ export default function DocumentPage() {
             <div className="flex-1 overflow-y-auto">
                 <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-8">
                     <div className="flex gap-6">
-                        <Card className="flex-1 bg-white dark:bg-gray-800 shadow-sm h-screen border-none">
+                        <Card className="flex-1 bg-background dark:bg-gray-800 shadow-sm h-screen border-none">
                             <Editor
                                 document={document}
                                 onContentChange={handleAutoSave}

@@ -508,7 +508,7 @@ const TaskCard = ({
               <div className="mt-3 flex items-center justify-between">
                 {card.tasks && card.tasks.length > 0 && (
                   <div className="flex items-center gap-2">
-                    <div className="h-2 w-16 overflow-hidden rounded-full bg-gray-100">
+                    <div className="h-2 w-16 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
                       <div
                         className={`h-full rounded-full transition-all ${progress === 100 ? 'bg-green-500' : 'bg-blue-600'}`}
                         style={{ width: `${progress}%` }}

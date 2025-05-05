@@ -83,7 +83,7 @@ export function InviteMemberDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-primary hover:bg-primary/90">
+        <Button className="bg-primary dark:bg-blue-400 dark:text-white hover:bg-primary/90">
           <PlusCircle className="mr-2 h-4 w-4" />
           Invite Member
         </Button>

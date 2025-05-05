@@ -96,7 +96,7 @@ const DraggableDocument = ({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex items-center justify-between py-1 px-2 rounded-md hover:bg-gray-100 cursor-pointer group document-item transition-colors duration-200",
+        "flex items-center justify-between py-1 px-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer group document-item transition-colors duration-200",
         isSelected && "bg-gray-100",
       )}
       onClick={onSelect}
@@ -123,7 +123,7 @@ const DraggableDocument = ({
             e.stopPropagation()
             onRename(e)
           }}
-          className="h-6 w-6 p-0 hover:bg-gray-100"
+          className="h-6 w-6 p-0 hover:bg-gray-100 dark:hover:bg-gray-700"
           title="Rename document"
         >
           <Edit className="h-3 w-3 text-gray-500" />
@@ -189,8 +189,8 @@ const DroppableFolder = ({
     <div ref={setNodeRef} style={style} className="mb-0.5">
       <div
         className={cn(
-          "flex items-center justify-between py-1 px-2 rounded-md hover:bg-gray-100 group transition-all duration-200",
-          isDropTarget && "bg-blue-50 border border-blue-200 shadow-sm",
+          "flex items-center justify-between py-1 px-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 group transition-all duration-200",
+          isDropTarget && "bg-blue-50 dark:bg-gray-700 dark:text-blue-500 hover:bg-gray-100 border border-blue-200 shadow-sm",
         )}
         onClick={(e) => e.stopPropagation()} // Prevent click from bubbling
       >
@@ -794,7 +794,7 @@ export function DocumentSidebar({
 
     if (activeItem.type === "document") {
       return (
-        <div className="flex items-center gap-1.5 bg-white p-2 rounded-md shadow-lg border border-blue-200 max-w-[200px]">
+        <div className="flex items-center gap-1.5 bg-background p-2 rounded-md shadow-lg border border-blue-200 max-w-[200px]">
           <File className="h-4 w-4 text-blue-500" />
           <span className="text-sm truncate text-gray-700 font-medium">{activeItem.data.title}</span>
         </div>
@@ -803,7 +803,7 @@ export function DocumentSidebar({
 
     if (activeItem.type === "folder") {
       return (
-        <div className="flex items-center gap-1.5 bg-white p-2 rounded-md shadow-lg border border-blue-200 max-w-[200px]">
+        <div className="flex items-center gap-1.5 bg-background p-2 rounded-md shadow-lg border border-blue-200 max-w-[200px]">
           <Folder className="h-4 w-4 text-blue-500" />
           <span className="text-sm truncate text-gray-700 font-medium">{activeItem.data.name}</span>
         </div>

@@ -157,7 +157,7 @@ const TimelineView = ({ features, currentUser }: GanttClientComponentProps) => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="w-full px-3 pb-2 border-b bg-white flex flex-wrap items-center justify-between gap-2">
+      <div className="w-full px-3 pb-2 border-b bg-background flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
             <PopoverTrigger asChild>
@@ -200,7 +200,7 @@ const TimelineView = ({ features, currentUser }: GanttClientComponentProps) => {
                         <span className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: statusColor }}></span>
                         <span>{groupName}</span>
                         <span
-                          className={`ml-auto px-1.5 py-0.5 text-xs rounded-full ${filter === groupName ? "bg-white bg-opacity-20" : "bg-slate-100"}`}
+                          className={`ml-auto px-1.5 py-0.5 text-xs rounded-full ${filter === groupName ? "bg-background bg-opacity-20" : "bg-slate-100"}`}
                         >
                           {groupFeatures.length}
                         </span>
@@ -269,7 +269,7 @@ const TimelineView = ({ features, currentUser }: GanttClientComponentProps) => {
                 <button
                   key={type}
                   onClick={() => setViewType(type)}
-                  className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${viewType === type ? "bg-blue-100 text-blue-700" : "text-gray-600 hover:text-gray-900"
+                  className={`flex items-center gap-1 px-3 py-2 rounded-md text-xs font-medium transition-colors ${viewType === type ? "bg-blue-100 dark:bg-gray-700 dark:text-blue-500 text-blue-700" : "text-gray-600 hover:text-gray-900"
                     }`}
                 >
                   {type.charAt(0).toUpperCase() + type.slice(1)}

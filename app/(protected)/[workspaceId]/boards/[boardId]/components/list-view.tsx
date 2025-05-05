@@ -362,7 +362,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
               key={list.id}
               open={openLists.includes(list.id)}
               onOpenChange={() => toggleList(list.id)}
-              className="rounded-md border-gray-100 overflow-hidden bg-white"
+              className="rounded-md border-gray-100 overflow-hidden bg-background"
             >
               <CollapsibleTrigger className="flex w-full">
                 <div className="flex items-center justify-center p-2">
@@ -372,7 +372,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                     <ChevronDown className="h-4 w-4 text-gray-700" />
                   )}
                 </div>
-                <div className="border rounded-lg bg-gray-50 w-full px-4 py-3 flex items-center justify-between hover:bg-gray-100 transition-colors">
+                <div className="border rounded-lg bg-gray-50 dark:bg-gray-700 w-full px-4 py-3 flex items-center justify-between hover:bg-gray-100 transition-colors">
                   <div className="flex items-center gap-x-2">
                     <div className="flex items-center gap-x-2">
                       <span
@@ -486,7 +486,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
                                             <div className="flex-shrink-0 w-4 opacity-0 group-hover:opacity-100">
                                               <GripVertical size={16} className="text-gray-400" />
                                             </div>
-                                            <span className="text-sm font-medium text-gray-900 line-clamp-2">
+                                            <span className="text-sm font-medium text-gray-900 dark:text-gray-200 line-clamp-2">
                                               {card.title}
                                             </span>
                                           </div>
@@ -688,7 +688,7 @@ export const ListView = ({ boardId, users, data = [], visibleFields }: ListViewP
               <div className="flex flex-col bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl shadow-xl overflow-hidden">
                 <div className="flex items-center justify-between px-4 py-3 bg-opacity-20 bg-black">
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-white bg-opacity-20">
+                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-background bg-opacity-20">
                       <span className="text-xs font-bold">{selectedCards.length}</span>
                     </div>
                     <span className="text-sm font-medium">cards selected</span>

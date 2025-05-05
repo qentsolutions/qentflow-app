@@ -43,7 +43,7 @@ export const BoardCard = ({ board, onClick }: BoardCardProps) => {
         <Card
           onClick={onClick}
           className={cn(
-            "relative overflow-hidden rounded-xl border border-neutral-200 bg-white transition-all duration-300",
+            "relative overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700 bg-background transition-all duration-300",
             board.isMember ? "cursor-pointer shadow-sm hover:shadow-lg" : "cursor-not-allowed opacity-60",
           )}
         >
@@ -91,7 +91,7 @@ export const BoardCard = ({ board, onClick }: BoardCardProps) => {
                       opacity: isHovered ? 1 : 0,
                     }}
                     transition={{ duration: 0.2 }}
-                    className="rounded-full bg-white px-4 py-2 font-medium text-indigo-600 shadow-md"
+                    className="rounded-full bg-background px-4 py-2 font-medium text-indigo-600 shadow-md"
                   >
                     Open Project
                   </motion.div>
@@ -101,7 +101,7 @@ export const BoardCard = ({ board, onClick }: BoardCardProps) => {
               {/* Status badge */}
               {!board.isMember && (
                 <div className="absolute right-3 top-3">
-                  <Badge variant="secondary" className="bg-white/80 backdrop-blur-sm">
+                  <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">
                     No Access
                   </Badge>
                 </div>
@@ -111,7 +111,7 @@ export const BoardCard = ({ board, onClick }: BoardCardProps) => {
             {/* Board info */}
             <div className="space-y-3 p-4">
               <div className="flex items-start justify-between">
-                <h3 className="line-clamp-1 font-medium text-neutral-900 transition-colors group-hover:text-neutral-700">
+                <h3 className="line-clamp-1 font-medium text-neutral-900 dark:text-gray-400 transition-colors group-hover:text-neutral-700">
                   {board.title}
                 </h3>
               </div>
@@ -136,7 +136,7 @@ export const BoardCard = ({ board, onClick }: BoardCardProps) => {
                   </Tooltip>
                 </div>
                 <div>
-                  <div className="flex items-center space-x-1 rounded-full bg-neutral-100 px-2 py-1">
+                  <div className="flex items-center space-x-1 rounded-full bg-neutral-100 dark:bg-gray-800 px-2 py-1">
                     <Users className="h-3 w-3 text-neutral-600" />
                     <span className="text-xs font-medium text-neutral-600">{board.memberCount}</span>
                   </div>

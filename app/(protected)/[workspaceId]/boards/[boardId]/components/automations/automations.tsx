@@ -202,7 +202,7 @@ export const Automations = ({ board }: AutomationsProps) => {
 
       <DialogContent className="max-w-[1250px] h-[90vh] p-0 overflow-hidden rounded-xl bg-gradient-to-b from-white to-gray-50">
         <div className="h-full flex flex-col">
-          <div className="flex items-center justify-between px-6 py-4 border-b bg-white/80 backdrop-blur-sm">
+          <div className="flex items-center justify-between px-6 py-4 border-b bg-background/80 backdrop-blur-sm">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-blue-50">
                 <ZapIcon className="h-6 w-6 text-blue-500" />
@@ -227,7 +227,7 @@ export const Automations = ({ board }: AutomationsProps) => {
             </div>
           ) : (
             <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex-grow flex flex-col">
-              <div className="flex justify-between items-center border-b bg-white/50 backdrop-blur-sm">
+              <div className="flex justify-between items-center border-b bg-background/50 backdrop-blur-sm">
                 <TabsList className="p-2">
                   <TabsTrigger
                     value="templates"
@@ -313,7 +313,7 @@ export const Automations = ({ board }: AutomationsProps) => {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
-                              className="w-56 bg-white/80 backdrop-blur-sm border border-gray-100 shadow-xl"
+                              className="w-56 bg-background/80 backdrop-blur-sm border border-gray-100 shadow-xl"
                             >
                               {usersInBoard?.map((user: any) => (
                                 <DropdownMenuItem
@@ -342,7 +342,7 @@ export const Automations = ({ board }: AutomationsProps) => {
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -20 }}
-                              className="group p-6 bg-white border rounded-xl hover:border-blue-400 hover:shadow-lg transition-all duration-200"
+                              className="group p-6 bg-background border rounded-xl hover:border-blue-400 hover:shadow-lg transition-all duration-200"
                             >
                               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                                 <div className="flex-1">

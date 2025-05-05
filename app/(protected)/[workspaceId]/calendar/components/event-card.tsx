@@ -20,7 +20,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
 
   return (
     <Card
-      className="p-3 cursor-pointer hover:shadow-md transition-shadow bg-white dark:bg-gray-800"
+      className="p-3 cursor-pointer hover:shadow-md transition-shadow bg-background dark:bg-gray-800"
       onClick={onClick}
     >
       <div className="flex items-start space-x-3">

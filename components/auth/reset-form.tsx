@@ -63,14 +63,14 @@ export const ResetForm = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white">Email</FormLabel>
+                  <FormLabel className="text-black">Email</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       disabled={isPending}
                       placeholder="john.doe@example.com"
                       type="email"
-                      className="h-11 border-[#3A3A3A] text-white focus:border-blue-500" />
+                      className="h-11 text-black focus:border-blue-500" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

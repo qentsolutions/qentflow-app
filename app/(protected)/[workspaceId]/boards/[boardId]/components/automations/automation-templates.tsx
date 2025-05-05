@@ -146,7 +146,7 @@ export const AutomationTemplates = ({
                                     >
                                         <span>{category.label}</span>
                                         <span className={` px-2 py-0.5 rounded-full text-xs ${activeCategory === category.id
-                                            ? "bg-white text-blue-800 font-medium"
+                                            ? "bg-background text-blue-800 font-medium"
                                             : "text-gray-600 bg-blue-100"
                                             }`}>
                                             {getTemplateCount(category.id)}
@@ -183,7 +183,7 @@ export const AutomationTemplates = ({
                                             exit={{ opacity: 0, scale: 0.9 }}
                                             whileHover={{ scale: 1.02 }}
                                             onClick={() => handleTemplateSelect(template)}
-                                            className="px-6 py-4 bg-white border rounded-xl hover:border-blue-200 hover:shadow-md transition-all duration-200 cursor-pointer"
+                                            className="px-6 py-4 bg-background border rounded-xl hover:border-blue-200 hover:shadow-md transition-all duration-200 cursor-pointer"
                                         >
                                             <div className="flex mb-2 flex-col gap-y-2">
                                                 <div className="flex items-center space-x-2">

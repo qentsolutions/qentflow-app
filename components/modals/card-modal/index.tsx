@@ -151,28 +151,28 @@ export const CardModal = () => {
                     <DropdownMenuContent className="w-48" align="start">
                       <DropdownMenuItem
                         onClick={() => setIsDocumentSelectorOpen(true)}
-                        className="flex items-center gap-2 cursor-pointer hover:bg-gray-100"
+                        className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
                         <FileText className="h-4 w-4 text-muted-foreground" />
                         Document
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => setIsAttachmentDialogOpen(true)}
-                        className="flex items-center gap-2 cursor-pointer hover:bg-gray-100"
+                        className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
                         <Paperclip className="h-4 w-4 text-muted-foreground" />
                         Attachment
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => setIsAssociateCardOpen(true)}
-                        className="flex items-center gap-2 cursor-pointer hover:bg-gray-100"
+                        className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
                         <Contact className="h-4 w-4 text-muted-foreground" />
                         Associate Card
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => setIsChildCardOpen(true)}
-                        className="flex items-center gap-2 cursor-pointer hover:bg-gray-100"
+                        className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
                         <Layers className="h-4 w-4 text-muted-foreground" />
                         Child Card
@@ -207,7 +207,7 @@ export const CardModal = () => {
                             {attachments.map((attachment: any) => (
                               <div
                                 key={attachment.id}
-                                className="p-3 bg-white dark:bg-gray-800 rounded-lg border flex items-center justify-between"
+                                className="p-3 bg-background dark:bg-gray-800 rounded-lg border flex items-center justify-between"
                               >
                                 <div className="flex items-center space-x-3">
                                   <div>
@@ -272,7 +272,7 @@ export const CardModal = () => {
                       {cardData.documents.slice(0, visibleDocuments).map((doc: any) => (
                         <div
                           key={doc.id}
-                          className="p-3 bg-white dark:bg-gray-800 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between"
+                          className="p-3 bg-background dark:bg-gray-800 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between"
                           onClick={() => handleDocumentClick(doc.id)}
                         >
                           <div className="flex items-center gap-x-2">
@@ -326,7 +326,7 @@ export const CardModal = () => {
                       </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="comments" className="mt-0">
+                    <TabsContent value="comments" className="mt-2">
                       {!commentsData ? (
                         <Comments.Skeleton />
                       ) : (

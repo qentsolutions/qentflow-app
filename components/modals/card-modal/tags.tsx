@@ -258,7 +258,7 @@ export const TagsComponent = ({
                         {tag.name}
                         {!readonly && (
                           <button
-                            className="absolute -right-2 -top-2 h-4 w-4 bg-white rounded-full flex items-center justify-center shadow-lg border opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="absolute -right-2 -top-2 h-4 w-4 bg-background rounded-full flex items-center justify-center shadow-lg border opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => {
                               e.stopPropagation();
                               onRemoveTag(tag.id);

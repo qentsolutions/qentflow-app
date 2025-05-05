@@ -307,8 +307,8 @@ export default function DocumentEditor({ params }: any) {
       <style jsx global>
         {animationStyles}
       </style>
-      <div className={`flex flex-col h-full ${isFullScreen ? "fixed inset-0 z-50 bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out" : ""}`}>
-        <div className={`relative w-full h-full overflow-auto ${isFullScreen ? "p-8 md:px-36" : "px-8 pt-4"} bg-white rounded-lg shadow-lg transition-transform duration-300 ${isFullScreen ? (isExiting ? "animate-expandOut" : "animate-expandIn") : ""}`}>
+      <div className={`flex flex-col h-full ${isFullScreen ? "fixed inset-0 z-50 bg-black dark:bg-gray-700 bg-opacity-50 transition-opacity duration-300 ease-in-out" : ""}`}>
+        <div className={`relative w-full h-full overflow-auto ${isFullScreen ? "p-8 md:px-36" : "px-8 pt-4"} bg-background rounded-lg shadow-lg transition-transform duration-300 ${isFullScreen ? (isExiting ? "animate-expandOut" : "animate-expandIn") : ""}`}>
           {isFullScreen && (
             <button className="absolute top-4 right-4 text-gray-600 hover:text-gray-800" onClick={exitFullScreen}>
               <X className="h-6 w-6" />
@@ -365,7 +365,7 @@ export default function DocumentEditor({ params }: any) {
 
 
             <div className={`${toolbarVisible ? "toolbar-visible" : "toolbar-hidden"}`}>
-              <div className="bg-white border rounded-lg shadow-sm flex items-center justify-between mt-2">
+              <div className="bg-background border rounded-lg shadow-sm flex items-center justify-between mt-2">
                 <DocumentToolbar editor={editor} />
               </div>
             </div>

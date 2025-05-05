@@ -110,7 +110,7 @@ export const CreateAutomationForm = ({ onClose, board, template }: CreateAutomat
         </Card>
 
         <div className="flex items-center justify-center pt-20">
-          <div className="w-12 h-12 rounded-lg border shadow-sm bg-white flex items-center justify-center">
+          <div className="w-12 h-12 rounded-lg border shadow-sm bg-background flex items-center justify-center">
             <ArrowRight className="h-6 w-6 text-muted-foreground" />
           </div>
         </div>
@@ -162,7 +162,7 @@ export const CreateAutomationForm = ({ onClose, board, template }: CreateAutomat
         </CardContent>
       </Card>
 
-      <div className="fixed bottom-0 left-0 w-full bg-white py-6 z-10 border-t border-gray-200">
+      <div className="fixed bottom-0 left-0 w-full bg-background py-6 z-10 border-t border-gray-200">
         <div className="flex justify-end gap-3 mr-8">
           <Button variant="outline" onClick={onClose} disabled={isLoading} className="px-6">
             Cancel

@@ -73,7 +73,7 @@ export const CalendarView = ({ data, boardId }: CalendarViewProps) => {
     }
 
     return (
-        <Card className="p-1 m-1 bg-white dark:bg-gray-800 shadow-none border-none">
+        <Card className="p-1 m-1 bg-background shadow-none border-none">
             <div className="flex justify-end gap-x-4 items-center mb-4 mr-2">
                 <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                     {format(currentDate, "MMMM yyyy", { locale: enUS })}
@@ -115,7 +115,7 @@ export const CalendarView = ({ data, boardId }: CalendarViewProps) => {
                                     key={day.toString()}
                                     className={`
                                     min-h-36 p-1 border border-gray-200 dark:border-gray-700
-                                    ${!isSameMonth(day, currentDate) ? "bg-gray-100 dark:bg-gray-800" : "bg-white dark:bg-gray-900"}
+                                    ${!isSameMonth(day, currentDate) ? "bg-gray-100 dark:bg-gray-800" : "bg-background dark:bg-gray-900"}
                                     ${isSameDay(day, new Date()) ? "ring-2 ring-blue-500" : ""}
                                 `}
                                 >

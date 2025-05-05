@@ -289,7 +289,7 @@ export const TableView = ({ data, visibleFields, users, boardId }: TableViewProp
   return (
     <TooltipProvider>
       <div className="space-y-4 p-4">
-        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+        <div className="rounded-2xl border border-gray-100 bg-background shadow-sm overflow-hidden">
           <Table className="border-collapse">
             <TableHeader className="bg-gray-50/50">
               <TableRow className="border-b border-gray-100">
@@ -389,7 +389,7 @@ export const TableView = ({ data, visibleFields, users, boardId }: TableViewProp
                         <div className="flex items-center justify-center">
                           <Tooltip>
                             <TooltipTrigger>{getPriorityBadge(card?.priority)}</TooltipTrigger>
-                            <TooltipContent className="flex items-center justify-center bg-white border border-gray-100 shadow-md text-xs font-medium">
+                            <TooltipContent className="flex items-center justify-center bg-background border border-gray-100 shadow-md text-xs font-medium">
                               {card.priority}
                             </TooltipContent>
                           </Tooltip>
@@ -417,7 +417,7 @@ export const TableView = ({ data, visibleFields, users, boardId }: TableViewProp
                                 </AvatarFallback>
                               </Avatar>
                             </TooltipTrigger>
-                            <TooltipContent className="bg-white border border-gray-100 shadow-md text-xs font-medium">
+                            <TooltipContent className="bg-background border border-gray-100 shadow-md text-xs font-medium">
                               {users.find((u: { id: string | null | undefined }) => u.id === card.assignedUserId)
                                 ?.name || ""}
                             </TooltipContent>
@@ -510,7 +510,7 @@ export const TableView = ({ data, visibleFields, users, boardId }: TableViewProp
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
                           align="end"
-                          className="bg-white border border-gray-100 shadow-lg rounded-xl p-1.5"
+                          className="bg-background border border-gray-100 shadow-lg rounded-xl p-1.5"
                         >
                           <CardActions data={card} lists={lists} setOrderedData={setLists} />
                         </DropdownMenuContent>
@@ -530,7 +530,7 @@ export const TableView = ({ data, visibleFields, users, boardId }: TableViewProp
           <div className="flex flex-col bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl shadow-xl overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 bg-opacity-20 bg-black">
               <div className="flex items-center gap-2">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-white bg-opacity-20">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-background bg-opacity-20">
                   <span className="text-xs font-bold">{selectedCards.length}</span>
                 </div>
                 <span className="text-sm font-medium">cards selected</span>

@@ -1,6 +1,6 @@
 "use client";
 
-import { type LucideIcon, ChevronRight, LayoutList, LibraryBig, Plus } from "lucide-react";
+import { type LucideIcon, ChevronRight, Layers, LayoutList, LibraryBig, Plus } from "lucide-react";
 import { Separator } from "@/components/ui/separator"; // Assurez-vous d'importer le composant Separator
 import {
   SidebarGroup,
@@ -54,11 +54,11 @@ export function NavTools({
       <SidebarMenu>
         <Collapsible className="group/collapsible">
           <SidebarMenuItem
-            className={`group/menu-item rounded-sm ${pathname.includes(`/${workspaceId}/boards`) ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-slate-600"}`}
+            className={`group/menu-item rounded-sm ${pathname.includes(`/${workspaceId}/boards`) ? "bg-blue-100 dark:bg-gray-800 text-blue-600" : "hover:bg-gray-100 dark:hover:bg-gray-800 text-slate-600"}`}
           >
             <SidebarMenuButton asChild>
               <Link href={`/${workspaceId}/boards`} className="ml-2">
-                <LayoutList className="h-4 w-4" />
+                <Layers className="h-4 w-4" />
                 <span className="ml-2">Projects</span>
               </Link>
             </SidebarMenuButton>

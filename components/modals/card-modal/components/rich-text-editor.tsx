@@ -117,7 +117,7 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
             <Type className="h-4 w-4" />
           </Button>
           {showFontSizes && (
-            <div className="absolute top-full left-0 mt-1 bg-white border rounded-md p-2 shadow-lg z-50 w-[120px] max-h-[200px] overflow-y-auto">
+            <div className="absolute top-full left-0 mt-1 bg-background border rounded-md p-2 shadow-lg z-50 w-[120px] max-h-[200px] overflow-y-auto">
               <div className="flex flex-col gap-1">
                 {fontSizes.map((size) => (
                   <button
@@ -143,7 +143,7 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
             <Palette className="h-4 w-4" />
           </Button>
           {showColorPalette && (
-            <div className="absolute top-full right-0 mt-1 bg-white border rounded-md p-2 shadow-lg z-50">
+            <div className="absolute top-full right-0 mt-1 bg-background border rounded-md p-2 shadow-lg z-50">
               <div className="grid grid-cols-5 gap-1 max-h-[200px] overflow-y-auto" style={{ width: '160px' }}>
                 {colors.map((color) => (
                   <button

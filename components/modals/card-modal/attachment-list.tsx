@@ -73,7 +73,7 @@ export const AttachmentList = ({ cardId, readonly = false }: AttachmentListProps
               <div
                 key={attachment.id}
                 onClick={() => setSelectedAttachment(attachment)}
-                className="p-2 bg-white dark:bg-gray-800 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between"
+                className="p-2 bg-background dark:bg-gray-800 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between"
               >
                 <div className="flex items-center gap-x-2">
                   <Paperclip className="h-4 w-4 text-blue-500" />

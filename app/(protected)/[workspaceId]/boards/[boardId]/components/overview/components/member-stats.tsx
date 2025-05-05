@@ -33,7 +33,7 @@ export const MemberStats = ({ members }: MemberStatsProps) => {
                 />
             </div>
             <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 dark:bg-gray-700">
                     <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned Cards</th>
@@ -41,7 +41,7 @@ export const MemberStats = ({ members }: MemberStatsProps) => {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Completion Rate</th>
                     </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-background divide-y divide-gray-200">
                     {filteredMembers.map((member, index) => (
                         <tr key={index}>
                             <td className="px-6 py-4 whitespace-nowrap">{member.name}</td>

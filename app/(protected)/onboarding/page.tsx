@@ -207,9 +207,9 @@ export default function OnboardingPage() {
     return (
         <div className="fixed inset-0 z-50 w-screen h-screen flex">
             {/* Full width for plan selection step */}
-            <div className={`${step.id === "plan" ? "w-full" : "w-full md:w-1/2"} bg-[#272727] text-white p-8 flex flex-col`}>
+            <div className={`${step.id === "plan" ? "w-full" : "w-full md:w-1/2"} bg-background text-black p-8 flex flex-col`}>
                 <div className="flex items-center mb-12">
-                    <button onClick={handleBack} className="p-2 rounded-full hover:bg-gray-800 transition-colors">
+                    <button onClick={handleBack} className="p-2 rounded-full hover:bg-blue-100 transition-colors">
                         <ChevronLeft className="h-5 w-5" />
                     </button>
                     <div className="ml-2">
@@ -220,7 +220,7 @@ export default function OnboardingPage() {
                 <div className={`flex-1 flex flex-col mx-12`}>
                     <div className={`mb-8 text-center ${step.id === "plan" ? "mb-4" : ""}`}>
                         <h1 className="text-3xl font-bold mb-2">{step.title}</h1>
-                        <p className="text-gray-400">{step.description}</p>
+                        <p className="text-gray-700">{step.description}</p>
                     </div>
 
                     {step.id === "plan" && (
@@ -231,7 +231,7 @@ export default function OnboardingPage() {
                                     className={cn(
                                         "text-lg font-bold py-2 rounded-none transition-all",
                                         billingCycle === "annually"
-                                            ? "border-b-white border-b-2 text-white"
+                                            ? "border-b-black border-b-2 text-black"
                                             : "border-b-transparent text-gray-400 border-b-2"
                                     )}
                                 >
@@ -245,7 +245,7 @@ export default function OnboardingPage() {
                                     className={cn(
                                         "text-lg font-bold py-2 rounded-none transition-all",
                                         billingCycle === "monthly"
-                                            ? "border-b-white border-b-2 text-white"
+                                            ? "border-b-black border-b-2 text-black"
                                             : "border-b-transparent text-gray-400 border-b-2"
                                     )}
                                 >
@@ -254,7 +254,7 @@ export default function OnboardingPage() {
                             </div>
                             <Button
                                 onClick={() => setShowComparePopup(true)}
-                                className="text-lg underline underline-offset-4 bg-transparent text-white px-6 py-2 rounded-none border-b-white"
+                                className="text-lg underline underline-offset-4 bg-transparent shadow-none text-black px-6 py-2 rounded-none border-b-white"
                             >
                                 Compare Plans
                             </Button>
@@ -269,7 +269,7 @@ export default function OnboardingPage() {
                                     onClick={() => handleOptionSelect(option.value)}
                                     className={cn(
                                         "w-1/3 p-6 border rounded-lg cursor-pointer transition-colors",
-                                        responses[step.id] === option.value ? "bg-[#444C6D] border-[#3579BF] text-[#3579BF]" : "hover:bg-gray-800 border-[#3A3A3A]"
+                                        responses[step.id] === option.value ? "bg-blue-100 border-[#3579BF] text-[#3579BF]" : "hover:bg-blue-100 border-gray-200 hover:border-[#3579BF]"
                                     )}
                                 >
                                     <div className="flex justify-between items-center mb-4">
@@ -286,7 +286,7 @@ export default function OnboardingPage() {
                                         </div>
 
                                     </div>
-                                    <p className="text-gray-400 mb-4">{option.description}</p>
+                                    <p className="text-gray-700 mb-4">{option.description}</p>
                                     <p className="text-5xl font-semibold mb-4">
                                         {billingCycle === "annually" ? option.priceAnnually : option.priceMonthly}
                                         {billingCycle === "annually" && option.priceMonthly !== "Free" && (
@@ -300,18 +300,18 @@ export default function OnboardingPage() {
                                     </p>
                                     <div className="relative mb-4">
                                         <div className="absolute inset-0 flex items-center justify-center">
-                                            <Separator className="w-full text-[#C7C7C7]" />
+                                            <Separator className="w-full text-gray-400" />
                                         </div>
                                         <div className="relative flex justify-center text-xs uppercase">
                                             <span className={cn(
-                                                "px-2 text-[#C7C7C7]",
-                                                responses[step.id] === option.value ? "bg-[#444C6D]" : "bg-[#272727]"
+                                                "px-2 text-gray-400",
+                                                responses[step.id] === option.value ? "bg-blue-100" : "bg-background"
                                             )}>
                                                 PLUS
                                             </span>
                                         </div>
                                     </div>
-                                    <ul className="text-gray-400 space-y-2">
+                                    <ul className="text-gray-600 space-y-2">
                                         {option.benefits.map((benefit: string, index: number) => (
                                             <li key={index} className="flex items-start gap-2">
                                                 <Check className="w-4 h-4 text-blue-500 mt-1" />
@@ -330,7 +330,7 @@ export default function OnboardingPage() {
                                     onClick={() => handleOptionSelect(option.value)}
                                     className={cn(
                                         "text-left px-5 py-3 rounded-lg border border-gray-700 transition-colors",
-                                        responses[step.id] === option.value ? "bg-[#444C6D] border-[#3579BF] text-[#3579BF]" : "hover:bg-gray-800"
+                                        responses[step.id] === option.value ? "bg-blue-100 border-[#3579BF] text-[#3579BF]" : "border-gray-200 hover:bg-gray-100"
                                     )}
                                 >
                                     {option.label}
@@ -340,7 +340,7 @@ export default function OnboardingPage() {
                     )}
 
                     <div className="mt-auto pt-8 flex items-center justify-between">
-                        <div className="w-[200px] bg-gray-700 h-1.5 rounded-full mb-6">
+                        <div className="w-[200px] bg-gray-200 h-1.5 rounded-full mb-6">
                             <div className="bg-blue-600 h-full rounded-full" style={{ width: `${progressPercentage}%` }} />
                         </div>
 
@@ -371,11 +371,11 @@ export default function OnboardingPage() {
             {/* Compare Plans Popup */}
             {showComparePopup && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center md:px-28 bg-black bg-opacity-50">
-                    <div className="bg-[#272727] p-14 rounded-lg w-full overflow-auto">
+                    <div className="bg-background p-14 rounded-lg w-full overflow-auto">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-2xl text-white font-bold mb-4">Compare Plans</h2>
-                            <Button onClick={() => setShowComparePopup(false)} className="bg-transparent shadow-none text-white">
-                                <X className="text-gray-200" size={28} />
+                            <h2 className="text-2xl text-black font-bold mb-4">Compare Plans</h2>
+                            <Button onClick={() => setShowComparePopup(false)} className="bg-transparent shadow-none text-black">
+                                <X className="text-gray-800" size={28} />
                             </Button>
                         </div>
 
@@ -383,7 +383,7 @@ export default function OnboardingPage() {
                             <div className="border-t border-solid border-gray-900 border-opacity-10">
                                 <div className="flex gap-5">
                                     <div className="flex flex-col w-[24%]">
-                                        <div className="mt-24 text-lg font-semibold leading-6 text-white">
+                                        <div className="mt-24 text-lg font-semibold leading-6 text-black">
                                             Plans
                                         </div>
                                     </div>
@@ -396,12 +396,12 @@ export default function OnboardingPage() {
                                                             <p className="text-green-500 text-xs">Recommended</p>
                                                         )}
                                                     </div>
-                                                    <div className={`font-semibold text-base leading-[171%] ${recommendedPlan === option.value ? 'text-blue-600' : 'text-white'}`}>
+                                                    <div className={`font-semibold text-base leading-[171%] ${recommendedPlan === option.value ? 'text-blue-600' : 'text-black'}`}>
                                                         {option.label}
                                                     </div>
                                                 </div>
 
-                                                <div className="mt-4 leading-6 text-gray-400">
+                                                <div className="mt-4 leading-6 text-gray-700">
                                                     {option.description}
                                                 </div>
                                             </div>
@@ -412,24 +412,24 @@ export default function OnboardingPage() {
 
                             {/* Features Grid */}
                             <div className="flex gap-5 mt-10 w-full">
-                                <div className="flex flex-col my-auto text-sm leading-4 text-gray-400 mx-14">
+                                <div className="flex flex-col my-auto text-sm leading-4 text-gray-600 mx-14">
                                     <div>Up to 5 users</div>
                                     <div className="mt-9">Advanced features</div>
                                     <div className="mt-9">Priority support</div>
                                     <div className="mt-9">Unlimited users</div>
                                 </div>
                                 <div className="flex-auto px-px">
-                                    <div className="flex gap-5">
+                                    <div className="flex gap-16">
                                         {steps.find(s => s.id === "plan")?.options.map((option: any, index: number) => (
                                             <div key={option.value} className={`flex flex-col w-[${index === 0 ? '33%' : '33%'}]`}>
-                                                <div className={`flex justify-center items-center px-16 py-4 rounded-lg shadow-sm ${recommendedPlan === option.value ? 'border-2 border-blue-600' : ''}`}>
+                                                <div className={`flex justify-center items-center px-16 py-4 rounded-lg  ${recommendedPlan === option.value ? 'border-2 border-blue-600' : 'shadow-sm border'}`}>
                                                     <div className="flex flex-col items-center w-[90px]">
                                                         {option.benefits.map((benefit: string, idx: number) => (
                                                             <div key={idx} className="flex items-center mt-7">
                                                                 {benefit.includes("Up to 5 users") || benefit.includes("Advanced features") || benefit.includes("Priority support") ? (
                                                                     <Check className={`w-5 ${recommendedPlan === option.value ? 'text-blue-600' : 'text-blue-600'}`} />
                                                                 ) : (
-                                                                    <X className="w-5 text-gray-400" />
+                                                                    <X className="w-5 text-gray-800" />
                                                                 )}
                                                             </div>
                                                         ))}

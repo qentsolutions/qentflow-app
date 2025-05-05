@@ -184,7 +184,7 @@ export const SelectWorkspaceForm = () => {
                                 </p>
                             </div>
                         )}
-                        <div className="flex items-center gap-4 bg-white rounded-lg p-2">
+                        <div className="flex items-center gap-4 bg-background rounded-lg p-2">
                             <button
                                 onClick={() => setBillingType("monthly")}
                                 className={`px-4 py-2 rounded-md transition-all ${billingType === "monthly"
@@ -213,7 +213,7 @@ export const SelectWorkspaceForm = () => {
                                 onClick={() => setSelectedPlan(plan.priceId)}
                                 className={`py-4 px-6 rounded-lg border transition-all cursor-pointer ${selectedPlan === plan.priceId
                                     ? "border-blue-500 bg-blue-50"
-                                    : "bg-white hover:border-blue-300"
+                                    : "bg-background hover:border-blue-300"
                                     }`}
                             >
                                 <div className="flex justify-between items-start mb-4">

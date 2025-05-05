@@ -144,15 +144,15 @@ export default function MyNotesPage() {
     };
 
     return (
-        <div className="flex bg-gradient-to-br from-gray-50 to-gray-100 h-screen">
-            <div className="w-1/3 bg-white border-r border-gray-200 flex flex-col shadow-lg">
-                <div className="p-6 border-b border-gray-200 space-y-4">
+        <div className="flex bg-background h-screen">
+            <div className="w-1/3 bg-background border-r border-gray-200 dark:border-gray-700 flex flex-col shadow-lg">
+                <div className="p-6 border-b border-gray-200 dark:border-gray-700 space-y-4">
                     <p className="text-3xl font-bold text-gray-800">Notes</p>
                     <div className="flex items-center gap-x-1 w-full">
                         <div className="relative w-full">
                             <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
                             <Input
-                                className="pl-10 w-full bg-gray-50 border-gray-300 focus:border-primary focus:ring-primary"
+                                className="pl-10 w-full bg-gray-50 dark:bg-gray-700 border-gray-300 focus:border-primary focus:ring-primary"
                                 placeholder="Search notes..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}

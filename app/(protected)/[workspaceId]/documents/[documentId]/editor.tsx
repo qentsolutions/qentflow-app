@@ -208,7 +208,7 @@ export function Editor({ document, onContentChange }: EditorProps) {
             </div>
           </div>
         )}
-        <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b p-2 flex justify-end gap-2">
+        <div className="sticky top-0 z-10 bg-background dark:bg-gray-800 border-b p-2 flex justify-end gap-2">
           <Button
             onClick={exportToPDF}
             variant="outline"

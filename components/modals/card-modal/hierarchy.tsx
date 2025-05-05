@@ -369,7 +369,7 @@ export const Hierarchy = ({
               <div className="space-y-1.5">
                 <div
                   key={relationshipsData.parent.id}
-                  className="p-2 bg-white dark:bg-gray-800 rounded-md border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between text-xs"
+                  className="p-2 bg-background dark:bg-gray-800 rounded-md border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between text-xs"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleOpenRelatedCard(relationshipsData.parent.id);
@@ -434,7 +434,7 @@ export const Hierarchy = ({
                 {relationshipsData?.children.map((child: any) => (
                   <div
                     key={child.id}
-                    className="p-2 bg-white dark:bg-gray-800 rounded-md border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between text-xs"
+                    className="p-2 bg-background dark:bg-gray-800 rounded-md border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between text-xs"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleOpenRelatedCard(child.id);
@@ -597,7 +597,7 @@ export const Hierarchy = ({
                   .map((rel: any) => (
                     <div
                       key={rel.id}
-                      className="p-2 bg-white dark:bg-gray-800 rounded-md border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between text-xs"
+                      className="p-2 bg-background dark:bg-gray-800 rounded-md border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between text-xs"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleOpenRelatedCard(rel.destCard.id);
@@ -646,7 +646,7 @@ export const Hierarchy = ({
                   .map((rel: any) => (
                     <div
                       key={rel.id}
-                      className="p-2 bg-white dark:bg-gray-800 rounded-md border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between text-xs"
+                      className="p-2 bg-background dark:bg-gray-800 rounded-md border hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition flex items-center justify-between text-xs"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleOpenRelatedCard(rel.sourceCard.id);

@@ -266,12 +266,12 @@ export const OverviewView = ({ lists, users }: OverviewViewProps) => {
 
             <div>
                 <Tabs defaultValue="teams">
-                    <TabsList className="bg-white border rounded-lg px-2 mb-2">
+                    <TabsList className="bg-background border rounded-lg px-2 mb-2">
                         <TabsTrigger value="progression"
                             className={cn(
                                 "inline-flex w-28 items-center justify-center whitespace-nowrap px-2.5 py-2 rounded-lg text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
                                 "border-b-2 border-transparent",
-                                "data-[state=active]:bg-blue-100 data-[state=active]:border-none data-[state=active]:text-blue-600",
+                                "data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-gray-700 data-[state=active]:border-none data-[state=active]:text-blue-600",
                             )}
                         >
                             Progression
@@ -280,7 +280,7 @@ export const OverviewView = ({ lists, users }: OverviewViewProps) => {
                             className={cn(
                                 "inline-flex w-28 items-center justify-center whitespace-nowrap px-2.5 py-2 rounded-lg text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
                                 "border-b-2 border-transparent",
-                                "data-[state=active]:bg-blue-100 data-[state=active]:border-none data-[state=active]:text-blue-600",
+                                "data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-gray-700 data-[state=active]:border-none data-[state=active]:text-blue-600",
                             )}>
                             Teams
                         </TabsTrigger>
@@ -288,7 +288,7 @@ export const OverviewView = ({ lists, users }: OverviewViewProps) => {
                             className={cn(
                                 "inline-flex w-28 items-center justify-center whitespace-nowrap px-2.5 py-2 rounded-lg text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
                                 "border-b-2 border-transparent",
-                                "data-[state=active]:bg-blue-100 data-[state=active]:border-none data-[state=active]:text-blue-600",
+                                "data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-gray-700 data-[state=active]:border-none data-[state=active]:text-blue-600",
                             )}>
                             Time
                         </TabsTrigger>
@@ -296,7 +296,7 @@ export const OverviewView = ({ lists, users }: OverviewViewProps) => {
                             className={cn(
                                 "inline-flex w-28 items-center justify-center whitespace-nowrap px-2.5 py-2 rounded-lg text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
                                 "border-b-2 border-transparent",
-                                "data-[state=active]:bg-blue-100 data-[state=active]:border-none data-[state=active]:text-blue-600",
+                                "data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-gray-700 data-[state=active]:border-none data-[state=active]:text-blue-600",
                             )}>
                             Quality
                         </TabsTrigger>

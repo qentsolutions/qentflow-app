@@ -95,7 +95,7 @@ export const ListHeader = ({ data, onAddCard }: ListHeaderProps) => {
               id="title"
               placeholder="Enter list title.."
               defaultValue={title}
-              className="text-sm px-[7px] py-1 h-7 font-medium border-transparent hover:border-input focus:border-input transition truncate bg-transparent focus:bg-white"
+              className="text-sm px-[7px] py-1 h-7 font-medium border-transparent hover:border-input focus:border-input transition truncate bg-transparent focus:bg-background"
             />
             <button type="submit" hidden />
           </form>

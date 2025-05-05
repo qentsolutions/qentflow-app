@@ -17,7 +17,7 @@ export const DocumentCard = ({ document, onClick }: DocumentCardProps) => {
     <div className="group cursor-pointer" onClick={onClick}>
       <div className=" h-52 relative bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200 group-hover:shadow-lg">
         {/* A4 effect */}
-        <div className="absolute mx-12 inset-2 bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="absolute mx-12 inset-2 bg-background shadow-md rounded-lg overflow-hidden">
           {/* Content container */}
           <div className="relative h-full p-4 flex flex-col">
             <div className="flex-1 overflow-hidden">

@@ -187,9 +187,9 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
 
 
   return (
-    <div className="flex flex-col lg:flex-row  dark:bg-gray-900 rounded-lg overflow-hidden h-screen">
+    <div className="flex flex-col lg:flex-row bg-background rounded-lg overflow-hidden h-screen">
 
-      <div className="w-full lg:w-80 p-4 h-screen bg-white dark:bg-gray-800 border-r mt-4">
+      <div className="w-full lg:w-80 p-4 h-screen bg-background border-r mt-4">
         <div className="text-center mb-6">
           <Button
             onClick={() => setIsCreateEventOpen(true)}
@@ -278,7 +278,7 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
         onClose={() => setSelectedEvent(null)}
       />
       <div className="flex-grow">
-        <div className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-900 border-b">
+        <div className="flex justify-between items-center p-4 bg-background border-b">
           <button onClick={() => navigateWeek('prev')} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -292,12 +292,12 @@ const WeeklyCalendar: React.FC<WeeklyCalendarProps> = () => {
         <div ref={scrollContainerRef} className="overflow-auto max-h-[calc(100vh-8rem)]">
           <div className="min-w-[800px]">
             <div className="grid grid-cols-8 border-b">
-              <div className="sticky top-0 bg-white dark:bg-gray-800 z-10"></div>
+              <div className="sticky top-0 bg-background z-10"></div>
               {weekDays.map((day, index) => (
                 <div
                   key={index}
                   className={cn(
-                    "sticky top-0 bg-white dark:bg-gray-800 z-10 text-center p-2 border-l",
+                    "sticky top-0 bg-background dark:bg-gray-800 z-10 text-center p-2 border-l",
                     isSameDay(day, new Date()) && "bg-blue-50 dark:bg-blue-900/20"
                   )}
                 >

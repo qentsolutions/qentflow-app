@@ -113,11 +113,11 @@ export function NavUser({ user }: { user: any }) {
 
     return (
         <SidebarMenu className="pr-2">
-                <Separator className="mb-2" />
+            <Separator className="mb-2" />
             <SidebarMenuItem>
                 <SidebarMenuButton
                     onClick={() => setShowInvitations(true)}
-                    className="w-full justify-start py-4 hover:bg-gray-100 text-slate-600 ml-2 pr-2"
+                    className="w-full justify-start py-4 hover:bg-gray-100 dark:hover:bg-gray-800 text-slate-600 ml-2 pr-2"
                 >
                     <Inbox className="mr-1 h-4 w-4" />
                     Invitations
@@ -216,7 +216,7 @@ export function NavUser({ user }: { user: any }) {
             <SidebarMenuItem>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <SidebarMenuButton className="ml-2 flex items-center justify-between gap-3 mb-2 py-4  rounded-sm hover:bg-gray-100">
+                        <SidebarMenuButton className="ml-2 flex items-center justify-between gap-3 mb-2 py-4  rounded-sm hover:bg-gray-100 dark:hover:bg-gray-800">
                             <div className="flex items-center gap-x-2 text-slate-600">
                                 <Bell className="mr-1 h-4 w-4" />
                                 <span>Notifications</span>
@@ -333,14 +333,20 @@ export function NavUser({ user }: { user: any }) {
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
-                            <DropdownMenuItem onClick={() => handleNavigation('/settings/account')}>
+                            <DropdownMenuItem
+                                className="cursor-pointer"
+                                onClick={() => handleNavigation('/settings/account')}
+                            >
                                 <Settings />
                                 Settings
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <LogoutButton>
-                            <DropdownMenuItem onClick={() => handleNavigation('/logout')}>
+                            <DropdownMenuItem
+                                className="cursor-pointer"
+                                onClick={() => handleNavigation('/logout')}
+                            >
                                 <LogOut className="text-red-500" />
                                 Log out
                             </DropdownMenuItem>

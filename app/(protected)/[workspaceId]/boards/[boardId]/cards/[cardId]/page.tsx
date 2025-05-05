@@ -90,7 +90,7 @@ const CardPage = ({ params, readonly }: any) => {
     return (
         <div className="flex h-full">
             <div className="flex-1 overflow-y-auto pl-2">
-                <div className="max-w-7xl mx-auto px-8 pb-8 pt-4 space-y-6 bg-white">
+                <div className="max-w-7xl mx-auto px-8 pb-8 pt-4 space-y-6 bg-background">
                     <BreadcrumbHeader />
                     {!cardData ? (
                         <Header.Skeleton />

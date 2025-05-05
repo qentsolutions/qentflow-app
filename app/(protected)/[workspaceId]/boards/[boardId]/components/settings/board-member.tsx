@@ -148,7 +148,7 @@ export const BoardMembers = ({ boardId, users, createdById, boardTitle }: BoardM
         {boardUsers.map((user) => (
           <div
             key={user.id}
-            className="group flex items-center justify-between p-4 bg-white dark:bg-gray-800 dark:border-gray-600 rounded-lg border border-gray-200 shadow-sm transition-all hover:shadow-md"
+            className="group flex items-center justify-between p-4 bg-background dark:bg-gray-800 dark:border-gray-600 rounded-lg border border-gray-200 shadow-sm transition-all hover:shadow-md"
           >
             <div className="flex items-center space-x-4">
               <Avatar className="h-10 w-10 border-2 border-white shadow-sm">

@@ -29,7 +29,7 @@ export function TeamSwitcher() {
                     <DropdownMenuTrigger asChild>
                         <SidebarMenuButton
                             size="lg"
-                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground dark:bg-gray-800 ml-2"
+                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground bg-background ml-2"
                         >
                             <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                                 {currentWorkspace?.logo ? (
@@ -70,7 +70,7 @@ export function TeamSwitcher() {
                             <div key={workspace.id} className="flex items-center w-full h-full">
                                 <DropdownMenuItem
                                     onClick={() => handleWorkspaceSelect(workspace)}
-                                    className={`${currentWorkspace?.id === workspace.id ? "bg-blue-50 text-black w-full rounded-none" : "text-muted-foreground w-full"
+                                    className={`${currentWorkspace?.id === workspace.id ? "bg-blue-50 dark:bg-gray-700 text-black w-full rounded-none" : "text-muted-foreground w-full"
                                         }`}  
                                 >
                                     {workspace.logo ? (
@@ -94,8 +94,8 @@ export function TeamSwitcher() {
                                 </DropdownMenuItem>
                                 {currentWorkspace?.id === workspace.id && (
                                     <Link href={`/${workspace.id}/settings`}>
-                                        <p className="flex items-center bg-blue-50 justify-center h-9 text-gray-800">
-                                            <Settings2 size={14} className="ml-1 mr-2" />
+                                        <p className="flex items-center bg-blue-50 dark:bg-gray-700 justify-center h-9 text-gray-800">
+                                            <Settings2 size={14} className="ml-1 mr-2 dark:text-gray-400" />
                                         </p>
                                     </Link>
                                 )}
