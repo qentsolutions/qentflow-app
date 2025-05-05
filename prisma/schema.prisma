@@ -136,7 +136,6 @@ model Document {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   users       User[]    @relation("DocumentEditors")
-  cards       Card[]    @relation("CardDocuments") // Nouvelle relation
 
   @@index([workspaceId])
 }
@@ -229,9 +228,11 @@ model BoardDocument {
   id      String  @id @default(uuid())
   title   String
   content String? @db.Text
-  order   Int     @default(0)
+  order   Int     @default(0) 
 
   // Relations
+  cards Card[] @relation("CardBoardDocuments")
+
   boardId     String
   board       Board        @relation(fields: [boardId], references: [id], onDelete: Cascade)
   folderId    String?
@@ -313,20 +314,21 @@ model Card {
   sourceRelationships      CardRelationship[] @relation("SourceCard")
   destinationRelationships CardRelationship[] @relation("DestinationCard")
 
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
   startDate   DateTime?
   dueDate     DateTime?
   comments    Comment[]
-  documents   Document[]   @relation("CardDocuments") // Nouvelle relation
+  documents   BoardDocument[] @relation("CardBoardDocuments")
   attachments Attachment[]
 
   calendarEvents CalendarEvent[]
 
-  tags  Tag[]  @relation("CardTags")
-  Tag   Tag[]
-  tasks Task[]
-  notes Note[]
+  tags       Tag[]     @relation("CardTags")
+  Tag        Tag[]
+  tasks      Task[]
+  notes      Note[]
+  documentId String?
 
   @@index([listId])
   @@index([parentId])

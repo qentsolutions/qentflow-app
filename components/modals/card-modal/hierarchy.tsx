@@ -609,8 +609,8 @@ export const Hierarchy = ({
                           <span className="text-muted-foreground whitespace-nowrap shrink-0">
                             {getRelationshipLabel(rel.relationshipType)}
                           </span>
-                          <span className="whitespace-nowrap shrink-0">→</span>
-                          <span className="font-medium min-w-0">{rel.destCard.title}</span>
+                          <span className="whitespace-nowrap shrink-0">→pqzokdq</span>
+                          <span className="font-medium  min-w-0">{rel.destCard.title}</span>
                         </div>
                       </div>
                       <Badge className="shrink-0 ml-1 bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 px-2 py-0.5 text-xs">

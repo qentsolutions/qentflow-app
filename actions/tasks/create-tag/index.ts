@@ -33,7 +33,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         order: 0,
         archived: false,
         parentId: null,
-
+        documentId: null,
         startDate: null,
         dueDate: null,
         priority: null,

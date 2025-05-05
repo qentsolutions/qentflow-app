@@ -28,7 +28,9 @@ export async function GET(
     });
 
     if (!board) {
-      return new NextResponse("Board not found or access denied", { status: 404 });
+      return new NextResponse("Board not found or access denied", {
+        status: 404,
+      });
     }
 
     // Get all documents and folders for the board

@@ -1,3 +1,4 @@
+// components/modals/card-modal/document-selector.tsx
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -19,10 +20,14 @@ interface DocumentSelectorProps {
 export const DocumentSelector = ({ isOpen, onClose, cardId, workspaceId }: DocumentSelectorProps) => {
     const [searchTerm, setSearchTerm] = useState("");
     const queryClient = useQueryClient();
+    const params = new URLSearchParams(window.location.search);
+    const boardId = params.get('boardId') || window.location.pathname.split('/')[3];
 
+    // Fetch board documents instead of workspace documents
     const { data: documents } = useQuery({
-        queryKey: ["workspace-documents", workspaceId],
-        queryFn: () => fetcher(`/api/documents?workspaceId=${workspaceId}`),
+        queryKey: ["board-documents", boardId],
+        queryFn: () => fetcher(`/api/boards/${workspaceId}/${boardId}/documents`),
+        enabled: !!boardId && !!workspaceId,
     });
 
     // Vérifier si un document est déjà lié à la carte
@@ -57,7 +62,7 @@ export const DocumentSelector = ({ isOpen, onClose, cardId, workspaceId }: Docum
         }
     };
 
-    const filteredDocuments = documents?.filter((doc: any) =>
+    const filteredDocuments = documents?.documents?.filter((doc: any) =>
         doc.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -77,26 +82,32 @@ export const DocumentSelector = ({ isOpen, onClose, cardId, workspaceId }: Docum
                     />
                 </div>
                 <ScrollArea className="h-[400px] pr-4">
-                    {filteredDocuments?.map((doc: any) => (
-                        <div
-                            key={doc.id}
-                            className="flex items-center justify-between p-3 hover:bg-gray-100 rounded-lg cursor-pointer"
-                            onClick={() => !isDocumentLinked(doc.id) && handleLinkDocument(doc.id)}
-                        >
-                            <div>
-                                <p className="font-medium">{doc.title}</p>
-                                <p className="text-sm text-muted-foreground">
-                                    Last updated: {new Date(doc.updatedAt).toLocaleDateString()}
-                                </p>
+                    {filteredDocuments?.length > 0 ? (
+                        filteredDocuments.map((doc: any) => (
+                            <div
+                                key={doc.id}
+                                className="flex items-center justify-between p-3 hover:bg-gray-100 rounded-lg cursor-pointer"
+                                onClick={() => !isDocumentLinked(doc.id) && handleLinkDocument(doc.id)}
+                            >
+                                <div>
+                                    <p className="font-medium">{doc.title}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                        Last updated: {new Date(doc.updatedAt).toLocaleDateString()}
+                                    </p>
+                                </div>
+                                {/* Afficher CheckIcon si le document est déjà lié */}
+                                {isDocumentLinked(doc.id) ? (
+                                    <CheckIcon className="text-green-500 mr-6" size={14} />
+                                ) : (
+                                    <Button variant="ghost">Link</Button>
+                                )}
                             </div>
-                            {/* Afficher CheckIcon si le document est déjà lié */}
-                            {isDocumentLinked(doc.id) ? (
-                                <CheckIcon className="text-green-500 mr-6" size={14} />
-                            ) : (
-                                <Button variant="ghost">Link</Button>
-                            )}
+                        ))
+                    ) : (
+                        <div className="text-center py-8">
+                            <p className="text-muted-foreground">No documents found</p>
                         </div>
-                    ))}
+                    )}
                 </ScrollArea>
             </DialogContent>
         </Dialog>

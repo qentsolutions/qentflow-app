@@ -317,7 +317,7 @@ export default function DocumentEditor({ params }: any) {
           <div className="flex flex-col h-full">
             <div
               ref={titleRef}
-              className="px-0 pt-0 pb-4 flex items-center justify-between"
+              className="px-0 pt-0 flex items-center justify-between"
               onClick={() => titleRef.current?.querySelector("input")?.focus()}
             >
               <input
@@ -326,9 +326,32 @@ export default function DocumentEditor({ params }: any) {
                 placeholder="Untitled Document"
                 className="text-3xl font-bold w-full border-none shadow-none focus:outline-none focus:ring-0 p-0 bg-transparent"
               />
+
               <button className="text-gray-600 hover:text-gray-800" onClick={() => setIsFullScreen(true)}>
-                <Expand className="h-6 w-6" />
+                <Expand className="h-4 w-4 mr-2" />
               </button>
+              <div className="flex items-center justify-end">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={toggleToolbar}
+                      className={`toggle-button h-8 w-8 rounded-full flex items-center justify-center text-gray-500 hover:text-gray-700 focus:outline-none ${!toolbarVisible ? "bg-gray-100" : ""}`}
+                    >
+                      {toolbarVisible ? <Pen className="h-4 w-4" /> : <PenOff className="h-4 w-4" />}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    {toolbarVisible ? "Hide the toolbar" : "Show the toolbar"}
+                  </TooltipContent>
+                </Tooltip>
+
+                <div className="flex items-center gap-2 ml-1">
+                  <Button variant="outline" size="sm" onClick={exportToPDF} className="text-xs">
+                    <FileDown className="h-3.5 w-3.5 mr-1" />
+                    Export
+                  </Button>
+                </div>
+              </div>
             </div>
             <div className="flex items-center gap-2 text-xs text-gray-400 mt-2">
               {lastSaved && (
@@ -340,30 +363,6 @@ export default function DocumentEditor({ params }: any) {
               {isSaving && <span>Saving...</span>}
             </div>
 
-            <div className="flex items-center justify-end">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={toggleToolbar}
-                      className={`toggle-button h-8 w-8 rounded-full flex items-center justify-center text-gray-500 hover:text-gray-700 focus:outline-none ${!toolbarVisible ? "bg-gray-100" : ""}`}
-                    >
-                      {toolbarVisible ? <Pen className="h-4 w-4" /> : <PenOff className="h-4 w-4" />}
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">
-                    {toolbarVisible ? "Masquer la barre d'outils" : "Afficher la barre d'outils"}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" onClick={exportToPDF} className="text-xs">
-                  <FileDown className="h-3.5 w-3.5 mr-1" />
-                  Export
-                </Button>
-              </div>
-            </div>
 
             <div className={`${toolbarVisible ? "toolbar-visible" : "toolbar-hidden"}`}>
               <div className="bg-white border rounded-lg shadow-sm flex items-center justify-between mt-2">

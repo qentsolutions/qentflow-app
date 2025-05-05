@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { currentUser } from "@/lib/auth";
 
-// GET - Récupérer les cartes liées à un document
+// GET – Récupérer un document
 export async function GET(
   req: Request,
   { params }: { params: { documentId: string } }
@@ -16,14 +16,15 @@ export async function GET(
     const document = await db.document.findUnique({
       where: { id: params.documentId },
       include: {
-        cards: {
+        workspace: {
           include: {
-            list: {
-              include: {
-                board: true,
-              },
+            members: {
+              where: { userId: user.id },
             },
           },
+        },
+        createdBy: {
+          select: { id: true, name: true, image: true },
         },
       },
     });
@@ -32,67 +33,17 @@ export async function GET(
       return new NextResponse("Document not found", { status: 404 });
     }
 
-    return NextResponse.json(document.cards);
-  } catch (error) {
-    return new NextResponse("Internal Error", { status: 500 });
-  }
-}
-
-// POST - Lier une carte à un document
-export async function POST(
-  req: Request,
-  { params }: { params: { documentId: string } }
-) {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    if (document.workspace.members.length === 0) {
+      return new NextResponse("Unauthorized access to document", {
+        status: 403,
+      });
     }
 
-    const { cardId } = await req.json();
-
-    const updatedDocument = await db.document.update({
-      where: { id: params.documentId },
-      data: {
-        cards: {
-          connect: { id: cardId },
-        },
-      },
-      include: {
-        cards: true,
-      },
-    });
-
-    return NextResponse.json(updatedDocument);
+    // On retire workspace avant d’envoyer
+    const { workspace, ...doc } = document;
+    return NextResponse.json(doc);
   } catch (error) {
-    return new NextResponse("Internal Error", { status: 500 });
-  }
-}
-
-export async function DELETE(
-  req: Request,
-  { params }: { params: { documentId: string; cardId: string } }
-) {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-    const updatedDocument = await db.document.update({
-      where: { id: params.documentId },
-      data: {
-        cards: {
-          disconnect: { id: params.cardId },
-        },
-      },
-      include: {
-        cards: true,
-      },
-    });
-
-    return NextResponse.json(updatedDocument);
-  } catch (error) {
+    console.error("[DOCUMENT_GET]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
