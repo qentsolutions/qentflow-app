@@ -1,140 +1,110 @@
-"use client"; // Ajoutez cette ligne en haut du fichier
+"use client"
 
-import { useEffect, useState, useRef } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import TextStyle from "@tiptap/extension-text-style";
-import Color from "@tiptap/extension-color";
-import TextAlign from "@tiptap/extension-text-align";
-import Underline from "@tiptap/extension-underline";
-import Superscript from "@tiptap/extension-superscript";
-import Subscript from "@tiptap/extension-subscript";
-import Highlight from "@tiptap/extension-highlight";
-import Typography from "@tiptap/extension-typography";
-import Link from "@tiptap/extension-link";
-import Image from "@tiptap/extension-image";
-import Table from "@tiptap/extension-table";
-import TableRow from "@tiptap/extension-table-row";
-import TableCell from "@tiptap/extension-table-cell";
-import TableHeader from "@tiptap/extension-table-header";
-import FontFamily from "@tiptap/extension-font-family";
-import Placeholder from "@tiptap/extension-placeholder";
+import { useEffect, useState, useRef, useCallback } from "react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useEditor, EditorContent } from "@tiptap/react"
+import StarterKit from "@tiptap/starter-kit"
+import TextStyle from "@tiptap/extension-text-style"
+import Color from "@tiptap/extension-color"
+import TextAlign from "@tiptap/extension-text-align"
+import Underline from "@tiptap/extension-underline"
+import Superscript from "@tiptap/extension-superscript"
+import Subscript from "@tiptap/extension-subscript"
+import Highlight from "@tiptap/extension-highlight"
+import Typography from "@tiptap/extension-typography"
+import Link from "@tiptap/extension-link"
+import Image from "@tiptap/extension-image"
+import Table from "@tiptap/extension-table"
+import TableRow from "@tiptap/extension-table-row"
+import TableCell from "@tiptap/extension-table-cell"
+import TableHeader from "@tiptap/extension-table-header"
+import FontFamily from "@tiptap/extension-font-family"
+import Placeholder from "@tiptap/extension-placeholder"
+import TaskList from "@tiptap/extension-task-list"
+import TaskItem from "@tiptap/extension-task-item"
+import Focus from "@tiptap/extension-focus"
+import CharacterCount from "@tiptap/extension-character-count"
 
-import { useDebounce } from "@/hooks/use-debounce";
-import { toast } from "sonner";
-import { useCurrentWorkspace } from "@/hooks/use-current-workspace";
-import { fetcher } from "@/lib/fetcher";
-import { updateBoardDocument } from "@/actions/board-documents/update-document";
-import { DocumentToolbar } from "./document-toolbar";
-import { Skeleton } from "@/components/ui/skeleton";
-import { FileDown, Clock, Expand, X, PenOff, Pen } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { formatDistanceToNow } from "date-fns";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useDebounce } from "@/hooks/use-debounce"
+import { toast } from "sonner"
+import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
+import { fetcher } from "@/lib/fetcher"
+import { updateBoardDocument } from "@/actions/board-documents/update-document"
+import { DocumentToolbar } from "./document-toolbar"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Progress } from "@/components/ui/progress"
+import { cn } from "@/lib/utils"
+import {
+  FileDown,
+  Clock,
+  X,
+  PenIcon as PenOff,
+  Pen,
+  Save,
+  Eye,
+  EyeOff,
+  Maximize2,
+  Minimize2,
+  Settings,
+  Share,
+  Download,
+  FileText,
+  Zap,
+  BarChart3,
+} from "lucide-react"
+import { formatDistanceToNow } from "date-fns"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
+import { Separator } from "@/components/ui/separator"
 
-// Add these animation keyframes after imports
-const animationStyles = `
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
-
-@keyframes expandIn {
-  from {
-    transform: translate(calc(50% - 50vw), calc(50% - 50vh)) scale(0.6);
-    opacity: 0;
+interface DocumentEditorProps {
+  params: {
+    documentId: string
+    boardId: string
+    workspaceId: string
   }
-  to {
-    transform: translate(0, 0) scale(1);
-    opacity: 1;
-  }
 }
 
-@keyframes expandOut {
-  from {
-    transform: translate(0, 0) scale(1);
-    opacity: 1;
-  }
-  to {
-    transform: translate(calc(50% - 50vw), calc(50% - 50vh)) scale(0.6);
-    opacity: 0;
-  }
-}
+export default function DocumentEditor({ params }: DocumentEditorProps) {
+  const { documentId, boardId, workspaceId } = params
+  const [title, setTitle] = useState("")
+  const [content, setContent] = useState("")
+  const [isSaving, setIsSaving] = useState(false)
+  const [lastSaved, setLastSaved] = useState<Date | null>(null)
+  const [isFullScreen, setIsFullScreen] = useState(false)
+  const [isExiting, setIsExiting] = useState(false)
+  const [toolbarVisible, setToolbarVisible] = useState(true)
+  const [isPreviewMode, setIsPreviewMode] = useState(false)
+  const [focusMode, setFocusMode] = useState(false)
+  const [autoSave, setAutoSave] = useState(true)
+  const [wordCount, setWordCount] = useState(0)
+  const [readingTime, setReadingTime] = useState(0)
+  const [saveProgress, setSaveProgress] = useState(0)
 
-.animate-fadeIn {
-  animation: fadeIn 0.4s ease-in-out forwards;
-}
-
-.animate-fadeOut {
-  animation: fadeOut 0.4s ease-in-out forwards;
-}
-
-.animate-expandIn {
-  animation: expandIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  transform-origin: center center;
-}
-
-.animate-expandOut {
-  animation: expandOut 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  transform-origin: center center;
-}
-
-.toolbar-visible {
-  max-height: 200px;
-  opacity: 1;
-  transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
-  margin-bottom: 16px;
-}
-
-.toolbar-hidden {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
-  margin-bottom: 0;
-}
-
-.toggle-button {
-  transition: transform 0.3s ease, background-color 0.2s ease;
-}
-
-.toggle-button:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-.toggle-button-active {
-  transform: rotate(180deg);
-}
-`;
-
-export default function DocumentEditor({ params }: any) {
-  const { documentId, boardId, workspaceId } = params;
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
-  const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  const [isFullScreen, setIsFullScreen] = useState(false); // État pour gérer l'affichage en plein écran
-  const [isExiting, setIsExiting] = useState(false);
-  const [toolbarVisible, setToolbarVisible] = useState(true); // État pour gérer la visibilité de la barre d'outils
-  const debouncedContent = useDebounce(content, 1000);
-  const debouncedTitle = useDebounce(title, 1000);
-  const { currentWorkspace } = useCurrentWorkspace();
-  const queryClient = useQueryClient();
-  const editorRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLDivElement>(null);
+  const debouncedContent = useDebounce(content, autoSave ? 1000 : 0)
+  const debouncedTitle = useDebounce(title, autoSave ? 1000 : 0)
+  const { currentWorkspace } = useCurrentWorkspace()
+  const queryClient = useQueryClient()
+  const editorRef = useRef<HTMLDivElement>(null)
+  const titleRef = useRef<HTMLInputElement>(null)
 
   // Fetch document data
-  const { data: document, isLoading } = useQuery({
+  const {
+    data: document,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["board-document", documentId],
     queryFn: () => fetcher(`/api/boards/${workspaceId}/${boardId}/documents/${documentId}`),
     enabled: !!documentId && !!boardId && !!workspaceId,
-  });
+    retry: 3,
+    staleTime: 30000,
+  })
 
   const editor = useEditor({
     extensions: [
@@ -150,7 +120,12 @@ export default function DocumentEditor({ params }: any) {
       }),
       TextStyle,
       Color,
-      Highlight.configure({ multicolor: true }),
+      Highlight.configure({
+        multicolor: true,
+        HTMLAttributes: {
+          class: "highlight",
+        },
+      }),
       Underline,
       Superscript,
       Subscript,
@@ -158,224 +133,542 @@ export default function DocumentEditor({ params }: any) {
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: "text-blue-600 underline",
+          class:
+            "text-primary underline decoration-primary/30 hover:decoration-primary transition-colors cursor-pointer",
         },
       }),
       Image.configure({
         HTMLAttributes: {
-          class: "max-w-full rounded-lg my-4",
+          class: "max-w-full rounded-lg my-4 shadow-sm border border-border",
         },
       }),
       Table.configure({
         resizable: true,
         HTMLAttributes: {
-          class: "border-collapse table-auto w-full my-4",
+          class: "border-collapse table-auto w-full my-4 border border-border rounded-lg overflow-hidden",
         },
       }),
       TableRow,
       TableHeader.configure({
         HTMLAttributes: {
-          class: "border border-gray-200 dark:border-gray-700 p-2 bg-gray-50 dark:bg-gray-800",
+          class: "border border-border p-3 bg-muted/50 font-semibold text-left",
         },
       }),
       TableCell.configure({
         HTMLAttributes: {
-          class: "border border-gray-200 dark:border-gray-700 p-2",
+          class: "border border-border p-3",
         },
       }),
       FontFamily,
       TextAlign.configure({
         types: ["heading", "paragraph"],
       }),
+      TaskList.configure({
+        HTMLAttributes: {
+          class: "task-list",
+        },
+      }),
+      TaskItem.configure({
+        HTMLAttributes: {
+          class: "task-item",
+        },
+        nested: true,
+      }),
+      Focus.configure({
+        className: "has-focus",
+        mode: "all",
+      }),
+      CharacterCount,
       Placeholder.configure({
-        placeholder: "Start writing...",
+        placeholder: ({ node }) => {
+          if (node.type.name === "heading") {
+            return "What's the title?"
+          }
+          return "Start writing your story..."
+        },
         emptyEditorClass: "is-editor-empty",
       }),
     ],
     content: "",
     editorProps: {
       attributes: {
-        class: "prose prose-sm sm:prose lg:prose-lg max-w-none focus:outline-none px-8 py-6 min-h-[calc(100vh-120px)]",
+        class: cn(
+          "prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none focus:outline-none",
+          "prose-headings:scroll-m-20 prose-headings:font-semibold prose-headings:tracking-tight",
+          "prose-h1:text-4xl prose-h1:lg:text-5xl prose-h1:mb-6",
+          "prose-h2:text-3xl prose-h2:mb-4 prose-h2:border-b prose-h2:pb-2",
+          "prose-h3:text-2xl prose-h3:mb-3",
+          "prose-p:leading-7 prose-p:mb-4",
+          "prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-6 prose-blockquote:italic",
+          "prose-code:relative prose-code:rounded prose-code:bg-muted prose-code:px-1.5 prose-code:py-1 prose-code:text-sm",
+          "prose-pre:bg-muted prose-pre:border prose-pre:rounded-lg prose-pre:p-4",
+          "prose-ul:my-6 prose-ol:my-6",
+          "prose-li:my-2",
+          "prose-table:my-6",
+          "prose-img:rounded-lg prose-img:shadow-md",
+          focusMode
+            ? "prose-p:opacity-50 prose-li:opacity-50 prose-h1:opacity-50 prose-h2:opacity-50 prose-h3:opacity-50 focus-within:prose-p:opacity-100 focus-within:prose-li:opacity-100 focus-within:prose-h1:opacity-100 focus-within:prose-h2:opacity-100 focus-within:prose-h3:opacity-100"
+            : "",
+          "py-6 min-h-[calc(100vh-200px)] transition-all duration-200",
+        ),
       },
     },
     onUpdate: ({ editor }) => {
-      setContent(editor.getHTML());
+      const html = editor.getHTML()
+      setContent(html)
+
+      // Calculate word count and reading time
+      const text = editor.getText()
+      const words = text
+        .trim()
+        .split(/\s+/)
+        .filter((word) => word.length > 0).length
+      setWordCount(words)
+      setReadingTime(Math.ceil(words / 200)) // Average reading speed: 200 words per minute
     },
-  });
+    onCreate: ({ editor }) => {
+      // Set initial word count
+      const text = editor.getText()
+      const words = text
+        .trim()
+        .split(/\s+/)
+        .filter((word) => word.length > 0).length
+      setWordCount(words)
+      setReadingTime(Math.ceil(words / 200))
+    },
+  })
 
   // Update editor content when document changes
   useEffect(() => {
     if (editor && document) {
       if (document.content !== undefined && document.content !== content) {
-        editor.commands.setContent(document.content || "");
-        setContent(document.content || "");
+        editor.commands.setContent(document.content || "")
+        setContent(document.content || "")
       }
       if (document.title !== title) {
-        setTitle(document.title || "");
+        setTitle(document.title || "")
+      }
+      if (document.updatedAt) {
+        setLastSaved(new Date(document.updatedAt))
       }
     }
-  }, [document, editor]);
+  }, [document, editor])
 
-  // Save changes when content or title changes
-  useEffect(() => {
-    const updateContent = async () => {
-      // Only save if content or title has changed and we have a document
+  // Auto-save functionality
+  const saveDocument = useCallback(
+    async (showToast = false) => {
+      if (!document || !autoSave) return
+
+      // Only save if content or title has changed
       if (
-        !document ||
         (debouncedContent === document.content && debouncedTitle === document.title) ||
         !debouncedContent ||
         !debouncedTitle
       ) {
-        return;
+        return
       }
 
-      setIsSaving(true);
+      setIsSaving(true)
+      setSaveProgress(0)
+
       try {
+        // Simulate progress for better UX
+        const progressInterval = setInterval(() => {
+          setSaveProgress((prev) => Math.min(prev + 20, 90))
+        }, 100)
+
         const result = await updateBoardDocument({
           id: documentId,
           title: debouncedTitle,
           content: debouncedContent,
           boardId: boardId,
           workspaceId: workspaceId,
-        });
+        })
+
+        clearInterval(progressInterval)
+        setSaveProgress(100)
 
         if (result.error) {
-          toast.error(result.error);
+          toast.error(result.error)
         } else {
           // Invalidate queries to refresh data
           queryClient.invalidateQueries({
             queryKey: ["board-document", documentId],
-          });
+          })
           queryClient.invalidateQueries({
             queryKey: ["board-documents", boardId],
-          });
-          setLastSaved(new Date());
+          })
+          setLastSaved(new Date())
+
+          if (showToast) {
+            toast.success("Document saved successfully")
+          }
         }
       } catch (error) {
-        toast.error("Failed to save changes");
+        toast.error("Failed to save changes")
       } finally {
-        setIsSaving(false);
+        setIsSaving(false)
+        setTimeout(() => setSaveProgress(0), 1000)
       }
-    };
+    },
+    [debouncedContent, debouncedTitle, documentId, document, boardId, workspaceId, queryClient, autoSave],
+  )
 
-    updateContent();
-  }, [debouncedContent, debouncedTitle, documentId, document, boardId, workspaceId, queryClient]);
+  // Auto-save effect
+  useEffect(() => {
+    if (autoSave) {
+      saveDocument()
+    }
+  }, [saveDocument, autoSave])
+
+  // Manual save with Ctrl+S
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault()
+        saveDocument(true)
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === "e") {
+        e.preventDefault()
+        setIsPreviewMode(!isPreviewMode)
+      }
+      if (e.key === "Escape" && isFullScreen) {
+        exitFullScreen()
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [saveDocument, isPreviewMode, isFullScreen])
 
   const exportToPDF = () => {
-    toast.info("PDF export functionality coming soon");
-  };
-
-  const toggleToolbar = () => {
-    setToolbarVisible(!toolbarVisible);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="p-8 space-y-4">
-        <Skeleton className="h-10 w-1/3" />
-        <Skeleton className="h-6 w-full mt-8" />
-        <Skeleton className="h-6 w-5/6" />
-        <Skeleton className="h-6 w-4/6" />
-        <Skeleton className="h-6 w-full" />
-      </div>
-    );
+    toast.info("PDF export functionality coming soon")
   }
 
-  if (!document) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <h3 className="text-xl font-medium text-gray-600">Document not found</h3>
-          <p className="text-sm text-gray-500 mt-2">
-            The document you&apos;re looking for doesn&apos;t exist or has been deleted
-          </p>
-        </div>
-      </div>
-    );
+  const exportToMarkdown = () => {
+    if (!editor) return
+
+    const markdown = editor.storage.markdown?.getMarkdown() || editor.getText()
+    const blob = new Blob([markdown], { type: "text/markdown" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `${title || "document"}.md`
+    a.click()
+    URL.revokeObjectURL(url)
+    toast.success("Document exported as Markdown")
+  }
+
+  const shareDocument = () => {
+    navigator.clipboard.writeText(window.location.href)
+    toast.success("Document link copied to clipboard")
+  }
+
+  const toggleToolbar = () => {
+    setToolbarVisible(!toolbarVisible)
+  }
+
+  const togglePreviewMode = () => {
+    setIsPreviewMode(!isPreviewMode)
+  }
+
+  const toggleFocusMode = () => {
+    setFocusMode(!focusMode)
   }
 
   const exitFullScreen = () => {
-    setIsExiting(true);
+    setIsExiting(true)
     setTimeout(() => {
-      setIsFullScreen(false);
-      setIsExiting(false);
-    }, 400); // Match this with the animation duration
-  };
+      setIsFullScreen(false)
+      setIsExiting(false)
+    }, 300)
+  }
+
+  const enterFullScreen = () => {
+    setIsFullScreen(true)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="p-8 space-y-6">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-10 w-1/3" />
+          <div className="flex gap-2">
+            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-8 w-8" />
+          </div>
+        </div>
+        <Skeleton className="h-12 w-full" />
+        <div className="space-y-3">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-5/6" />
+          <Skeleton className="h-4 w-4/6" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !document) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 mx-auto bg-destructive/10 rounded-full flex items-center justify-center">
+            <FileText className="h-8 w-8 text-destructive" />
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold text-foreground">Document not found</h3>
+            <p className="text-sm text-muted-foreground mt-2">
+              The document you&apos;re looking for doesn&apos;t exist or has been deleted
+            </p>
+          </div>
+          <Button variant="outline" onClick={() => window.history.back()}>
+            Go Back
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <>
-      <style jsx global>
-        {animationStyles}
-      </style>
-      <div className={`flex flex-col h-full ${isFullScreen ? "fixed inset-0 z-50 bg-black dark:bg-gray-700 bg-opacity-50 transition-opacity duration-300 ease-in-out" : ""}`}>
-        <div className={`relative w-full h-full overflow-auto ${isFullScreen ? "p-8 md:px-36" : "px-8 pt-4"} bg-background rounded-lg shadow-lg transition-transform duration-300 ${isFullScreen ? (isExiting ? "animate-expandOut" : "animate-expandIn") : ""}`}>
-          {isFullScreen && (
-            <button className="absolute top-4 right-4 text-gray-600 hover:text-gray-800" onClick={exitFullScreen}>
-              <X className="h-6 w-6" />
-            </button>
+    <TooltipProvider>
+      <div
+        className={cn(
+          "flex flex-col h-full transition-all duration-300",
+          isFullScreen && "fixed inset-0 z-50 bg-background",
+        )}
+      >
+        {/* Header */}
+        <div
+          className={cn(
+            "border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+            isFullScreen ? "p-6" : "p-4",
           )}
-          <div className="flex flex-col h-full">
-            <div
-              ref={titleRef}
-              className="px-0 pt-0 flex items-center justify-between"
-              onClick={() => titleRef.current?.querySelector("input")?.focus()}
-            >
+        >
+          <div className="flex items-center justify-between">
+            {/* Title */}
+            <div className="flex-1 mr-4">
               <input
+                ref={titleRef}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Untitled Document"
-                className="text-3xl font-bold w-full border-none shadow-none focus:outline-none focus:ring-0 p-0 bg-transparent"
+                className={cn(
+                  "font-bold border-none shadow-none focus:outline-none focus:ring-0 p-0 bg-transparent w-full",
+                  isFullScreen ? "text-4xl" : "text-2xl",
+                )}
+                disabled={isPreviewMode}
               />
 
-              <button className="text-gray-600 hover:text-gray-800" onClick={() => setIsFullScreen(true)}>
-                <Expand className="h-4 w-4 mr-2" />
-              </button>
-              <div className="flex items-center justify-end">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={toggleToolbar}
-                      className={`toggle-button h-8 w-8 rounded-full flex items-center justify-center text-gray-500 hover:text-gray-700 focus:outline-none ${!toolbarVisible ? "bg-gray-100" : ""}`}
-                    >
-                      {toolbarVisible ? <Pen className="h-4 w-4" /> : <PenOff className="h-4 w-4" />}
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">
-                    {toolbarVisible ? "Hide the toolbar" : "Show the toolbar"}
-                  </TooltipContent>
-                </Tooltip>
-
-                <div className="flex items-center gap-2 ml-1">
-                  <Button variant="outline" size="sm" onClick={exportToPDF} className="text-xs">
-                    <FileDown className="h-3.5 w-3.5 mr-1" />
-                    Export
-                  </Button>
+              {/* Document stats */}
+              <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <BarChart3 className="h-3 w-3" />
+                  <span>{wordCount} words</span>
                 </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  <span>{readingTime} min read</span>
+                </div>
+                {editor && (
+                  <div className="flex items-center gap-1">
+                    <FileText className="h-3 w-3" />
+                    <span>{editor.storage.characterCount.characters()} characters</span>
+                  </div>
+                )}
+                {lastSaved && (
+                  <div className="flex items-center gap-1">
+                    <Save className="h-3 w-3" />
+                    <span>Saved {formatDistanceToNow(lastSaved, { addSuffix: true })}</span>
+                  </div>
+                )}
               </div>
             </div>
-            <div className="flex items-center gap-2 text-xs text-gray-400 mt-2">
-              {lastSaved && (
-                <div className="flex items-center">
-                  <Clock className="h-3 w-3 mr-1" />
-                  <span>Last saved {formatDistanceToNow(lastSaved, { addSuffix: true })}</span>
+
+            {/* Actions */}
+            <div className="flex items-center gap-2">
+              {/* Save progress */}
+              {isSaving && (
+                <div className="flex items-center gap-2">
+                  <Progress value={saveProgress} className="w-16 h-1" />
+                  <span className="text-xs text-muted-foreground">Saving...</span>
                 </div>
               )}
-              {isSaving && <span>Saving...</span>}
-            </div>
 
+              {/* Mode toggles */}
+              <div className="flex items-center gap-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={isPreviewMode ? "default" : "ghost"}
+                      size="sm"
+                      onClick={togglePreviewMode}
+                      className="h-8 w-8 p-0"
+                    >
+                      {isPreviewMode ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>{isPreviewMode ? "Exit preview mode" : "Preview mode"} (Ctrl+E)</TooltipContent>
+                </Tooltip>
 
-            <div className={`${toolbarVisible ? "toolbar-visible" : "toolbar-hidden"}`}>
-              <div className="bg-background border rounded-lg shadow-sm flex items-center justify-between mt-2">
-                <DocumentToolbar editor={editor} />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={focusMode ? "default" : "ghost"}
+                      size="sm"
+                      onClick={toggleFocusMode}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Zap className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>{focusMode ? "Exit focus mode" : "Focus mode"}</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={toolbarVisible ? "default" : "ghost"}
+                      size="sm"
+                      onClick={toggleToolbar}
+                      className="h-8 w-8 p-0"
+                    >
+                      {toolbarVisible ? <PenOff className="h-4 w-4" /> : <Pen className="h-4 w-4" />}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>{toolbarVisible ? "Hide toolbar" : "Show toolbar"}</TooltipContent>
+                </Tooltip>
               </div>
+
+              <Separator orientation="vertical" className="h-6" />
+
+              {/* Export menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-8">
+                    <Download className="h-3.5 w-3.5 mr-1" />
+                    Export
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={exportToPDF}>
+                    <FileDown className="h-4 w-4 mr-2" />
+                    Export as PDF
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={exportToMarkdown}>
+                    <FileText className="h-4 w-4 mr-2" />
+                    Export as Markdown
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Settings */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Editor Settings</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="auto-save">Auto-save</Label>
+                      <Switch id="auto-save" checked={autoSave} onCheckedChange={setAutoSave} />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="focus-mode">Focus mode</Label>
+                      <Switch id="focus-mode" checked={focusMode} onCheckedChange={setFocusMode} />
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              {/* Share */}
+              <Button variant="ghost" size="sm" onClick={shareDocument} className="h-8 w-8 p-0">
+                <Share className="h-4 w-4" />
+              </Button>
+
+              {/* Fullscreen toggle */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={isFullScreen ? exitFullScreen : enterFullScreen}
+                    className="h-8 w-8 p-0"
+                  >
+                    {isFullScreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{isFullScreen ? "Exit fullscreen" : "Enter fullscreen"}</TooltipContent>
+              </Tooltip>
+
+              {isFullScreen && (
+                <Button variant="ghost" size="sm" onClick={exitFullScreen} className="h-8 w-8 p-0">
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Toolbar */}
+        {toolbarVisible && !isPreviewMode && (
+          <div
+            className={cn(
+              "border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300",
+              isFullScreen ? "px-6" : "px-4",
+            )}
+          >
+            <DocumentToolbar editor={editor} />
+          </div>
+        )}
+
+        {/* Editor Content */}
+        <div className={cn("flex-1 overflow-y-auto", isFullScreen ? "px-6 pb-6" : "px-4 pb-4")}>
+          <div className={cn("max-w-4xl mx-auto", isFullScreen && "max-w-5xl")}>
+            {editor && (
+              <EditorContent
+                editor={editor}
+                className={cn(
+                  "min-h-[calc(100vh-200px)] transition-all duration-200",
+                  isPreviewMode && "pointer-events-none",
+                  focusMode && "focus-mode",
+                )}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Status bar */}
+        <div className={cn("border-t bg-muted/30 px-4 py-2 text-xs text-muted-foreground", isFullScreen && "px-6")}>
+          <div className="flex items-center justify-between max-w-4xl mx-auto">
+            <div className="flex items-center gap-4">
+              <Badge variant="secondary" className="text-xs">
+                {isPreviewMode ? "Preview" : "Edit"} Mode
+              </Badge>
+              {focusMode && (
+                <Badge variant="outline" className="text-xs">
+                  Focus Mode
+                </Badge>
+              )}
+              {!autoSave && (
+                <Badge variant="destructive" className="text-xs">
+                  Auto-save disabled
+                </Badge>
+              )}
             </div>
 
-            <div className="flex-1 overflow-y-auto" ref={editorRef}>
-              {editor && <EditorContent editor={editor} className="min-h-[calc(100vh-200px)]" />}
+            <div className="flex items-center gap-4">
+              <span>Ctrl+S to save • Ctrl+E to preview • Esc to exit fullscreen</span>
             </div>
           </div>
         </div>
       </div>
-    </>
-  );
+    </TooltipProvider>
+  )
 }

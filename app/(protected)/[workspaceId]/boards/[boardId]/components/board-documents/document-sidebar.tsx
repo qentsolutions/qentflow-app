@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect, useRef } from "react"
 import { useParams } from "next/navigation"
 import { useQuery } from "@tanstack/react-query"
@@ -10,7 +9,6 @@ import { useCurrentWorkspace } from "@/hooks/use-current-workspace"
 import { toast } from "sonner"
 import {
   ChevronRight,
-  File,
   Folder,
   FolderPlus,
   FilePlus,
@@ -21,12 +19,16 @@ import {
   Loader2,
   Plus,
   GripVertical,
+  FileText,
+  Move,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Badge } from "@/components/ui/badge"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { createBoardDocument } from "@/actions/board-documents/create-document"
 import { createBoardFolder } from "@/actions/board-documents/create-folder"
 import { deleteBoardDocument } from "@/actions/board-documents/delete-document"
@@ -88,60 +90,93 @@ const DraggableDocument = ({
     transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
     transition,
     opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 1 : "auto",
+    zIndex: isDragging ? 1000 : "auto",
   }
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={cn(
-        "flex items-center justify-between py-1 px-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer group document-item transition-colors duration-200",
-        isSelected && "bg-gray-100",
-      )}
-      onClick={onSelect}
-    >
-      <div className="flex items-center gap-1.5 flex-1">
-        <div className="w-3.5"></div> {/* Spacer to align with folders */}
+    <TooltipProvider>
+      <div
+        ref={setNodeRef}
+        style={style}
+        className={cn(
+          "group relative flex items-center gap-2 py-1 px-1 rounded-lg hover:bg-accent/50 cursor-pointer transition-all duration-200 border border-transparent",
+          isSelected && "bg-accent border-accent-foreground/20 shadow-sm",
+          isDragging && "shadow-lg border-primary/30",
+        )}
+        onClick={onSelect}
+      >
+        {/* Drag Handle */}
         <div
           {...attributes}
           {...listeners}
-          className="cursor-grab active:cursor-grabbing p-0.5 -ml-1 opacity-0 group-hover:opacity-60 drag-handle"
+          className="cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-60 transition-opacity p-1 -ml-1 hover:bg-accent rounded"
           title="Drag to move document"
         >
-          <GripVertical className="h-3 w-3 text-gray-400" />
+          <GripVertical className="h-3 w-3 text-muted-foreground" />
         </div>
-        <File className="h-3.5 w-3.5 text-gray-500" />
-        <span className="text-sm truncate text-gray-700">{document.title}</span>
-      </div>
 
-      <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation()
-            onRename(e)
-          }}
-          className="h-6 w-6 p-0 hover:bg-gray-100 dark:hover:bg-gray-700"
-          title="Rename document"
-        >
-          <Edit className="h-3 w-3 text-gray-500" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation()
-            onDelete(e)
-          }}
-          className="h-6 w-6 p-0 hover:bg-red-50 text-red-500"
-          title="Delete document"
-        >
-          <Trash className="h-3 w-3" />
-        </Button>
+        {/* Document Icon */}
+        <FileText className="h-4 w-4 text-blue-500 flex-shrink-0" />
+
+        {/* Document Title with Tooltip for long names */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="text-xs font-medium truncate flex-1 min-w-0 text-foreground">{document.title}</span>
+          </TooltipTrigger>
+          <TooltipContent side="right" className="max-w-xs">
+            <p className="break-words">{document.title}</p>
+          </TooltipContent>
+        </Tooltip>
+
+        {/* Action Buttons */}
+        {/* Action menu – caché jusqu’au hover */}
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 hover:bg-accent"
+                onClick={(e) => e.stopPropagation()}  // ne pas sélectionner le doc
+                title="Actions"
+              >
+                <MoreHorizontal className="h-3 w-3 text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" className="w-36">
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onRename(e)
+                }}
+                className="text-xs"
+              >
+                <Edit className="h-3 w-3 mr-2" />
+                Rename
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDelete(e)
+                }}
+                className="text-xs text-destructive"
+              >
+                <Trash className="h-3 w-3 mr-2" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+
+        {/* Drop indicator when dragging */}
+        {isDragging && (
+          <div className="absolute inset-0 bg-primary/10 border-2 border-dashed border-primary rounded-lg pointer-events-none" />
+        )}
       </div>
-    </div>
+    </TooltipProvider>
   )
 }
 
@@ -155,7 +190,8 @@ const DroppableFolder = ({
   onAddDocument,
   onAddFolder,
   children,
-  dropTargetId, // Add dropTargetId as a prop
+  dropTargetId,
+  documentCount = 0,
 }: {
   folder: FolderType
   isExpanded: boolean
@@ -165,7 +201,8 @@ const DroppableFolder = ({
   onAddDocument: (e: React.MouseEvent) => void
   onAddFolder: (e: React.MouseEvent) => void
   children?: React.ReactNode
-  dropTargetId: string | null // Add dropTargetId type
+  dropTargetId: string | null
+  documentCount?: number
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: `folder-${folder.id}`,
@@ -179,83 +216,153 @@ const DroppableFolder = ({
     transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
     transition,
     opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 1 : "auto",
+    zIndex: isDragging ? 1000 : "auto",
   }
 
-  // Check if this folder is the current drop target
   const isDropTarget = dropTargetId === folder.id
 
   return (
-    <div ref={setNodeRef} style={style} className="mb-0.5">
-      <div
-        className={cn(
-          "flex items-center justify-between py-1 px-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 group transition-all duration-200",
-          isDropTarget && "bg-blue-50 dark:bg-gray-700 dark:text-blue-500 hover:bg-gray-100 border border-blue-200 shadow-sm",
-        )}
-        onClick={(e) => e.stopPropagation()} // Prevent click from bubbling
-      >
-        <div className="flex items-center gap-1.5 flex-1" onClick={onToggle}>
-          <ChevronRight
-            className={cn("h-3.5 w-3.5 text-gray-400 transition-transform", isExpanded && "transform rotate-90")}
-          />
+    <TooltipProvider>
+      <div ref={setNodeRef} style={style} className="mb-1">
+        <div
+          className={cn(
+            "group relative flex items-center gap-2 py-2 px-3 mx-1 rounded-lg hover:bg-accent/50 transition-all duration-200 border border-transparent",
+            isDropTarget && "bg-primary/10 border-primary/30 shadow-sm ring-1 ring-primary/20",
+            isDragging && "shadow-lg border-primary/30",
+          )}
+        >
+          {/* Expand/Collapse Button */}
+          {/* Icône dossier / chevron */}
+          <div
+            onClick={onToggle}
+            className="relative h-4 w-4 flex-shrink-0 cursor-pointer"
+            title={isExpanded ? 'Réduire' : 'Développer'}
+          >
+            {/* Dossier fermé (devient transparent au survol) */}
+            <Folder
+              className={cn(
+                'h-4 w-4 transition-opacity duration-200',
+                isDropTarget ? 'text-primary' : 'text-amber-500',
+                'group-hover:opacity-0',
+                isExpanded && 'hidden',
+              )}
+            />
+
+            {/* Dossier ouvert (affiché quand isExpanded) */}
+            <FolderOpen
+              className={cn(
+                'h-4 w-4 transition-opacity duration-200',
+                isDropTarget ? 'text-primary' : 'text-amber-500',
+                !isExpanded && 'hidden',
+                'group-hover:opacity-0',
+              )}
+            />
+
+            {/* Chevron : invisible → visible au hover (et pivoté si le dossier est ouvert) */}
+            <ChevronRight
+              className={cn(
+                'absolute inset-0 h-4 w-4 text-muted-foreground transition-opacity duration-200',
+                'opacity-0 group-hover:opacity-100',
+                isExpanded && 'rotate-90', // facultatif : 90 ° quand le dossier est ouvert
+              )}
+            />
+          </div>
+
+
+          {/* Drag Handle */}
           <div
             {...attributes}
             {...listeners}
-            className="cursor-grab active:cursor-grabbing p-0.5 -ml-1 opacity-0 group-hover:opacity-60"
+            className="cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-60 transition-opacity p-1 hover:bg-accent rounded"
+            title="Drag to move folder"
           >
-            <GripVertical className="h-3 w-3 text-gray-400" />
+            <GripVertical className="h-3 w-3 text-muted-foreground" />
           </div>
-          {isExpanded ? (
-            <FolderOpen className={cn("h-3.5 w-3.5", isDropTarget ? "text-blue-500" : "text-gray-500")} />
-          ) : (
-            <Folder className={cn("h-3.5 w-3.5", isDropTarget ? "text-blue-500" : "text-gray-500")} />
+
+          {/* Folder Name with Tooltip */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span
+                className={cn(
+                  "text-xs font-medium truncate flex-1 min-w-0 cursor-pointer",
+                  isDropTarget ? "text-primary font-semibold" : "text-foreground",
+                )}
+                onClick={onToggle}
+              >
+                {folder.name}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="max-w-xs">
+              <p className="break-words">{folder.name}</p>
+              {documentCount > 0 && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  {documentCount} document{documentCount !== 1 ? "s" : ""}
+                </p>
+              )}
+            </TooltipContent>
+          </Tooltip>
+
+          {/* Document Count Badge */}
+          {documentCount > 0 && (
+            <Badge variant="secondary" className="text-xs h-5 px-1.5 flex-shrink-0">
+              {documentCount}
+            </Badge>
           )}
-          <span className={cn("text-sm truncate", isDropTarget ? "text-blue-600 font-medium" : "text-gray-700")}>
-            {folder.name}
-          </span>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onAddDocument}
+              className="h-6 w-6 p-0 hover:bg-primary/10 hover:text-primary"
+              title="Add document to this folder"
+            >
+              <Plus className="h-3 w-3" />
+            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0 hover:bg-accent"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MoreHorizontal className="h-3 w-3 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={onAddDocument} className="text-xs">
+                  <FilePlus className="h-3 w-3 mr-2" />
+                  New Document
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onAddFolder} className="text-xs">
+                  <FolderPlus className="h-3 w-3 mr-2" />
+                  New Subfolder
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onRename} className="text-xs">
+                  <Edit className="h-3 w-3 mr-2" />
+                  Rename
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onDelete} className="text-xs text-destructive">
+                  <Trash className="h-3 w-3 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* Drop indicator */}
+          {isDropTarget && (
+            <div className="absolute inset-0 bg-primary/5 border-2 border-dashed border-primary rounded-lg pointer-events-none" />
+          )}
         </div>
 
-        <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onAddDocument}
-            className="h-6 w-6 p-0 hover:bg-blue-50 hover:text-blue-500"
-            title="Add document to this folder"
-          >
-            <Plus className="h-3 w-3 text-gray-500" />
-          </Button>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={(e) => e.stopPropagation()}>
-                <MoreHorizontal className="h-3.5 w-3.5 text-gray-500" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={onAddDocument} className="text-xs">
-                <FilePlus className="h-3.5 w-3.5 mr-2" />
-                New Document
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={onAddFolder} className="text-xs">
-                <FolderPlus className="h-3.5 w-3.5 mr-2" />
-                New Folder
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={onRename} className="text-xs">
-                <Edit className="h-3.5 w-3.5 mr-2" />
-                Rename
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={onDelete} className="text-xs text-red-600">
-                <Trash className="h-3.5 w-3.5 mr-2" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        {/* Children with improved indentation */}
+        {isExpanded && <div className="ml-6 mt-1 border-l border-border/50 pl-2">{children}</div>}
       </div>
-
-      {isExpanded && <div className={cn("ml-3", isDropTarget && "border-l-2 border-blue-100 pl-1")}>{children}</div>}
-    </div>
+    </TooltipProvider>
   )
 }
 
@@ -279,21 +386,21 @@ export function DocumentSidebar({
   const [newName, setNewName] = useState("")
   const [activeId, setActiveId] = useState<string | null>(null)
   const [activeItem, setActiveItem] = useState<any | null>(null)
-  const [dropTargetId, setDropTargetId] = useState<string | null>(null) // Declare dropTargetId here
+  const [dropTargetId, setDropTargetId] = useState<string | null>(null)
   const params = useParams()
   const dropTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Configure DnD sensors
+  // Configure DnD sensors with better touch support
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: {
-        distance: 8, // 8px movement before drag starts
+        distance: 8,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 250, // 250ms delay before drag starts on touch
-        tolerance: 5, // 5px movement tolerance
+        delay: 250,
+        tolerance: 5,
       },
     }),
   )
@@ -308,12 +415,11 @@ export function DocumentSidebar({
     enabled: !!params.boardId && !!currentWorkspace?.id,
   })
 
-  // Expand parent folders when a document is selected
+  // Auto-expand folders containing selected document
   useEffect(() => {
     if (selectedDocumentId && documentsData) {
       const selectedDoc = documentsData.documents.find((doc) => doc.id === selectedDocumentId)
       if (selectedDoc && selectedDoc.folderId) {
-        // Find all parent folders recursively
         const expandParentFolders = (folderId: string) => {
           setExpandedFolders((prev) => {
             const newSet = new Set(prev)
@@ -331,6 +437,17 @@ export function DocumentSidebar({
       }
     }
   }, [selectedDocumentId, documentsData])
+
+  // Helper function to count documents in a folder (including subfolders)
+  const getDocumentCount = (folderId: string): number => {
+    if (!documentsData) return 0
+
+    const directDocuments = documentsData.documents.filter((doc) => doc.folderId === folderId).length
+    const subfolders = documentsData.folders.filter((folder) => folder.parentId === folderId)
+    const subfolderDocuments = subfolders.reduce((count, subfolder) => count + getDocumentCount(subfolder.id), 0)
+
+    return directDocuments + subfolderDocuments
+  }
 
   const toggleFolder = (folderId: string, e: React.MouseEvent) => {
     e.stopPropagation()
@@ -370,6 +487,11 @@ export function DocumentSidebar({
         if (result.data?.id) {
           onSelectDocument(result.data.id)
         }
+
+        // Auto-expand the parent folder
+        if (selectedFolderId) {
+          setExpandedFolders((prev) => new Set(prev).add(selectedFolderId))
+        }
       }
     } catch (error) {
       toast.error("Failed to create document")
@@ -399,13 +521,9 @@ export function DocumentSidebar({
         setNewFolderName("")
         setIsCreateFolderOpen(false)
 
-        // Expand the parent folder if a subfolder was created
+        // Auto-expand the parent folder
         if (selectedFolderId) {
-          setExpandedFolders((prev) => {
-            const newSet = new Set(prev)
-            newSet.add(selectedFolderId)
-            return newSet
-          })
+          setExpandedFolders((prev) => new Set(prev).add(selectedFolderId))
         }
       }
     } catch (error) {
@@ -429,7 +547,6 @@ export function DocumentSidebar({
         await refetch()
         if (refetchDocuments) refetchDocuments()
 
-        // If the deleted document was selected, clear the selection
         if (selectedDocumentId === documentId) {
           onSelectDocument(null as any)
         }
@@ -455,7 +572,6 @@ export function DocumentSidebar({
         await refetch()
         if (refetchDocuments) refetchDocuments()
 
-        // If any document in the deleted folder was selected, clear the selection
         if (selectedDocumentId) {
           const selectedDoc = documentsData?.documents.find((doc) => doc.id === selectedDocumentId)
           if (
@@ -521,12 +637,10 @@ export function DocumentSidebar({
     }
   }
 
-  // Handle drag start
   const handleDragStart = (event: any) => {
     const { active } = event
     setActiveId(active.id)
 
-    // Extract the dragged item data
     if (active.id.startsWith("document-")) {
       const documentId = active.id.replace("document-", "")
       const document = documentsData?.documents.find((doc) => doc.id === documentId)
@@ -542,29 +656,26 @@ export function DocumentSidebar({
     }
   }
 
-  // Handle drag over
   const handleDragOver = (event: any) => {
     const { over } = event
 
     if (over) {
-      // Clear any existing timeout
       if (dropTimeoutRef.current) {
         clearTimeout(dropTimeoutRef.current)
       }
 
-      // If hovering over a folder, set it as the drop target and expand it after a delay
       if (over.id.startsWith("folder-")) {
         const folderId = over.id.replace("folder-", "")
         setDropTargetId(folderId)
 
-        // Auto-expand folder after hovering for a moment
+        // Auto-expand folder after hovering
         dropTimeoutRef.current = setTimeout(() => {
           setExpandedFolders((prev) => {
             const newSet = new Set(prev)
             newSet.add(folderId)
             return newSet
           })
-        }, 800) // 800ms delay before auto-expanding
+        }, 800)
       } else {
         setDropTargetId(over.id)
       }
@@ -573,16 +684,13 @@ export function DocumentSidebar({
     }
   }
 
-  // Handle drag end
   const handleDragEnd = async (event: any) => {
     const { active, over } = event
 
-    // Clear state
     setActiveId(null)
     setActiveItem(null)
     setDropTargetId(null)
 
-    // Clear any pending timeouts
     if (dropTimeoutRef.current) {
       clearTimeout(dropTimeoutRef.current)
       dropTimeoutRef.current = null
@@ -595,11 +703,9 @@ export function DocumentSidebar({
         const folderId = over.id.replace("folder-", "")
 
         try {
-          // Find the document
           const document = documentsData?.documents.find((doc) => doc.id === documentId)
           if (!document) return
 
-          // Update the document's folderId
           const result = await updateBoardDocument({
             id: documentId,
             title: document.title,
@@ -614,7 +720,6 @@ export function DocumentSidebar({
             await refetch()
             if (refetchDocuments) refetchDocuments()
 
-            // Expand the target folder
             setExpandedFolders((prev) => {
               const newSet = new Set(prev)
               newSet.add(folderId)
@@ -626,16 +731,14 @@ export function DocumentSidebar({
         }
       }
 
-      // Handle dropping a document to root (no folder)
+      // Handle dropping a document to root
       if (active.id.startsWith("document-") && over.id === "root-drop-area") {
         const documentId = active.id.replace("document-", "")
 
         try {
-          // Find the document
           const document = documentsData?.documents.find((doc) => doc.id === documentId)
           if (!document) return
 
-          // Update the document's folderId to null
           const result = await updateBoardDocument({
             id: documentId,
             title: document.title,
@@ -655,12 +758,11 @@ export function DocumentSidebar({
         }
       }
 
-      // Handle dropping a folder into another folder (nesting)
+      // Handle folder nesting
       if (active.id.startsWith("folder-") && over.id.startsWith("folder-")) {
         const sourceFolderId = active.id.replace("folder-", "")
         const targetFolderId = over.id.replace("folder-", "")
 
-        // Prevent dropping a folder into itself or its descendants
         const isDescendant = (parentId: string, childId: string): boolean => {
           if (parentId === childId) return true
 
@@ -676,11 +778,9 @@ export function DocumentSidebar({
         }
 
         try {
-          // Find the folder
           const folder = documentsData?.folders.find((f) => f.id === sourceFolderId)
           if (!folder) return
 
-          // Update the folder's parentId
           const result = await renameBoardFolder({
             id: sourceFolderId,
             name: folder.name,
@@ -695,7 +795,6 @@ export function DocumentSidebar({
             await refetch()
             if (refetchDocuments) refetchDocuments()
 
-            // Expand the target folder
             setExpandedFolders((prev) => {
               const newSet = new Set(prev)
               newSet.add(targetFolderId)
@@ -706,46 +805,15 @@ export function DocumentSidebar({
           toast.error("Failed to move folder")
         }
       }
-
-      // Handle dropping a folder to root
-      if (active.id.startsWith("folder-") && over.id === "root-drop-area") {
-        const folderId = active.id.replace("folder-", "")
-
-        try {
-          // Find the folder
-          const folder = documentsData?.folders.find((f) => f.id === folderId)
-          if (!folder) return
-
-          // Update the folder's parentId to null
-          const result = await renameBoardFolder({
-            id: folderId,
-            name: folder.name,
-            boardId: params.boardId as string,
-            workspaceId: currentWorkspace?.id as string,
-          })
-
-          if (result.error) {
-            toast.error(result.error)
-          } else {
-            toast.success("Folder moved to root")
-            await refetch()
-            if (refetchDocuments) refetchDocuments()
-          }
-        } catch (error) {
-          toast.error("Failed to move folder")
-        }
-      }
     }
   }
 
-  // Function to render folders and their contents recursively
   const renderFolderContents = (folderId: string | null, level = 0) => {
     if (!documentsData) return null
 
     const folders = documentsData.folders.filter((f) => f.parentId === folderId)
     const documents = documentsData.documents.filter((d) => d.folderId === folderId)
 
-    // Get all item IDs for this level for SortableContext
     const itemIds = [...folders.map((folder) => `folder-${folder.id}`), ...documents.map((doc) => `document-${doc.id}`)]
 
     return (
@@ -768,7 +836,8 @@ export function DocumentSidebar({
               setSelectedFolderId(folder.id)
               setIsCreateFolderOpen(true)
             }}
-            dropTargetId={dropTargetId} // Pass dropTargetId as a prop
+            dropTargetId={dropTargetId}
+            documentCount={getDocumentCount(folder.id)}
           >
             {renderFolderContents(folder.id, level + 1)}
           </DroppableFolder>
@@ -788,24 +857,25 @@ export function DocumentSidebar({
     )
   }
 
-  // Render the drag overlay
   const renderDragOverlay = () => {
     if (!activeItem) return null
 
     if (activeItem.type === "document") {
       return (
-        <div className="flex items-center gap-1.5 bg-background p-2 rounded-md shadow-lg border border-blue-200 max-w-[200px]">
-          <File className="h-4 w-4 text-blue-500" />
-          <span className="text-sm truncate text-gray-700 font-medium">{activeItem.data.title}</span>
+        <div className="flex items-center gap-2 bg-background p-3 rounded-lg shadow-xl border border-primary/30 max-w-[250px]">
+          <FileText className="h-4 w-4 text-blue-500 flex-shrink-0" />
+          <span className="text-sm font-medium truncate text-foreground">{activeItem.data.title}</span>
+          <Move className="h-3 w-3 text-muted-foreground flex-shrink-0" />
         </div>
       )
     }
 
     if (activeItem.type === "folder") {
       return (
-        <div className="flex items-center gap-1.5 bg-background p-2 rounded-md shadow-lg border border-blue-200 max-w-[200px]">
-          <Folder className="h-4 w-4 text-blue-500" />
-          <span className="text-sm truncate text-gray-700 font-medium">{activeItem.data.name}</span>
+        <div className="flex items-center gap-2 bg-background p-3 rounded-lg shadow-xl border border-primary/30 max-w-[250px]">
+          <Folder className="h-4 w-4 text-amber-500 flex-shrink-0" />
+          <span className="text-sm font-medium truncate text-foreground">{activeItem.data.name}</span>
+          <Move className="h-3 w-3 text-muted-foreground flex-shrink-0" />
         </div>
       )
     }
@@ -822,83 +892,115 @@ export function DocumentSidebar({
       onDragEnd={handleDragEnd}
       modifiers={[restrictToWindowEdges]}
     >
-      <div className="flex-1 overflow-y-auto">
-        <div className="flex items-center justify-between px-3 py-2">
+      <div className="flex flex-col h-full overflow-hidden">
+        {/* Header with action buttons */}
+        <div className="flex items-center justify-end p-1 border-b bg-background/50 backdrop-blur-sm">
           <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setSelectedFolderId(null)
-                setIsCreateFolderOpen(true)
-              }}
-              className="h-7 w-7 p-0"
-            >
-              <FolderPlus className="h-3.5 w-3.5 text-gray-500" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                if (onCreateDocument) {
-                  onCreateDocument()
-                } else {
-                  setSelectedFolderId(null)
-                  setIsCreateDocumentOpen(true)
-                }
-              }}
-              className="h-7 w-7 p-0"
-            >
-              <FilePlus className="h-3.5 w-3.5 text-gray-500" />
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedFolderId(null)
+                      setIsCreateFolderOpen(true)
+                    }}
+                    className="h-8 w-8 p-0"
+                  >
+                    <FolderPlus className="h-4 w-4 text-muted-foreground" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Create new folder</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      if (onCreateDocument) {
+                        onCreateDocument()
+                      } else {
+                        setSelectedFolderId(null)
+                        setIsCreateDocumentOpen(true)
+                      }
+                    }}
+                    className="h-8 w-8 p-0"
+                  >
+                    <FilePlus className="h-4 w-4 text-muted-foreground" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Create new document</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
 
-        <div className="px-1">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-20">
-              <Loader2 className="h-4 w-4 text-gray-400 animate-spin" />
-              <p className="text-xs text-gray-400 ml-2">Loading...</p>
-            </div>
-          ) : documentsData && (documentsData.folders.length > 0 || documentsData.documents.length > 0) ? (
-            <div
-              id="root-drop-area"
-              className={cn(
-                "min-h-[50px] rounded-md transition-colors p-1",
-                dropTargetId === "root-drop-area"
-                  ? "bg-blue-50 border-2 border-dashed border-blue-200"
-                  : "border-2 border-transparent",
-              )}
-            >
-              {/* Zone de dépôt racine avec indication visuelle */}
-              {activeId && (
-                <div className="text-xs text-blue-500 mb-2 font-medium flex items-center justify-center h-6 rounded bg-blue-50 opacity-70">
-                  <span>Déposer ici pour déplacer à la racine</span>
+        {/* Scrollable content area */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden">
+          <div className="p-2">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-32">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 text-muted-foreground animate-spin" />
+                  <p className="text-sm text-muted-foreground">Loading documents...</p>
                 </div>
-              )}
-              {renderFolderContents(null)}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-40 text-center p-4">
-              <File className="h-8 w-8 text-gray-300 mb-2" />
-              <p className="text-sm text-gray-500 mb-3">No documents yet</p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  if (onCreateDocument) {
-                    onCreateDocument()
-                  } else {
-                    setSelectedFolderId(null)
-                    setIsCreateDocumentOpen(true)
-                  }
-                }}
-                className="text-xs h-8"
+              </div>
+            ) : documentsData && (documentsData.folders.length > 0 || documentsData.documents.length > 0) ? (
+              <div
+                id="root-drop-area"
+                className={cn(
+                  "min-h-[100px] rounded-lg transition-all duration-200 p-2",
+                  dropTargetId === "root-drop-area"
+                    ? "bg-primary/5 border-2 border-dashed border-primary/30"
+                    : "border-2 border-transparent",
+                )}
               >
-                Create your first document
-              </Button>
-            </div>
-          )}
+                {/* Root drop indicator */}
+                {activeId && dropTargetId === "root-drop-area" && (
+                  <div className="text-xs text-primary mb-3 font-medium flex items-center justify-center h-8 rounded-md bg-primary/10 border border-primary/20">
+                    <Move className="h-3 w-3 mr-1" />
+                    <span>Drop here to move to root level</span>
+                  </div>
+                )}
+                {renderFolderContents(null)}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-48 text-center p-6">
+                <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+                  <FileText className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <h4 className="text-sm font-medium text-foreground mb-2">No documents yet</h4>
+                <p className="text-xs text-muted-foreground mb-4 max-w-[200px]">
+                  Create your first document or folder to get started organizing your content.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (onCreateDocument) {
+                      onCreateDocument()
+                    } else {
+                      setSelectedFolderId(null)
+                      setIsCreateDocumentOpen(true)
+                    }
+                  }}
+                  className="text-xs h-8"
+                >
+                  <FilePlus className="h-3 w-3 mr-1" />
+                  Create Document
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Create Document Dialog */}
@@ -909,13 +1011,18 @@ export function DocumentSidebar({
             </DialogHeader>
             <div className="py-4">
               <Input
-                placeholder="Document Title"
+                placeholder="Enter document title..."
                 value={newDocumentTitle}
                 onChange={(e) => setNewDocumentTitle(e.target.value)}
                 className="mb-4"
                 autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleCreateDocument()
+                  }
+                }}
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 {selectedFolderId
                   ? "This document will be created in the selected folder."
                   : "This document will be created at the root level."}
@@ -925,8 +1032,8 @@ export function DocumentSidebar({
               <Button variant="outline" size="sm" onClick={() => setIsCreateDocumentOpen(false)}>
                 Cancel
               </Button>
-              <Button size="sm" onClick={handleCreateDocument}>
-                Create
+              <Button size="sm" onClick={handleCreateDocument} disabled={!newDocumentTitle.trim()}>
+                Create Document
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -940,13 +1047,18 @@ export function DocumentSidebar({
             </DialogHeader>
             <div className="py-4">
               <Input
-                placeholder="Folder Name"
+                placeholder="Enter folder name..."
                 value={newFolderName}
                 onChange={(e) => setNewFolderName(e.target.value)}
                 className="mb-4"
                 autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleCreateFolder()
+                  }
+                }}
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 {selectedFolderId
                   ? "This folder will be created as a subfolder."
                   : "This folder will be created at the root level."}
@@ -956,8 +1068,8 @@ export function DocumentSidebar({
               <Button variant="outline" size="sm" onClick={() => setIsCreateFolderOpen(false)}>
                 Cancel
               </Button>
-              <Button size="sm" onClick={handleCreateFolder}>
-                Create
+              <Button size="sm" onClick={handleCreateFolder} disabled={!newFolderName.trim()}>
+                Create Folder
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -971,17 +1083,22 @@ export function DocumentSidebar({
             </DialogHeader>
             <div className="py-4">
               <Input
-                placeholder={itemToRename?.type === "document" ? "Document Title" : "Folder Name"}
+                placeholder={itemToRename?.type === "document" ? "Enter document title..." : "Enter folder name..."}
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleRenameItem()
+                  }
+                }}
               />
             </div>
             <DialogFooter>
               <Button variant="outline" size="sm" onClick={() => setIsRenameDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button size="sm" onClick={handleRenameItem}>
+              <Button size="sm" onClick={handleRenameItem} disabled={!newName.trim()}>
                 Rename
               </Button>
             </DialogFooter>

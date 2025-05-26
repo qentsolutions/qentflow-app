@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "@/lib/fetcher";
 import { Skeleton } from "@/components/ui/skeleton";
 import DocumentEditor from "../../components/board-documents/document-editor";
 
-export default function DocumentDynamic({ params }: any) {
+export default function DocumentDynamic() {
   const router = useRouter();
+  const params = useParams();
+
   const documentId = params.documentId as string;
   const boardId = params.boardId as string;
   const workspaceId = params.workspaceId as string;
@@ -19,7 +20,7 @@ export default function DocumentDynamic({ params }: any) {
     enabled: !!documentId && !!boardId,
   });
 
-  if (isDocumentLoading) { 
+  if (isDocumentLoading) {
     return (
       <div className="flex-1 p-6">
         <Skeleton className="h-10 w-1/3 mb-6" />
@@ -38,7 +39,7 @@ export default function DocumentDynamic({ params }: any) {
 
   return (
     <div className="flex-1 overflow-y-auto">
-      <DocumentEditor document={document} boardId={boardId} workspaceId={workspaceId} />
+      <DocumentEditor params={{ documentId, boardId, workspaceId }} />
     </div>
   );
 }
